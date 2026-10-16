@@ -85,7 +85,17 @@ INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/shock", Init_ShockVoiceSet);
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/shock", Init_Shock);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/shock", Shock_SetShockVoiceSet);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/shock", Shock_SetShockVoiceSet);
+s32 Shock_SetShockVoiceSet(u32 id, ShockVoiceSet* vs)
+{
+    s32 ret = -1;
+    if (id < D_40045818->count)
+    {
+        D_40045818->table[id] = vs;
+        ret = id;
+    }
+    return ret;
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/shock", Init_Player);
 void Init_Player(ShockPlayer* arg0)
