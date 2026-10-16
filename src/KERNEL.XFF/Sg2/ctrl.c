@@ -37,7 +37,14 @@ s32 Sg2CtrlEntryTickProc(void (*proc)(void))
     return ret;
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ctrl", Sg2CtrlEntryTickProcById);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ctrl", Sg2CtrlEntryTickProcById);
+s32 Sg2CtrlEntryTickProcById(s32 id, void (*proc)(void))
+{
+    if (D_400F8EC0[id].proc != func_40030D00) return -1;
+    D_400F8EC0[id].proc = proc;
+    D_400F8EC0[id].count = 0;
+    return id;
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ctrl", Sg2CtrlRemoveTickProc);
 s32 Sg2CtrlRemoveTickProc(void (*proc)(void))
@@ -106,4 +113,15 @@ s32 Sg2CtrlGetTickTime(void)
     return D_400F8F40;
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ctrl", Sg2CtrlInit);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ctrl", Sg2CtrlInit);
+s32 Sg2CtrlInit(void)
+{
+    s32 i;
+    for (i = 0; i < 16; i++)
+    {
+        D_400F8EC0[i].proc = func_40030D00;
+        D_400F8EC0[i].count = 0;
+    }
+    Sg2CtrlSetTickTime(0);
+    return 0;
+}
