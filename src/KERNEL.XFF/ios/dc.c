@@ -77,7 +77,14 @@ void iosSetDC(DC *dc)
     }
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dc", iosPushDC);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dc", iosPushDC);
+void iosPushDC(DC *dc)
+{
+    D_40092288[D_40045A08] = dc;
+    D_40045A08++;
+    iosDlChainTailCurrent(dc);
+    D_40045A00 = dc;
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dc", iosPopDC);
 void iosPopDC(void)
