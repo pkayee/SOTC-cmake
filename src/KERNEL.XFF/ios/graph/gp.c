@@ -13,6 +13,12 @@ extern void iosDlSwap();
 extern void iosDlTrans();
 extern void iosSyncV(s32);
 extern void iosSyncPath(s32, s32);
+extern void iosDebPcVsyncCounterCheck(void);
+extern void waitVscheduler(void);
+extern void iosPushVu0Registers(void);
+extern void iosPopVu0Registers(void);
+extern s32 iosCheckDrawFinish(void);
+extern volatile s64* iosGetPacketPtrPath1();
 
 extern void InitDL(s32, s32);
 extern void iosSetScreenEnv(s32, s32, s32, s32);
@@ -47,6 +53,10 @@ extern s32 D_40045AF8;
 
 
 // .bss
+extern volatile struct { char pad[0xA0]; s32 unkA0; s32 unkA4; } D_40092BD0;
+extern s16 D_40045A50, D_40045A54, D_40045A58;
+extern void iosInitDC();
+extern void isysSleepSubThread();
 extern volatile s64 D_40092C90;
 extern iosThread* D_40092C98;
 extern s32 D_40092CA0;
@@ -65,7 +75,22 @@ void func_400286E8();
 
 
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gp", InitGp);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gp", InitGp);
+void InitGp(void)
+{
+    s16 a;
+    s16 b;
+    s16 c;
+
+    iosInitDC();
+    a = D_40045A50;
+    b = D_40045A54;
+    c = D_40045A58;
+    D_40092BD0.unkA0 = 1;
+    D_40092BD0.unkA4 = 0;
+    *GS_CSR = 0x200;
+    sceGsResetGraph(0, a & 1, b, c & 1);
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gp", iosWaitDMA);
 s32 iosWaitDMA(void)
@@ -218,7 +243,6 @@ s32 iosSetVSchedulerFunc(void* arg0)
 }
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gp", iosWaitGPFinish);
-
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gp", func_40028600);
 s32 func_40028600(void)
 {
@@ -250,8 +274,8 @@ void iFinish(void)
     D_40045AC0 = 1;
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gp", func_400286E8);
-/*void func_400286E8(void)
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gp", func_400286E8);
+void func_400286E8(void)
 {
     while(1)
     {
@@ -283,14 +307,11 @@ INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gp", func_400286E8);
         }
         iosPopVu0Registers();
     }
-}*/
+}
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gp", gsRegBegin);
-
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gp", gsRegEnd);
-
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gp", gsRegEndWithPtr);
-
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gp", gsReglistBegin);
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gp", gsReglistEnd);
@@ -327,6 +348,5 @@ void gsReglist(void)
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gp", iosTransTex);
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gp", getTWH);
-
 
 
