@@ -57,8 +57,8 @@ segments:
       align: 8
       subsegments:
         # file data
-        - [ 0x21A0, c, ios/assert ] # _iosAssert
-        - [ 0x21d0, c, ios/cd ]
+        - [ 0x21A0, c, ios/assert, "-O2 -fno-strict-aliasing" ] # _iosAssert
+        - [ 0x21d0, c, ios/cd, "-O2 -fno-strict-aliasing" ]
         #- [ 0x40012418, c,  ] # iosIopRead
         #- [ 0x40012600, c,  ] # iosCdStStart
         #- [ 0x40012630, c,  ] # iosCdStStop
@@ -69,17 +69,17 @@ segments:
         #- [ 0x400127D8, c,  ] # iosCdSetMode
         #- [ 0x40012808, c,  ] # iosCdStInit
         #- [ 0x400128E8, c,  ] # iosCdInit
-        - [ 0x2948, c, ios/pc ] # iosInitDebPc
+        - [ 0x2948, c, ios/pc, "-O2 -fno-strict-aliasing" ] # iosInitDebPc
         #- [ 0x40012950, c,  ] # iosStopPc
         #- [ 0x40012958, c,  ] # iosDebPcVsyncCounterCheck
         #- [ 0x40012960, c,  ] # iosGetCnt0Pc
         #- [ 0x40012968, c,  ] # iosGetCnt1Pc
         #- [ 0x40012970, c,  ] # InitDebPc
-        - [ 0x2978, c, ios/timer ] # iosWaitIdleThread
+        - [ 0x2978, c, ios/timer, "-O2 -fno-strict-aliasing" ] # iosWaitIdleThread
         #- [ 0x400129A0, c,  ] # iosCreateIdleThread
         #- [ 0x400129F8, c,  ] # iosGetClock
         #- [ 0x40012A08, c,  ] # iosGetClockSecond
-        - [ 0x2B08, c, ios/system ] # iosInit
+        - [ 0x2B08, c, ios/system, "-O2 -fno-strict-aliasing" ] # iosInit
         #- [ 0x40012B40, c,  ] # iosAddIntcHandler
         #- [ 0x40012C00, c,  ] # iosCreateSema
         #- [ 0x40012C40, c,  ] # iosDeleteSema
@@ -95,7 +95,7 @@ segments:
         #- [ 0x400130E0, c,  ] # iosEE2IopRequest
         #- [ 0x40013150, c,  ] # iosEE2IopEndChk
         #- [ 0x40013158, c,  ] # iosCreateIopMgr
-        - [ 0x3160, c, ios/memory ]
+        - [ 0x3160, c, ios/memory, "-O2 -fno-strict-aliasing" ]
         #- [ 0x400141B8, c,  ] # iosMallocInGarbagePtn
         #- [ 0x400157A0, c,  ] # iosWaitMalloc
         #- [ 0x400157C0, c,  ] # iosSignalMalloc
@@ -116,7 +116,7 @@ segments:
         #- [ 0x40015EB0, c,  ] # iosDebugPartitionFileDump
         #- [ 0x40015F38, c,  ] # addMemoryDebugCallback
         #- [ 0x40015F48, c,  ] # getMemorySafetyLockFlag
-        - [ 0x5F88, c, ios/mc ] # iosMcInit
+        - [ 0x5F88, c, ios/mc, "-O2 -fno-strict-aliasing" ] # iosMcInit
         #- [ 0x40016080, c,  ] # iosMcGetInfo
         #- [ 0x400161A8, c,  ] # iosMcChDir
         #- [ 0x40016250, c,  ] # iosMcMkDir
@@ -127,11 +127,11 @@ segments:
         #- [ 0x40016638, c,  ] # iosMcFormat
         #- [ 0x40016680, c,  ] # iosMcUnformat
         #- [ 0x400166C8, c,  ] # iosMcGetDir
-        - [ 0x6850, c, ios/message ] # iosSendMsg
+        - [ 0x6850, c, ios/message, "-O2 -fno-strict-aliasing" ] # iosSendMsg
         #- [ 0x400169C8, c,  ] # iosRecvMsg
         #- [ 0x40016B40, c,  ] # iosInitMessageSystem
         #- [ 0x40016B48, c,  ] # iosCreateMsgQueue
-        - [ 0x6c10, c, ios/net ]
+        - [ 0x6c10, c, ios/net, "-O2 -fno-strict-aliasing" ]
         #- [ 0x40016EA8, c,  ] # iosNetRecvMsg
         #- [ 0x40017050, c,  ] # InitNet
         #- [ 0x400171C0, c,  ] # iosNetRecv
@@ -139,7 +139,7 @@ segments:
         #- [ 0x400173D8, c,  ] # iosNetRecvMsgWithStateCallback
         #- [ 0x400175A0, c,  ] # iosNetClose
         #- [ 0x40017638, c,  ] # iosNetOpen
-        - [ 0x7700, c, ios/pad ] # iosPadTickProc
+        - [ 0x7700, c, ios/pad, "-O2 -fno-strict-aliasing" ] # iosPadTickProc
         #- [ 0x400178E8, c,  ] # iosPadGetXZInputL
         #- [ 0x40017AE0, c,  ] # iosPadGetXZInputLwithThreshold
         #- [ 0x40017CC8, c,  ] # iosPadGetXZInputLwithThresholdIndepAxis
@@ -148,14 +148,14 @@ segments:
         #- [ 0x40018040, c,  ] # iosPadRead
         #- [ 0x40018130, c,  ] # iosPadChkConnect
         #- [ 0x40018158, c,  ] # iosPadInit
-        - [ 0x81B0, c, ios/print ] # iosSPrintf
+        - [ 0x81B0, c, ios/print, "-O2 -fno-strict-aliasing" ] # iosSPrintf
         #- [ 0x40018208, c,  ] # iosUsbSerialPrintf
         #- [ 0x40018278, c,  ] # iosCreatePrintMgr
         #- [ 0x40018280, c,  ] # iosGetPrintfMode
-        - [ 0x8290, c, ios/srp ] # iosSrpWaitDMA
+        - [ 0x8290, c, ios/srp, "-O2 -fno-strict-aliasing" ] # iosSrpWaitDMA
         #- [ 0x400182A8, c,  ] # iosMemToSprDmaAdrCopy
         #- [ 0x40018310, c,  ] # iosSprToMemDmaAdrCopy
-        - [ 0x8378, c, ios/thread ] # iosCreateThread
+        - [ 0x8378, c, ios/thread, "-O2 -fno-strict-aliasing" ] # iosCreateThread
         #- [ 0x40018698, c,  ] # iosInitThreadSystem
         #- [ 0x400187F0, c,  ] # iosGetThread
         #- [ 0x40018828, c,  ] # iosCreateThreadS
@@ -167,11 +167,11 @@ segments:
         #- [ 0x40018A18, c,  ] # iosGetThreadPriority
         #- [ 0x40018A58, c,  ] # iosDeleteThread
         #- [ 0x40018AD0, c,  ] # iosCallBackThreadMgr
-        - [ 0x8B30, c, ios/kernel ] # ioskernel
+        - [ 0x8B30, c, ios/kernel, "-O2 -fno-strict-aliasing" ] # ioskernel
         #- [ 0x40018CA0, c,  ] # iosJumpRecoverPoint
         #- [ 0x40018D18, c,  ] # iosResetKernel
-        - [ 0x8D80, c, ios/demo ] # endSCEDemo
-        - [ 0x8d88, c, ios/shock ]
+        - [ 0x8D80, c, ios/demo, "-O2 -fno-strict-aliasing" ] # endSCEDemo
+        - [ 0x8d88, c, ios/shock, "-O2 -fno-strict-aliasing" ]
         #- [ 0x400194A8, c,  ] # Init_ShockVoiceSet
         #- [ 0x400194E0, c,  ] # Init_Shock
         #- [ 0x400195A0, c,  ] # Shock_SetShockVoiceSet
@@ -180,7 +180,7 @@ segments:
         #- [ 0x40019628, c,  ] # Shock_Request
         #- [ 0x400196C8, c,  ] # Shock_Decode
         #- [ 0x400197F8, c,  ] # Shock_SetMotor
-        - [ 0x99b0, c, ios/isys/module ]
+        - [ 0x99b0, c, ios/isys/module, "-O2 -fno-strict-aliasing" ]
         #- [ 0x4001A4B0, c,  ] # isysMoveModuleObj
         #- [ 0x4001A5E8, c,  ] # isysCreateModuleObjExisted
         #- [ 0x4001A820, c,  ] # isysResolveAllModuleObjHasUndefSymbol
@@ -223,13 +223,13 @@ segments:
         #- [ 0x4001D288, c,  ] # DldExceptionByOriginAdr
         #- [ 0x4001D2E0, c,  ] # isysSearchCalledModuleFuncNameByAddr
         #- [ 0x4001D3A0, c,  ] # isysCreateExceptionThread
-        - [ 0xD3C0, c, ios/math/curve ] # iosCubicBezier
+        - [ 0xD3C0, c, ios/math/curve, "-O2 -fno-strict-aliasing" ] # iosCubicBezier
         #- [ 0x4001D400, c,  ] # iosCubicInterVectorXYZ
         #- [ 0x4001D468, c,  ] # iosFourthBezier
         #- [ 0x4001D4D0, c,  ] # iosCubicBezierVectorXYZ
-        - [ 0xD560, c, ios/math ] # InitMath
+        - [ 0xD560, c, ios/math, "-O2 -fno-strict-aliasing" ] # InitMath
         #- [ 0x4001DE18, c,  ] # CompareString16
-        - [ 0xD5e0, c, ios/math/matrix ]
+        - [ 0xD5e0, c, ios/math/matrix, "-O2 -fno-strict-aliasing" ]
         #- [ 0x4001DE48, c,  ] # iosInitCurrentMatrix
         #- [ 0x4001DE68, c,  ] # iosUnitCurrentMatrix
         #- [ 0x4001DE80, c,  ] # iosPushCurrentMatrix
@@ -285,7 +285,7 @@ segments:
         #- [ 0x4001F320, c,  ] # iosGetXDirXYZFromMatrix
         #- [ 0x4001F338, c,  ] # iosFmodf
         #- [ 0x4001F350, c,  ] # iosRotTransCurrentMatrix
-        - [ 0xF3B0, c, ios/math/mvec ] # iosMvecZero
+        - [ 0xF3B0, c, ios/math/mvec, "-O2 -fno-strict-aliasing" ] # iosMvecZero
         #- [ 0x4001F3C0, c,  ] # iosMvecAllOnes
         #- [ 0x4001F3D0, c,  ] # iosMvecAllOne
         #- [ 0x4001F3E0, c,  ] # iosAddMvec
@@ -310,9 +310,9 @@ segments:
         #- [ 0x4001FA18, c,  ] # iosFvecToICol
         #- [ 0x4001FA60, c,  ] # iosIColToMvecSl
         #- [ 0x4001FA90, c,  ] # iosIColToFvec
-        - [ 0xFAD8, c, ios/math/power ] # iosPowf
+        - [ 0xFAD8, c, ios/math/power, "-O2 -fno-strict-aliasing" ] # iosPowf
         #- [ 0x4001FAF0, c,  ] # iosFastPowf
-        - [ 0xFB08, c, ios/math/quat ] # GetDifferencialQuaternionWithNoRegularize
+        - [ 0xFB08, c, ios/math/quat, "-O2 -fno-strict-aliasing" ] # GetDifferencialQuaternionWithNoRegularize
         #- [ 0x4001FE98, c,  ] # GetEulerYXZFromQuaternion
         #- [ 0x400201A8, c,  ] # GetEulerZXYFromQuaternion
         #- [ 0x400204B8, c,  ] # GetEulerXYZFromQuaternion
@@ -365,7 +365,7 @@ segments:
         #- [ 0x40023088, c,  ] # GetQuaternionByDegEulerYXZ
         #- [ 0x40023298, c,  ] # GetQuaternionAxisRotInfo
         #- [ 0x40023318, c,  ] # SetQuaternionByCosineAxisRotateV
-        - [ 0x13390, c, ios/math/trig ] # iosGetAlignSinCosf
+        - [ 0x13390, c, ios/math/trig, "-O2 -fno-strict-aliasing" ] # iosGetAlignSinCosf
         #- [ 0x400233C8, c,  ] # iosGetSinCosf
         #- [ 0x40023518, c,  ] # iosGetSinf
         #- [ 0x40023638, c,  ] # iosGetCosf
@@ -386,7 +386,7 @@ segments:
         #- [ 0x40023B20, c,  ] # iosGetTableSin
         #- [ 0x40023B70, c,  ] # iosGetTableCos
         #- [ 0x40023BB8, c,  ] # InitTableSinCos
-        - [ 0x13CD0, c, ios/math/convert ] # iosFTOI15Vector
+        - [ 0x13CD0, c, ios/math/convert, "-O2 -fno-strict-aliasing" ] # iosFTOI15Vector
         #- [ 0x40023CE8, c,  ] # iosFTOI12Vector
         #- [ 0x40023D00, c,  ] # iosFTOI4Vector
         #- [ 0x40023D18, c,  ] # iosFTOI0Vector
@@ -395,9 +395,9 @@ segments:
         #- [ 0x40023D60, c,  ] # iosITOF4Vector
         #- [ 0x40023D78, c,  ] # iosITOF0Vector
         #- [ 0x40023D90, c,  ] # iosGetStabXZVector
-        - [ 0x13DC8, c, ios/math/random ] # iosInitRandom
+        - [ 0x13DC8, c, ios/math/random, "-O2 -fno-strict-aliasing" ] # iosInitRandom
         #- [ 0x40023DE8, c,  ] # iosGetRandom
-        - [ 0x13E38, c, ios/math/vector ] # iosGetRandomVector
+        - [ 0x13E38, c, ios/math/vector, "-O2 -fno-strict-aliasing" ] # iosGetRandomVector
         #- [ 0x40023E58, c,  ] # iosGetDRandomVector
         #- [ 0x40023E80, c,  ] # iosGetRandomVector0
         #- [ 0x40023E98, c,  ] # iosAbsVector
@@ -415,7 +415,7 @@ segments:
         #- [ 0x400241C0, c,  ] # iosITOF15VectorXYZ
         #- [ 0x400241D8, c,  ] # iosScaleColorTo255
         #- [ 0x400241F8, c,  ] # iosScaleColorToONE
-        - [ 0x14218, c, ios/dc ]
+        - [ 0x14218, c, ios/dc, "-O2 -fno-strict-aliasing" ]
         #- [ 0x40024528, c,  ] # iosCreateDC
         #- [ 0x40024600, c,  ] # iosReleaseDC
         #- [ 0x40024648, c,  ] # iosSetDCParam
@@ -435,7 +435,7 @@ segments:
         #- [ 0x40024A40, c,  ] # iosSetDCWithClear
         #- [ 0x40024AA0, c,  ] # _iosPushDC
         #- [ 0x40024B20, c,  ] # iosPushDCWithClear
-        - [ 0x14b90, c, ios/dl ]
+        - [ 0x14b90, c, ios/dl, "-O2 -fno-strict-aliasing" ]
         #- [ 0x40024EC0, c,  ] # iosDlPopLayer
         #- [ 0x400250D8, c,  ] # iosUsedPacketBufferSize
         #- [ 0x40025150, c,  ] # iosCreateIVArbitrationSema
@@ -464,7 +464,7 @@ segments:
         #- [ 0x40025A58, c,  ] # iosDlGetCreateAdrs
         #- [ 0x40025A80, c,  ] # iosAllocPacketPtrPath1UnCachedA
         #- [ 0x40025AA8, c,  ] # iosDlTransNow
-        - [ 0x15B08, c, ios/graph/gs ] # iosDumpDMAStatus
+        - [ 0x15B08, c, ios/graph/gs, "-O2 -fno-strict-aliasing" ] # iosDumpDMAStatus
         #- [ 0x40025E48, c,  ] # iosDumpVIF1Status
         #- [ 0x400261E8, c,  ] # iosDumpGIFStatus
         #- [ 0x400265E0, c,  ] # iosSyncPath
@@ -508,7 +508,7 @@ segments:
         #- [ 0x40027F68, c,  ] # iosSetScreenEnv
         #- [ 0x40028090, c,  ] # iosCheckDrawFinish
         #- [ 0x40028128, c,  ] # iosGsInitDC
-        - [ 0x18168, c, ios/graph/gp ] # InitGp
+        - [ 0x18168, c, ios/graph/gp, "-O2 -fno-strict-aliasing" ] # InitGp
         #- [ 0x400281D0, c,  ] # iosWaitDMA
         #- [ 0x400281F8, c,  ] # iosWaitVU1
         #- [ 0x40028220, c,  ] # getCRTCoffsetU
@@ -543,7 +543,7 @@ segments:
         #- [ 0x4002A968, c,  ] # gsReglist
         #- [ 0x4002A970, c,  ] # iosTransTex
         #- [ 0x4002AC10, c,  ] # getTWH
-        - [ 0x1AC70, c, ios/isys/obj ] # isysDeleteObjManager
+        - [ 0x1AC70, c, ios/isys/obj, "-O2 -fno-strict-aliasing" ] # isysDeleteObjManager
         #- [ 0x4002B360, c,  ] # isysAddGroupWithLinkParam
         #- [ 0x4002B5C0, c,  ] # isysAddGroupRelativeWithLinkParam
         #- [ 0x4002B808, c,  ] # _isysDeleteGroup
@@ -570,7 +570,7 @@ segments:
         #- [ 0x4002C7F0, c,  ] # isysGetGroupSrhNext
         #- [ 0x4002C828, c,  ] # isysObjWaitSema
         #- [ 0x4002C8A0, c,  ] # isysObjSignalSema
-        - [ 0x1C8f0, c, ios/sched ]
+        - [ 0x1C8f0, c, ios/sched, "-O2 -fno-strict-aliasing" ]
         #- [ 0x4002CB90, c,  ] # getVIntrCnt
         #- [ 0x4002CBA8, c,  ] # waitVscheduler
         #- [ 0x4002CBD0, c,  ] # bootSchedulerThread
@@ -583,7 +583,7 @@ segments:
         #- [ 0x4002CD58, c,  ] # iosGetIVSyncMode
         #- [ 0x4002CD68, c,  ] # vschedSetNextFrameForceGarbage
         #- [ 0x4002CD78, c,  ] # GetGarbageTime
-        - [ 0x1CF48, c, ios/isys/letter ] # isysInitISYSLetterObj
+        - [ 0x1CF48, c, ios/isys/letter, "-O2 -fno-strict-aliasing" ] # isysInitISYSLetterObj
         #- [ 0x4002CF70, c,  ] # isysFlushISYSLetterObj
         #- [ 0x4002CF88, c,  ] # isysGetLetterObj
         #- [ 0x4002CFC8, c,  ] # isysLetterObjDiscardLetterAll
@@ -614,7 +614,7 @@ segments:
         #- [ 0x4002D7E0, c,  ] # entry_new_letter_type
         #- [ 0x4002D820, c,  ] # init_letter_type_store
         #- [ 0x4002D858, c,  ] # get_letter_type
-        - [ 0x1D888, c, ios/font ]
+        - [ 0x1D888, c, ios/font, "-O2 -fno-strict-aliasing" ]
         #- [ 0x4002DA78, c,  ] # iosConvertStringSJIStoEUC
         #- [ 0x4002DBB8, c,  ] # iosConvertStringEUCtoSJIS
         #- [ 0x4002DC88, c,  ] # iosConvertStringEUCtoID
@@ -629,7 +629,7 @@ segments:
         #- [ 0x4002E310, c,  ] # iosEntryLocaleFontNoLoad
         #- [ 0x4002E368, c,  ] # iosGetFontInfo
         #- [ 0x4002E3F8, c,  ] # iosGet2ByteCharCode
-        - [ 0x1E410, c, ios/isys/subthread ] # _isysCreateSubMsgQueue
+        - [ 0x1E410, c, ios/isys/subthread, "-O2 -fno-strict-aliasing" ] # _isysCreateSubMsgQueue
         #- [ 0x4002E428, c,  ] # _isysRecvSubMsg
         #- [ 0x4002E498, c,  ] # _isysSendSubMsg
         #- [ 0x4002E518, c,  ] # InitSubThread
@@ -650,7 +650,7 @@ segments:
         #- [ 0x4002F248, c,  ] # isysGetSubThreadStackSize
         #- [ 0x4002F290, c,  ] # isysDumpSubThreadPC
         #- [ 0x4002F298, c,  ] # isysDebugSetSubThreadSleepProtection
-        - [ 0x1F2a8, c, ios/snd ]
+        - [ 0x1F2a8, c, ios/snd, "-O2 -fno-strict-aliasing" ]
         #- [ 0x4002F4F0, c,  ] # sndSepTickProc
         #- [ 0x4002F700, c,  ] # sndSepReq
         #- [ 0x4002F870, c,  ] # sndSepPlayerSrh
@@ -681,7 +681,7 @@ segments:
         #- [ 0x400300F8, c,  ] # soundGetRevMode
         #- [ 0x40030108, c,  ] # getSlotInfo
         #- [ 0x40030120, c,  ] # setSoundMode
-        - [ 0x20150, c, ios/iop ] # iosAllocIopHeap
+        - [ 0x20150, c, ios/iop, "-O2 -fno-strict-aliasing" ] # iosAllocIopHeap
         #- [ 0x400301A8, c,  ] # iosFreeIopHeap
         #- [ 0x400301F0, c,  ] # iosLoadIopModule
         #- [ 0x400302C0, c,  ] # iosGetIopTotalFreeMemSize
@@ -689,13 +689,13 @@ segments:
         #- [ 0x40030338, c,  ] # iosWaitIopSema
         #- [ 0x40030358, c,  ] # iosSignalIopSema
         #- [ 0x40030378, c,  ] # InitIopDev
-        - [ 0x203a8, c, ios/dev ]
+        - [ 0x203a8, c, ios/dev, "-O2 -fno-strict-aliasing" ]
         #- [ 0x400305C0, c,  ] # iosKeybdInit
         #- [ 0x400305F8, c,  ] # iosKeybdSetCallBackFunc
         #- [ 0x40030640, c,  ] # iosKeybdGetInfo
         #- [ 0x40030920, c,  ] # iosMouseInit
         #- [ 0x40030948, c,  ] # iosMouseSetCallBackFunc
-        - [ 0x20990, c, ios/hash ] # GetStrHashWorkBuffer
+        - [ 0x20990, c, ios/hash, "-O2 -fno-strict-aliasing" ] # GetStrHashWorkBuffer
         #- [ 0x400309A8, c,  ] # InitStrHash
         #- [ 0x40030A48, c,  ] # AddStrHashKey
         #- [ 0x40030A90, c,  ] # MakeStrHashValue
