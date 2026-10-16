@@ -46,7 +46,27 @@ void _isysCreateSubMsgQueue(s32 *q, s32 arg1, s32 arg2, s32 arg3)
     q[3] = 0;
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/subthread", _isysRecvSubMsg);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/subthread", _isysRecvSubMsg);
+s32 _isysRecvSubMsg(s32 *q, void *dst, s32 size)
+{
+    s32 rd;
+
+    if (q[0] != size)
+    {
+        return 0;
+    }
+    rd = q[4];
+    if (rd == q[3])
+    {
+        return 0;
+    }
+    memcpy(dst, (u8 *)q[1] + rd * q[0], size);
+    {
+        s32 n = q[4] + 1;
+        q[4] = (n < q[2]) ? n : 0;
+    }
+    return 1;
+}
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/subthread", _isysSendSubMsg);
 
