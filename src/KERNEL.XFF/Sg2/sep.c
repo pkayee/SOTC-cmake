@@ -2,20 +2,25 @@
 
 typedef struct
 {
+    s32 mod;         /* 0x10 */
+    s32 unk4;
+    s32 unk8;
+    s32 unkC;
+    s32 unk10[8];
+    u8 *data;        /* 0x40 */
+    s32 unk34;
+    u8 runStatus;    /* 0x48 */
+    u8 pad39[3];
+    s32 unk3C;
+} Sg2SepSub;
+
+typedef struct
+{
     s32 status;      /* 0x00 */
     s32 savedStatus; /* 0x04 */
     s32 unk8;
     s32 vab;         /* 0x0C */
-    s32 mod;         /* 0x10 */
-    s32 unk14;
-    s32 unk18;
-    s32 unk1C;
-    s32 unk20[8];
-    u8 *data;        /* 0x40 */
-    s32 unk44;
-    u8 runStatus;    /* 0x48 */
-    u8 pad49[3];
-    s32 unk4C;
+    Sg2SepSub sub;   /* 0x10 */
 } Sg2SepSlot;
 
 extern Sg2SepSlot D_40110B40[32];
@@ -50,13 +55,83 @@ s32 Sg2SepPlay(s32 vab, s32 prog, s32 flags, s32 arg3)
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/sep", Sg2SepPlaySelectCore);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/sep", Sg2SepStop);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/sep", Sg2SepStop);
+s32 Sg2SepStop(u32 id)
+{
+    s32 intr;
+    Sg2SepSlot *slot;
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/sep", Sg2SepStopSndOff);
+    if (id < 32)
+    {
+        slot = &D_40110B40[id];
+        if (slot->status > 0)
+        {
+            intr = DIntr();
+            slot->status = 2;
+            slot->vab = -1;
+            Sg2ModMidiout1(D_40110B40[id].sub.mod, 255);
+            Sg2ModMidiout1(D_40110B40[id].sub.mod, 64);
+            Sg2ModMidiout1(D_40110B40[id].sub.mod, 247);
+        }
+        if (intr != 0)
+        {
+            EIntr();
+        }
+    }
+    return 0;
+}
+
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/sep", Sg2SepStopSndOff);
+s32 Sg2SepStopSndOff(u32 id)
+{
+    s32 intr;
+    Sg2SepSlot *slot;
+
+    if (id < 32)
+    {
+        slot = &D_40110B40[id];
+        if (slot->status > 0)
+        {
+            intr = DIntr();
+            slot->status = 2;
+            slot->vab = -1;
+            Sg2ModMidiout1(D_40110B40[id].sub.mod, 255);
+            Sg2ModMidiout1(D_40110B40[id].sub.mod, 65);
+            Sg2ModMidiout1(D_40110B40[id].sub.mod, 247);
+            if (intr != 0)
+            {
+                EIntr();
+            }
+        }
+    }
+    return 0;
+}
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/sep", Sg2SepPause);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/sep", Sg2SepCont);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/sep", Sg2SepCont);
+s32 Sg2SepCont(u32 id)
+{
+    s32 intr;
+    Sg2SepSlot *slot;
+
+    if (id < 32)
+    {
+        slot = &D_40110B40[id];
+        if ((u32)(slot->status - 3) < 2)
+        {
+            intr = DIntr();
+            Sg2ModSetParam(D_40110B40[id].sub.mod, 128, 0, 0);
+            Sg2ModSetParam(D_40110B40[id].sub.mod, 16, 0, 0);
+            slot->status = slot->savedStatus;
+            if (intr != 0)
+            {
+                EIntr();
+            }
+        }
+    }
+    return 0;
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/sep", Sg2SepVabStopSndOff);
 s32 Sg2SepVabStopSndOff(s32 vab)
@@ -124,7 +199,7 @@ s32 Sg2SepMidiOut(u32 id, s32 len, u8 *data)
         {
             return -1;
         }
-        D_40111660[D_40111760++] = D_40110B40[id].mod;
+        D_40111660[D_40111760++] = D_40110B40[id].sub.mod;
         D_40111660[D_40111760++] = len;
         src = data;
         n = len;
@@ -152,7 +227,7 @@ s32 Sg2SepMasterVol(s32 vab, s32 vol)
     {
         if (p->vab == vab)
         {
-            Sg2ModSetParam(p->mod, 2, vol, 0);
+            Sg2ModSetParam(p->sub.mod, 2, vol, 0);
         }
     }
     return vol;
