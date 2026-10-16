@@ -1,6 +1,10 @@
 #include "common.h"
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/dsp", Sg2DmaInit);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/dsp", Sg2DmaInit);
+s32 Sg2DmaInit()
+{
+    return 0;
+}
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/dsp", Sg2DspEffectSetEndAdr);
 
