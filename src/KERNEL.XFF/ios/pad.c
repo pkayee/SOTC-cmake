@@ -44,11 +44,178 @@ void Shock_SetShockVoiceSet(s32, void *);
 void Init_Player(void *);
 void Init_Controler(void *);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/pad", iosPadTickProc);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/pad", iosPadTickProc);
+void iosPadTickProc(void)
+{
+    s32 i;
+    s32 j;
+    f32 now;
+    t_iosPadData *d;
+    t_padSysDataK *pad;
+    u8 *sh;
+    u32 mask;
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/pad", iosPadGetXZInputL);
+    now = iosGetSecondFromTCount(iosGetTCountExtension());
+    padSysTickProc();
+    for (i = 0; i < 2; i++)
+    {
+        d = &iosDefaultPadData[i];
+        pad = padSysGet(i, 0);
+        d->prev = d->cur;
+        d->cur = (pad->buttonsLo << 8) | pad->buttonsHi;
+        d->repeat = 0;
+        d->pressed = (d->cur ^ d->prev) & d->cur;
+        d->released = (d->cur ^ d->prev) & ~d->cur;
+        for (j = 0; j < 16; j++)
+        {
+            mask = 1 << j;
+            if (*(volatile u32 *)&d->pressed & mask)
+            {
+                d->timer[j] = now + 0.4f;
+            }
+            else if ((d->cur & mask) && d->timer[j] < now)
+            {
+                d->timer[j] = now + 0.08f;
+            }
+            else
+            {
+                continue;
+            }
+            d->repeat |= mask;
+        }
+        d->unk56 = pad->analogLVer;
+        d->unk57 = pad->analogLHor;
+        d->unk54 = pad->analogRVer;
+        d->unk55 = pad->analogRHor;
+        sh = d->shock;
+        Shock_Decode(sh, sh + 0x10, sh + 0x11);
+        if (pad->pad2State == 1)
+        {
+            Shock_SetMotor(sh[0x10], sh[0x11], sh + 0x14, i, 0);
+            padSysVibSetAcrParam(pad, sh + 0x18);
+        }
+    }
+    if (D_40045718 != 0)
+    {
+        D_40045718();
+    }
+}
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/pad", iosPadGetXZInputLwithThreshold);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/pad", iosPadGetXZInputL);
+void iosPadGetXZInputL(f32 *arg0, t_iosPadData *arg1)
+{
+    f32 x;
+    f32 z;
+    f32 len;
+    f32 sq;
+    f32 inv;
+    f32 nx;
+    f32 nz;
+    f32 ax;
+    f32 az;
+    f32 dx;
+    f32 dz;
+
+    x = arg1->unk54 * 0.007843137f - 1.0f;
+    arg0[1] = 0.0f;
+    arg0[0] = x;
+    z = arg1->unk55 * 0.007843137f - 1.0f;
+    arg0[3] = 0.0f;
+    sq = x * x + z * z;
+    arg0[2] = z;
+    if (sq < 0.4f * 0.4f)
+    {
+        arg0[2] = arg0[1];
+        arg0[0] = arg0[1];
+        return;
+    }
+    asm("sqrt.s %0,%1" : "=f"(len) : "f"(sq));
+    inv = 1.0f / len;
+    nz = z * inv;
+    nx = x * inv;
+    if (len > 1.0f)
+    {
+        arg0[0] = nx;
+        arg0[2] = nz;
+        return;
+    }
+    ax = nx;
+    if (ax < arg0[1])
+    {
+        ax = -ax;
+    }
+    az = nz;
+    if (az < arg0[1])
+    {
+        az = -az;
+    }
+    dx = ax * 0.4f;
+    dz = az * 0.4f;
+    arg0[0] = ((x < arg0[1] ? -x : x) < dx)
+        ? 0.0f
+        : (arg0[0] < 0.0f ? -1.0f : 1.0f) * ((((arg0[0] < 0.0f) ? -arg0[0] : arg0[0]) - dx) * (ax / (ax - dx)));
+    arg0[2] = ((arg0[2] < 0.0f ? -arg0[2] : arg0[2]) < dz)
+        ? 0.0f
+        : (arg0[2] < 0.0f ? -1.0f : 1.0f) * ((((arg0[2] < 0.0f) ? -arg0[2] : arg0[2]) - dz) * (az / (az - dz)));
+}
+
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/pad", iosPadGetXZInputLwithThreshold);
+void iosPadGetXZInputLwithThreshold(f32 *arg0, t_iosPadData *arg1, f32 threshold)
+{
+    f32 x;
+    f32 z;
+    f32 len;
+    f32 sq;
+    f32 inv;
+    f32 nx;
+    f32 nz;
+    f32 ax;
+    f32 az;
+    f32 dx;
+    f32 dz;
+
+    x = arg1->unk54 * 0.007843137f - 1.0f;
+    arg0[1] = 0.0f;
+    arg0[0] = x;
+    z = arg1->unk55 * 0.007843137f - 1.0f;
+    arg0[3] = 0.0f;
+    sq = x * x + z * z;
+    arg0[2] = z;
+    if (sq < threshold * threshold)
+    {
+        arg0[2] = arg0[1];
+        arg0[0] = arg0[1];
+        return;
+    }
+    asm("sqrt.s %0,%1" : "=f"(len) : "f"(sq));
+    inv = 1.0f / len;
+    nz = z * inv;
+    nx = x * inv;
+    if (len > 1.0f)
+    {
+        arg0[0] = nx;
+        arg0[2] = nz;
+        return;
+    }
+    ax = nx;
+    if (ax < arg0[1])
+    {
+        ax = -ax;
+    }
+    az = nz;
+    if (az < arg0[1])
+    {
+        az = -az;
+    }
+    dx = threshold * ax;
+    dz = threshold * az;
+    arg0[0] = ((x < arg0[1] ? -x : x) < dx)
+        ? 0.0f
+        : (arg0[0] < 0.0f ? -1.0f : 1.0f) * ((((arg0[0] < 0.0f) ? -arg0[0] : arg0[0]) - dx) * (ax / (ax - dx)));
+    arg0[2] = ((arg0[2] < 0.0f ? -arg0[2] : arg0[2]) < dz)
+        ? 0.0f
+        : (arg0[2] < 0.0f ? -1.0f : 1.0f) * ((((arg0[2] < 0.0f) ? -arg0[2] : arg0[2]) - dz) * (az / (az - dz)));
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/pad", iosPadGetXZInputLwithThresholdIndepAxis);
 void iosPadGetXZInputLwithThresholdIndepAxis(f32 *arg0, t_iosPadData *arg1, f32 threshold)
@@ -70,7 +237,63 @@ void iosPadGetXZInputLwithThresholdIndepAxis(f32 *arg0, t_iosPadData *arg1, f32 
         : (arg0[2] < 0.0f ? -1.0f : 1.0f) * ((((arg0[2] < 0.0f) ? -arg0[2] : arg0[2]) - threshold) * (1.0f / (1.0f - threshold)));
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/pad", iosPadGetXZInputR);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/pad", iosPadGetXZInputR);
+void iosPadGetXZInputR(f32 *arg0, t_iosPadData *arg1)
+{
+    f32 x;
+    f32 z;
+    f32 len;
+    f32 sq;
+    f32 inv;
+    f32 nx;
+    f32 nz;
+    f32 ax;
+    f32 az;
+    f32 dx;
+    f32 dz;
+
+    x = arg1->unk56 * 0.007843137f - 1.0f;
+    arg0[1] = 0.0f;
+    arg0[0] = x;
+    z = arg1->unk57 * 0.007843137f - 1.0f;
+    arg0[3] = 0.0f;
+    sq = x * x + z * z;
+    arg0[2] = z;
+    if (sq < 0.4f * 0.4f)
+    {
+        arg0[2] = arg0[1];
+        arg0[0] = arg0[1];
+        return;
+    }
+    asm("sqrt.s %0,%1" : "=f"(len) : "f"(sq));
+    inv = 1.0f / len;
+    nz = z * inv;
+    nx = x * inv;
+    if (len > 1.0f)
+    {
+        arg0[0] = nx;
+        arg0[2] = nz;
+        return;
+    }
+    ax = nx;
+    if (ax < arg0[1])
+    {
+        ax = -ax;
+    }
+    az = nz;
+    if (az < arg0[1])
+    {
+        az = -az;
+    }
+    dx = ax * 0.4f;
+    dz = az * 0.4f;
+    arg0[0] = ((x < arg0[1] ? -x : x) < dx)
+        ? 0.0f
+        : (arg0[0] < 0.0f ? -1.0f : 1.0f) * ((((arg0[0] < 0.0f) ? -arg0[0] : arg0[0]) - dx) * (ax / (ax - dx)));
+    arg0[2] = ((arg0[2] < 0.0f ? -arg0[2] : arg0[2]) < dz)
+        ? 0.0f
+        : (arg0[2] < 0.0f ? -1.0f : 1.0f) * ((((arg0[2] < 0.0f) ? -arg0[2] : arg0[2]) - dz) * (az / (az - dz)));
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/pad", iosPadEntryTickFunc);
 void iosPadEntryTickFunc(void (*arg0)(void))
