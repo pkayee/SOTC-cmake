@@ -79,3 +79,4 @@ permuter_settings.toml
 
 compile_commands.json
 /__pycache__
+.score/
