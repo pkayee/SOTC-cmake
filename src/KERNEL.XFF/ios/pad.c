@@ -1,19 +1,102 @@
 #include "common.h"
 
+typedef struct
+{
+    u8 unk0[0x104];
+    u8 buttonsLo;
+    u8 buttonsHi;
+    u8 analogLVer;
+    u8 analogLHor;
+    u8 analogRVer;
+    u8 analogRHor;
+    u8 unk10A[0x118 - 0x10A];
+    s32 pad2State;
+} t_padSysDataK;
+
+typedef struct
+{
+    u32 cur;       // 00
+    u32 prev;      // 04
+    u32 pressed;   // 08
+    u32 released;  // 0C
+    u32 repeat;    // 10
+    f32 timer[16]; // 14
+    u8 unk54;      // 54
+    u8 unk55;      // 55
+    u8 unk56;      // 56
+    u8 unk57;      // 57
+    u8 shock[0x20]; // 58
+} t_iosPadData;
+
+extern t_iosPadData iosDefaultPadData[];
+extern void (*D_40045718)(void);
+extern void *ShockVoiceSetCommon;
+extern u8 D_4004578C[];
+
+t_padSysDataK *padSysGet(s32 padId, s32 arg1);
+#include "ios/system.h"
+void padSysTickProc(void);
+void Shock_Decode(void *, void *, void *);
+void Shock_SetMotor(s32, s32, void *, s32, s32);
+void padSysVibSetAcrParam(t_padSysDataK *, void *);
+void Init_Shock(void);
+void Shock_SetShockVoiceSet(s32, void *);
+void Init_Player(void *);
+void Init_Controler(void *);
+
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/pad", iosPadTickProc);
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/pad", iosPadGetXZInputL);
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/pad", iosPadGetXZInputLwithThreshold);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/pad", iosPadGetXZInputLwithThresholdIndepAxis);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/pad", iosPadGetXZInputLwithThresholdIndepAxis);
+void iosPadGetXZInputLwithThresholdIndepAxis(f32 *arg0, t_iosPadData *arg1, f32 threshold)
+{
+    f32 x;
+    f32 z;
+
+    x = arg1->unk54 * 0.007843137f - 1.0f;
+    arg0[1] = 0.0f;
+    arg0[0] = x;
+    z = arg1->unk55 * 0.007843137f - 1.0f;
+    arg0[3] = arg0[1];
+    arg0[2] = z;
+    arg0[0] = ((x < arg0[1] ? -x : x) < threshold)
+        ? 0.0f
+        : (arg0[0] < 0.0f ? -1.0f : 1.0f) * ((((arg0[0] < 0.0f) ? -arg0[0] : arg0[0]) - threshold) * (1.0f / (1.0f - threshold)));
+    arg0[2] = ((arg0[2] < 0.0f ? -arg0[2] : arg0[2]) < threshold)
+        ? 0.0f
+        : (arg0[2] < 0.0f ? -1.0f : 1.0f) * ((((arg0[2] < 0.0f) ? -arg0[2] : arg0[2]) - threshold) * (1.0f / (1.0f - threshold)));
+}
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/pad", iosPadGetXZInputR);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/pad", iosPadEntryTickFunc);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/pad", iosPadEntryTickFunc);
+void iosPadEntryTickFunc(void (*arg0)(void))
+{
+    D_40045718 = arg0;
+}
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/pad", iosPadRead);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/pad", iosPadRead);
+void iosPadRead(s32 arg0, t_iosPadData *arg1)
+{
+    *arg1 = iosDefaultPadData[arg0];
+}
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/pad", iosPadChkConnect);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/pad", iosPadChkConnect);
+s32 iosPadChkConnect(s32 arg0)
+{
+    return padSysGet(arg0, 0)->pad2State == 1;
+}
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/pad", iosPadInit);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/pad", iosPadInit);
+void iosPadInit(void)
+{
+    Init_Shock();
+    Shock_SetShockVoiceSet(0, ShockVoiceSetCommon);
+    Init_Controler(D_4004578C);
+    Init_Controler(D_4004578C + 0x78);
+    Init_Player(D_4004578C - 0x14);
+    Init_Player(D_4004578C + 0x64);
+}
