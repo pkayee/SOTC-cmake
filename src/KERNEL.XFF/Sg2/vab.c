@@ -1,17 +1,21 @@
 #include "common.h"
 
 typedef struct {
+    s32 unk0;   /* 0x10 semastervol */
+    s32 unk4;   /* 0x14 header */
+    void *unk8; /* 0x18 veltbl */
+    s32 unkC;   /* 0x1C */
+    void *unk10; /* 0x20 lfotbl */
+    s32 unk14;  /* 0x24 */
+    s32 unk18;  /* 0x28 */
+} VabSub;
+
+typedef struct {
     s32 unk0;
     s32 unk4;
     s32 unk8;
     s32 unkC;
-    s32 unk10;
-    s32 unk14;
-    s32 unk18;
-    s32 unk1C;
-    s32 unk20;
-    s32 unk24;
-    s32 unk28;
+    VabSub sub; /* 0x10 */
 } VabSlot;
 
 extern VabSlot D_40115640[8];
@@ -41,7 +45,7 @@ INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/vab", func_4003EBE0);
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/vab", func_4003ED58);
 s32 func_4003ED58(VabSlot *arg0, s32 arg1)
 {
-    u8 *base = *(u8 **)(arg0->unk14 + 0x30);
+    u8 *base = *(u8 **)(arg0->sub.unk4 + 0x30);
     u16 *p = (u16 *)(arg1 * 2 + (s32)base);
 
     return (s32)base + p[1];
@@ -73,9 +77,20 @@ s32 vab_get_splitchunk(s32 arg0)
     return arg0 + 8;
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/vab", vab_get_veltbl);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/vab", vab_get_veltbl);
+s32 vab_get_veltbl(s32 arg0, void **arg1)
+{
+    *arg1 = D_40115640[arg0].sub.unk8;
+    return D_40115640[arg0].sub.unkC;
+}
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/vab", vab_get_lfotbl_param);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/vab", vab_get_lfotbl_param);
+s32 vab_get_lfotbl_param(s32 arg0, void **arg1, s32 *arg2)
+{
+    *arg2 = D_40115640[arg0].sub.unk14;
+    *arg1 = D_40115640[arg0].sub.unk10;
+    return D_40115640[arg0].sub.unk18;
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/vab", vab_set_semastervol);
 s32 vab_set_semastervol(s32 arg0, s32 arg1)
