@@ -1,8 +1,52 @@
 #include "common.h"
 
+extern s32 sceInetClose(void *, void *, s32, s32);
+extern s32 sceLibnetTerminate(void *);
+extern s32 sceInetSend(void *, void *, s32, void *, s32, s32 *, s32);
+extern s32 sceInetRecv(void *, void *, s32, void *, s32, s32 *, s32);
+extern s32 LoaderSysCheckCDBootMode(void);
+extern void LoaderSysInitTCP(void);
+extern s32 CreateSema(void *);
+extern s32 sceSifInitRpc(s32);
+extern s32 sceSifBindRpc(void *, u32, s32);
+extern s32 iosLoadIopModule(const char *, const char *, s32, s32);
+extern void iosFree(void *);
+extern s32 sceSifCallRpc(void *, u32, u32, void *, s32, void *, s32, void *, void *);
+extern s32 WaitSema(s32);
+extern s32 SignalSema(s32);
+extern void *memcpy(void *, const void *, u32);
+extern u32 strlen(const char *);
+extern char *strncpy(char *, const char *, u32);
+
+extern s32 D_40045710;
+extern s32 D_4007DF28;
+extern s8 D_4007CF04[];
+extern s8 D_4007DF30[];
+extern s8 D_40046C80[];
+extern s8 D_40046CA8[];
+extern s8 D_4007DF00[];
+extern s32 D_4007CF00[];
+extern s8 D_4007DF38[];
+
+s32 func_40016C10(void *arg0);
+
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/net", func_40016C10);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/net", func_40016E20);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/net", func_40016E20);
+s32 func_40016E20(s32 arg0, s32 arg1)
+{
+    s32 off = arg0 * 68;
+    s8 *slot = D_4007DF38 + off;
+    void **bufp = (void **)(D_4007DF38 - 4 + off);
+    s32 *cidp = (s32 *)(D_4007DF38 - 8 + off);
+
+    sceInetClose(slot, *bufp, *cidp, arg1);
+    *cidp = -1;
+    sceLibnetTerminate(slot);
+    iosFree(*bufp);
+    *bufp = NULL;
+    return 1;
+}
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/net", iosNetRecvMsg);
 
@@ -14,6 +58,21 @@ INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/net", iosNetSend);
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/net", iosNetRecvMsgWithStateCallback);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/net", iosNetClose);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/net", iosNetClose);
+s32 iosNetClose(s32 arg0)
+{
+    if (D_40045710 != 0)
+    {
+        func_40016E20(arg0, -1);
+    }
+    else
+    {
+        D_4007CF00[0] = arg0;
+        WaitSema(D_4007DF28);
+        sceSifCallRpc(D_4007DF00, 1, 0, D_4007CF00, 4, D_4007CF00, 4, NULL, NULL);
+        SignalSema(D_4007DF28);
+        return D_4007CF00[0];
+    }
+}
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/net", iosNetOpen);
