@@ -115,7 +115,48 @@ s32 Sg2RemoteSyncStatus()
     return sceSifCheckStatRpc((sceSifRpcData *)&D_40110880);
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/remote", Sg2RemoteTickProc);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/remote", Sg2RemoteTickProc);
+void Sg2RemoteTickProc()
+{
+    s32 idx;
+    s32 wrap = 0;
+    s32 n;
+    s32 wr;
+    s32 rd;
+
+    if (D_401108C0[idx = D_401108AC].status == -1)
+    {
+        D_401108C0[idx].status = -2;
+        D_401106C0[0x61] = 1;
+        Sg2RemoteSend(D_401108C0[idx].cmd, D_401108C0[idx].arg1, D_401108C0[idx].arg2, D_401108C0[idx].arg3);
+    }
+    rd = D_4010C684;
+    wr = D_4010C680;
+    if (wr < rd)
+    {
+        wrap = wr;
+        n = 0x200 - rd;
+    }
+    else
+    {
+        n = wr - rd;
+    }
+    if (n != 0)
+    {
+        memcpy(D_4010E6C0, &D_4010C6C0[D_4010C684], n * 16);
+    }
+    if (wrap != 0)
+    {
+        memcpy(&D_4010E6C0[n], D_4010C6C0, wrap * 16);
+    }
+    sceSifCallRpc(&D_40110880, 0, 1, D_4010E6C0, (n + wrap) * 16, D_401106C0, 0x190, 0, 0);
+    D_4010C684 = D_4010C680;
+    if (D_401108C0[D_401108AC].status == -2 && D_401106C0[0x61] == 0)
+    {
+        D_401108C0[D_401108AC].status = 0;
+        D_401108AC = (D_401108AC + 1) % 0x20;
+    }
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/remote", Sg2RemoteInit);
 s32 Sg2RemoteInit()
