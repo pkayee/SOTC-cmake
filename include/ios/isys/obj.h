@@ -8,8 +8,8 @@ typedef struct isysObj {
     s32 partition;
     void* sourceFunc;
     s32 flags;
-    s16 unkC;
-    s16 unkE;
+    u16 unkC;
+    u16 unkE;
     struct isysObj* unk10;
     s32 unk14;
     void* immediateDeleteFunc;
