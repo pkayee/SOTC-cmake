@@ -30,7 +30,11 @@ s32 Sg2ExStAdpcmGetFd(void* pAdpcm)
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/st_adpcm", Sg2ExStAdpcmSetLsn);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/st_adpcm", Sg2ExStAdpcmGetLsn);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/st_adpcm", Sg2ExStAdpcmGetLsn);
+s32 Sg2ExStAdpcmGetLsn(void* pAdpcm)
+{
+    return *(s32*)((u8*)pAdpcm + 0x2D8);
+}
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/st_adpcm", Sg2ExStAdpcmGetTargetLsn);
 
