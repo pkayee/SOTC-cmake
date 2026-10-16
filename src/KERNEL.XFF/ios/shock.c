@@ -1,14 +1,17 @@
 #include "common.h"
 
-typedef struct ShockVoiceSetHdr
+typedef union ShockVoiceSetHdr
 {
-    /* 0x0 */ u16 unk0;
-    /* 0x2 */ u16 unk2;
-    /* 0x4 */ u16 unk4;
-    /* 0x6 */ u16 unk6;
-    /* 0x8 */ u16 unk8;
-    /* 0xA */ u16 unkA;
-} ShockVoiceSetHdr;
+    struct
+    {
+        /* 0x0 */ u16 unk0;
+        /* 0x2 */ u16 unk2;
+        /* 0x4 */ u16 unk4;
+        /* 0x6 */ u16 unk6;
+        /* 0x8 */ u16 unk8;
+        /* 0xA */ u16 unkA;
+    };
+} ShockVoiceSetHdr; // union: accesses get alias set 0, which keeps the loads after the stores (see Init_ShockVoiceSet)
 
 typedef struct ShockVoiceSet
 {
@@ -81,7 +84,14 @@ INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/shock", func_40019018);
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/shock", func_400192E0);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/shock", Init_ShockVoiceSet);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/shock", Init_ShockVoiceSet);
+void Init_ShockVoiceSet(ShockVoiceSet* arg0, ShockVoiceSetHdr* arg1)
+{
+    arg0->hdr = arg1;
+    arg0->unkC = (u32*)arg1 + arg1->unkA;
+    arg0->unk4 = (u32*)arg1 + arg1->unk2;
+    arg0->unk8 = (u32*)arg1 + arg1->unk6;
+}
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/shock", Init_Shock);
 

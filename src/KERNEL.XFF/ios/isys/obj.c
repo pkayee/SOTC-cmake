@@ -221,7 +221,24 @@ void isysDeleteAllGroup(isysObj* obj, s32 (*func)(s32))
     isysUnlock();
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/obj", isysGroupForFirst);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/obj", isysGroupForFirst);
+isysLink* isysGroupForFirst(u16* group)
+{
+    isysLink* link;
+
+    isysLock();
+    link = LINK_AT(group[0]);
+    for (; link != NULL; link = LINK_AT(link->next))
+    {
+        if (link->unkC == 0 && !(((u32)link->obj->flags >> 16) & 1))
+        {
+            ((u8*)link->obj)[9]++;
+            break;
+        }
+    }
+    isysUnlock();
+    return link;
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/obj", isysGroupForFirstForce);
 isysLink* isysGroupForFirstForce(u16* group)
@@ -327,9 +344,42 @@ void isysObjDeleteUnLock(isysObj* obj)
 }
 
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/obj", isysGroupForNext);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/obj", isysGroupForNext);
+isysLink* isysGroupForNext(isysLink* link)
+{
+    isysObj* head = link->obj;
+    isysLink* next;
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/obj", isysGroupForNextForce);
+    do
+    {
+        next = LINK_AT(link->next);
+        link = next;
+        if (next == NULL) break;
+    } while (next->unkC != 0 || (((u32)next->obj->flags >> 16) & 1));
+    if (next != NULL)
+    {
+        ((u8*)head)[9]--;
+        ((u8*)next->obj)[9]++;
+    }
+    return next;
+}
+
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/obj", isysGroupForNextForce);
+isysLink* isysGroupForNextForce(isysLink* link)
+{
+    isysObj* head = link->obj;
+    isysLink* next;
+
+    for (;;)
+    {
+        next = LINK_AT(link->next);
+        if (next == NULL) break;
+        ((u8*)head)[9]--;
+        ((u8*)next->obj)[9]++;
+        break;
+    }
+    return next;
+}
 
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/obj", isysGroupForExit);
