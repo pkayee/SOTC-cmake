@@ -974,19 +974,19 @@ segments:
         #- [ 0x31a98, textbin, sce ]
         - [ 0x31a98, asm, sdk/mktime ]
         #- [ 0x31E68, asm, sdk/mktime ] # mktime
-        - [ 0x32100, asm, sdk/strstr ] # strstr
-        - [ 0x32188, asm, sdk/div ] # div
+        - [ 0x32100, c, sdk/strstr ] # strstr
+        - [ 0x32188, c, sdk/div ] # div
         - [ 0x32210, asm, sdk/atanf ] # atanf
-        - [ 0x324A0, asm, sdk/cosf ] # cosf
-        - [ 0x32578, asm, sdk/fabsf ] # fabsf
-        - [ 0x325A0, asm, sdk/sinf] # sinf
-        - [ 0x32688, asm, sdk/sqrt] # sqrt
-        - [ 0x326A0, asm, sdk/acosf] # acosf
-        - [ 0x326B8, asm, sdk/asinf ] # asinf
-        - [ 0x326D0, asm, sdk/atan2f ] # atan2f
-        - [ 0x326E8, asm, sdk/fmodf ] # fmodf
-        - [ 0x32700, asm, sdk/powf ] # powf
-        - [ 0x32718, asm, sdk/sqrtf ] # sqrtf
+        - [ 0x324A0, c, sdk/cosf ] # cosf
+        - [ 0x32578, c, sdk/fabsf ] # fabsf
+        - [ 0x325A0, c, sdk/sinf] # sinf
+        - [ 0x32688, c, sdk/sqrt] # sqrt
+        - [ 0x326A0, c, sdk/acosf] # acosf
+        - [ 0x326B8, c, sdk/asinf ] # asinf
+        - [ 0x326D0, c, sdk/atan2f ] # atan2f
+        - [ 0x326E8, c, sdk/fmodf ] # fmodf
+        - [ 0x32700, c, sdk/powf ] # powf
+        - [ 0x32718, c, sdk/sqrtf ] # sqrtf
         - [ 0x32730, asm, sdk/__ieee754_sqrt ] # __ieee754_sqrt
         - [ 0x32A50, asm, sdk/__ieee754_acosf ] # __ieee754_acosf
         - [ 0x32E78, asm, sdk/__ieee754_asinf ] # __ieee754_asinf
@@ -994,21 +994,21 @@ segments:
         - [ 0x333F8, asm, sdk/__ieee754_fmodf ] # __ieee754_fmodf
         - [ 0x335C8, asm, sdk/__ieee754_powf ] # __ieee754_powf
         - [ 0x33DA8, asm, sdk/__ieee754_rem_pio2f ] # __ieee754_rem_pio2f
-        - [ 0x34158, asm, sdk/__ieee754_sqrtf ] # __ieee754_sqrtf
-        - [ 0x34228, asm, sdk/__kernel_cosf ] # __kernel_cosf
+        - [ 0x34158, c, sdk/__ieee754_sqrtf ] # __ieee754_sqrtf
+        - [ 0x34228, c, sdk/__kernel_cosf ] # __kernel_cosf
         - [ 0x34378, asm, sdk/__kernel_rem_pio2f ] # __kernel_rem_pio2f
-        - [ 0x34BE0, asm, sdk/__kernel_sinf ] # __kernel_sinf
-        - [ 0x34CE8, asm, sdk/floorf ] # floorf
-        - [ 0x34DC0, asm, sdk/scalbnf ] # scalbnf
-        - [ 0x34E88, asm, sdk/copysignf ] # copysignf
-        - [ 0x34EC8, asm, sdk/sceGsPutIMR ] # sceGsPutIMR
-        - [ 0x34F08, asm, sdk/sceGsGetIMR ] # sceGsGetIMR
-        - [ 0x34F28, asm, sdk/isceGsPutIMR ] # isceGsPutIMR
+        - [ 0x34BE0, c, sdk/__kernel_sinf ] # __kernel_sinf
+        - [ 0x34CE8, c, sdk/floorf ] # floorf
+        - [ 0x34DC0, c, sdk/scalbnf ] # scalbnf
+        - [ 0x34E88, c, sdk/copysignf ] # copysignf
+        - [ 0x34EC8, c, sdk/sceGsPutIMR ] # sceGsPutIMR
+        - [ 0x34F08, c, sdk/sceGsGetIMR ] # sceGsGetIMR
+        - [ 0x34F28, c, sdk/isceGsPutIMR ] # isceGsPutIMR
         - [ 0x34F68, asm, sdk/sceCdRead ] # sceCdRead
-        - [ 0x35148, asm, sdk/sceCdReadIOPm ] # sceCdReadIOPm
-        - [ 0x352A0, asm, sdk/sceCdGetError ] # sceCdGetError
-        - [ 0x35338, asm, sdk/sceCdStatus ] # sceCdStatus
-        - [ 0x353F0, asm, sdk/sceCdReadClock ] # sceCdReadClock
+        - [ 0x35148, c, sdk/sceCdReadIOPm ] # sceCdReadIOPm
+        - [ 0x352A0, c, sdk/sceCdGetError ] # sceCdGetError
+        - [ 0x35338, c, sdk/sceCdStatus ] # sceCdStatus
+        - [ 0x353F0, c, sdk/sceCdReadClock ] # sceCdReadClock
         
         # bss
         - { type: bss, vram: 0x40073bc0, name: bss, size: 0xa24ec } # set to the end of the file, aligned by 64 bytes
