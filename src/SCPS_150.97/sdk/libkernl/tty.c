@@ -14,6 +14,12 @@ INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/tty", sceTtyRead);
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/tty", sceTtyInit);
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/tty", func_001129A0);
+void func_001129A0(s32 *a0, s32 *a1)
+{
+    ((s32 *)a1[7])[a0[4]] = a0[5];
+}
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/tty", func_001129C0);
+void func_001129C0(s32 *a0, s32 *a1)
+{
+    a1[2] = a0[4];
+}
