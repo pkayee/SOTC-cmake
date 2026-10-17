@@ -34,4 +34,7 @@ char *setlocale(int category, char *locale)
     return _setlocale_r(D_00135D60[0], category, locale);
 }
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libc/locale", localeconv);
+char *localeconv(void)
+{
+    return func_0012E620(D_00135D60[0]);
+}

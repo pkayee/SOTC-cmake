@@ -25,4 +25,13 @@ void __malloc_lock(void)
     }
 }
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libc/mlock", __malloc_unlock);
+void __malloc_unlock(void)
+{
+    s32 count = --D_001361C4[0];
+
+    if (count == 0)
+    {
+        D_001361C0[0] = -1;
+        SignalSema(D_00132AA0[0]);
+    }
+}
