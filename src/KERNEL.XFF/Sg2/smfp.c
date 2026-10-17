@@ -112,6 +112,110 @@ s32 Sg2SmfpOpen(s32 arg0, s32 arg1)
 }
 
 
+/* NEARMISS-STUB Sg2SmfpOpenSelCore */
+#if 0 /* NEARMISS 82.4% cat=regalloc sub=- | target keeps 0x4059 s64 const in s4 across dpmul (no rematerialize, ours re-emits ori/dsll32 for dpdiv arg); loop lui t4 vs v0 and a2/a1 temp order; not a width | attempts=2 */
+
+s32 Sg2SmfpOpenSelCore(s32 arg0, s32 arg1, s32 arg2)
+{
+    Sg2SmfpSlot *slot;
+    s32 intr;
+    s32 ret;
+    s32 serial;
+    s32 idx;
+    s32 i;
+    s32 j;
+    s32 mod;
+    s32 tickMode;
+    s64 tmp;
+    s64 div;
+
+    intr = DIntr();
+    if (!vab_check_alive(arg0))
+    {
+        ret = -1;
+    }
+    else
+    {
+        serial = D_40114604;
+        idx = -1;
+        for (i = 0; i < 8; i++)
+        {
+            j = (serial + i) & 7;
+            if (D_40114200[j].status == 0)
+            {
+                idx = j;
+                D_40114604 = serial + 1;
+                D_40114200[j].status = 1;
+                D_40114200[j].unk4 = serial;
+                break;
+            }
+        }
+        if (idx == -1)
+        {
+            ret = -1;
+        }
+        else
+        {
+            ret = idx;
+            slot = &D_40114200[idx];
+            if (slot->status != 1)
+            {
+                ret = -1;
+            }
+            else
+            {
+                slot->unk60 = (u8 *)arg1;
+                if (func_4003CE68(slot) != 0)
+                {
+                    ret = -1;
+                }
+                else if (func_4003CF28(slot) != 0)
+                {
+                    ret = -1;
+                }
+                else
+                {
+                    mod = Sg2ModOpenBgm(arg0, arg2);
+                    if (mod == -1)
+                    {
+                        ret = -1;
+                    }
+                    else
+                    {
+                        slot->unk8 = mod;
+                        slot->unkC = arg0;
+                        slot->unk30 = 0x405E000000000000LL;
+                        slot->unk78 = 0x4059000000000000LL;
+                        div = dpmul(0x4000000000000000LL, slot->unk38);
+                        tickMode = Sg2CtrlGetTickMode();
+                        tmp = litodp(tickMode);
+                        if (tickMode < 0)
+                        {
+                            tmp = dpadd(tmp, 0x41F0000000000000LL);
+                        }
+                        slot->unk40 = dpdiv(div, tmp);
+                        slot->unk40 = dpdiv(dpmul(slot->unk40, slot->unk78), 0x4059000000000000LL);
+                        slot->unk48 = 0;
+                        slot->unk64 = (s32)slot->unk60;
+                        slot->unk1C = 0x40;
+                        slot->unk70 = 0x7F;
+                        slot->unk10 = 0x7F;
+                        slot->unk14 = 0x7F;
+                        slot->unk18 = 0x40;
+                        slot->unk6C = 0;
+                        slot->unk69 = 0;
+                    }
+                }
+            }
+        }
+    }
+    if (intr)
+    {
+        EIntr();
+    }
+    return ret;
+}
+#endif
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/smfp", Sg2SmfpOpenSelCore);
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/smfp", Sg2SmfpClose);
@@ -331,6 +435,104 @@ s32 Sg2SmfpInit(void)
     return 0;
 }
 
+/* NEARMISS-STUB debug_smfp_mod_config */
+#if 0 /* NEARMISS 70.4% cat=regalloc sub=- | frame 0x250 vs ours 0x240: target keeps extra regs s6-s8 live (&D_4004641C, &D_40046420, 0x404E const reused across dpdiv/dpcmp); not a width issue | attempts=2 */
+extern u8 D_40049288;
+extern char D_40049290[];
+extern char D_400492C8[];
+extern char D_40049300[];
+extern char D_40049338[];
+extern char D_40049358[];
+extern s32 D_4004641C;
+extern s32 D_40046418;
+extern s32 D_40046420;
+extern s64 D_40049380;
+
+s32 sprintf(char *, const char *, ...);
+char *strcat(char *, const char *);
+void debug_mod_config(s32 mod, char *out, s32 flip);
+
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/smfp", debug_smfp_mod_config);
+void debug_smfp_mod_config(s32 arg0, char *out)
+{
+    char buf[0x200];
+    Sg2SmfpSlot *slot;
+    s32 a;
+    s32 b;
+    s32 tick;
+    s32 t1;
+    s64 x;
+    s64 y;
+    s64 r;
+
+    *out = D_40049288;
+    slot = &D_40114200[arg0];
+    a = dptoli(slot->unk48);
+    b = dptoli(slot->unk38);
+    if (a != 0)
+    {
+        tick = a % b;
+    }
+    sprintf(buf, D_40049290, slot->unk24, slot->unk20, slot->unk2C, slot->unk28, tick);
+    strcat(out, buf);
+    if (arg0 >= 0)
+    {
+        if (dpcmp(slot->unk48, 0) != 0)
+        {
+            if (dpcmp(slot->unk78, 0) != 0)
+            {
+                x = dpdiv(slot->unk58, 0x404E000000000000LL);
+                if (dpcmp(x, 0) < 0)
+                {
+                    x = 0;
+                }
+                y = dpdiv(x, 0x404E000000000000LL);
+                D_40046418 = dptoli(y);
+                if (D_40046418 < 0)
+                {
+                    D_40046418 = 0;
+                }
+                r = dpsub(x, litodp(D_40046418 * 60));
+                D_4004641C = dptoli(r);
+                if (D_4004641C < 0)
+                {
+                    D_4004641C = 0;
+                }
+                r = dpsub(x, litodp(dptoli(x)));
+                D_40046420 = dptoli(dpmul(r, D_40049380));
+                if (D_40046420 < 0)
+                {
+                    D_40046420 = 0;
+                }
+            }
+        }
+    }
+    t1 = D_40046420;
+    if (t1 < 501)
+    {
+        sprintf(buf, D_40049300, slot->unk30, D_40046418, D_4004641C, t1);
+    }
+    else
+    {
+        sprintf(buf, D_400492C8, slot->unk30, D_40046418, D_4004641C, t1);
+    }
+    strcat(out, buf);
+    sprintf(buf, D_40049338, slot->unk78);
+    strcat(out, buf);
+    sprintf(buf, D_40049358, arg0, slot->unk8);
+    strcat(out, buf);
+    if (slot->status == 2)
+    {
+        D_40046418 = slot->unk28;
+    }
+    else
+    {
+        D_40046418 = 0;
+    }
+    debug_mod_config(slot->unk8, buf, D_40046418);
+    strcat(out, buf);
+}
+#endif
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/smfp", debug_smfp_mod_config);
 
 /* NEARMISS-STUB debug_set_smfp_time_count_delta_per */
