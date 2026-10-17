@@ -2,6 +2,7 @@
 #include <stdarg.h>
 #include "ios/kernel.h"
 #include "ios/hash.h"
+#include "gcc/string.h"
 
 typedef struct MemoryInfo
 {
@@ -16,6 +17,39 @@ typedef struct MemoryInfo
     /* 0x20 */ struct { char path[0x40]; s32 stack_size; void *unk44; } module_info;
 } MemoryInfo;
 
+typedef struct ModPartEnt
+{
+    /* 0x00 */ void *ptr;
+    /* 0x04 */ u32 unk4[5];
+    /* 0x18 */ void *ptr18;
+    /* 0x1C */ u32 unk1C;
+} ModPartEnt;
+
+typedef struct ModSymEnt
+{
+    /* 0x00 */ u32 nameOff;
+    /* 0x04 */ u32 unk4;
+    /* 0x08 */ u32 unk8;
+    /* 0x0C */ u16 unkC;
+    /* 0x0E */ u16 sect;
+} ModSymEnt;
+
+typedef struct ModExpEnt
+{
+    /* 0x00 */ u32 unk0;
+    /* 0x04 */ u32 unk4;
+    /* 0x08 */ void *sym;
+    /* 0x0C */ u32 unkC;
+} ModExpEnt;
+
+typedef struct ModImpEnt
+{
+    /* 0x00 */ u32 unk0;
+    /* 0x04 */ void *sym;
+    /* 0x08 */ u32 unk8;
+    /* 0x0C */ u32 unkC;
+} ModImpEnt;
+
 typedef struct ModHdr
 {
     /* 0x00 */ u32 unk0;
@@ -26,11 +60,14 @@ typedef struct ModHdr
     /* 0x14 */ s32 unk14;
     /* 0x18 */ u32 unk18;
     /* 0x1C */ u32 unk1C;
-    /* 0x20 */ u32 unk20;
+    /* 0x20 */ u32 *impSymIxs;
     /* 0x24 */ u32 unk24;
-    /* 0x28 */ struct { u32 nameOff; u32 unk4; u32 unk8; u32 unkC; } *symTab;
+    /* 0x28 */ ModSymEnt *symTab;
     /* 0x2C */ u32 strTab;
-    /* 0x30 */ u32 unk30[4];
+    /* 0x30 */ u8 *table;
+    /* 0x34 */ u32 unk34;
+    /* 0x38 */ s32 relocNrE;
+    /* 0x3C */ struct t_xffRelocEnt *relocTab;
     /* 0x40 */ s32 symBase;
 } ModHdr;
 
@@ -38,15 +75,20 @@ typedef struct ModObj
 {
     /* 0x00 */ u32 unk0[7];
     /* 0x1C */ ModHdr *hdr;
-    /* 0x20 */ u32 unk20[3];
+    /* 0x20 */ void *entry;
+    /* 0x24 */ ModExpEnt *exp;
+    /* 0x28 */ ModImpEnt *imports;
     /* 0x2C */ u32 flags;
-    /* 0x30 */ u32 unk30[2];
+    /* 0x30 */ u32 pendCount;
+    /* 0x34 */ void *pending;
     /* 0x38 */ char *name;
+    /* 0x3C */ u32 allocSize;
 } ModObj;
 
 extern char D_40047138[];
 extern char D_40046EC0[]; // "dld:\tError. this file no needs for allocate memory.\n"
 extern s32 D_40045820;
+extern s32 D_40045828;
 extern s32 D_40081A20;
 extern t_hashTable D_40081A18;
 extern char D_40047400[];
@@ -58,8 +100,27 @@ extern char D_400470A8[];
 extern char D_400470B8[];
 extern char D_400470D8[];
 extern s32 iosLoadIopModule(char *, char *, s32, s32);
-extern s32 func_4001AD58(char *, s32, s32);
+extern ModObj *func_4001AD58(char *, s32, s32);
 extern s32 iosLoaderGetFileSizeName(char *);
+extern s32 func_4001C350(s32, char *, s32);
+extern void func_4001AB68(void *, char *, void *);
+extern void *_isysCreateObj(s32, s32, s32, s32, void *, s32);
+extern void func_4001C5E8();
+extern s32 DldSysUndefSymbol;
+extern void *func_4001C3B0(s32, s32);
+extern s32 func_4001C440(void);
+extern void func_40019D68(void *, void *, u32, void *, void *, s32, void *, s32);
+extern char D_40047058[];
+extern char D_40047028[];
+extern char D_40047030[];
+typedef struct CdlFile
+{
+    /* 0x00 */ u32 lsn;
+    /* 0x04 */ s32 size;
+    /* 0x08 */ char name[0x20];
+    /* 0x28 */ u8 date[8];
+} CdlFile;
+extern s32 sceCdSearchFile(CdlFile *, const char *);
 extern s32 func_4001D120(s32);
 typedef struct DldSlot { s32 unk0; s32 unk4; } DldSlot;
 extern DldSlot D_40081A28[8];
@@ -70,7 +131,10 @@ extern s32 rootPtn;
 extern s32 iosLoaderFOpen(char *, s32, s32);
 extern s32 iosLoaderFRead(s32, void *, s32);
 extern s32 iosLoaderFClose(s32);
-extern s32 func_40019A00(ModObj *, s32);
+extern void func_40019A00(ModObj *, s32);
+extern s32 func_40019FF0(ModObj *);
+extern void func_4001A2F8(ModObj *);
+extern void func_4001C8F0(void *arg0, void *arg1);
 extern void _isysDeleteGroup(void *obj, void *group, s32 flag);
 extern void isysLaunchModule(ModObj *obj);
 extern char D_40047060[];
@@ -94,6 +158,9 @@ extern void func_4001AE88(char *name, void *hdr, void *ptn);
 extern void isysCreateExceptionThread(void);
 extern s32 LoaderSysGetMemoryInfo(MemoryInfo *info);
 extern MemoryInfo D_400819B0;
+extern s32 LoaderSysFOpen(char *, s32, s32);
+extern s32 LoaderSysFClose(s32);
+extern s32 LoaderSysGetstat(char *, void *);
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", func_400199B0);
 s32 func_400199B0(s32 arg0, ...)
@@ -114,7 +181,6 @@ INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", func_4001A170);
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", func_4001A2F8);
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", isysMoveModuleObj);
-
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", isysCreateModuleObjExisted);
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", isysResolveAllModuleObjHasUndefSymbol);
@@ -124,7 +190,6 @@ INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", func_4001A918);
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", func_4001AB68);
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", func_4001AD58);
-
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", func_4001AE88);
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", isysLaunchModule);
@@ -212,7 +277,29 @@ void isysRemoveModuleObjGroup(ModObj *obj)
     }
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", isysResolveOneModuleObj);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", isysResolveOneModuleObj);
+s32 isysResolveOneModuleObj(ModObj *arg0)
+{
+    s32 ret;
+
+    iosResetCpuRapCounter(2);
+    ret = func_40019FF0(arg0);
+    iosGetCpuRapCountPar1Int();
+    if (arg0->flags & 0x20000000)
+    {
+        if (ret != 0)
+        {
+            func_40019A00(arg0, 0);
+        }
+    }
+    else
+    {
+        func_40019A00(arg0, 1);
+        arg0->flags |= 0x20000000;
+    }
+    iosGetCpuRapCountPar1Int();
+    return ret;
+}
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", isysResolveAllProgramModule);
 
@@ -232,7 +319,45 @@ void isysLaunchExecModule(ModObj *obj)
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", isysInitModuleObjExisted);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", isysFlushModuleObj);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", isysFlushModuleObj);
+s32 isysFlushModuleObj(ModObj *obj)
+{
+    ModPartEnt *ent;
+    ModHdr *hdr;
+    s32 i;
+    if (obj->flags & 0x40000000)
+    {
+        iosFree((void *)obj->hdr->unk4);
+        func_4001A2F8(obj);
+    }
+    else
+    {
+        u32 *pend = &obj->pendCount;
+
+        if (pend[1] != 0)
+        {
+            iosFree((void *)pend[1]);
+            pend[0] = 0;
+        }
+        func_4001A2F8(obj);
+        hdr = obj->hdr;
+        if (hdr != NULL)
+        {
+            ent = (ModPartEnt *)(hdr->table + 0x20);
+            for (i = hdr->symBase - 2; i != -1; i--)
+            {
+                if (ent->ptr18 != NULL)
+                {
+                    ent->ptr18 = NULL;
+                    iosFree(ent->ptr);
+                }
+                ent++;
+            }
+            iosFree(hdr);
+        }
+    }
+    return 0;
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", GetSymbolByIndex);
 u32 GetSymbolByIndex(ModObj *arg0, s32 idx)
@@ -274,6 +399,8 @@ u32 isysGetModuleObjMallocSize(ModObj *arg0)
 }
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", isysDisposeModuleObjRelocationElement);
+
+
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", GetExecModuleSize);
 s32 GetExecModuleSize(void)
@@ -370,14 +497,6 @@ s32 func_4001C440(void)
     return 0;
 }
 
-typedef struct ModPartEnt
-{
-    /* 0x00 */ void *ptr;
-    /* 0x04 */ u32 unk4[5];
-    /* 0x18 */ void *ptr18;
-    /* 0x1C */ u32 unk1C;
-} ModPartEnt;
-
 typedef struct ModPartObj
 {
     /* 0x00 */ u32 unk0[12];
@@ -409,9 +528,86 @@ void *func_4001C468(ModPartObj *arg0)
     return arg0;
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", func_4001C4F8);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", func_4001C4F8);
+void func_4001C4F8(ModObj *obj)
+{
+    ModPartEnt *ent;
+    ModHdr *hdr;
+    s32 i;
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", func_4001C5E8);
+    if (obj->flags & 0x40000000)
+    {
+        iosFree((void *)obj->hdr->unk4);
+        func_4001A2F8(obj);
+        return;
+    }
+    {
+        u32 *pend = &obj->pendCount;
+
+        if (pend[1] != 0)
+        {
+            iosFree((void *)pend[1]);
+            pend[0] = 0;
+        }
+    }
+    func_4001A2F8(obj);
+    hdr = obj->hdr;
+    if (hdr != NULL)
+    {
+        ent = (ModPartEnt *)(hdr->table + 0x20);
+        for (i = hdr->symBase - 2; i != -1; i--)
+        {
+            if (ent->ptr18 != NULL)
+            {
+                ent->ptr18 = NULL;
+                iosFree(ent->ptr);
+            }
+            ent++;
+        }
+        iosFree(hdr);
+    }
+}
+
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", func_4001C5E8);
+void func_4001C5E8(ModObj *obj)
+{
+    ModPartEnt *ent;
+    ModHdr *hdr;
+    s32 i;
+
+    if (obj->flags & 0x40000000)
+    {
+        iosFree((void *)obj->hdr->unk4);
+        func_4001A2F8(obj);
+    }
+    else
+    {
+        u32 *pend = &obj->pendCount;
+
+        if (pend[1] != 0)
+        {
+            iosFree((void *)pend[1]);
+            pend[0] = 0;
+        }
+        func_4001A2F8(obj);
+        hdr = obj->hdr;
+        if (hdr != NULL)
+        {
+            ent = (ModPartEnt *)(hdr->table + 0x20);
+            for (i = hdr->symBase - 2; i != -1; i--)
+            {
+                if (ent->ptr18 != NULL)
+                {
+                    ent->ptr18 = NULL;
+                    iosFree(ent->ptr);
+                }
+                ent++;
+            }
+            iosFree(hdr);
+        }
+    }
+    D_40045820 -= obj->allocSize;
+}
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", isysResolveAllModuleObjOfGroup);
 
@@ -450,9 +646,62 @@ INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", iosLoaderGetFileSizeN
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", iosFileRead);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", iosLoaderFOpen);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", iosLoaderFOpen);
+s32 iosLoaderFOpen(char *name, s32 flags, s32 mode)
+{
+    s32 fd;
+    s32 i;
+    s32 key;
+    DldSlot *slot;
+    s32 stat[16];
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", iosLoaderFClose);
+    fd = LoaderSysFOpen(name, flags, mode);
+    if (fd < 0)
+    {
+        return fd;
+    }
+    key = -1;
+    for (i = 0; i < 8; i++)
+    {
+        if (D_40081A28[i].unk0 == key)
+        {
+            goto found;
+        }
+    }
+    slot = NULL;
+    goto store;
+found:
+    slot = &D_40081A28[i];
+store:
+    slot->unk0 = fd;
+    LoaderSysGetstat(name, (void *)stat);
+    slot->unk4 = stat[2];
+    return fd;
+}
+
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", iosLoaderFClose);
+s32 iosLoaderFClose(s32 fd)
+{
+    s32 ret;
+    s32 i;
+    DldSlot *slot;
+
+    ret = LoaderSysFClose(fd);
+    for (i = 0; i < 8; i++)
+    {
+        if (D_40081A28[i].unk0 == fd)
+        {
+            slot = &D_40081A28[i];
+            goto found;
+        }
+    }
+    asm("break 0");
+    goto end;
+found:
+    slot->unk0 = -1;
+end:
+    return ret;
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", iosLoaderFRead);
 s32 iosLoaderFRead(s32 fd, void *buf, s32 count)
