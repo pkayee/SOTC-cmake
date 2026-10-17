@@ -1,0 +1,78 @@
+sha1: 63c4cd94e8510dddebfa9e484af4ba69a089e155
+options:
+    basename: MANAGER.XFF
+    target_path: iso/MANAGER.XFF
+    base_path: ../..
+    asm_path: asm/MANAGER.XFF
+    asset_path: assets/MANAGER.XFF
+    src_path: src/MANAGER.XFF
+    build_path: build/MANAGER.XFF
+    symbol_addrs_path:
+        - config/MANAGER.XFF/MANAGER.XFF_symbols.txt
+        - config/MANAGER.XFF/MANAGER.XFF_ignore_symbols.txt
+    reloc_addrs_path: config/MANAGER.XFF/MANAGER.XFF_relocs.txt
+    ld_bss_contains_common: True
+    ld_bss_is_noload: True
+    create_undefined_funcs_auto: True
+    undefined_funcs_auto_path: config/MANAGER.XFF/MANAGER.XFF_undefined_funcs_auto.txt
+    create_undefined_syms_auto: True
+    undefined_syms_auto_path:  config/MANAGER.XFF/MANAGER.XFF_undefined_syms_auto.txt
+    compiler: EEGCC
+    platform: ps2
+    migrate_rodata_to_functions: True
+    use_gp_rel_macro_nonmatching: False
+    string_encoding: EUC-JP
+    rodata_string_guesser_level: 2
+    disasm_unknown: True
+    named_regs_for_c_funcs: True
+    find_file_boundaries: True
+    section_order: [".text", ".data", ".rodata", ".lit4", ".sdata", ".sbss", ".bss"]
+segments:
+    - name: xff_header
+      type: textbin
+      start: 0x0
+      vram: 0x40010000
+      size: 0x4a60
+      align: 1
+      subalign: 1
+    - name: text
+      type: code
+      start: 0x4a60
+      vram: 0x40014a60
+      bss_size: 0x1b300
+      subalign: 8
+      align: 8
+      subsegments:
+        - [ 0x4a60, asm, all_text ]
+        - { type: bss, vram: 0x401aa940, name: bss, size: 0x1b300 }
+    - name: vutext
+      type: textbin
+      start: 0xfa048
+      vram: 0x4010a048
+      size: 0x1a3f8
+      align: 1
+      subalign: 1
+    - name: data
+      type: data
+      start: 0x114440
+      vram: 0x40124440
+      subalign: 16
+      align: 16
+      subsegments:
+        - [ 0x114440, data, all_data ]
+    - name: rodata
+      type: rodata
+      start: 0x11f100
+      vram: 0x4012f100
+      subalign: 8
+      align: 8
+      subsegments:
+        - [ 0x11f100, rodata, all_rodata ]
+    - name: xff_footer
+      type: rodatabin
+      start: 0x125df4
+      vram: 0x40135df4
+      size: 0x74b4c
+      align: 1
+      subalign: 1
+    - [0x19a940]

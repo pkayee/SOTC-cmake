@@ -1,0 +1,71 @@
+sha1: d04ffaa08c1f3628885bfba9b36c8803b65d1704
+options:
+    basename: GRPTOOLS.XFF
+    target_path: iso/GRPTOOLS.XFF
+    base_path: ../..
+    asm_path: asm/GRPTOOLS.XFF
+    asset_path: assets/GRPTOOLS.XFF
+    src_path: src/GRPTOOLS.XFF
+    build_path: build/GRPTOOLS.XFF
+    symbol_addrs_path:
+        - config/GRPTOOLS.XFF/GRPTOOLS.XFF_symbols.txt
+        - config/GRPTOOLS.XFF/GRPTOOLS.XFF_ignore_symbols.txt
+    reloc_addrs_path: config/GRPTOOLS.XFF/GRPTOOLS.XFF_relocs.txt
+    ld_bss_contains_common: True
+    ld_bss_is_noload: True
+    create_undefined_funcs_auto: True
+    undefined_funcs_auto_path: config/GRPTOOLS.XFF/GRPTOOLS.XFF_undefined_funcs_auto.txt
+    create_undefined_syms_auto: True
+    undefined_syms_auto_path:  config/GRPTOOLS.XFF/GRPTOOLS.XFF_undefined_syms_auto.txt
+    compiler: EEGCC
+    platform: ps2
+    migrate_rodata_to_functions: True
+    use_gp_rel_macro_nonmatching: False
+    string_encoding: EUC-JP
+    rodata_string_guesser_level: 2
+    disasm_unknown: True
+    named_regs_for_c_funcs: True
+    find_file_boundaries: True
+    section_order: [".text", ".data", ".rodata", ".lit4", ".sdata", ".sbss", ".bss"]
+segments:
+    - name: xff_header
+      type: textbin
+      start: 0x0
+      vram: 0x40010000
+      size: 0x908
+      align: 1
+      subalign: 1
+    - name: text
+      type: code
+      start: 0x908
+      vram: 0x40010908
+      bss_size: 0x780
+      subalign: 8
+      align: 8
+      subsegments:
+        - [ 0x908, asm, all_text ]
+        - { type: bss, vram: 0x40021e00, name: bss, size: 0x780 }
+    - name: data
+      type: data
+      start: 0x42d0
+      vram: 0x400142d0
+      subalign: 16
+      align: 16
+      subsegments:
+        - [ 0x42d0, data, all_data ]
+    - name: rodata
+      type: rodata
+      start: 0x7960
+      vram: 0x40017960
+      subalign: 8
+      align: 8
+      subsegments:
+        - [ 0x7960, rodata, all_rodata ]
+    - name: xff_footer
+      type: rodatabin
+      start: 0x93dc
+      vram: 0x400193dc
+      size: 0x8a24
+      align: 1
+      subalign: 1
+    - [0x11e00]

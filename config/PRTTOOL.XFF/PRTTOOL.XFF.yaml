@@ -1,0 +1,71 @@
+sha1: 42429f9161b4b5a2876a6971b9f326ebf8a18ff7
+options:
+    basename: PRTTOOL.XFF
+    target_path: iso/PRTTOOL.XFF
+    base_path: ../..
+    asm_path: asm/PRTTOOL.XFF
+    asset_path: assets/PRTTOOL.XFF
+    src_path: src/PRTTOOL.XFF
+    build_path: build/PRTTOOL.XFF
+    symbol_addrs_path:
+        - config/PRTTOOL.XFF/PRTTOOL.XFF_symbols.txt
+        - config/PRTTOOL.XFF/PRTTOOL.XFF_ignore_symbols.txt
+    reloc_addrs_path: config/PRTTOOL.XFF/PRTTOOL.XFF_relocs.txt
+    ld_bss_contains_common: True
+    ld_bss_is_noload: True
+    create_undefined_funcs_auto: True
+    undefined_funcs_auto_path: config/PRTTOOL.XFF/PRTTOOL.XFF_undefined_funcs_auto.txt
+    create_undefined_syms_auto: True
+    undefined_syms_auto_path:  config/PRTTOOL.XFF/PRTTOOL.XFF_undefined_syms_auto.txt
+    compiler: EEGCC
+    platform: ps2
+    migrate_rodata_to_functions: True
+    use_gp_rel_macro_nonmatching: False
+    string_encoding: EUC-JP
+    rodata_string_guesser_level: 2
+    disasm_unknown: True
+    named_regs_for_c_funcs: True
+    find_file_boundaries: True
+    section_order: [".text", ".data", ".rodata", ".lit4", ".sdata", ".sbss", ".bss"]
+segments:
+    - name: xff_header
+      type: textbin
+      start: 0x0
+      vram: 0x40010000
+      size: 0x638
+      align: 1
+      subalign: 1
+    - name: text
+      type: code
+      start: 0x638
+      vram: 0x40010638
+      bss_size: 0x1278
+      subalign: 8
+      align: 8
+      subsegments:
+        - [ 0x638, asm, all_text ]
+        - { type: bss, vram: 0x4002b880, name: bss, size: 0x1278 }
+    - name: data
+      type: data
+      start: 0x9360
+      vram: 0x40019360
+      subalign: 16
+      align: 16
+      subsegments:
+        - [ 0x9360, data, all_data ]
+    - name: rodata
+      type: rodata
+      start: 0xc790
+      vram: 0x4001c790
+      subalign: 8
+      align: 8
+      subsegments:
+        - [ 0xc790, rodata, all_rodata ]
+    - name: xff_footer
+      type: rodatabin
+      start: 0xdd08
+      vram: 0x4001dd08
+      size: 0xdb3c
+      align: 1
+      subalign: 1
+    - [0x1b844]

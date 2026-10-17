@@ -240,6 +240,12 @@ COMMENT_PART = r"\/\* (.+) ([0-9A-Z]{2})([0-9A-Z]{2})([0-9A-Z]{2})([0-9A-Z]{2}) 
 INSTRUCTION_PART = r"(\b(bne|bnel|beq|beql|bnez|bnezl|beqzl|bgez|bgezl|bgtz|bgtzl|blez|blezl|bltz|bltzl|b)\b.*)"
 OPCODE_PATTERN = re.compile(f"{COMMENT_PART}  {INSTRUCTION_PART}")
 
+# Phase 2 (v4): a branch whose operand is a `func_XXXXXXXX` label (splat made a function out of a branch target that
+# follows a `jr ra`) is left unresolved by `as` (global symbol -> PC16 reloc survives `ld -r`, bytes stay 0xFFFF).
+# Same fix as above, computed instead of listed: embed the opcode for every such branch, in every module.
+FUNC_BRANCH_PART = r"(\b(bne|bnel|beq|beql|bnez|bnezl|beqz|beqzl|bgez|bgezl|bgtz|bgtzl|blez|blezl|bltz|bltzl|b|bc1f|bc1t|bc1fl|bc1tl)\b[^\n]*\bfunc_[0-9A-F]+)"
+FUNC_BRANCH_PATTERN = re.compile(f"{COMMENT_PART}  {FUNC_BRANCH_PART}")
+
 PROBLEMATIC_FUNCS = set(
     [
         "OutputLinkerScriptFile",
@@ -252,20 +258,26 @@ PROBLEMATIC_FUNCS = set(
 
 
 def replace_instructions_with_opcodes(asm_folder: Path) -> None:
-    nm_folder = ROOT / asm_folder / "nonmatchings"
+    asm_root = ROOT / asm_folder
 
-    for p in nm_folder.rglob("*.s"):
-        if p.stem not in PROBLEMATIC_FUNCS:
+    for p in asm_root.rglob("*.s"):
+        if "data" in p.relative_to(asm_root).parts[:1]:
             continue
+
+        named = p.stem in PROBLEMATIC_FUNCS and "nonmatchings" in p.parts
+        pattern = OPCODE_PATTERN if named else FUNC_BRANCH_PATTERN
 
         with p.open("r") as file:
             content = file.read()
 
-        if re.search(OPCODE_PATTERN, content):
+        if "func_" not in content and not named:
+            continue
+
+        if re.search(pattern, content):
             # Reference found
             # Embed the opcode, we have to swap byte order for correct endianness
             content = re.sub(
-                OPCODE_PATTERN,
+                pattern,
                 r"/* \1 \2\3\4\5 */  .word      0x\5\4\3\2 /* \6 */",
                 content,
             )
@@ -275,12 +287,24 @@ def replace_instructions_with_opcodes(asm_folder: Path) -> None:
                 file.write(content)
 
 
+# alias -> module (file name under iso/ and config/). Order = build order. swarm/bin/modules parses this dict, keep the layout.
+TARGET_ALIASES = {
+    "loader": "SCPS_150.97",
+    "kernel": "KERNEL.XFF",
+    "gamecore": "GAMECORE.XFF",
+    "manager": "MANAGER.XFF",
+    "dbgcore": "DBGCORE.XFF",
+    "dbgmgr": "DBGMGR.XFF",
+    "grptools": "GRPTOOLS.XFF",
+    "maptool": "MAPTOOL.XFF",
+    "pathtool": "PATHTOOL.XFF",
+    "prttool": "PRTTOOL.XFF",
+}
+
+
 def split_binaries(args):
-    target_aliases = {
-        "loader" : "SCPS_150.97", 
-        "kernel" : "KERNEL.XFF",
-        }
-    
+    target_aliases = TARGET_ALIASES
+
     target_files = []
     
     if not args.target:
