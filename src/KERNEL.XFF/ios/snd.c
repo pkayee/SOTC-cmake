@@ -43,6 +43,17 @@ extern s32 sg2NicoReverbMode;
 extern SndSep D_400F5D50[];
 extern s32 D_400F6B50;
 extern s32 D_40048F20;
+
+typedef struct SndVabEntry
+{
+    u32 unk0;
+    s32 unk4;
+    u8 pad8[8];
+    s32 unk10;
+    u8 pad14[8];
+} SndVabEntry;
+extern SndVabEntry D_400F6B58[];
+
 s32 iosCreateSema(s32, s32, s32);
 void iosJumpRecoverPoint();
 
@@ -139,7 +150,20 @@ void sndSepSetPan(f32 arg0, SndSep *arg1)
     arg1->unk24 = (s32)(arg0 * 63.0f + 64.0f);
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/snd", sndSepSetDefaultParam);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/snd", sndSepSetDefaultParam);
+void sndSepSetDefaultParam(SndSep *arg0)
+{
+    s32 neg = -1;
+
+    *(s32 *)&arg0->unk8 = 0xC;
+    arg0->unk2A = neg;
+    arg0->unk20 = -1.0f;
+    arg0->unk30 = 1;
+    arg0->unk24 = 64.0f;
+    arg0->unk2E = 1;
+    arg0->unk2C = 0x1000;
+    arg0->unk28 = arg0->unk1C * 127.0f;
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/snd", sndSepPauseAll);
 void sndSepPauseAll(s32 arg0)
@@ -218,7 +242,27 @@ void sndSepInit(void)
     }
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/snd", sndVabCreate);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/snd", sndVabCreate);
+void *sndVabCreate(void)
+{
+    s32 i;
+    SndVabEntry *p;
+
+    for (i = 0; i < 20; i++)
+    {
+        if (!(D_400F6B58[i].unk0 & 1))
+        {
+            goto found;
+        }
+    }
+    return NULL;
+found:
+    p = &D_400F6B58[i];
+    p->unk0 |= 1;
+    D_400F6B58[i].unk4 = -1;
+    D_400F6B58[i].unk10 = 0;
+    return p;
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/snd", sndVabDelete);
 void sndVabDelete(u32 *arg0)

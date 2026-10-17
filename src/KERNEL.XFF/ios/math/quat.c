@@ -634,7 +634,55 @@ void GetYRotQuaternionFromDir(f32 *dst, f32 *dir)
     dst[3] = w;
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/quat", GetStabYRotQuaternion);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/quat", GetStabYRotQuaternion);
+void GetStabYRotQuaternion(f32 *dst, f32 *src)
+{
+    f32 *sp2 = src;
+    f32 *d = dst;
+    f32 diff[4] __attribute__((aligned(16)));
+    f32 tmp[4] __attribute__((aligned(16)));
+    asm volatile(
+        "lqc2 $vf4, 0(%0);"
+        "vmul.xyzw $vf5, $vf4, $vf4;"
+        "vmr32.xyzw $vf6, $vf4;"
+        "vmul.xyzw $vf7, $vf6, $vf4;"
+        "vaddy.z $vf6, $vf0, $vf7y;"
+        "vsubw.z $vf6, $vf6, $vf7w;"
+        "vsubx.y $vf6, $vf0, $vf5x;"
+        "vsubz.y $vf6, $vf6, $vf5z;"
+        "vaddz.x $vf6, $vf7, $vf7z;"
+        "vsub.w $vf6, $vf0, $vf0;"
+        "vadd.w $vf5, $vf0, $vf0;"
+        "vmulw.xyz $vf6, $vf6, $vf5w;"
+        "vaddw.y $vf6, $vf6, $vf0w;"
+        "sqc2 $vf6, 0(%1)"
+        : : "r"(sp2), "r"(tmp), "r"(d) : "memory");
+    GetDifferencialQuaternionWithNoRegularize(diff, YUnitVector, tmp, ZUnitVector);
+    asm volatile(
+        "lqc2 $vf11, 0(%2);"
+        "lqc2 $vf12, 0(%0);"
+        "vmul.xyzw $vf13, $vf11, $vf12;"
+        "vaddy.x $vf13, $vf13, $vf13y;"
+        "vaddz.x $vf13, $vf13, $vf13z;"
+        "vsubx.w $vf13, $vf13, $vf13x;"
+        "vmulw.xyz $vf14, $vf12, $vf11w;"
+        "vmulw.xyz $vf15, $vf11, $vf12w;"
+        "vopmula.xyz ACC, $vf12, $vf11;"
+        "vopmsub.xyz $vf16, $vf11, $vf12;"
+        "vadd.xyz $vf13, $vf14, $vf15;"
+        "vadd.xyz $vf13, $vf13, $vf16;"
+        "sqc2 $vf13, 0(%1);"
+        "lqc2 $vf14, 0(%1);"
+        "vmul.xyzw $vf15, $vf14, $vf14;"
+        "vaddy.x $vf15, $vf15, $vf15y;"
+        "vaddz.x $vf15, $vf15, $vf15z;"
+        "vaddw.x $vf15, $vf15, $vf15w;"
+        "vrsqrt Q, $vf0w, $vf15x;"
+        "vwaitq;"
+        "vmulq.xyzw $vf15, $vf14, Q;"
+        "sqc2 $vf15, 0(%1)"
+        : : "r"(sp2), "r"(d), "r"(diff) : "memory");
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/quat", StabilizeToYRotQuaternion);
 void StabilizeToYRotQuaternion(f32 *dst)

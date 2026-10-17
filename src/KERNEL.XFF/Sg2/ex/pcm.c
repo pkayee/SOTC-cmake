@@ -7,13 +7,29 @@ extern PcmInSlot D_40115B28[];
 extern PcmInSlot D_40115B00[];
 extern PcmAfSlot D_401157BC[];
 extern s32 D_401157B8;
-extern s32 D_401157A0;
+typedef struct {
+    s32 f0;
+    s32 ctrl;
+    s32 f8;
+    s32 buf;
+    s32 size;
+    s32 f14;
+    s32 pos;
+    u8 pad1C[0x188];
+    s32 mode;   /* 0x1A4 */
+    s32 len;    /* 0x1A8 */
+    s32 f1AC;
+    s32 f1B0;
+} PcmOut;
+extern PcmOut D_401157A0;
 extern s32 D_401157A8[];
 extern s32 D_401160A8;
 s32 Sg2StPcmSetVolume(s32 arg0, s32 arg1);
 s32 Sg2StPcmSetEffect(s32 arg0);
 void *memset(void *s, int c, unsigned long n);
 void func_4003FC78();
+s32 Sg2StPcmIopTransOffset(void);
+void func_40040118(void);
 extern PcmInSlot D_40115958[];
 extern PcmInSlot D_4011595C[];
 extern PcmInSlot D_40115970[];
@@ -29,6 +45,7 @@ void func_40040710();
 extern s32 D_401157B0;
 void Sg2ExPcmInputCtrl(u32 arg0, s32 arg1);
 void func_4003FF10(void *a0, s32 a1, void *a2, s32 a3);
+void func_4003FD60(s32 *a0, s32 a1, s32 a2, s32 a3, f32 f12, f32 f13);
 s32 func_4003FAD0(void *arg0, s32 arg1);
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", func_4003F3C8);
@@ -259,7 +276,27 @@ s32 Sg2ExPcmInputOpenDoubleBuffer(s32 arg0, s32 arg1, s32 arg2)
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", Sg2ExPcmInputOpen);
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", Sg2ExPcmInputClose);
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", Sg2ExPcmInputCtrl);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", Sg2ExPcmInputCtrl);
+void Sg2ExPcmInputCtrl(u32 arg0, s32 arg1)
+{
+    s32 intr;
+
+    if (arg0 >= 4 || (arg1 & 3) == 3)
+    {
+        return;
+    }
+    intr = DIntr();
+    if (arg1 & 1)
+    {
+        D_40115958[arg0].f[5] = 0;
+        D_40115958[arg0].f[116] = 0;
+    }
+    D_40115958[arg0].f[0] = arg1;
+    if (intr)
+    {
+        EIntr();
+    }
+}
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", Sg2ExPcmInputGetLipFrame);
 s32 Sg2ExPcmInputGetLipFrame(u32 arg0)
 {
@@ -286,6 +323,7 @@ s32 Sg2ExPcmInputGetRealPlayFrameCount(u32 arg0)
 }
 
 
+extern u16 pan_tbl[];
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", func_40040710);
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", Sg2ExPcmInputSetVol);
@@ -383,7 +421,7 @@ s32 Sg2ExPcmOutputClose(void)
 
     intr = DIntr();
     Sg2ExPcmOutputCtrl(2);
-    p = &D_401157A0;
+    p = (s32 *)&D_401157A0;
     buf = p[3];
     p[3] = 0;
     if (intr)
@@ -394,7 +432,26 @@ s32 Sg2ExPcmOutputClose(void)
     return 0;
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", Sg2ExPcmOutputBufferClear);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", Sg2ExPcmOutputBufferClear);
+s32 Sg2ExPcmOutputBufferClear(void)
+{
+    s32 *p = (s32 *)&D_401157A0;
+    s32 intr;
+
+    if (p[3] != 0)
+    {
+        return -1;
+    }
+    intr = DIntr();
+    func_4003FAD0(p, p[4]);
+    if (intr != 0)
+    {
+        EIntr();
+    }
+    func_4003FBD8((PcmInSlot *)p, p[4]);
+    p[6] = 0;
+    return 0;
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", Sg2ExPcmOutputSetVol);
 void Sg2ExPcmOutputSetVol(s32 arg0, s32 arg1)
@@ -413,11 +470,37 @@ void Sg2ExPcmOutputSetEffect(s32 arg0)
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", Sg2ExPcmOutputSetOutputMode);
 void Sg2ExPcmOutputSetOutputMode(s32 arg0)
 {
-    D_401157A0 = arg0;
+    D_401157A0.f0 = arg0;
 }
 
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", Sg2ExPcmOutputCtrl);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", Sg2ExPcmOutputCtrl);
+void Sg2ExPcmOutputCtrl(s32 arg0)
+{
+    if ((arg0 & 3) == 3)
+    {
+        return;
+    }
+    if (arg0 & 1)
+    {
+        if (!(D_401157A0.ctrl & 1))
+        {
+            D_401157A0.pos = 0;
+            if (D_401157A0.mode != 0)
+            {
+                if (D_401157A0.buf != 0)
+                {
+                    Sg2StPcmStart(D_401157A0.mode, D_401157A0.len << 1);
+                }
+            }
+        }
+    }
+    if (arg0 & 2)
+    {
+        Sg2StPcmStop();
+    }
+    D_401157A0.ctrl = arg0;
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", Sg2ExPcmOutputGetLipFrame);
 s32 Sg2ExPcmOutputGetLipFrame(void)
@@ -467,7 +550,27 @@ void Sg2ExPcmCheckAutoFilterSeq(u8 *arg0)
 }
 
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", Sg2ExPcmTickProc);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", Sg2ExPcmTickProc);
+void Sg2ExPcmTickProc(void)
+{
+    s32 off;
+    s32 len;
+
+    func_40040118();
+    if (D_401157A0.ctrl & 2)
+    {
+        return;
+    }
+    off = Sg2StPcmIopTransOffset();
+    len = D_401157A0.len / 2;
+    if (off / 2 / len == D_401157A0.f1B0)
+    {
+        return;
+    }
+    func_4003FAD0((void *)&D_401157A0, len);
+    func_4003FBD8((PcmInSlot *)&D_401157A0, len);
+    D_401157A0.f1B0 = (D_401157A0.f1B0 + 1) % 2;
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", Sg2ExPcmSetSignal);
 void Sg2ExPcmSetSignal(s32 arg0)
