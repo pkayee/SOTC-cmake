@@ -4,12 +4,13 @@ extern void isysInitGroup();
 extern char subThreadGroup[];
 typedef struct {
     s32 unk0;
-    s32 unk4;
+    u32 unk4;
     u8 pad8[4];
     s32 unkC;
     s32 unk10;
     s32 unk14;
     s32 unk18;
+    s32 state;
 } SubThreadEnv;
 
 typedef struct {
@@ -126,9 +127,54 @@ void *isysGetThisSubThread(void)
     return D_40045E98;
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/subthread", isysInitSubThreadObj);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/subthread", isysInitSubThreadObj);
+s32 isysInitSubThreadObj(SubThread *t, s32 entry, s32 unused, s32 size)
+{
+    SubThreadEnv *e = SUBTHREAD_ENV(t);
+    void *stack = iosMallocAlign(*(s32 *)t, size, 0x10);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/subthread", isysCreateSubThreadS);
+    e->unkC = (s32)stack;
+    if (stack == NULL)
+    {
+        return -1;
+    }
+    e->unk14 = size;
+    e->unk0 = entry;
+    e->unk18 = 1;
+    e->unk4 = entry;
+    e->unk10 = (s32)stack + size;
+    isysAddGroupWithLinkParam(t, subThreadGroup, 0, 0);
+    return 0;
+}
+
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/subthread", isysCreateSubThreadS);
+SubThread *isysCreateSubThreadS(s32 entry, s32 parent, s32 size)
+{
+    SubThread *t = _isysCreateObj(parent, 3, 0x40, size + 0x10, isysDeleteSubThread, 4);
+    SubThreadEnv *e;
+    void *stack;
+    s32 r;
+
+    if (t == NULL)
+    {
+        return NULL;
+    }
+    e = SUBTHREAD_ENV(t);
+    stack = iosMallocAlign(*(s32 *)t, size, 0x10);
+    e->unkC = (s32)stack;
+    r = -1;
+    if (stack != NULL)
+    {
+        e->unk14 = size;
+        e->unk0 = entry;
+        e->unk18 = 1;
+        e->unk4 = entry;
+        e->unk10 = (s32)stack + size;
+        isysAddGroupWithLinkParam(t, subThreadGroup, 0, 0);
+        r = 0;
+    }
+    return r == 0 ? t : NULL;
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/subthread", isysSleepSubThreadM);
 void isysSleepSubThreadM(s32 count)
