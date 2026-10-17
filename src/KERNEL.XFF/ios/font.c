@@ -121,7 +121,16 @@ u8 *iosGetFontDataWithSJIS(FontInfo *out, s32 sjis, s32 font) {
     return ret;
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/font", iosGetFontDataWithEUC);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/font", iosGetFontDataWithEUC);
+u8 *iosGetFontDataWithEUC(FontInfo *out, s32 euc, s32 font) {
+    s32 jis = SjisToJis(func_4002D888(euc));
+    FontInfo *f = &D_400F5BF8[font];
+    u8 *ret = f->data + JisToId(jis) * (f->w * f->h);
+    if (out != NULL) {
+        *out = *f;
+    }
+    return ret;
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/font", iosGetFontIDWithJIS);
 s32 iosGetFontIDWithJIS(s32 jis) {
