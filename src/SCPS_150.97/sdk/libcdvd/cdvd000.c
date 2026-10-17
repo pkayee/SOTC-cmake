@@ -70,8 +70,7 @@ INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libcdvd/cdvd000", _sceCd_cd_callba
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libcdvd/cdvd000", _sceCd_cbLoop);
 
-/* NEARMISS-STUB sceCdInitEeCB */
-#if 0 /* NEARMISS 96.0% cat=branch-layout sub=- | ret join-point copy, s1 base | attempts=1 */
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libcdvd/cdvd000", sceCdInitEeCB);
 extern struct ThreadParam D_00150F98[];
 extern s32 D_00133B54[];
 extern char D_00138990[];
@@ -83,8 +82,7 @@ s32 sceCdInitEeCB(s32 prio, void *stack, s32 stackSize)
     s32 thread;
 
     ret = 1;
-    thread = D_00133B54[0];
-    if (thread == 0)
+    if (D_00133B54[0] == 0)
     {
         D_00150F98[0].stackSize = stackSize;
         D_00150F98[0].entry = _sceCd_cbLoop;
@@ -92,67 +90,59 @@ s32 sceCdInitEeCB(s32 prio, void *stack, s32 stackSize)
         D_00150F98[0].initPriority = prio;
         D_00150F98[0].option = (u32)D_00138990;
         D_00150F98[0].gpReg = NULL;
-        thread = CreateThread(D_00150F98);
-        D_00133B54[0] = thread;
-        StartThread(thread, NULL);
+        D_00133B54[0] = CreateThread(D_00150F98);
+        StartThread(D_00133B54[0], NULL);
     }
     else
     {
-        ChangeThreadPriority(thread, prio);
+        ChangeThreadPriority(D_00133B54[0], prio);
         ret = 0;
     }
     return ret;
 }
-#endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libcdvd/cdvd000", sceCdInitEeCB);
 
-/* NEARMISS-STUB _sceCd_cd_read_intr */
-#if 0 /* NEARMISS 70.0% cat=inline-unroll sub=- | copy loops pointer increment vs index | attempts=1 */
-extern s32 D_00133BA0[];
-void _sceCd_cd_callback(s32 *arg);
 
-void _sceCd_cd_read_intr(u32 addr)
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libcdvd/cdvd000", _sceCd_cd_read_intr);
+typedef struct
 {
-    volatile s32 *hdr;
-    volatile u8 *src;
-    u8 *dst;
-    u8 *dstu;
-    s32 i;
-    u8 c;
+    int size1;
+    int size2;
+    u8 *dest1;
+    u8 *dest2;
+    u8 buf1[64];
+    u8 buf2[64];
+} CdReadIntrData;
 
-    hdr = (volatile s32 *)(addr | 0x20000000);
-    if (hdr[0] > 0)
+extern u8 D_00133BA0[];
+void _sceCd_cd_callback(void *arg);
+
+void _sceCd_cd_read_intr(CdReadIntrData *data)
+{
+    int i;
+    u8 *dst;
+    u8 *udst;
+
+    data = (CdReadIntrData *)((u32)data | 0x20000000);
+    if (data->size1 > 0)
     {
-        dst = (u8 *)hdr[2];
-        dstu = (u8 *)((u32)dst | 0x20000000);
-        src = (volatile u8 *)hdr + 0x10;
-        i = 0;
-        do
+        udst = (u8 *)((u32)data->dest1 | 0x20000000);
+        dst = data->dest1;
+        for (i = 0; i < data->size1; i++)
         {
-            c = src[i];
-            dstu[i] = c;
-            dst[i] = c;
-            i++;
-        } while (i < hdr[0]);
+            dst[i] = udst[i] = data->buf1[i];
+        }
     }
-    if (hdr[1] > 0)
+    if (data->size2 > 0)
     {
-        dst = (u8 *)hdr[3];
-        dstu = (u8 *)((u32)dst | 0x20000000);
-        src = (volatile u8 *)hdr + 0x50;
-        i = 0;
-        do
+        udst = (u8 *)((u32)data->dest2 | 0x20000000);
+        dst = data->dest2;
+        for (i = 0; i < data->size2; i++)
         {
-            c = src[i];
-            dstu[i] = c;
-            dst[i] = c;
-            i++;
-        } while (i < hdr[1]);
+            dst[i] = udst[i] = data->buf2[i];
+        }
     }
     _sceCd_cd_callback(D_00133BA0);
 }
-#endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libcdvd/cdvd000", _sceCd_cd_read_intr);
 
 /* NEARMISS-STUB func_001170B0 */
 #if 0 /* NEARMISS 91.0% cat=regalloc sub=- | SemaParam store order/const reuse | attempts=1 */
