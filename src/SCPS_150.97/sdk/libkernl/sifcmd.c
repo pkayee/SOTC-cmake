@@ -53,11 +53,10 @@ INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/sifcmd", sceSifAddCmdHand
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/sifcmd", sceSifRemoveCmdHandler);
 
 /* NEARMISS-STUB _sceSifSendCmd */
-#if 0 /* NEARMISS 99.45% cat=sched sub=- | andi v0 vs v1 on mode&4; sdd[0].addr store order | attempts=1 */
+#if 0 /* NEARMISS 99.58% cat=sched sub=- | sdd[0] store order, mode&1 andi v1 vs v0 | attempts=2 */
 unsigned int _sceSifSendCmd(unsigned int fcode, int mode, void *pkt, int psize, void *dest, void *ddata, int dsize)
 {
     sceSifDmaData sdd[2];
-    u32 w;
     int n;
 
     if ((u32)(psize - 16) >= 0x61)
@@ -68,11 +67,10 @@ unsigned int _sceSifSendCmd(unsigned int fcode, int mode, void *pkt, int psize, 
     n = 0;
     if (dsize > 0)
     {
-        w = ((u8 *)pkt)[0] | (dsize << 8);
         ((u32 *)pkt)[1] = (u32)ddata;
-        n = 1;
         sdd[0].data = (u32)dest;
-        ((u32 *)pkt)[0] = w;
+        ((u32 *)pkt)[0] = ((u8 *)pkt)[0] | (dsize << 8);
+        n = 1;
         sdd[0].addr = (u32)ddata;
         sdd[0].size = dsize;
         sdd[0].mode = 0;
@@ -83,7 +81,7 @@ unsigned int _sceSifSendCmd(unsigned int fcode, int mode, void *pkt, int psize, 
     }
     else
     {
-        w = ((u8 *)pkt)[0];
+        u32 w = ((u8 *)pkt)[0];
         ((u32 *)pkt)[1] = 0;
         ((u32 *)pkt)[0] = w;
     }
