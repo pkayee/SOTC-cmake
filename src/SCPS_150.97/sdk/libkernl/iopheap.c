@@ -198,4 +198,20 @@ u32 sceSifQueryBlockTopAddress(u32 addr)
     return D_00147380[0];
 }
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/iopheap", sceSifQueryBlockSize);
+u32 sceSifQueryBlockSize(u32 addr)
+{
+    s32 ret;
+
+    if (D_0013242C[0] < 0)
+    {
+        return 0;
+    }
+    D_001473C0[0] = addr;
+    ret = sceSifCallRpc(D_00147340, 9, 0, D_001473C0, 4, D_00147380, 4, NULL, NULL);
+    if (ret < 0)
+    {
+        return -1;
+    }
+    return D_00147380[0];
+}
+
