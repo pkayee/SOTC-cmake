@@ -140,6 +140,13 @@ def build_stuff(basename, linker_entries: List[LinkerEntry], is_xff, split):
             command=f"{XFF_COMPILE_CMD} $in -o $out && {cross}strip $out -N dummy-symbol-name",
         )
 
+    # second compiler (v4.1): segments whose option string carries `cc=<dir under tools/cc>` (e.g. the Sony SDK libs, ee-gcc2.9-991111)
+    ninja.rule(
+        "cc_alt",
+        description="cc[$cc_name] $in",
+        command=f"sh tools/cc_alt.sh tools/cc/$cc_name $in $out -Iinclude/cc29 {COMMON_INCLUDES} $optlevel {'-G0 ' if is_xff else ''}-g2 && {cross}strip $out -N dummy-symbol-name",
+    )
+
     ninja.rule(
         "ld",
         description="link $out",
@@ -197,7 +204,14 @@ def build_stuff(basename, linker_entries: List[LinkerEntry], is_xff, split):
                 opt = "-O2"
             else:
                 opt = seg.yaml[3]
-            build(entry.object_path, entry.src_paths, "cc", variables={"regnames": regnames, "optlevel": opt})
+            # per-segment compiler: a `cc=<name>` token in the option string selects tools/cc/<name> (default: COMPILER)
+            toks = opt.split()
+            alt = [t[3:] for t in toks if t.startswith("cc=")]
+            opt = " ".join(t for t in toks if not t.startswith("cc="))
+            if alt and alt[0] != COMPILER:
+                build(entry.object_path, entry.src_paths, "cc_alt", variables={"cc_name": alt[0], "optlevel": opt})
+            else:
+                build(entry.object_path, entry.src_paths, "cc", variables={"regnames": regnames, "optlevel": opt})
         elif isinstance(
             seg, splat.segtypes.common.databin.CommonSegDatabin
         ) or isinstance(seg, splat.segtypes.common.rodatabin.CommonSegRodatabin
