@@ -37,10 +37,41 @@ void iosDmaSendSChainPath1(s32);
 void isysObjDeleteLock(s32);
 s32 isysAddGroupWithLinkParamNoWait(s32, volatile s32 *, s32, s32);
 void func_40024FB0(void);
+extern char D_40047600[];
+void isysObjWaitSema();
+void isysObjSignalSema();
+s32 *isysGroupForFirstForce();
+s32 *isysGroupForNextForce();
+void isysObjDeleteUnLock();
+void isysGroupForExit();
+void isysDeleteGroupAllObj();
+void func_40024B90(void);
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dl", func_40024B90);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dl", iosDlPopLayer);
+s32 iosDlPopLayer(void)
+{
+    s32 count = D_40045A20 - 1;
+    s32 layer;
+
+    D_40045A20 = count;
+    if (count < 0)
+    {
+        LoaderSysPrintf(D_40047600, ((volatile DlState *)&D_40092698)->layer, D_400926C8[count]);
+    }
+    layer = D_400926C8[D_40045A20];
+    if (layer < 0)
+    {
+        LoaderSysPrintf(D_400475C0);
+    }
+    else if (layer >= ((volatile DlState *)&D_40092698)->layerNum)
+    {
+        layer = ((volatile DlState *)&D_40092698)->layerNum - 1;
+    }
+    ((volatile DlState *)&D_40092698)->layer = layer;
+
+    return D_400926C8[D_40045A20];
+}
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dl", func_40024FB0);
 
@@ -208,7 +239,35 @@ void iosDlChainTailCurrent(s32 dc)
 #endif
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dl", iosDlChainTailCurrent);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dl", iosDlSwap);
+void iosDlSwap(void)
+{
+    s32 *group;
+    s32 idx;
+    s32 *link;
+    s32 obj = 0;
+
+    WaitSema(*(volatile s32 *)&D_40092690);
+    ((volatile DlState *)&D_40092698)->workBufId ^= 1;
+    idx = ((volatile DlState *)&D_40092698)->workBufId;
+    group = (s32 *)((volatile DlState *)&D_40092698)->lockLink + idx;
+    isysObjWaitSema();
+    link = isysGroupForFirstForce(group, 0);
+    while (link != 0)
+    {
+        obj = *link;
+        isysObjDeleteUnLock(obj);
+        ((volatile DlState *)&D_40092698)->lockCount[idx]--;
+        link = isysGroupForNextForce(link, 0);
+    }
+    if (obj != 0)
+    {
+        isysGroupForExit(obj, 0);
+    }
+    isysDeleteGroupAllObj(group);
+    isysObjSignalSema();
+    func_40024B90();
+    SignalSema(*(volatile s32 *)&D_40092690);
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dl", iosDlTrans);
 void iosDlTrans(void)
@@ -223,20 +282,12 @@ void iosDlTrans(void)
     SignalSema(*sema);
 }
 
-/* NEARMISS-STUB iosDlLockObj */
-#if 0 /* NEARMISS 85.36% cat=sched sub=- | REA: 100 with no link vars via volatile DlState* base re-materialised per use (rea/dl.md, decomper2 FIX); a0<-s1 before lw a1 | attempts=1 */
-// kR39 iosDlLockObj 85.36% partial: sched2 order of move a0,s1 vs lw a1 after jal isysObjDeleteLock; inline &dl->lockLink variant 83.04 (worse)
 void iosDlLockObj(s32 arg0)
 {
-    volatile DlState *dl = &D_40092698;
-    volatile s32 *link = dl->lockLink;
-
     isysObjDeleteLock(arg0);
-    isysAddGroupWithLinkParamNoWait(arg0, &link[dl->workBufId], 0, 0);
-    dl->lockCount[dl->workBufId]++;
+    isysAddGroupWithLinkParamNoWait(arg0, &((volatile DlState *)&D_40092698)->lockLink[((volatile DlState *)&D_40092698)->workBufId], 0, 0);
+    ((volatile DlState *)&D_40092698)->lockCount[((volatile DlState *)&D_40092698)->workBufId]++;
 }
-#endif
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dl", iosDlLockObj);
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dl", iosDlGetWorkBufId);
 s32 iosDlGetWorkBufId(void)

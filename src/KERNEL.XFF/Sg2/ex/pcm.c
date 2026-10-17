@@ -68,18 +68,13 @@ extern PcmInSlot D_40115B00[];
 extern PcmAfSlot D_401157BC[];
 extern s32 D_401157B8;
 typedef struct {
-    s32 f0;
-    s32 ctrl;
-    s32 f8;
-    s32 buf;
-    s32 size;
-    s32 f14;
-    s32 pos;
-    u8 pad1C[0x188];
-    s32 mode;   /* 0x1A4 */
-    s32 len;    /* 0x1A8 */
+    s32 outMode;    /* +0x000 */
+    s32 ctrl;       /* +0x004 */
+    PcmStream st;   /* +0x008 pcm=+8, work=+0xC, size=+0x10, chunk=+0x14, pos=+0x18 */
+    s32 mode;       /* +0x1A4 */
+    s32 len;        /* +0x1A8 */
     s32 f1AC;
-    s32 f1B0;
+    s32 f1B0;       /* +0x1B0 half-buffer toggle */
 } PcmOut;
 extern PcmOut D_401157A0;
 extern s32 D_401157A8[];
@@ -87,6 +82,7 @@ extern s32 D_401160A8;
 s32 Sg2StPcmSetVolume(s32 arg0, s32 arg1);
 s32 Sg2StPcmSetEffect(s32 arg0);
 void *memset(void *s, int c, unsigned long n);
+void *malloc(s32 n);
 void func_4003FC78();
 s32 Sg2StPcmIopTransOffset(void);
 void func_40040118(void);
@@ -454,8 +450,7 @@ s32 func_40040350(void)
 }
 
 /* NEARMISS-STUB func_40040398 */
-#if 0 /* NEARMISS 91.55% cat=sched sub=- | addu base in jal malloc delay slot; post-SetPhase store order chunk,pcm,playFrames,size | attempts=1 */
-//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", func_40040398);
+#if 0 /* NEARMISS 96.45% cat=sched sub=delay-slot | jal malloc delay slot: target fills it with addu s1,s1,a1 (p=&D_40115958[idx] after call); ours hoists addu before jal, nop in slot. Tail store order: target ch | attempts=2 */
 s32 func_40040398(s16 *pcm, s32 size, s32 chunk, s32 mode, s32 flags, s32 ls, s32 le, s32 lipLen)
 {
     s32 idx;
@@ -477,20 +472,20 @@ s32 func_40040398(s16 *pcm, s32 size, s32 chunk, s32 mode, s32 flags, s32 ls, s3
     }
     intr = DIntr();
     p->mode = mode;
-    p->ctrl = 2;
+    p->outMode = mode;
     p->flags = flags;
     p->loopStart = ls;
     p->loopEnd = le;
+    p->ctrl = 2;
     p->lipLen = lipLen;
-    p->outMode = mode;
     Sg2ExPcmInputSetVol(idx, 100);
     Sg2ExPcmInputSetPan(idx, 0x40);
     Sg2ExPcmInputSetPhase(idx, 1, 1);
-    p->st.chunk = chunk;
     p->st.pcm = pcm;
-    p->playFrames = 0;
-    p->st.size = size;
     p->st.pos = 0;
+    p->st.size = size;
+    p->playFrames = 0;
+    p->st.chunk = chunk;
     Sg2ExPcmInputAutoFilterInit(idx, 0);
     Sg2ExPcmInputAutoFilterInit(idx, 1);
     if (intr)
@@ -499,12 +494,6 @@ s32 func_40040398(s16 *pcm, s32 size, s32 chunk, s32 mode, s32 flags, s32 ls, s3
     }
     return idx;
 }
-/* kR38 best 91.55% (typed PcmIn, mode/outMode store order flipped). Residual (compact):
- *  - malloc delay slot: target has `addu s1,s1,a1` in jal malloc delay slot; ours hoists it before jal, nop in slot
- *  - post-SetPhase tail: target order chunk(+0x10), pcm(+4), playFrames(+0x1D0), size(+0xC), pos(+0x14) in AutoFilterInit delay slot;
- *    ours compiles pos(+0x14) early and size into the delay slot (reordering A3/A4 did not help)
- *  - malloc arg `chunk*4` / implicit malloc prototype warns; codegen unaffected
- */
 #endif
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", func_40040398);
 
@@ -694,7 +683,45 @@ void Sg2ExPcmInputAutoFilterCtrl(u32 arg0, s32 arg1, s32 arg2)
     }
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", Sg2ExPcmOutputOpen);
+s32 Sg2ExPcmOutputBufferClear(void);
+void Sg2ExPcmOutputAutoFilterInit(s32 arg0);
+
+s32 Sg2ExPcmOutputOpen(s32 arg0, s16 *arg1, s32 arg2)
+{
+    PcmOut *o = &D_401157A0;
+    f32 *work;
+    s32 intr;
+
+    if (o->st.work != 0)
+    {
+        return -1;
+    }
+    work = malloc((arg2 / 2) * 4);
+    o->st.work = work;
+    if (work == 0)
+    {
+        return -2;
+    }
+    intr = DIntr();
+    o->st.pcm = arg1;
+    o->len = arg2;
+    o->f1B0 = 0;
+    o->st.size = arg2;
+    o->mode = arg0;
+    o->st.chunk = arg2;
+    o->st.pos = 0;
+    Sg2ExPcmOutputBufferClear();
+    o->st.pos = 0;
+    o->f1AC = 0;
+    Sg2ExPcmOutputAutoFilterInit(0);
+    Sg2ExPcmOutputAutoFilterInit(1);
+    o->outMode = 1;
+    if (intr)
+    {
+        EIntr();
+    }
+    return 0;
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", Sg2ExPcmOutputClose);
 s32 Sg2ExPcmOutputClose(void)
@@ -754,7 +781,7 @@ void Sg2ExPcmOutputSetEffect(s32 arg0)
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", Sg2ExPcmOutputSetOutputMode);
 void Sg2ExPcmOutputSetOutputMode(s32 arg0)
 {
-    D_401157A0.f0 = arg0;
+    D_401157A0.outMode = arg0;
 }
 
 
@@ -769,10 +796,10 @@ void Sg2ExPcmOutputCtrl(s32 arg0)
     {
         if (!(D_401157A0.ctrl & 1))
         {
-            D_401157A0.pos = 0;
+            D_401157A0.st.pos = 0;
             if (D_401157A0.mode != 0)
             {
-                if (D_401157A0.buf != 0)
+                if (D_401157A0.st.work != 0)
                 {
                     Sg2StPcmStart(D_401157A0.mode, D_401157A0.len << 1);
                 }
