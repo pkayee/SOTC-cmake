@@ -215,7 +215,47 @@ s32 Sg2SepCheckSndOn(u32 id)
     return 0;
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/sep", Sg2SepSetParam);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/sep", Sg2SepSetParam);
+s32 Sg2SepSetParam(u32 id, s32 p, s32 a2, s32 a3)
+{
+    if (id < 32)
+    {
+        switch (p)
+        {
+        case 2:
+            Sg2ModSetParam(D_40110B50[id][0], 1, a2, a3);
+            break;
+        case 1024:
+            Sg2ModSetParam(D_40110B50[id][0], 65536, a2, a3);
+            break;
+        case 4:
+            Sg2ModSetParam(D_40110B50[id][0], 4, a2, a3);
+            break;
+        case 8:
+            Sg2ModSetParam(D_40110B50[id][0], 16, 1, 0);
+            break;
+        case 16:
+            Sg2ModSetParam(D_40110B50[id][0], 16, 0, 0);
+            break;
+        case 32:
+            Sg2ModSetParam(D_40110B50[id][0], 256, a2, a3);
+            break;
+        case 64:
+            Sg2ModSetParam(D_40110B50[id][0], 512, a2, 0);
+            break;
+        case 128:
+            Sg2ModSetParam(D_40110B50[id][0], 1024, a2, a3);
+            break;
+        case 256:
+            Sg2ModSetParam(D_40110B50[id][0], 2048, a2, a3);
+            break;
+        case 512:
+            Sg2ModSetParam(D_40110B50[id][0], 4096, a2, a3);
+            break;
+        }
+    }
+    return 0;
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/sep", Sg2SepMidiOut);
 s32 Sg2SepMidiOut(u32 id, s32 len, u8 *data)
