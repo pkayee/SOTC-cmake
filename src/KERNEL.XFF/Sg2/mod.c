@@ -90,6 +90,7 @@ f32 dptofp(s64 x);
 s32 DIntr(void);
 s32 EIntr(void);
 void *memset(void *p, s32 c, u32 n);
+void *memcpy(void *d, const void *s, u32 n);
 void func_40032AC0(s32 arg0);
 s32 Sg2CtrlEntryTickProcById(s32 id, void (*proc)(void));
 void Sg2ModTickProc(void);
@@ -195,7 +196,27 @@ void Sg2ModMidiout1Exclusive(s32 arg0, u8 *arg1) {
     }
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/mod", Sg2ModMidiout);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/mod", Sg2ModMidiout);
+void Sg2ModMidiout(s32 mod, s32 len, u8 *data) {
+    s32 intr = DIntr();
+    Sg2ModMidiBuf *b = &D_400F90BC[mod];
+    s32 room = 0x200 - b->wp;
+    s32 diff = room - len;
+    s32 rest;
+
+    if (diff >= 0) {
+        memcpy(&b->data[b->wp], data, len);
+        b->wp = (b->wp + len) & 0x1FF;
+    } else {
+        memcpy(&b->data[b->wp], data, room);
+        rest = -diff;
+        memcpy(b->data, data + room, rest);
+        b->wp = rest;
+    }
+    if (intr) {
+        EIntr();
+    }
+}
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/mod", Sg2ModTickProc);
 
