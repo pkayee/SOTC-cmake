@@ -37,7 +37,8 @@ typedef struct {
     s32 directPitch; /* 0x70 */
     s16 volPhase0; /* 0x74 */
     s16 volPhase1; /* 0x76 */
-    u8 pad78[8];
+    s32 lfoPitchSpeed; /* 0x78 */
+    s32 lfoPitchDepth; /* 0x7C */
     union {
         struct {
             s32 lfoPitchPhase;
@@ -88,6 +89,7 @@ extern Sg2SlotWord D_401117F8[];
 extern Sg2SlotWord D_40111804[];
 extern Sg2SlotWord D_40111808[];
 extern Sg2SlotWord D_40111810[];
+extern Sg2SlotWord D_401117B4[];
 extern void Sg2RemoteSend(s32, s32, s32, s32);
 extern s32 D_401117A4;
 extern s32 D_401117A8;
@@ -339,7 +341,19 @@ void Sg2SlotSetGroup(s32 idx, s32 v)
     D_401117CC[idx].v = v;
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotSetMute);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotSetMute);
+void Sg2SlotSetMute(s32 idx, s32 on)
+{
+    if (on)
+    {
+        D_401117B0[idx].flags |= 0x8000;
+    }
+    else
+    {
+        D_401117B0[idx].flags &= ~0x8000;
+    }
+    D_401117B0[idx].flags |= 0x1000;
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotSetMasVol);
 void Sg2SlotSetMasVol(s32 i, s32 L, s32 R)
@@ -434,7 +448,19 @@ void Sg2SlotSetPitch(s32 idx, s32 note, s32 semi, s32 baseNote, s32 fine, s32 di
     D_401117B0[idx].flags |= 0x80;
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotSetPause);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotSetPause);
+void Sg2SlotSetPause(s32 idx, s32 on)
+{
+    if (on)
+    {
+        D_401117B0[idx].flags |= 0x4000;
+    }
+    else
+    {
+        D_401117B0[idx].flags &= ~0x4000;
+    }
+    D_401117B0[idx].flags |= 0x80;
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotSetDirectPitch);
 void Sg2SlotSetDirectPitch(s32 idx, s32 v)
@@ -566,9 +592,48 @@ s32 Sg2SlotGetPan(s32 idx)
     return D_40111804[idx].v;
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotSetDumperOff);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotSetDumperOff);
+void Sg2SlotSetDumperOff(s32 slotClass, s32 ch)
+{
+    s32 st;
+    s32 i;
+    st = DIntr();
+    for (i = 0; i < 0x30; i++)
+    {
+        if ((D_401117B0[i].flags & 1) && (D_401117B0[i].flags & 8) && D_401117B0[i].slotClass == slotClass && D_401117B0[i].sub.ch == ch)
+        {
+            D_401117B0[i].flags &= ~8;
+            D_40111778[i < 0x18 ? 0 : 1] |= (i < 0x18) ? (1 << i) : (1 << (i - 0x18));
+        }
+    }
+    if (st)
+    {
+        EIntr();
+    }
+}
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotModKeyOff);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotModKeyOff);
+void Sg2SlotModKeyOff(s32 slotClass, s32 ch, s32 note)
+{
+    s32 st;
+    s32 i;
+    st = DIntr();
+    for (i = 0; i < 0x30; i++)
+    {
+        if (D_401117B0[i].flags & 1)
+        {
+            if (D_401117B0[i].slotClass == slotClass && D_401117B0[i].sub.ch == ch && D_401117B0[i].pit.note == note)
+            {
+                D_401117B0[i].flags &= ~8;
+                D_40111778[i < 0x18 ? 0 : 1] |= (i < 0x18) ? (1 << i) : (1 << (i - 0x18));
+            }
+        }
+    }
+    if (st)
+    {
+        EIntr();
+    }
+}
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotVabKeyOff);
 
@@ -666,6 +731,47 @@ INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotTickProc);
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotInit);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotTbl);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotTbl);
+void Sg2SlotTbl(s32 idx, char *out)
+{
+    s32 n = 0;
+    s32 k;
+    s8 c;
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotEnvTbl);
+    for (k = idx * 24; k < idx * 24 + 24; k++) {
+        c = '-';
+        if (D_401117B4[k].v != 0) {
+            c = *(u8 *)&D_401117B4[k].v + 0x30;
+        }
+        out[n++] = c;
+        if (k != 0 && k != 24 && k % 4 == 3) {
+            out[n++] = ' ';
+        }
+    }
+    out[n] = 0;
+}
+
+extern u8 D_40049260;
+extern char D_40049268[];
+extern char D_40049270[];
+extern s32 Sg2RemoteGetSlotReleaseLv(s32);
+s32 sprintf(char *, const char *, ...);
+char *strcat(char *, const char *);
+
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotEnvTbl);
+void Sg2SlotEnvTbl(char *out)
+{
+    char buf[16];
+    s32 i = 0;
+    s32 rel;
+
+    out[0] = D_40049260;
+    for (i = 0; i < 48; i++) {
+        rel = Sg2RemoteGetSlotReleaseLv(i);
+        sprintf(buf, D_40049268, rel);
+        if ((i + 1) % 12 == 0) {
+            strcat(buf, D_40049270);
+        }
+        strcat(out, buf);
+    }
+}
