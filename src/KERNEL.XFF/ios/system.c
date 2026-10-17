@@ -56,7 +56,35 @@ void iosInit()
     iosCreateIopMgr();
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/system", iosAddIntcHandler);
+typedef struct IntcEnt { s32 key; s32 intc; void *handler; } IntcEnt;
+extern IntcEnt D_400454C0[11];
+extern char D_40046488[];
+extern char D_400464D0[];
+
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/system", iosAddIntcHandler);
+void iosAddIntcHandler(s32 arg0, void *arg1)
+{
+    u32 i;
+
+    for (i = 0; i < 11; i++)
+    {
+        if (D_400454C0[i].key == arg0)
+        {
+            goto found;
+        }
+    }
+    iosJumpRecoverPoint(D_40046488);
+    return;
+found:
+    if (D_400454C0[i].handler != 0)
+    {
+        iosJumpRecoverPoint(D_400464D0);
+        return;
+    }
+    D_400454C0[i].handler = arg1;
+    LoaderSysEntryExternalIntcHandlerList(AddIntcHandler(D_400454C0[i].intc, arg1, 0), D_400454C0[i].intc);
+    EnableIntc(D_400454C0[i].intc);
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/system", iosCreateSema);
 s32 iosCreateSema(s32 arg0, s32 arg1, s32 arg2)
@@ -180,7 +208,30 @@ s32 iosEI()
     return D_40045554;
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/system", iosLoaderResetEntry);
+void func_40013090();
+extern void loaderSetResetCallback(void (*)());
+extern char D_40046590[];
+
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/system", iosLoaderResetEntry);
+void iosLoaderResetEntry(void (*cb)())
+{
+    s32 i;
+
+    if (D_4007CC70[0] == NULL)
+    {
+        loaderSetResetCallback(func_40013090);
+    }
+    for (i = 0; i < 2; i++)
+    {
+        if (D_4007CC70[i] == NULL)
+        {
+            goto done;
+        }
+    }
+    iosJumpRecoverPoint(D_40046590);
+done:
+    D_4007CC70[i] = cb;
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/system", func_40013058);
 s32 func_40013058()
