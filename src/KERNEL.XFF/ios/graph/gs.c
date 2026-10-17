@@ -441,18 +441,7 @@ void iosDmaSendSChainPath3(u32 arg0)
     *D2_CHCR = 0x105;
 }
 
-//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosResetPath);
-void iosResetPath(void)
-{
-    register s32 tmp asm("v1") = 0;
-    *VIF1_FBRST = 1;
-    asm volatile("cfc2.ni %0, $vi28" : "+r"(tmp));
-    tmp |= 0x200;
-    asm volatile("ctc2.ni %0, $vi28; sync.p" : : "r"(tmp));
-    *VIF1_FIFO = D_40045A70[0];
-    *VIF1_FIFO = D_40045A70[1];
-    *GIF_CTRL = 1;
-}
+INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosResetPath);
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosSyncV);
 s32 iosSyncV(s32 arg0)
