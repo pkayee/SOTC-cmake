@@ -30,6 +30,55 @@ extern s8 D_4007DF38[];
 
 s32 func_40016C10(void *arg0);
 
+/* NEARMISS-STUB func_40016C10 */
+#if 0 /* NEARMISS 84.9% cat=regalloc sub=- | best 84.9%: slot base/ctx/off pieces (D_4007DF30+4+off, +8+off) kept live in s0/s3/s2 across iosMallocAlign/sceLibnetInitialize calls; prologue callee-saved save order differs; D_4007DF30 lui/addiu reloads per store | attempts=2 */
+s32 func_40016C10(void *arg0)
+{
+    char host[0x100];
+    s32 prm[16];
+    s32 idx;
+    s32 j;
+    s32 cid;
+    char *name;
+
+    idx = NetFindFreeSlot();
+    D_4007DF30[idx].id = 0;
+    if (idx < 0)
+    {
+        return -1;
+    }
+    memset(prm, 0, 0x40);
+    prm[0] = 1;
+    prm[1] = -1;
+    prm[6] = -1;
+    strcpy(host, arg0);
+    name = host;
+    for (j = 0; j < strlen(name);)
+    {
+        char *p = &name[j];
+
+        j++;
+        if (*p == ':')
+        {
+            *p = 0;
+            sscanf(p + 1, D_40046CB8, &prm[6]);
+            break;
+        }
+    }
+    sceSifMInitRpc(0);
+    D_4007DF30[idx].buf = iosMallocAlign(&rootPtn, 0x800, 0x40);
+    sceLibnetInitialize(D_4007DF30[idx].ctx, 0x800, 0x2000, 0x20);
+    sceLibnetRegisterHandler(D_4007DF30[idx].ctx, D_4007DF30[idx].buf);
+    sceInetName2Address(D_4007DF30[idx].ctx, D_4007DF30[idx].buf, 0, &prm[2], name, -1, -1);
+    cid = sceInetCreate(D_4007DF30[idx].ctx, D_4007DF30[idx].buf, prm);
+    if (sceInetOpen(D_4007DF30[idx].ctx, D_4007DF30[idx].buf, cid, -1) != 0)
+    {
+        return -1;
+    }
+    D_4007DF30[idx].id = cid;
+    return idx;
+}
+#endif
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/net", func_40016C10);
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/net", func_40016E20);

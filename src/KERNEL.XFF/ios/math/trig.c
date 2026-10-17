@@ -204,4 +204,26 @@ f32 iosGetTableCos(s16 arg0)
     return neg ? -D_40082280[idx] : D_40082280[idx];
 }
 
+/* NEARMISS-STUB InitTableSinCos */
+#if 0 /* NEARMISS 93.93% cat=regalloc sub=flag-in-s3 | regalloc: flag addr kept in extra saved s3 (frame 0x50 vs target); sqrt result held in f1 on NaN-check path; table/sinTable copy placement (kN2 re-diff) | attempts=1 */
+// SCORE 93.93% (angle scale 1.0f/16384.0f, pi/2 1.5707963f; arm pointer names swapped: sqrt arm writes table[0], cos arm writes sinTable[0]) (INCLUDE_ASM in tree). needs extern s32 D_400458F4. Diff: target frame 0x50, extra saved s3 (flag addr), sqrt result kept in f1 (NaN-check path).
+void InitTableSinCos(void)
+{
+    s32 i; f32 *table; f32 *sinTable; f32 angle; f32 v;
+    if (D_400458F4 == 0)
+    {
+        table = D_40082280;
+        sinTable = D_40082280;
+        for (i = 0; i <= 0x4000; i++)
+        {
+            angle = (f32)i * (1.0f / 16384.0f);
+            if (angle > 0.5f) { v = sinf(angle * 1.5707963f); table[0] = sqrtf(1.0f - v * v); }
+            else { sinTable[0] = cosf(angle * 1.5707963f); }
+            table++; sinTable++;
+        }
+        D_400458F4 = 1;
+    }
+}
+// remaining: target does addiu v0,lo; daddu s1,v0,zero (table = copy of address temp); sinTable=s1 copy placed after i=0 init
+#endif
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/trig", InitTableSinCos);
