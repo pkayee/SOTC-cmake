@@ -115,4 +115,15 @@ void _cleanup(void)
 
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libc/findfp", _cleanup);
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libc/findfp", __sinit);
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libc/findfp", __sinit);
+void __sinit(struct _reent *s)
+{
+    s->__cleanup = _cleanup_r;
+    s->__sdidinit = 1;
+    std(&s->__sf[0], 4, 0, s);
+    std(&s->__sf[1], 9, 1, s);
+    std(&s->__sf[2], 0xA, 2, s);
+    s->__sglue._next = NULL;
+    s->__sglue._niobs = 3;
+    s->__sglue._iobs = &s->__sf[0];
+}
