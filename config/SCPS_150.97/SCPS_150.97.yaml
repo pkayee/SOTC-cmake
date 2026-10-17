@@ -70,7 +70,7 @@ segments:
 
         - [0x9f08, c, sdk/libkernl/kprintf2, "-O2 -G0 cc=ee-gcc2.9-991111"]
         - [0xa0f8, c, sdk/libkernl/sifrpc, "-O2 -G0 cc=ee-gcc2.9-991111"]
-        - [0xb1b0, asm, sdk/libkernl/filestub]
+        - [0xb1b0, c, sdk/libkernl/filestub, "-O2 -G0 cc=ee-gcc2.9-991111"]
         - [0xede8, c, sdk/libkernl/iopheap, "-O2 -G0 cc=ee-gcc2.9-991111"]
         - [0xf338, asm, sdk/libkernl/eeloadfile]
         - [0x10098, asm, sdk/libkernl/iopreset]
@@ -119,7 +119,7 @@ segments:
         # libvib.a
         - [0x169c0, c, sdk/libvib, "-O2 -G0 cc=ee-gcc2.9-991111"]
         # libdbc.a
-        - [0x16b88, asm, sdk/libdbc]
+        - [0x16b88, c, sdk/libdbc, "-O2 -G0 cc=ee-gcc2.9-991111"]
         # libcdvd.a
         - [0x17d58, c, sdk/libcdvd/cdvd000, "-O2 -G0 cc=ee-gcc2.9-991111"]
         - [0x192d0, asm, sdk/libcdvd/cdvd035]
