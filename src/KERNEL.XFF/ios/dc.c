@@ -115,7 +115,29 @@ void iosSetDCClearParam(DC *dc, u32 flag, u8 r, u8 g, u8 b, u8 a)
     func_40024218(dc);
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dc", iosSetDCViewPort);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dc", iosSetDCViewPort);
+void iosSetDCViewPort(DC *dc, s32 x, s32 y, s32 w, s32 h)
+{
+    s32 oy = 0x800 - y - h / 2;
+    s32 sx = x + w - 1;
+    s32 ox = 0x800 - x - w / 2;
+    s32 sy = y + h - 1;
+    u64 xyoff = ((u64)(oy << 4) << 32) | (u64)(ox << 4);
+    u64 scis = (u64)x | ((u64)sx << 16) | ((u64)y << 32) | ((u64)sy << 48);
+
+    dc->unk68 = 0x18;
+    dc->unk78 = 0x19;
+    dc->unk70 = xyoff;
+    dc->unk60 = xyoff;
+    dc->unk88 = 0x40;
+    dc->unk98 = 0x41;
+    dc->unk174 = x;
+    dc->unk178 = y;
+    dc->unk90 = scis;
+    dc->unk17C = w;
+    dc->unk180 = h;
+    dc->unk80 = scis;
+}
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dc", iosSetDCViewPortCenter);
 
@@ -170,7 +192,42 @@ void iosSetCurrentDC(void)
     iosDlChainTailCurrent(D_40045A00);
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dc", iosResetDC);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dc", iosResetDC);
+static inline void PushDC_i(DC *dc)
+{
+    D_40092288[D_40045A08] = dc;
+    D_40045A08++;
+    iosDlChainTailCurrent(dc);
+    D_40045A00 = dc;
+}
+
+static inline void PushDCWithClear_i(DC *dc)
+{
+    D_40092288[D_40045A08] = dc;
+    D_40045A08++;
+    iosDlChainTailCurrent(dc);
+    if (*(u32 *)&dc->unk170 & 1)
+    {
+        iosDlChainTailCurrent(dc->unkD0);
+    }
+    D_40045A00 = dc;
+}
+
+void iosResetDC(DC *dc)
+{
+    D_40045A04 = dc;
+    D_40045A08 = 0;
+    iosDlPushLayer(0);
+    if (*(u32 *)&dc->unk170 & 1)
+    {
+        PushDCWithClear_i(dc);
+    }
+    else
+    {
+        PushDC_i(dc);
+    }
+    iosDlPopLayer();
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dc", iosInitDC);
 void iosInitDC(void)
