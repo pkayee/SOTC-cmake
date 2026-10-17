@@ -243,7 +243,20 @@ u32 GetSymbolByIndex(ModObj *arg0, s32 idx)
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", isysRelocateModuleObj);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", isysGetXffWorkSize);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", isysGetXffWorkSize);
+s32 isysGetXffWorkSize(ModHdr *h)
+{
+    s32 adj = *(u8 *)&h->unkC != 0 ? *(u8 *)&h->unkC + 1 : 2;
+    s32 nExp = h->unk24 - h->unk1C - adj;
+    s32 sz;
+
+    sz = nExp != 0 ? nExp * 16 + 0x33 : 0;
+    if (h->unk1C != 0)
+    {
+        sz += h->unk1C * 16 + 0x33;
+    }
+    return sz;
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", isysGetModuleObjMallocSize);
 u32 isysGetModuleObjMallocSize(ModObj *arg0)
@@ -334,9 +347,21 @@ s32 func_4001C350(s32 arg0, char *arg1, s32 arg2)
     return iosLoaderFClose(fd);
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", func_4001C3B0);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", func_4001C3B0);
+void *func_4001C3B0(s32 arg0, s32 arg1)
+{
+    void *p = iosMallocAlign((s32)&rootPtn, arg0, arg1);
+    D_40045820 += arg0;
+    return p;
+}
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", func_4001C3F8);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", func_4001C3F8);
+void *func_4001C3F8(s32 arg0)
+{
+    void *p = iosMallocAlign((s32)&rootPtn, arg0, 0x40);
+    D_40045820 += arg0;
+    return p;
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", func_4001C440);
 s32 func_4001C440(void)
