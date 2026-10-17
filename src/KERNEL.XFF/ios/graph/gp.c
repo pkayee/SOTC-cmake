@@ -260,6 +260,19 @@ s32 iosSetVSchedulerFunc(void* arg0)
     return 1;
 }
 
+/* NEARMISS-STUB iosWaitGPFinish */
+#if 0 /* NEARMISS 88.8% cat=regalloc sub=- | t in v1 then copied to s0 in preheader; beqz vs beqzl | attempts=1 */
+// kR39 iosWaitGPFinish 88.8% partial: target keeps t in v1 and copies to s0 only in the loop preheader with plain beqz; ours keeps t in s0 from entry (beqzl). Tried: subtraction-form loop (81.8), s64 arg1 (88.4).
+extern void isysSleepSubThread();
+
+void iosWaitGPFinish(s32 arg0, s32 arg1)
+{
+    s64 t = D_40045AC8 + arg1;
+
+    while (D_40045AC8 < t)
+        isysSleepSubThread();
+}
+#endif
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gp", iosWaitGPFinish);
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gp", func_40028600);
 s32 func_40028600(void)
