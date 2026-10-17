@@ -72,7 +72,7 @@ segments:
         - [0xa0f8, c, sdk/libkernl/sifrpc, "-O2 -G0 cc=ee-gcc2.9-991111"]
         - [0xb1b0, c, sdk/libkernl/filestub, "-O2 -G0 cc=ee-gcc2.9-991111"]
         - [0xede8, c, sdk/libkernl/iopheap, "-O2 -G0 cc=ee-gcc2.9-991111"]
-        - [0xf338, asm, sdk/libkernl/eeloadfile]
+        - [0xf338, c, sdk/libkernl/eeloadfile, "-O2 -G0 cc=ee-gcc2.9-991111"]
         - [0x10098, asm, sdk/libkernl/iopreset]
         - [0x10378, asm, sdk/libkernl/tlbfunc]
         - [0x108c0, asm, sdk/libkernl/tlbtrap]
