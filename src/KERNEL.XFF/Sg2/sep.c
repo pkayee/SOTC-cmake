@@ -107,7 +107,37 @@ s32 Sg2SepStopSndOff(u32 id)
     return 0;
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/sep", Sg2SepPause);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/sep", Sg2SepPause);
+s32 Sg2SepPause(u32 id, s32 flag)
+{
+    s32 intr;
+    Sg2SepSlot *slot;
+
+    if (id < 32)
+    {
+        slot = &D_40110B40[id];
+        if ((u32)(slot->status - 1) < 2)
+        {
+            intr = DIntr();
+            slot->savedStatus = slot->status;
+            Sg2ModSetParam(D_40110B40[id].sub.mod, 128, 1, 0);
+            Sg2ModSetParam(D_40110B40[id].sub.mod, 16, flag, 0);
+            if (flag != 0)
+            {
+                slot->status = 3;
+            }
+            else
+            {
+                slot->status = 4;
+            }
+            if (intr != 0)
+            {
+                EIntr();
+            }
+        }
+    }
+    return 0;
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/sep", Sg2SepCont);
 s32 Sg2SepCont(u32 id)
@@ -235,7 +265,24 @@ s32 Sg2SepMasterVol(s32 vab, s32 vol)
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/sep", Sg2SepTickProc);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/sep", Sg2SepInit);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/sep", Sg2SepInit);
+s32 Sg2SepInit(void)
+{
+    s32 i;
+    Sg2SepSlot *base = D_40110B40;
+    for (i = 0; i < 32; i++)
+    {
+        Sg2SepSub *sub = &D_40110B40[i].sub;
+        memset(&base[i], 0, 0x50);
+        D_40110B40[i].status = 0;
+        sub->unk4 = -1;
+        sub->unk8 = -1;
+        D_40110B40[i].vab = -1;
+    }
+    D_40111540 = 1;
+    Sg2CtrlEntryTickProcById(1, Sg2SepTickProc);
+    return 0;
+}
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/sep", debug_sep_config);
 
