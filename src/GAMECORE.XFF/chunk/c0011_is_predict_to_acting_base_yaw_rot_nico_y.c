@@ -1,0 +1,37 @@
+#include "common.h"
+
+INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0011_is_predict_to_acting_base_yaw_rot_nico_y", is_predict_to_acting_base_yaw_rot_nico_yaw_pitch_cntrl);
+
+INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0011_is_predict_to_acting_base_yaw_rot_nico_y", reset_nico_yaw_pitch_cntrl);
+
+INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0011_is_predict_to_acting_base_yaw_rot_nico_y", set_yaw_pitch_input_border_parameter_nico_yaw_pitch_cntrl);
+
+INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0011_is_predict_to_acting_base_yaw_rot_nico_y", set_offset_yaw_parameter_nico_yaw_pitch_cntrl);
+
+INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0011_is_predict_to_acting_base_yaw_rot_nico_y", set_offset_pitch_parameter_nico_yaw_pitch_cntrl);
+
+INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0011_is_predict_to_acting_base_yaw_rot_nico_y", set_base_yaw_parameter_nico_yaw_pitch_cntrl);
+
+INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0011_is_predict_to_acting_base_yaw_rot_nico_y", set_base_pitch_parameter_nico_yaw_pitch_cntrl);
+
+INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0011_is_predict_to_acting_base_yaw_rot_nico_y", set_max_min_yaw_parameter_nico_yaw_pitch_cntrl);
+
+INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0011_is_predict_to_acting_base_yaw_rot_nico_y", set_max_min_yaw_parameter_extend_nico_yaw_pitch_cntrl);
+
+INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0011_is_predict_to_acting_base_yaw_rot_nico_y", set_max_min_pitch_parameter_nico_yaw_pitch_cntrl);
+
+INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0011_is_predict_to_acting_base_yaw_rot_nico_y", set_reverse_input_yaw_flag_nico_yaw_pitch_cntrl);
+
+INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0011_is_predict_to_acting_base_yaw_rot_nico_y", set_reverse_input_pitch_flag_nico_yaw_pitch_cntrl);
+
+INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0011_is_predict_to_acting_base_yaw_rot_nico_y", set_yaw_parameter_effective_ratio_nico_yaw_pitch_cntrl);
+
+INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0011_is_predict_to_acting_base_yaw_rot_nico_y", set_pitch_parameter_effective_ratio_nico_yaw_pitch_cntrl);
+
+INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0011_is_predict_to_acting_base_yaw_rot_nico_y", set_base_vel_nico_yaw_pitch_cntrl);
+
+INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0011_is_predict_to_acting_base_yaw_rot_nico_y", begin_nico_yaw_pitch_cntrl);
+
+INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0011_is_predict_to_acting_base_yaw_rot_nico_y", doit_nico_yaw_pitch_cntrl);
+
+INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0011_is_predict_to_acting_base_yaw_rot_nico_y", end_nico_yaw_pitch_cntrl);

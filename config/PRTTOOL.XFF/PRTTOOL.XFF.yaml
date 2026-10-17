@@ -43,7 +43,13 @@ segments:
       subalign: 8
       align: 8
       subsegments:
-        - [ 0x638, asm, all_text ]
+        - [ 0x638, c, chunk/c0000_batch_changing_particle_parameter ]
+        - [ 0x2058, c, chunk/c0001_func_40012058 ]
+        - [ 0x2d90, c, chunk/c0002_convert_to_particle_effect_lod ]
+        - [ 0x47f8, c, chunk/c0003_save_main_sub_particle_effect_lod_to_npe ]
+        - [ 0x5ff8, c, chunk/c0004_func_40015FF8 ]
+        - [ 0x7818, c, chunk/c0005_func_40017818 ]
+        - [ 0x9050, c, chunk/c0006_func_40019050 ]
         - { type: bss, vram: 0x4002b880, name: bss, size: 0x1278 }
     - name: data
       type: data
