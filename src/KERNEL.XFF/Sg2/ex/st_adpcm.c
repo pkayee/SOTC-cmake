@@ -5,11 +5,13 @@ extern s32 D_400F9040;
 extern s32 Sg2StAdpcmQuit(void);
 extern s32 Sg2StAdpcmSetPitch(u64, u32);
 extern s32 Sg2ExStAdpcmSlotFree(void);
-extern s32 D_400F8F78;
+extern volatile s32 D_400F8F78;
 extern s32 D_400F8F80[48];
 extern s32 Sg2StAdpcmInit(s32);
 extern s32 Sg2StAdpcmPlay(u64);
+extern s32 Sg2StAdpcmClose(s32);
 extern s32 Sg2StAdpcmStop(u64);
+extern s32 Sg2StAdpcmSetVolume(u64, s32, s32);
 extern s32 Sg2StAdpcmIopReadAdr(void);
 extern s32 Sg2SlotFree(s32);
 extern void* memset(void*, s32, u32);
@@ -18,8 +20,24 @@ extern s32 func_40031728(void*);
 extern void func_40032608(void*);
 extern void func_400327D0(void*);
 extern s32 Sg2ExStAdpcmSlotReserv(s32, s32);
+extern void Sg2SlotSetReverbOnBit(s32, s32);
+extern void Sg2SlotSetReverbOffBit(s32, s32);
+extern void func_40032420(void*, s32, s32, s32);
+extern s32 Sg2ExStAdpcmIopReadAdr(void*, s32);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/st_adpcm", Sg2ExStAdpcmInit);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/st_adpcm", Sg2ExStAdpcmInit);
+void Sg2ExStAdpcmInit(void)
+{
+    s32 i;
+
+    for (i = 47; i >= 0; i--)
+    {
+        D_400F8F80[i] = 0;
+    }
+    Sg2StAdpcmInit(0);
+    D_400F8F78 = 1;
+    D_400F8F7C = 0;
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/st_adpcm", Sg2ExStAdpcmStopMode);
 void Sg2ExStAdpcmStopMode(s32 arg0)
@@ -141,7 +159,60 @@ s32 Sg2ExStAdpcmGetUserParam(void* p)
     return *(s32*)((u8*)p + 0x2DC);
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/st_adpcm", func_40031C08);
+/* decomper FIX (scratch MATCH via cmp.sh; only diffs are the j-label name and TU padding).
+   Needs `extern volatile s32 D_400F8F78;` (see Sg2ExStAdpcmInit fix).
+   Two embedded views of the ctx: track vol bank pairs at ctx+0xC+0x240 = ctx+0x24C (stride 8, [16][2]),
+   per-track send L/R arrays at ctx+0x10+0x30 = ctx+0x40 / ctx+0x60 ([8] each).
+   The pointer locals MUST be declared d first, then c (that gives addiu p+0x10 before addiu p+0xC). */
+typedef struct { u8 pad[0x240]; s32 lr[16][2]; } StAdpcmVolSub;          /* starts at ctx+0xC */
+typedef struct { u8 pad[0x30]; s32 l[8]; s32 r[8]; } StAdpcmSendSub;     /* starts at ctx+0x10 */
+typedef struct
+{
+    u8 pad0[0xC];
+    union
+    {
+        StAdpcmVolSub c;
+        struct { s32 pad; StAdpcmSendSub d; } d;
+    } u;
+} StAdpcmVolCtx;
+
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/st_adpcm", func_40031C08);
+s32 func_40031C08(StAdpcmVolCtx* p, s32 voice, s32 idx)
+{
+    s32 l;
+    s32 r;
+    StAdpcmSendSub *d = &p->u.d.d;
+    StAdpcmVolSub *c = &p->u.c;
+
+    l = d->l[idx] * c->lr[idx][0] / 100;
+    r = d->r[idx] * c->lr[idx][1] / 100;
+    if (l >= 0x4000)
+    {
+        l = 0x3FFF;
+    }
+    if (r >= 0x4000)
+    {
+        r = 0x3FFF;
+    }
+    if (D_400F8F78 == 0 || D_400F8F78 == 2)
+    {
+        if (r < l)
+        {
+            r = l;
+        }
+        else
+        {
+            l = r;
+        }
+        if ((D_400F8F78 & 2) && *(s32*)((u8*)p + 0x2C) == 0x20000)
+        {
+            l /= 2;
+            r /= 2;
+        }
+    }
+    return Sg2StAdpcmSetVolume(1LL << voice, l, r);
+}
+
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/st_adpcm", Sg2ExStAdpcmVolumePercent);
 
@@ -299,7 +370,25 @@ INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/st_adpcm", func_40032608);
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/st_adpcm", func_400327D0);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/st_adpcm", Sg2ExStAdpcmPreLoad);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/st_adpcm", Sg2ExStAdpcmPreLoad);
+s32 Sg2ExStAdpcmPreLoad(void* p)
+{
+    if (*(s32*)((u8*)p + 0) != 1)
+    {
+        return -1;
+    }
+    *(s32*)((u8*)p + 0) = 2;
+    if (!(*(s32*)((u8*)p + 8) & 1))
+    {
+        func_40032420(p, 2, 0, 0);
+    }
+    func_40032420(p, 1, *(s32*)((u8*)p + 0x230), *(s32*)((u8*)p + 0x234));
+    if (*(s32*)((u8*)p + 8) & 0x10)
+    {
+        func_40032420(p, 0x10, 0, 0);
+    }
+    return 0;
+}
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/st_adpcm", Sg2ExStAdpcmClose);
 
