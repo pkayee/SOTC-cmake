@@ -5,20 +5,52 @@ typedef struct {
     /* 0x04 */ s32 unk4;
     /* 0x08 */ s32 unk8;
     /* 0x0C */ s32 unkC;
-    /* 0x10 */ u8 pad10[0x50];
+    /* 0x10 */ s32 unk10;
+    /* 0x14 */ s32 unk14;
+    /* 0x18 */ s32 unk18;
+    /* 0x1C */ s32 unk1C;
+    /* 0x20 */ s32 unk20;
+    /* 0x24 */ s32 unk24;
+    /* 0x28 */ s32 unk28;
+    /* 0x2C */ s32 unk2C;
+    /* 0x30 */ s64 unk30;
+    /* 0x38 */ s64 unk38;
+    /* 0x40 */ s64 unk40;
+    /* 0x48 */ s64 unk48;
+    /* 0x50 */ s64 unk50;
+    /* 0x58 */ s64 unk58;
     /* 0x60 */ u8 *unk60;
     /* 0x64 */ s32 unk64;
     /* 0x68 */ u8 unk68;
-    /* 0x69 */ u8 pad69[0x17];
+    /* 0x69 */ u8 unk69;
+    /* 0x6A */ u8 pad6A[0x2];
+    /* 0x6C */ s32 unk6C;
+    /* 0x70 */ s32 unk70;
+    /* 0x74 */ u8 pad74[0x4];
+    /* 0x78 */ s64 unk78;
 } Sg2SmfpSlot;
 
 extern Sg2SmfpSlot D_40114200[];
 extern s32 D_40114208[][0x20];
 extern s32 D_40114604;
 extern s32 D_40114608;
+extern u8 D_40114600;
 extern s32 D_40114E14;
 extern s32 D_40114E10;
 extern u8 D_40114610[];
+extern u8 D_40114E20[];
+extern s32 D_40115620;
+extern s64 D_40049388;
+extern s64 D_40049390;
+
+s64 litodp(s32);
+s64 dpdiv(s64, s64);
+s64 dpmul(s64, s64);
+s64 dpadd(s64, s64);
+s32 dptoli(s64);
+s32 Sg2CtrlGetTickMode(void);
+s64 __floatdidf(s64);
+s32 Sg2SmfpSetParam(s32 arg0, s32 arg1, s32 arg2, s32 arg3);
 
 s32 Sg2SmfpOpenSelCore(s32 arg0, s32 arg1, s32 arg2);
 s32 Sg2SmfpStopSndOff(s32 arg0);
@@ -28,6 +60,9 @@ s32 Sg2ModCheckSndOn(s32 arg0);
 s32 Sg2ModSetParam(s32 arg0, s32 arg1, s32 arg2, s32 arg3);
 s32 Sg2ModClose(s32 arg0);
 s32 vab_check_alive(s32 arg0);
+void *memset(void *s, s32 c, u32 n);
+s32 Sg2CtrlEntryTickProcById(s32 id, void (*proc)(void));
+void Sg2SmfpTickProc(void);
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/smfp", func_4003CE68);
 
@@ -172,7 +207,32 @@ INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/smfp", Sg2SmfpSetParam);
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/smfp", Sg2SmfpGetParam);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/smfp", Sg2SmfpMidiOut);
+
+
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/smfp", Sg2SmfpMidiOut);
+s32 Sg2SmfpMidiOut(s32 id, s32 len, u8 *data)
+{
+    s32 n;
+    Sg2SmfpSlot *slot;
+
+    if (id >= 0)
+    {
+        slot = &D_40114200[id];
+        if (slot->status == 0)
+        {
+            return -1;
+        }
+        D_40114E20[D_40115620++] = *(u8 *)&slot->unk8;
+        D_40114E20[D_40115620++] = len;
+        n = len;
+        while (n != 0)
+        {
+            D_40114E20[D_40115620++] = *data++;
+            n--;
+        }
+    }
+    return 0;
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/smfp", Sg2SmfpSetSignal);
 void Sg2SmfpSetSignal(s32 arg0)
@@ -183,7 +243,24 @@ void Sg2SmfpSetSignal(s32 arg0)
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/smfp", Sg2SmfpTickProc);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/smfp", Sg2SmfpInit);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/smfp", Sg2SmfpInit);
+s32 Sg2SmfpInit(void)
+{
+    s32 i;
+    Sg2SmfpSlot *slot;
+
+    slot = D_40114200;
+    for (i = 7; i >= 0; i--, slot++)
+    {
+        memset(slot, -1, 0x80);
+        slot->status = 0;
+    }
+    D_40114604 = 1;
+    D_40115620 = 0;
+    D_40114608 = 0;
+    Sg2CtrlEntryTickProcById(0, Sg2SmfpTickProc);
+    return 0;
+}
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/smfp", debug_smfp_mod_config);
 
@@ -192,7 +269,20 @@ INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/smfp", debug_set_smfp_time_count_de
 void func_4003E2A0(void) {
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/smfp", func_4003E2A8);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/smfp", func_4003E2A8);
+void func_4003E2A8(Sg2SmfpSlot *arg0)
+{
+    u8 d0 = *arg0->unk60++;
+    u8 d1 = *arg0->unk60++;
+
+    if (D_40114E14 != arg0->unk68)
+    {
+        D_40114E14 = arg0->unk68;
+        D_40114610[D_40114E10++] = arg0->unk68;
+    }
+    D_40114610[D_40114E10++] = d0;
+    D_40114610[D_40114E10++] = d1;
+}
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/smfp", func_4003E338);
 
