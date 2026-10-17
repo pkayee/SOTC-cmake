@@ -12,6 +12,12 @@ extern s32 D_40092C80;
 extern s32 D_40045A90;
 extern s32 D_40045A50, D_40045A54, D_40045A58;
 extern u_long128 D_40045A70[2];
+extern u8 *D_40092C58;
+void waitVscheduler(void);
+void func_400268A8(void);
+s32 iosDlGetWorkBufId(void);
+void iosResetDC(void *dc);
+void sceGsResetGraph(short mode, short inter, short omode, short ffmode);
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosDumpDMAStatus);
 
@@ -225,9 +231,23 @@ void iosResetPath(void)
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosSyncV);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosGetField);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosGetField);
+s32 iosGetField(void)
+{
+    return (*(volatile u64 *)0x12001000 >> 13) & 1;
+}
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosGsChangeMode);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosGsChangeMode);
+void iosGsChangeMode(void)
+{
+    s16 a = D_40045A50;
+    s16 b = D_40045A54;
+    s16 c = D_40045A58;
+
+    *GS_CSR = 0x200;
+    sceGsResetGraph(0, a & 1, b, c & 1);
+    func_400268A8();
+}
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosSetBGColor);
 
@@ -244,4 +264,8 @@ INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosSetScreenEnv);
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosCheckDrawFinish);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosGsInitDC);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosGsInitDC);
+void iosGsInitDC(void)
+{
+    iosResetDC(D_40092C58 + iosDlGetWorkBufId() * 0x190);
+}
