@@ -24,8 +24,7 @@ int func_00110370(u32 *dst, u32 *src, u32 size)
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/alarm", func_001103A8);
 
-/* NEARMISS-STUB InitAlarm */
-#if 0 /* NEARMISS 96.9% cat=regalloc sub=- | loop counter: target counts up (addiu+1,sltiu,bnezl), gcc2.9 strength-reduces to countdown; early exit bnez off by one insn | attempts=1 */
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/alarm", InitAlarm);
 extern u32 D_001339D8[];
 extern u32 D_00133270[];
 extern u32 D_001339B0[];
@@ -33,33 +32,22 @@ void FlushCache(int);
 void func_00110350(u32 dst, u32 src);
 void func_00110360(u32 dst, u32 *src, u32 size);
 u32 func_001103A8(u32 arg);
-
 void InitAlarm(void)
 {
-    u32 *base;
-    u32 *p;
-    int i;
-    u32 v;
+    u32 i;
 
     if ((*(volatile u32 *)0x10001810 & 0x100) == 0)
     {
-        base = D_001339D8;
-        func_00110350(base[0], base[1]);
+        func_00110350(D_001339D8[0], D_001339D8[1]);
         func_00110360(0x80076000, D_00133270, 0x740);
         func_00110360(0x82000, D_001339B0, 0x28);
         FlushCache(0);
         FlushCache(2);
-        func_00110350(base[2], base[3]);
-        p = base + 4;
-        i = 2;
-        do
+        func_00110350(D_001339D8[2], D_001339D8[3]);
+        for (i = 2; i < 8; i++)
         {
-            i++;
-            v = func_001103A8(p[0]);
-            func_00110350(p[0], v);
-            p += 2;
-        } while (i < 8);
+            func_00110350(D_001339D8[i * 2], func_001103A8(D_001339D8[i * 2]));
+        }
     }
 }
-#endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/alarm", InitAlarm);
+
