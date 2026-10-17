@@ -783,7 +783,19 @@ void func_40036258(void) {
     D_400F9050->b.trk[D_400F904C[0] & 0xF].unk20 = D_400F904C[2];
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/mod", func_40036290);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/mod", func_40036290);
+void func_40036290(void) {
+    u8 *p = D_400F904C;
+    u16 v[2];
+    s32 t = p[0] & 0xF;
+    u8 m = p[2];
+    if (m >= 4) { v[1] = -1; v[0] = -1; }
+    else if (m == 2) { v[0] = 1; v[1] = -1; }
+    else if (m == 1) { v[0] = -1; v[1] = 1; }
+    else { v[1] = 1; v[0] = 1; }
+    D_400F9050->b.trk[t].unk40 = v[0];
+    *(s16 *)((u8 *)D_400F9050 + t * 0x70 + 0x2F6) = v[1];
+}
 
 void func_40036330(void) {
 }
