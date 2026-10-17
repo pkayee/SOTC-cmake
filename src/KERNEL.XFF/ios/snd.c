@@ -17,9 +17,16 @@ typedef struct
     /* 0x2C */ s16 unk2C;
     /* 0x2E */ s16 unk2E;
     /* 0x30 */ s16 unk30;
-    /* 0x32 */ u8 pad32[0x48 - 0x32];
+    /* 0x32 */ u8 pad32[0x34 - 0x32];
+    /* 0x34 */ s32 unk34;
+    /* 0x38 */ s32 unk38;
+    /* 0x3C */ s32 unk3C;
+    /* 0x40 */ s32 unk40;
+    /* 0x44 */ s32 unk44;
     /* 0x48 */ s32 unk48;
-    /* 0x4C */ u8 pad4C[0x70 - 0x4C];
+    /* 0x4C */ u8 pad4C[0x60 - 0x4C];
+    /* 0x60 */ s32 unk60;
+    /* 0x64 */ u8 pad64[0x70 - 0x64];
 } SndSep;
 
 s32 Sg2VabClose(s32 arg0);
@@ -61,7 +68,49 @@ INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/snd", func_4002F2A8);
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/snd", sndSepTickProc);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/snd", sndSepReq);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/snd", sndSepReq);
+SndSep *sndSepReq(s32 arg0, s32 arg1, s32 arg2, s32 arg3, void (*arg4)(SndSep *), s32 arg5, s32 *arg6)
+{
+    SndSep *ret;
+    s32 i;
+    s32 cnt;
+    u64 flag;
+
+    WaitSema(D_400F6B50);
+    ret = NULL;
+    for (i = 0; i < 32; i++)
+    {
+        if (D_400F5D50[i].unk0 == 0)
+        {
+            goto found;
+        }
+    }
+    goto done;
+found:
+    ret = &D_400F5D50[i];
+    flag = ret->unk8;
+    flag &= 0xFFFFFFFEFFFFFFFFULL;
+    flag &= 0xFFFFFFE3FFFFFFFFULL;
+    flag |= (u64)(arg5 & 7) << 34;
+    flag |= 0x2000000000ULL;
+    ret->unk34 = arg0;
+    ret->unk38 = arg1;
+    ret->unk40 = arg2;
+    ret->unk44 = arg3;
+    ret->unk10 = arg6;
+    ret->unk8 = flag;
+    ret->unk3C = 0;
+    if (arg4 != NULL)
+    {
+        arg4(ret);
+    }
+    cnt = soundTickProcCnt;
+    ret->unk0 = 1;
+    ret->unk60 = cnt;
+done:
+    SignalSema(D_400F6B50);
+    return ret;
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/snd", sndSepPlayerSrh);
 SndSep *sndSepPlayerSrh(s32 arg0, s32 arg1, s32 arg2)
@@ -278,14 +327,97 @@ s32 sndVabHDClose(s32 *arg0)
     return Sg2VabClose(arg0[1]);
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/snd", sndBDOpen);
+extern s32 D_40048F60;
+s32 Sg2DmaTransVoice(s32 arg0, s32 arg1, s32 arg2);
+s32 Sg2DmaTransStatus(s32 arg0);
+s32 iosAllocIopHeap(s32 arg0);
+void iosFreeIopHeap(s32 arg0);
+void iosWaitIdleThread();
+void iosEE2IopRequest(s32 arg0, s32 arg1, s32 arg2, s32 *arg3);
+s32 iosEE2IopEndChk(s32 arg0);
+
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/snd", sndBDOpen);
+void sndBDOpen(s32 *p, s32 (*cb)(), s32 arg2, s32 size, void (*fn)())
+{
+    s32 id;
+    s32 buf;
+    s32 n;
+    s32 off = 0;
+    s32 st;
+
+    buf = iosAllocIopHeap(size);
+    if (buf == 0)
+    {
+        iosJumpRecoverPoint(&D_40048F60);
+    }
+    while ((n = cb()) != 0)
+    {
+        iosEE2IopRequest(arg2, buf, n, &id);
+        while (iosEE2IopEndChk(id) == 0)
+        {
+            if (fn != NULL)
+            {
+                fn();
+            }
+        }
+        st = Sg2DmaTransVoice(buf, p[4] + off, n);
+        while (Sg2DmaTransStatus(st) != 0)
+        {
+            if (fn == NULL)
+            {
+                iosWaitIdleThread();
+            }
+            else
+            {
+                fn();
+            }
+        }
+        off += n;
+    }
+    if (p[1] >= 0 && p[4] != 0)
+    {
+        Sg2VabBdOpen(p[1], p[4]);
+    }
+    iosFreeIopHeap(buf);
+}
 
 void sndBDClose(void) {
 }
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/snd", sndVabInit);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/snd", initSound);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/snd", initSound);
+void initSound(void)
+{
+    D_400F6D88 = NULL;
+    sg2NicoReverbMode = 0;
+    Sg2CtrlInit(0);
+    Sg2RemoteInit(0);
+    Sg2ChipInit(0);
+    Sg2CtrlSetTickMode(0x3C);
+    Sg2ExStAdpcmInit();
+    Sg2DspInit(0);
+    Sg2ModInit(0);
+    Sg2SepInit(0);
+    Sg2SmfpInit(0);
+    Sg2SlotInit(0);
+    Sg2DmaInit(0);
+    Sg2VabInit(0);
+    Sg2ExPcmInit(0);
+    Sg2ChipSetDigitalOutputMode(0x880);
+    Sg2DspEffectSetEndAdr(0, 0x1FFFFF);
+    Sg2DspEffectSetEndAdr(1, 0x1DFFFF);
+    Sg2DspEffectSetType(0, 0x104);
+    Sg2DspEffectSetType(1, 0x104);
+    Sg2DspEffectSetDepth(0, 0x3C);
+    Sg2DspEffectSetDepth(1, 0x3C);
+    Sg2DspEffectChange(0);
+    Sg2DspEffectChange(1);
+    Sg2DspSetMasterVolumeMax();
+    sndVabInit();
+    sndSepInit();
+    Sg2SlotSetOutputMode(D_40045EA8);
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/snd", tickProcSound);
 void tickProcSound(s32 arg0)
