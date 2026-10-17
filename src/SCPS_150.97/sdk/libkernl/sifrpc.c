@@ -132,14 +132,11 @@ INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/sifrpc", func_001093F8);
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/sifrpc", func_001094C8);
 
-/* NEARMISS-STUB func_00109508 */
-#if 0 /* NEARMISS 91.0% cat=call-abi sub=- | no sibcall: jal+epilogue vs j iSetTimerAlarm | attempts=1 */
 u_long func_001094C8(int a0, u_long a1, u_long a2, void *a3, void *a4);
 
-s32 func_00109508(s32 *a0, s32 *a1)
+void func_00109508(s32 *a0, s32 *a1)
 {
     s32 *s0;
-    s32 ret;
     s32 t14;
     s32 t1c;
 
@@ -159,15 +156,12 @@ s32 func_00109508(s32 *a0, s32 *a1)
     s0[9] = a0[8];
     s0[10] = a0[9];
     s0[11] = a0[10];
-    ret = isceSifSendCmd(0x80000008, s0, 0x40, (void *)a0[8], (void *)a0[9], a0[10]);
-    if (ret == 0)
+    if (isceSifSendCmd(0x80000008, s0, 0x40, (void *)a0[8], (void *)a0[9], a0[10]) == 0)
     {
-        return iSetTimerAlarm(0x800, func_001094C8, s0);
+        iSetTimerAlarm(0x800, func_001094C8, s0);
     }
-    return ret;
 }
-#endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/sifrpc", func_00109508);
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/sifrpc", func_00109508);
 
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/sifrpc", sceSifGetOtherData);
 
@@ -237,11 +231,9 @@ s32 func_00109790(s32 a0, s32 a1, s32 a2, void *a3)
     return 0x800;
 }
 
-/* NEARMISS-STUB func_001097D0 */
-#if 0 /* NEARMISS 88.9% cat=call-abi sub=- | no sibcall tail j; field copy reg order | attempts=1 */
 void *func_00109740(s32 a0, void *a1);
 
-s32 func_001097D0(s32 *a0, void *a1)
+void func_001097D0(s32 *a0, void *a1)
 {
     s32 *s2;
     s32 *v;
@@ -267,14 +259,12 @@ s32 func_001097D0(s32 *a0, void *a1)
         s2[10] = v[2];
     }
     ret = isceSifSendCmd(0x80000008, s2, 0x40, 0, 0, 0);
-    if (ret != 0)
+    if (ret == 0)
     {
-        return ret;
+        iSetTimerAlarm(0x800, func_00109790, s2);
     }
-    return iSetTimerAlarm(0x800, func_00109790, s2);
 }
-#endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/sifrpc", func_001097D0);
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/sifrpc", func_001097D0);
 
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/sifrpc", sceSifBindRpc);
 
@@ -416,10 +406,11 @@ INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/sifrpc", sceSifCallRpc);
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/sifrpc", sceSifCheckStatRpc);
 
 /* NEARMISS-STUB sceSifSetRpcQueue */
-#if 0 /* NEARMISS 93.8% cat=sched sub=- | head load before key store, head reg | attempts=1 */
+#if 0 /* NEARMISS 99.6% cat=sched sub=- | head load scheduled before key/8/c stores | attempts=2 */
 void sceSifSetRpcQueue(sceSifQueueData *queue, int key)
 {
     sceSifQueueData *cur;
+    sceSifQueueData *p;
 
     DIntr();
     cur = (sceSifQueueData *)D_00145AC0[10];
@@ -435,10 +426,10 @@ void sceSifSetRpcQueue(sceSifQueueData *queue, int key)
     }
     else
     {
-        for (; cur->next != NULL; cur = cur->next)
+        for (p = cur; p->next != NULL; p = p->next)
         {
         }
-        cur->next = queue;
+        p->next = queue;
     }
     EIntr();
 }
