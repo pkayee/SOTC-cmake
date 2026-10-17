@@ -75,4 +75,26 @@ s32 iosNetClose(s32 arg0)
     }
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/net", iosNetOpen);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/net", iosNetOpen);
+s32 iosNetOpen(char* arg0)
+{
+    s32 ret;
+    s32 len;
+
+    if (D_40045710 != 0)
+    {
+        ret = func_40016C10(arg0);
+    }
+    else
+    {
+        len = strlen(arg0);
+        D_4007CF00[0] = len + 1;
+        strncpy((char*)&D_4007CF00[1], arg0, len + 1);
+        len += 5;
+        WaitSema(D_4007DF28);
+        sceSifCallRpc(D_4007DF00, 0, 0, D_4007CF00, len, D_4007CF00, 4, NULL, NULL);
+        SignalSema(D_4007DF28);
+        ret = D_4007CF00[0];
+    }
+    return ret;
+}

@@ -1,4 +1,6 @@
 #include "common.h"
+#include "sdk/ee/eekernel.h"
+#include "sdk/ee/eeregs.h"
 
 extern s32 D_40092BD0;
 extern s32 D_40092BD4;
@@ -9,6 +11,16 @@ extern s32 D_40092C74;
 extern s32 D_40092C7C;
 extern s32 D_40092C80;
 extern s32 D_40045A90;
+extern s32 D_40045A50, D_40045A54, D_40045A58;
+extern u_long128 D_40045A70[2];
+extern u8 *D_40092C58;
+void waitVscheduler(void);
+void func_400268A8(void);
+s32 iosDlGetWorkBufId(void);
+void iosResetDC(void *dc);
+void iosSetDCParam(void *dc, s32 a, s32 b, s32 c, s32 d);
+void iosSetDCViewPort(void *dc, s32 x, s32 y, s32 w, s32 h);
+void sceGsResetGraph(short mode, short inter, short omode, short ffmode);
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosDumpDMAStatus);
 
@@ -22,9 +34,49 @@ INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", func_400268A8);
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", func_40026BE0);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosGsResizeRootDC);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosGsResizeRootDC);
+void iosGsResizeRootDC(void)
+{
+    s32 *p = (s32 *)&D_40092BD0;
+    s32 i = 1;
+    s32 off = 0;
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosGsSetMode);
+    do
+    {
+        iosSetDCParam((u8 *)p[0x22] + off, ((p[0] * p[1]) >> 11) + ((p[2] * p[3]) >> 11), (p[0] * p[1]) >> 11, p[2], p[3]);
+        iosSetDCViewPort((u8 *)p[0x22] + off, 0, 0, p[2], p[3]);
+        off += 0x190;
+    } while (--i >= 0);
+}
+
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosGsSetMode);
+void iosGsSetMode(void)
+{
+    s32 *p = (s32 *)&D_40092BD0;
+
+    if (p[0xA4 / 4] != 0)
+    {
+        p[0xA0 / 4] = 0;
+        p[2] = 0x200;
+        p[0] = 0x200;
+        p[3] = 0x1C0;
+        p[1] = 0x1C0;
+        D_40045A50 = 0;
+        D_40045A54 = 0x50;
+        D_40045A58 = 1;
+    }
+    else
+    {
+        p[0xA0 / 4] = 1;
+        p[2] = 0x200;
+        p[3] = 0x1C0;
+        p[0] = 0x200;
+        p[1] = 0x1C0;
+        D_40045A50 = 1;
+        D_40045A54 = 2;
+        D_40045A58 = 0;
+    }
+}
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosGsSetDrawContext);
 
@@ -166,27 +218,114 @@ s32 *getProgressiveMode(void)
     return &D_40092C74;
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosResetGraph);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosResetGraph);
+void iosResetGraph(s16 arg0, s16 arg1, s16 arg2, s16 arg3)
+{
+    if (arg0 != 0)
+    {
+        *GS_CSR = 0x100;
+        return;
+    }
+    *GS_CSR = 0x200;
+    sceGsResetGraph(0, arg1 & 1, arg2, arg3 & 1);
+}
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosDmaSendPath1);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosDmaSendPath1);
+void iosDmaSendPath1(s64 arg0, s64 arg1)
+{
+    u32 stat;
+
+    do
+    {
+        asm volatile("cfc2.ni %0, $vi29" : "=r"(stat));
+    } while ((*D1_CHCR & 0x100) || (*D2_CHCR & 0x100) || (*VIF1_STAT & 0x1F000003) || (stat & 0x100) || (*GIF_STAT & 0xC00));
+    *D1_QWC = arg1;
+    *D1_MADR = arg0 & 0x0FFFFFFF;
+    FlushCache(0);
+    *D1_CHCR = 0x101;
+}
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosDmaSendPath2);
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosDmaSendPath3);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosDmaSendSChainPath1);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosDmaSendSChainPath1);
+void iosDmaSendSChainPath1(u32 arg0)
+{
+    u32 stat;
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosDmaSendSChainPath2);
+    do
+    {
+        asm volatile("cfc2.ni %0, $vi29" : "=r"(stat));
+    } while ((*D1_CHCR & 0x100) || (*D2_CHCR & 0x100) || (*VIF1_STAT & 0x1F000003) || (stat & 0x100) || (*GIF_STAT & 0xC00));
+    *D1_QWC = 0;
+    *D1_TADR = arg0 & 0x7FFFFFFF;
+    FlushCache(0);
+    *D1_CHCR = 0x145;
+}
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosDmaSendSChainPath3);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosDmaSendSChainPath2);
+void iosDmaSendSChainPath2(u32 arg0)
+{
+    u32 stat;
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosResetPath);
+    do
+    {
+        asm volatile("cfc2.ni %0, $vi29" : "=r"(stat));
+    } while ((*D1_CHCR & 0x100) || (*D2_CHCR & 0x100) || (*VIF1_STAT & 0x1F000003) || (stat & 0x100) || (*GIF_STAT & 0xC00));
+    *D1_QWC = 0;
+    *D1_TADR = arg0 & 0x7FFFFFFF;
+    FlushCache(0);
+    *D1_CHCR = 0x145;
+}
+
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosDmaSendSChainPath3);
+void iosDmaSendSChainPath3(u32 arg0)
+{
+    u32 stat;
+
+    do
+    {
+        asm volatile("cfc2.ni %0, $vi29" : "=r"(stat));
+    } while ((*D1_CHCR & 0x100) || (*D2_CHCR & 0x100) || (*VIF1_STAT & 0x1F000003) || (stat & 0x100) || (*GIF_STAT & 0xC00));
+    *D2_QWC = 0;
+    *D2_TADR = arg0 & 0x7FFFFFFF;
+    FlushCache(0);
+    *D2_CHCR = 0x105;
+}
+
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosResetPath);
+void iosResetPath(void)
+{
+    register s32 tmp asm("v1") = 0;
+    *VIF1_FBRST = 1;
+    asm volatile("cfc2.ni %0, $vi28" : "+r"(tmp));
+    tmp |= 0x200;
+    asm volatile("ctc2.ni %0, $vi28; sync.p" : : "r"(tmp));
+    *VIF1_FIFO = D_40045A70[0];
+    *VIF1_FIFO = D_40045A70[1];
+    *GIF_CTRL = 1;
+}
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosSyncV);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosGetField);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosGetField);
+s32 iosGetField(void)
+{
+    return (*(volatile u64 *)0x12001000 >> 13) & 1;
+}
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosGsChangeMode);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosGsChangeMode);
+void iosGsChangeMode(void)
+{
+    s16 a = D_40045A50;
+    s16 b = D_40045A54;
+    s16 c = D_40045A58;
+
+    *GS_CSR = 0x200;
+    sceGsResetGraph(0, a & 1, b, c & 1);
+    func_400268A8();
+}
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosSetBGColor);
 
@@ -203,4 +342,8 @@ INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosSetScreenEnv);
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosCheckDrawFinish);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosGsInitDC);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosGsInitDC);
+void iosGsInitDC(void)
+{
+    iosResetDC(D_40092C58 + iosDlGetWorkBufId() * 0x190);
+}
