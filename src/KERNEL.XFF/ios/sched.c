@@ -21,6 +21,21 @@ extern t_iosMessageQueue D_400F2B28;
 extern iosThread* D_400F2B44;
 extern t_iosMessageQueue D_400F3B50;
 extern t_ischedTask D_400F3B70[3];
+extern iosThread *D_400F3B88;
+extern u8 D_400F2B50[];
+extern u8 D_400F3B90[];
+extern u64 D_400F2B10;
+extern s32 vschedGameTimeExec;
+extern s32 vschedGameTime;
+extern void iosPadInit(void);
+extern void iosPadTickProc(void);
+extern void iosCreateIVArbitrationSema(void);
+extern void iosAddIntcHandler(s32, void *);
+extern void tickProcSound(s32);
+extern s64 iosGetTCountExtension(void);
+extern s32 func_4002C8F0();
+extern s32 func_4002CDB0();
+extern s32 func_4002CE70(void);
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/sched", func_4002C8F0);
 
@@ -38,7 +53,18 @@ void waitVscheduler(void)
 }
 
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/sched", bootSchedulerThread);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/sched", bootSchedulerThread);
+void bootSchedulerThread(void)
+{
+    iosPadInit();
+    D_40045C6C = 0;
+    iosCreateIVArbitrationSema();
+    D_400F2B44 = iosCreateThread(func_4002CDB0, D_400F2B50, 0x1000, 0x28, 0);
+    iosStartThread(D_400F2B44, 0);
+    iosAddIntcHandler(2, func_4002CE70);
+    D_400F3B88 = iosCreateThread(func_4002C8F0, D_400F3B90, 0x2000, 0x2D, 0);
+    iosStartThread(D_400F3B88, 0);
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/sched", iosAddISchedulerTaskList);
 void iosAddISchedulerTaskList(s32 arg0, s32 arg1)
@@ -65,7 +91,15 @@ s32 iosGetISchedulerExecCnt(void)
 }
 
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/sched", ischedStop);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/sched", ischedStop);
+void ischedStop(void)
+{
+    if (D_400F2B20 == 0)
+    {
+        *T0_MODE &= ~0x80;
+    }
+    D_400F2B20 += 1;
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/sched", ischedRestart);
 void ischedRestart(void)
@@ -120,7 +154,24 @@ void func_4002CD88(void)
 }
 
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/sched", func_4002CDB0);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/sched", func_4002CDB0);
+s32 func_4002CDB0(void)
+{
+    iosCreateMsgQueue(&D_400F3B50, 0, 0);
+    while (1)
+    {
+        iosSleepThread();
+        D_400F2B10 = iosGetTCountExtension();
+        D_40045C64++;
+        if (vschedGameTimeExec != 0)
+        {
+            vschedGameTime++;
+        }
+        tickProcSound(D_400F2B20);
+        iosPadTickProc();
+        iosRecvMsg(&D_400F3B50, 0, 0);
+    }
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/sched", func_4002CE70);
 s32 func_4002CE70(void)
@@ -131,4 +182,22 @@ s32 func_4002CE70(void)
 }
 
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/sched", func_4002CEA0);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/sched", func_4002CEA0);
+s32 func_4002CEA0(s32 arg0)
+{
+    s32 r;
+
+    if (D_40045C68 == 0)
+    {
+        r = 0;
+        if (arg0 == D_40045C64 && (float)(u64)(iosGetTCountExtension() - D_400F2B10) < 2124999.75f)
+        {
+            r = 1;
+        }
+    }
+    else
+    {
+        r = 1;
+    }
+    return r;
+}
