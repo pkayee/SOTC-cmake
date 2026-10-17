@@ -68,7 +68,10 @@ segments:
       subalign: 8
       align: 8
       subsegments:
-        - [ 0x106b8, rodata, all_rodata ]
+        - [ 0x106b8, rodata, chunk/c0000_func_40010618 ]
+        - [ 0x10fe8, rodata, chunk/c0001_func_40011EF8 ]
+        - [ 0x11050, rodata, chunk/c0002_drawPathData ]
+        - [ 0x110e0, rodata, chunk/c0006_func_4001A9C0 ]
     - name: xff_footer
       type: rodatabin
       start: 0x1117c

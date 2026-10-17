@@ -66,7 +66,9 @@ segments:
       subalign: 8
       align: 8
       subsegments:
-        - [ 0xc790, rodata, all_rodata ]
+        - [ 0xc790, rodata, chunk/c0000_batch_changing_particle_parameter ]
+        - [ 0xc870, rodata, chunk/c0001_func_40012058 ]
+        - [ 0xc968, rodata, chunk/c0003_save_main_sub_particle_effect_lod_to_npe ]
     - name: xff_footer
       type: rodatabin
       start: 0xdd08

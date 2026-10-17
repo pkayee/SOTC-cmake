@@ -70,7 +70,13 @@ segments:
       subalign: 8
       align: 8
       subsegments:
-        - [ 0xe0b0, rodata, all_rodata ]
+        - [ 0xe0b0, rodata, chunk/c0000_getUserName ]
+        - [ 0xe0c8, rodata, chunk/c0001_SnapShot ]
+        - [ 0xe0d8, rodata, chunk/c0002_isT10000 ]
+        - [ 0xe800, rodata, chunk/c0004_iosgluAddLineCylinderObject ]
+        - [ 0xeba0, rodata, chunk/c0006_func_40017C10 ]
+        - [ 0xec10, rodata, chunk/c0007_DebugDispLineCircle ]
+        - [ 0xecb0, rodata, chunk/c0010_VRAMViewer ]
     - name: xff_footer
       type: rodatabin
       start: 0xee7c

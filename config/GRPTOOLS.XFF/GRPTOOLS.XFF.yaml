@@ -63,7 +63,9 @@ segments:
       subalign: 8
       align: 8
       subsegments:
-        - [ 0x7960, rodata, all_rodata ]
+        - [ 0x7960, rodata, chunk/c0000_createLayerMenu ]
+        - [ 0x87b0, rodata, chunk/c0001_create_fog_col_param_menu ]
+        - [ 0x90d8, rodata, chunk/c0002_func_40012790 ]
     - name: xff_footer
       type: rodatabin
       start: 0x93dc
