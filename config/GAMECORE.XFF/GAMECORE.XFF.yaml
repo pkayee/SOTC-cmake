@@ -1,0 +1,71 @@
+sha1: ba0ec0c7a9b426e5fc75dd0c00598321a1e1c530
+options:
+    basename: GAMECORE.XFF
+    target_path: iso/GAMECORE.XFF
+    base_path: ../..
+    asm_path: asm/GAMECORE.XFF
+    asset_path: assets/GAMECORE.XFF
+    src_path: src/GAMECORE.XFF
+    build_path: build/GAMECORE.XFF
+    symbol_addrs_path:
+        - config/GAMECORE.XFF/GAMECORE.XFF_symbols.txt
+        - config/GAMECORE.XFF/GAMECORE.XFF_ignore_symbols.txt
+    reloc_addrs_path: config/GAMECORE.XFF/GAMECORE.XFF_relocs.txt
+    ld_bss_contains_common: True
+    ld_bss_is_noload: True
+    create_undefined_funcs_auto: True
+    undefined_funcs_auto_path: config/GAMECORE.XFF/GAMECORE.XFF_undefined_funcs_auto.txt
+    create_undefined_syms_auto: True
+    undefined_syms_auto_path:  config/GAMECORE.XFF/GAMECORE.XFF_undefined_syms_auto.txt
+    compiler: EEGCC
+    platform: ps2
+    migrate_rodata_to_functions: True
+    use_gp_rel_macro_nonmatching: False
+    string_encoding: EUC-JP
+    rodata_string_guesser_level: 2
+    disasm_unknown: True
+    named_regs_for_c_funcs: True
+    find_file_boundaries: True
+    section_order: [".text", ".data", ".rodata", ".lit4", ".sdata", ".sbss", ".bss"]
+segments:
+    - name: xff_header
+      type: textbin
+      start: 0x0
+      vram: 0x40010000
+      size: 0x63d0
+      align: 1
+      subalign: 1
+    - name: text
+      type: code
+      start: 0x63d0
+      vram: 0x400163d0
+      bss_size: 0x21e08
+      subalign: 8
+      align: 8
+      subsegments:
+        - [ 0x63d0, asm, all_text ]
+        - { type: bss, vram: 0x401fc4c0, name: bss, size: 0x21e08 }
+    - name: data
+      type: data
+      start: 0x1204b0
+      vram: 0x401304b0
+      subalign: 16
+      align: 16
+      subsegments:
+        - [ 0x1204b0, data, all_data ]
+    - name: rodata
+      type: rodata
+      start: 0x122490
+      vram: 0x40132490
+      subalign: 8
+      align: 8
+      subsegments:
+        - [ 0x122490, rodata, all_rodata ]
+    - name: xff_footer
+      type: rodatabin
+      start: 0x127920
+      vram: 0x40137920
+      size: 0xc4b80
+      align: 1
+      subalign: 1
+    - [0x1ec4a0]

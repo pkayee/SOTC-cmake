@@ -1,0 +1,71 @@
+sha1: 947f1bdf83215eb0dc60c3dd17ccfdd7ae4d98c0
+options:
+    basename: DBGMGR.XFF
+    target_path: iso/DBGMGR.XFF
+    base_path: ../..
+    asm_path: asm/DBGMGR.XFF
+    asset_path: assets/DBGMGR.XFF
+    src_path: src/DBGMGR.XFF
+    build_path: build/DBGMGR.XFF
+    symbol_addrs_path:
+        - config/DBGMGR.XFF/DBGMGR.XFF_symbols.txt
+        - config/DBGMGR.XFF/DBGMGR.XFF_ignore_symbols.txt
+    reloc_addrs_path: config/DBGMGR.XFF/DBGMGR.XFF_relocs.txt
+    ld_bss_contains_common: True
+    ld_bss_is_noload: True
+    create_undefined_funcs_auto: True
+    undefined_funcs_auto_path: config/DBGMGR.XFF/DBGMGR.XFF_undefined_funcs_auto.txt
+    create_undefined_syms_auto: True
+    undefined_syms_auto_path:  config/DBGMGR.XFF/DBGMGR.XFF_undefined_syms_auto.txt
+    compiler: EEGCC
+    platform: ps2
+    migrate_rodata_to_functions: True
+    use_gp_rel_macro_nonmatching: False
+    string_encoding: EUC-JP
+    rodata_string_guesser_level: 2
+    disasm_unknown: True
+    named_regs_for_c_funcs: True
+    find_file_boundaries: True
+    section_order: [".text", ".data", ".rodata", ".lit4", ".sdata", ".sbss", ".bss"]
+segments:
+    - name: xff_header
+      type: textbin
+      start: 0x0
+      vram: 0x40010000
+      size: 0x948
+      align: 1
+      subalign: 1
+    - name: text
+      type: code
+      start: 0x948
+      vram: 0x40010948
+      bss_size: 0x120
+      subalign: 8
+      align: 8
+      subsegments:
+        - [ 0x948, asm, all_text ]
+        - { type: bss, vram: 0x400288c0, name: bss, size: 0x120 }
+    - name: data
+      type: data
+      start: 0xdec0
+      vram: 0x4001dec0
+      subalign: 16
+      align: 16
+      subsegments:
+        - [ 0xdec0, data, all_data ]
+    - name: rodata
+      type: rodata
+      start: 0xe0b0
+      vram: 0x4001e0b0
+      subalign: 8
+      align: 8
+      subsegments:
+        - [ 0xe0b0, rodata, all_rodata ]
+    - name: xff_footer
+      type: rodatabin
+      start: 0xee7c
+      vram: 0x4001ee7c
+      size: 0x9a1c
+      align: 1
+      subalign: 1
+    - [0x18898]

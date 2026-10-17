@@ -1,0 +1,71 @@
+sha1: fa697109d2d1d772184cfc5958cf72fb7172254c
+options:
+    basename: PATHTOOL.XFF
+    target_path: iso/PATHTOOL.XFF
+    base_path: ../..
+    asm_path: asm/PATHTOOL.XFF
+    asset_path: assets/PATHTOOL.XFF
+    src_path: src/PATHTOOL.XFF
+    build_path: build/PATHTOOL.XFF
+    symbol_addrs_path:
+        - config/PATHTOOL.XFF/PATHTOOL.XFF_symbols.txt
+        - config/PATHTOOL.XFF/PATHTOOL.XFF_ignore_symbols.txt
+    reloc_addrs_path: config/PATHTOOL.XFF/PATHTOOL.XFF_relocs.txt
+    ld_bss_contains_common: True
+    ld_bss_is_noload: True
+    create_undefined_funcs_auto: True
+    undefined_funcs_auto_path: config/PATHTOOL.XFF/PATHTOOL.XFF_undefined_funcs_auto.txt
+    create_undefined_syms_auto: True
+    undefined_syms_auto_path:  config/PATHTOOL.XFF/PATHTOOL.XFF_undefined_syms_auto.txt
+    compiler: EEGCC
+    platform: ps2
+    migrate_rodata_to_functions: True
+    use_gp_rel_macro_nonmatching: False
+    string_encoding: EUC-JP
+    rodata_string_guesser_level: 2
+    disasm_unknown: True
+    named_regs_for_c_funcs: True
+    find_file_boundaries: True
+    section_order: [".text", ".data", ".rodata", ".lit4", ".sdata", ".sbss", ".bss"]
+segments:
+    - name: xff_header
+      type: textbin
+      start: 0x0
+      vram: 0x40010000
+      size: 0x618
+      align: 1
+      subalign: 1
+    - name: text
+      type: code
+      start: 0x618
+      vram: 0x40010618
+      bss_size: 0x10fc
+      subalign: 8
+      align: 8
+      subsegments:
+        - [ 0x618, asm, all_text ]
+        - { type: bss, vram: 0x4002df80, name: bss, size: 0x10fc }
+    - name: data
+      type: data
+      start: 0xd7f0
+      vram: 0x4001d7f0
+      subalign: 16
+      align: 16
+      subsegments:
+        - [ 0xd7f0, data, all_data ]
+    - name: rodata
+      type: rodata
+      start: 0x106b8
+      vram: 0x400206b8
+      subalign: 8
+      align: 8
+      subsegments:
+        - [ 0x106b8, rodata, all_rodata ]
+    - name: xff_footer
+      type: rodatabin
+      start: 0x1117c
+      vram: 0x4002117c
+      size: 0xcde8
+      align: 1
+      subalign: 1
+    - [0x1df64]

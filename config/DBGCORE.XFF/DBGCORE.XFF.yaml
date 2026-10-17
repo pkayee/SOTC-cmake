@@ -1,0 +1,71 @@
+sha1: c47d4f14477a8781e7eb9e72ead5f20032562411
+options:
+    basename: DBGCORE.XFF
+    target_path: iso/DBGCORE.XFF
+    base_path: ../..
+    asm_path: asm/DBGCORE.XFF
+    asset_path: assets/DBGCORE.XFF
+    src_path: src/DBGCORE.XFF
+    build_path: build/DBGCORE.XFF
+    symbol_addrs_path:
+        - config/DBGCORE.XFF/DBGCORE.XFF_symbols.txt
+        - config/DBGCORE.XFF/DBGCORE.XFF_ignore_symbols.txt
+    reloc_addrs_path: config/DBGCORE.XFF/DBGCORE.XFF_relocs.txt
+    ld_bss_contains_common: True
+    ld_bss_is_noload: True
+    create_undefined_funcs_auto: True
+    undefined_funcs_auto_path: config/DBGCORE.XFF/DBGCORE.XFF_undefined_funcs_auto.txt
+    create_undefined_syms_auto: True
+    undefined_syms_auto_path:  config/DBGCORE.XFF/DBGCORE.XFF_undefined_syms_auto.txt
+    compiler: EEGCC
+    platform: ps2
+    migrate_rodata_to_functions: True
+    use_gp_rel_macro_nonmatching: False
+    string_encoding: EUC-JP
+    rodata_string_guesser_level: 2
+    disasm_unknown: True
+    named_regs_for_c_funcs: True
+    find_file_boundaries: True
+    section_order: [".text", ".data", ".rodata", ".lit4", ".sdata", ".sbss", ".bss"]
+segments:
+    - name: xff_header
+      type: textbin
+      start: 0x0
+      vram: 0x40010000
+      size: 0x998
+      align: 1
+      subalign: 1
+    - name: text
+      type: code
+      start: 0x998
+      vram: 0x40010998
+      bss_size: 0xb58
+      subalign: 8
+      align: 8
+      subsegments:
+        - [ 0x998, asm, all_text ]
+        - { type: bss, vram: 0x40021300, name: bss, size: 0xb58 }
+    - name: data
+      type: data
+      start: 0x8f10
+      vram: 0x40018f10
+      subalign: 16
+      align: 16
+      subsegments:
+        - [ 0x8f10, data, all_data ]
+    - name: rodata
+      type: rodata
+      start: 0x9440
+      vram: 0x40019440
+      subalign: 8
+      align: 8
+      subsegments:
+        - [ 0x9440, rodata, all_rodata ]
+    - name: xff_footer
+      type: rodatabin
+      start: 0x9c38
+      vram: 0x40019c38
+      size: 0x76c4
+      align: 1
+      subalign: 1
+    - [0x112fc]

@@ -1,0 +1,71 @@
+sha1: 919e9991fd032046891275d43478b43848b6eb33
+options:
+    basename: MAPTOOL.XFF
+    target_path: iso/MAPTOOL.XFF
+    base_path: ../..
+    asm_path: asm/MAPTOOL.XFF
+    asset_path: assets/MAPTOOL.XFF
+    src_path: src/MAPTOOL.XFF
+    build_path: build/MAPTOOL.XFF
+    symbol_addrs_path:
+        - config/MAPTOOL.XFF/MAPTOOL.XFF_symbols.txt
+        - config/MAPTOOL.XFF/MAPTOOL.XFF_ignore_symbols.txt
+    reloc_addrs_path: config/MAPTOOL.XFF/MAPTOOL.XFF_relocs.txt
+    ld_bss_contains_common: True
+    ld_bss_is_noload: True
+    create_undefined_funcs_auto: True
+    undefined_funcs_auto_path: config/MAPTOOL.XFF/MAPTOOL.XFF_undefined_funcs_auto.txt
+    create_undefined_syms_auto: True
+    undefined_syms_auto_path:  config/MAPTOOL.XFF/MAPTOOL.XFF_undefined_syms_auto.txt
+    compiler: EEGCC
+    platform: ps2
+    migrate_rodata_to_functions: True
+    use_gp_rel_macro_nonmatching: False
+    string_encoding: EUC-JP
+    rodata_string_guesser_level: 2
+    disasm_unknown: True
+    named_regs_for_c_funcs: True
+    find_file_boundaries: True
+    section_order: [".text", ".data", ".rodata", ".lit4", ".sdata", ".sbss", ".bss"]
+segments:
+    - name: xff_header
+      type: textbin
+      start: 0x0
+      vram: 0x40010000
+      size: 0x608
+      align: 1
+      subalign: 1
+    - name: text
+      type: code
+      start: 0x608
+      vram: 0x40010608
+      bss_size: 0x8
+      subalign: 8
+      align: 8
+      subsegments:
+        - [ 0x608, asm, all_text ]
+        - { type: bss, vram: 0x40018c80, name: bss, size: 0x8 }
+    - name: data
+      type: data
+      start: 0x4850
+      vram: 0x40014850
+      subalign: 16
+      align: 16
+      subsegments:
+        - [ 0x4850, data, all_data ]
+    - name: rodata
+      type: rodata
+      start: 0x4f70
+      vram: 0x40014f70
+      subalign: 8
+      align: 8
+      subsegments:
+        - [ 0x4f70, rodata, all_rodata ]
+    - name: xff_footer
+      type: rodatabin
+      start: 0x54c0
+      vram: 0x400154c0
+      size: 0x37a4
+      align: 1
+      subalign: 1
+    - [0x8c64]
