@@ -57,9 +57,25 @@ void iosClampSW_AddMvec(u_long128 *dst, u_long128 *a, u_long128 *b)
     *dst = r;
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/mvec", iosClampUW_AddMvec);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/mvec", iosClampUW_AddMvec);
+void iosClampUW_AddMvec(u_long128 *dst, u_long128 *a, u_long128 *b)
+{
+    MvecRaw x = *(MvecRaw *)a;
+    MvecRaw y = *(MvecRaw *)b;
+    u_long128 r;
+    asm volatile("padduw %0, %1, %2" : "=r"(r) : "r"(*(u_long128 *)&x), "r"(*(u_long128 *)&y));
+    *dst = r;
+}
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/mvec", iosSubMvec);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/mvec", iosSubMvec);
+void iosSubMvec(u_long128 *dst, u_long128 *a, u_long128 *b)
+{
+    MvecRaw x = *(MvecRaw *)a;
+    MvecRaw y = *(MvecRaw *)b;
+    u_long128 r;
+    asm volatile("psubw %0, %1, %2" : "=r"(r) : "r"(*(u_long128 *)&x), "r"(*(u_long128 *)&y));
+    *dst = r;
+}
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/mvec", iosMulMvec);
 
@@ -146,7 +162,16 @@ INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/mvec", iosMmColToFvecMvec);
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/mvec", iosSwClipMvec);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/mvec", iosFvecToICol);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/mvec", iosFvecToICol);
+void iosFvecToICol(u8 *dst, void *src)
+{
+    u32 t[4];
+    iosFTOI0Vector(t, src);
+    dst[0] = t[0];
+    dst[1] = t[1];
+    dst[2] = t[2];
+    dst[3] = t[3];
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/mvec", iosIColToMvecSl);
 void iosIColToMvecSl(u32 *dst, u32 c)
@@ -157,4 +182,13 @@ void iosIColToMvecSl(u32 *dst, u32 c)
     dst[3] = c >> 24;
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/mvec", iosIColToFvec);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/mvec", iosIColToFvec);
+void iosIColToFvec(void *dst, u32 c)
+{
+    u32 t[4];
+    t[0] = c & 0xFF;
+    t[1] = (c >> 8) & 0xFF;
+    t[2] = (c >> 16) & 0xFF;
+    t[3] = c >> 24;
+    iosITOF0Vector(dst, t);
+}

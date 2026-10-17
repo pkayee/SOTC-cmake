@@ -24,11 +24,81 @@ void iosGetAlignSinCosf(f32 *arg0, f32 arg1)
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/trig", iosGetSinCosf);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/trig", func_40023498);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/trig", func_40023498);
+void func_40023498(f32 *arg0)
+{
+    asm volatile(
+        "mfc1 $8,$f5\n"
+        "qmtc2.ni $8,$vf16\n"
+        "lqc2 $vf15,0($2)\n"
+        "vmr32.w $vf16,$vf16\n"
+        "vaddx.x $vf18,$vf0,$vf16x\n"
+        "vmul.x $vf16,$vf16,$vf16\n"
+        "vmulx.yzw $vf18,$vf18,$vf0x\n"
+        "vmulw.xyzw $vf19,$vf15,$vf16w\n"
+        "vmulx.xyzw $vf19,$vf19,$vf16x\n"
+        "vmulx.xyz $vf19,$vf19,$vf16x\n"
+        "vaddw.x $vf18,$vf18,$vf19w\n"
+        "vmulx.xy $vf19,$vf19,$vf16x\n"
+        "vaddz.x $vf18,$vf18,$vf19z\n"
+        "vmulx.x $vf19,$vf19,$vf16x\n"
+        "vaddy.x $vf18,$vf18,$vf19y\n"
+        "vaddx.x $vf18,$vf18,$vf19x\n"
+        "vaddx.xy $vf18,$vf0,$vf18x\n"
+        "vmul.x $vf17,$vf18,$vf18\n"
+        "vsubx.w $vf17,$vf0,$vf17x\n"
+        "vsqrt Q,$vf17w\n"
+        "bnez $7,1f\n"
+        "vwaitq\n"
+        "vaddq.y $vf18,$vf0,Q\n"
+        "b 2f\n"
+        "1:\n"
+        "vwaitq\n"
+        "vsubq.y $vf18,$vf0,Q\n"
+        "2:\n"
+        "sqc2 $vf18,0($4)\n"
+        :
+        :
+        : "$2", "$4", "$7", "$8");
+}
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/trig", iosGetSinf);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/trig", func_400235DC);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/trig", func_400235DC);
+/* File-level asm so gcc does not emit .align 3 before this 4-aligned function. */
+asm(
+    ".set push\n"
+    ".set noreorder\n"
+    ".globl func_400235DC\n"
+    ".type func_400235DC,@function\n"
+    "func_400235DC:\n"
+    "mfc1 $t0, $f3\n"
+    "qmtc2.ni $t0, $vf16\n"
+    "lqc2 $vf15, 0($v0)\n"
+    "vmr32.w $vf16, $vf16\n"
+    "vaddx.x $vf18, $vf0, $vf16x\n"
+    "vmul.x $vf16, $vf16, $vf16\n"
+    "vmulx.yzw $vf18, $vf18, $vf0x\n"
+    "vmulw.xyzw $vf19, $vf15, $vf16w\n"
+    "vmulx.xyzw $vf19, $vf19, $vf16x\n"
+    "vmulx.xyz $vf19, $vf19, $vf16x\n"
+    "vaddw.x $vf18, $vf18, $vf19w\n"
+    "vmulx.xy $vf19, $vf19, $vf16x\n"
+    "vaddz.x $vf18, $vf18, $vf19z\n"
+    "vmulx.x $vf19, $vf19, $vf16x\n"
+    "vaddy.x $vf18, $vf18, $vf19y\n"
+    "vaddx.x $vf18, $vf18, $vf19x\n"
+    "bnez $a3, .L40023628\n"
+    "nop\n"
+    "vsubx.xyzw $vf18, $vf0, $vf18x\n"
+    ".L40023628:\n"
+    "qmfc2.ni $t0, $vf18\n"
+    "mtc1 $t0, $f12\n"
+    "jr $ra\n"
+    "mov.s $f0, $f12\n"
+    ".size func_400235DC, . - func_400235DC\n"
+    ".set pop\n"
+);
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/trig", iosGetCosf);
 
@@ -102,9 +172,33 @@ INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/trig", iosGetACosf);
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/trig", iosGetACos);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/trig", iosGetACosfExact);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/trig", iosGetACosfExact);
+f32 iosGetACosfExact(f32 arg0)
+{
+    if (arg0 >= 1.0f)
+    {
+        return 0.0f;
+    }
+    if (arg0 <= -1.0f)
+    {
+        return 3.14159265f;
+    }
+    return acosf(arg0);
+}
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/trig", iosGetASinfExact);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/trig", iosGetASinfExact);
+f32 iosGetASinfExact(f32 arg0)
+{
+    if (arg0 >= 1.0f)
+    {
+        return 3.14159265f / 2.0f;
+    }
+    if (arg0 <= -1.0f)
+    {
+        return -3.14159265f / 2.0f;
+    }
+    return asinf(arg0);
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/trig", iosGetATanfExact);
 f32 iosGetATanfExact(f32 arg0)
@@ -112,7 +206,27 @@ f32 iosGetATanfExact(f32 arg0)
     return atanf(arg0);
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/trig", iosGetATan2fExact);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/trig", iosGetATan2fExact);
+f32 iosGetATan2fExact(f32 arg0, f32 arg1)
+{
+    if (arg0 > 1.0f)
+    {
+        arg0 = 1.0f;
+    }
+    else if (arg0 < -1.0f)
+    {
+        arg0 = -1.0f;
+    }
+    if (arg1 > 1.0f)
+    {
+        arg1 = 1.0f;
+    }
+    else if (arg1 < -1.0f)
+    {
+        arg1 = -1.0f;
+    }
+    return atan2f(arg0, arg1);
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/trig", iosGetASin);
 f32 iosGetASin(void)
@@ -132,7 +246,20 @@ void resetArcFuncCall(void)
     D_400458E4 = D_400458E8 = D_400458EC = D_400458F0 = 0;
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/trig", iosGetTableSin);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/trig", iosGetTableSin);
+f32 iosGetTableSin(s16 arg0)
+{
+    s32 neg = 0;
+    s32 idx = (((s32)arg0 << 16) - 0x40000000) >> 16;
+
+    idx = idx < 0 ? -idx : idx;
+    if (idx > 0x3FFF)
+    {
+        idx = 0x8000 - idx;
+        neg = 1;
+    }
+    return neg ? -D_40082280[idx] : D_40082280[idx];
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/trig", iosGetTableCos);
 f32 iosGetTableCos(s16 arg0)
