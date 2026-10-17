@@ -1,5 +1,7 @@
 #include "common.h"
 
+extern s32 D_00135A58[];
+
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", CallRpc);
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", MemcpyD);
@@ -370,7 +372,12 @@ INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceNetcnfifCheck);
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceNetcnfifGetResult);
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceNetcnfifSetFNoDecode);
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceNetcnfifSetFNoDecode);
+s32 sceNetcnfifSetFNoDecode(s32 arg0)
+{
+    D_00135A58[0] = arg0;
+    return 0;
+}
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceNetcnfifGetCount);
 
