@@ -18,52 +18,81 @@ long _write_r(struct _reent *ptr, int fd, const void *buf, unsigned int cnt)
     return ret;
 }
 
-/* NEARMISS-STUB _calloc_r */
-#if 0 /* NEARMISS 38.0% cat=branch-layout sub=- | nclears ladder control-flow shape and arg/temp regs differ; db best 38 pct not reproduced | attempts=1 */
-void *_calloc_r(struct _reent *ptr, s32 n, s32 size)
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libc/writer", _calloc_r);
+/* newlib mallocr.c cALLOc (no MORECORE_CLEARS, no mmap) */
+typedef unsigned int INTERNAL_SIZE_T;
+#define SIZE_SZ (sizeof(INTERNAL_SIZE_T))
+struct malloc_chunk
 {
-    u32 *d;
-    u32 nclears;
-    u32 csz;
+    INTERNAL_SIZE_T prev_size;
+    INTERNAL_SIZE_T size;
+    struct malloc_chunk *fd;
+    struct malloc_chunk *bk;
+};
+typedef struct malloc_chunk *mchunkptr;
+#define PREV_INUSE 0x1
+#define IS_MMAPPED 0x2
+#define SIZE_BITS (PREV_INUSE | IS_MMAPPED)
+#define chunksize(p) ((p)->size & ~(SIZE_BITS))
+#define mem2chunk(mem) ((mchunkptr)((char *)(mem)-2 * SIZE_SZ))
+#define MALLOC_ZERO(charp, nbytes) \
+    do \
+    { \
+        INTERNAL_SIZE_T mzsz = (nbytes); \
+        if (mzsz <= 9 * sizeof(mzsz)) \
+        { \
+            INTERNAL_SIZE_T *mz = (INTERNAL_SIZE_T *)(charp); \
+            if (mzsz >= 5 * sizeof(mzsz)) \
+            { \
+                *mz++ = 0; \
+                *mz++ = 0; \
+                if (mzsz >= 7 * sizeof(mzsz)) \
+                { \
+                    *mz++ = 0; \
+                    *mz++ = 0; \
+                    if (mzsz >= 9 * sizeof(mzsz)) \
+                    { \
+                        *mz++ = 0; \
+                        *mz++ = 0; \
+                    } \
+                } \
+            } \
+            *mz++ = 0; \
+            *mz++ = 0; \
+            *mz = 0; \
+        } \
+        else \
+            memset((charp), 0, mzsz); \
+    } while (0)
+
+void *_malloc_r(struct _reent *, unsigned int);
+void *memset(void *, int, unsigned int);
+
+void *_calloc_r(struct _reent *reent_ptr, unsigned int n, unsigned int elem_size)
+{
+    mchunkptr p;
+    INTERNAL_SIZE_T csz;
+
+    INTERNAL_SIZE_T sz = n * elem_size;
+
     void *mem;
 
-    mem = _malloc_r(ptr, n * size);
+    mem = _malloc_r(reent_ptr, sz);
+
     if (mem == 0)
     {
         return 0;
     }
-    csz = *(u32 *)((u8 *)mem - 4) & ~3;
-    nclears = (csz - 4) / 4;
-    d = mem;
-    if (nclears > 9)
-    {
-        memset(mem, 0, csz - 4);
-    }
     else
     {
-        d[0] = 0;
-        d[1] = 0;
-        d[2] = 0;
-        if (nclears > 4)
-        {
-            d[3] = 0;
-            d[4] = 0;
-            if (nclears > 6)
-            {
-                d[5] = 0;
-                d[6] = 0;
-                if (nclears > 8)
-                {
-                    d[7] = 0;
-                    d[8] = 0;
-                }
-            }
-        }
+        p = mem2chunk(mem);
+
+        csz = chunksize(p);
+
+        MALLOC_ZERO(mem, csz - SIZE_SZ);
+        return mem;
     }
-    return mem;
 }
-#endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libc/writer", _calloc_r);
 
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libc/writer", _close_r);
 int close(s32 fd);
@@ -128,259 +157,250 @@ long _read_r(struct _reent *ptr, int fd, void *buf, unsigned int cnt)
 }
 
 
-/* NEARMISS-STUB _realloc_r */
-#if 0 /* NEARMISS 11.4% cat=regalloc sub=- | prologue saves s0-s6 with different register assignment for locals (arg_mism on sd/daddu); re-score 11.4 pct matches db | attempts=1 */
-struct malloc_chunk
-{
-    u32 prev_size;
-    u32 size;
-    struct malloc_chunk *fd;
-    struct malloc_chunk *bk;
-};
-
-extern s32 D_00135D68[];
-void __malloc_lock(struct _reent *ptr);
-void __malloc_unlock(struct _reent *ptr);
-void *_malloc_r(struct _reent *ptr, u32 nbytes);
-void _free_r(struct _reent *ptr, void *mem);
-
-#define REALLOC_COPY_WORDS(d, s, n)                                         \
-    if ((n) < 20)                                                           \
-    {                                                                       \
-        (d)[0] = (s)[0];                                                    \
-        (d)[1] = (s)[1];                                                    \
-        (d)[2] = (s)[2];                                                    \
-    }                                                                       \
-    else if ((n) < 28)                                                      \
-    {                                                                       \
-        (d)[0] = (s)[0];                                                    \
-        (d)[1] = (s)[1];                                                    \
-        (d)[2] = (s)[2];                                                    \
-        (d)[3] = (s)[3];                                                    \
-        (d)[4] = (s)[4];                                                    \
-    }                                                                       \
-    else if ((n) < 36)                                                      \
-    {                                                                       \
-        (d)[0] = (s)[0];                                                    \
-        (d)[1] = (s)[1];                                                    \
-        (d)[2] = (s)[2];                                                    \
-        (d)[3] = (s)[3];                                                    \
-        (d)[4] = (s)[4];                                                    \
-        (d)[5] = (s)[5];                                                    \
-        (d)[6] = (s)[6];                                                    \
-    }                                                                       \
-    else                                                                    \
-    {                                                                       \
-        (d)[0] = (s)[0];                                                    \
-        (d)[1] = (s)[1];                                                    \
-        (d)[2] = (s)[2];                                                    \
-        (d)[3] = (s)[3];                                                    \
-        (d)[4] = (s)[4];                                                    \
-        (d)[5] = (s)[5];                                                    \
-        (d)[6] = (s)[6];                                                    \
-        (d)[7] = (s)[7];                                                    \
-        (d)[8] = (s)[8];                                                    \
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libc/writer", _realloc_r);
+/* newlib mallocr.c rEALLOc (EE config, no mmap; MALLOC_COPY ladder) */
+#define MALLOC_ALIGNMENT 16
+#define MALLOC_ALIGN_MASK (MALLOC_ALIGNMENT - 1)
+#define MINSIZE (sizeof(struct malloc_chunk))
+#define chunk2mem(p) ((void *)((char *)(p) + 2 * SIZE_SZ))
+#define chunk_at_offset(p, s) ((mchunkptr)(((char *)(p)) + (s)))
+#define next_chunk(p) ((mchunkptr)(((char *)(p)) + ((p)->size & ~PREV_INUSE)))
+#define prev_chunk(p) ((mchunkptr)(((char *)(p)) - ((p)->prev_size)))
+#define inuse(p) ((((mchunkptr)(((char *)(p)) + ((p)->size & ~PREV_INUSE)))->size) & PREV_INUSE)
+#define prev_inuse(p) ((p)->size & PREV_INUSE)
+#define set_head(p, s) ((p)->size = (s))
+#define set_head_size(p, s) ((p)->size = (((p)->size & PREV_INUSE) | (s)))
+#define set_inuse_bit_at_offset(p, s) (((mchunkptr)(((char *)(p)) + (s)))->size |= PREV_INUSE)
+#define long_sub_size_t(x, y) (sizeof(long) > sizeof(INTERNAL_SIZE_T) && x < y ? -(long)(y - x) : (long)(x - y))
+#define request2size(req) \
+    (((long)((req) + (SIZE_SZ + MALLOC_ALIGN_MASK)) < \
+      (long)(MINSIZE + MALLOC_ALIGN_MASK)) ? MINSIZE : \
+     (((req) + (SIZE_SZ + MALLOC_ALIGN_MASK)) & ~(MALLOC_ALIGN_MASK)))
+#define unlink(P, BK, FD) \
+    { \
+        BK = P->bk; \
+        FD = P->fd; \
+        FD->bk = BK; \
+        BK->fd = FD; \
     }
+#define check_inuse_chunk(P)
+#define MALLOC_COPY(dest, src, nbytes) \
+    do \
+    { \
+        INTERNAL_SIZE_T mcsz = (nbytes); \
+        if (mcsz <= 9 * sizeof(mcsz)) \
+        { \
+            INTERNAL_SIZE_T *mcsrc = (INTERNAL_SIZE_T *)(src); \
+            INTERNAL_SIZE_T *mcdst = (INTERNAL_SIZE_T *)(dest); \
+            if (mcsz >= 5 * sizeof(mcsz)) \
+            { \
+                *mcdst++ = *mcsrc++; \
+                *mcdst++ = *mcsrc++; \
+                if (mcsz >= 7 * sizeof(mcsz)) \
+                { \
+                    *mcdst++ = *mcsrc++; \
+                    *mcdst++ = *mcsrc++; \
+                    if (mcsz >= 9 * sizeof(mcsz)) \
+                    { \
+                        *mcdst++ = *mcsrc++; \
+                        *mcdst++ = *mcsrc++; \
+                    } \
+                } \
+            } \
+            *mcdst++ = *mcsrc++; \
+            *mcdst++ = *mcsrc++; \
+            *mcdst = *mcsrc; \
+        } \
+        else \
+            memcpy(dest, src, mcsz); \
+    } while (0)
 
-void *_realloc_r(struct _reent *ptr, void *oldmem, u32 bytes)
+typedef struct malloc_chunk *mbinptr;
+extern mbinptr D_00135D68[];
+#define av_ D_00135D68
+#define bin_at(i) ((mbinptr)((char *)&(av_[2 * (i) + 2]) - 2 * SIZE_SZ))
+#define top (bin_at(0)->fd)
+
+void __malloc_lock(struct _reent *);
+void __malloc_unlock(struct _reent *);
+void _free_r(struct _reent *, void *);
+void *memcpy(void *, const void *, unsigned int);
+#define MALLOC_LOCK __malloc_lock(reent_ptr)
+#define MALLOC_UNLOCK __malloc_unlock(reent_ptr)
+
+void *_realloc_r(struct _reent *reent_ptr, void *oldmem, unsigned int bytes)
 {
-    s32 *av;
-    s32 *top;
-    struct malloc_chunk *oldp;
-    struct malloc_chunk *newp;
-    struct malloc_chunk *nxt;
-    struct malloc_chunk *nn;
-    struct malloc_chunk *prv;
-    struct malloc_chunk *rem;
-    struct malloc_chunk *chunk;
-    void *newmem;
-    u32 *d;
-    u32 *s;
-    u32 oldsize;
-    u32 nb;
-    u32 newsize;
-    u32 nsz;
-    u32 hdr;
-    u32 psz;
-    u32 cp;
+    INTERNAL_SIZE_T nb; /* padded request size */
 
+    mchunkptr oldp;          /* chunk corresponding to oldmem */
+    INTERNAL_SIZE_T oldsize; /* its size */
+
+    mchunkptr newp;          /* chunk to return */
+    INTERNAL_SIZE_T newsize; /* its size */
+    void *newmem;            /* corresponding user mem */
+
+    mchunkptr next;           /* next contiguous chunk after oldp */
+    INTERNAL_SIZE_T nextsize; /* its size */
+
+    mchunkptr prev;           /* previous contiguous chunk before oldp */
+    INTERNAL_SIZE_T prevsize; /* its size */
+
+    mchunkptr remainder;    /* holds split off extra space from newp */
+    INTERNAL_SIZE_T remainder_size; /* its size */
+
+    mchunkptr bck; /* misc temp for linking */
+    mchunkptr fwd; /* misc temp for linking */
+
+    /* realloc of null is supposed to be same as malloc */
     if (oldmem == 0)
+        return _malloc_r(reent_ptr, bytes);
+
+    MALLOC_LOCK;
+
+    newp = oldp = mem2chunk(oldmem);
+    newsize = oldsize = chunksize(oldp);
+
+    nb = request2size(bytes);
+
+    check_inuse_chunk(oldp);
+
+    if ((long)(oldsize) < (long)(nb))
     {
-        return _malloc_r(ptr, bytes);
-    }
-    __malloc_lock(ptr);
-    oldp = (struct malloc_chunk *)((u8 *)oldmem - 8);
-    oldsize = oldp->size & ~3;
-    if (bytes + 0x13 < 0x1F)
-    {
-        nb = 0x10;
-    }
-    else
-    {
-        nb = (bytes + 0x13) & ~0xF;
-    }
-    av = D_00135D68;
-    newp = oldp;
-    newsize = oldsize;
-    newmem = (u8 *)oldp + 8;
-    hdr = (u32)oldmem;
-    nxt = 0;
-    if (oldsize < nb)
-    {
-        nxt = (struct malloc_chunk *)((u8 *)oldp + oldsize);
-        top = (s32 *)av[2];
-        if (nxt == (struct malloc_chunk *)top)
+
+        /* Try expanding forward */
+
+        next = chunk_at_offset(oldp, oldsize);
+        if (next == top || !inuse(next))
         {
-            nsz = nxt->size & ~3;
-            if (oldsize + nsz >= nb + 0x10)
+            nextsize = chunksize(next);
+
+            /* Forward into top only if a remainder */
+            if (next == top)
             {
-                av[2] = (s32)((u8 *)oldp + nb);
-                rem = (struct malloc_chunk *)av[2];
-                rem->size = (oldsize + nsz - nb) | 1;
-                oldp->size = (oldp->size & 1) | nb;
-                __malloc_unlock(ptr);
-                return (u8 *)oldp + 8;
+                if ((long)(nextsize + newsize) >= (long)(nb + MINSIZE))
+                {
+                    newsize += nextsize;
+                    top = chunk_at_offset(oldp, nb);
+                    set_head(top, (newsize - nb) | PREV_INUSE);
+                    set_head_size(oldp, nb);
+                    MALLOC_UNLOCK;
+                    return chunk2mem(oldp);
+                }
+            }
+
+            /* Forward into next chunk */
+            else if (((long)(nextsize + newsize) >= (long)(nb)))
+            {
+                unlink(next, bck, fwd);
+                newsize += nextsize;
+                goto split;
             }
         }
         else
         {
-            nn = (struct malloc_chunk *)((u8 *)nxt + (nxt->size & ~1));
-            if (nn->size & 1)
-            {
-                nxt = 0;
-            }
-            else
-            {
-                nsz = nxt->size & ~3;
-                if (oldsize + nsz >= nb)
-                {
-                    newsize = oldsize + nsz;
-                    nxt->fd->bk = nxt->bk;
-                    nxt->bk->fd = nxt->fd;
-                    hdr = (u32)oldmem;
-                    goto merged;
-                }
-            }
+            next = 0;
+            nextsize = 0;
         }
-        if (!(oldp->size & 1))
+
+        /* Try shifting backwards. */
+
+        if (!prev_inuse(oldp))
         {
-            prv = (struct malloc_chunk *)((u8 *)oldp - oldp->prev_size);
-            psz = prv->size & ~3;
-            if (nxt != 0)
+            prev = prev_chunk(oldp);
+            prevsize = chunksize(prev);
+
+            /* try forward + backward first to save a later consolidation */
+
+            if (next != 0)
             {
-                if (nxt != (struct malloc_chunk *)top)
+                /* into top */
+                if (next == top)
                 {
-                    if (psz + nsz + oldsize >= nb)
+                    if ((long)(nextsize + prevsize + newsize) >= (long)(nb + MINSIZE))
                     {
-                        newsize = psz + nsz + oldsize;
-                        nxt->fd->bk = nxt->bk;
-                        nxt->bk->fd = nxt->fd;
-                        goto prev_merge;
+                        unlink(prev, bck, fwd);
+                        newp = prev;
+                        newsize += prevsize + nextsize;
+                        newmem = chunk2mem(newp);
+                        MALLOC_COPY(newmem, oldmem, oldsize - SIZE_SZ);
+                        top = chunk_at_offset(newp, nb);
+                        set_head(top, (newsize - nb) | PREV_INUSE);
+                        set_head_size(newp, nb);
+                        MALLOC_UNLOCK;
+                        return newmem;
                     }
                 }
-                else if (psz + nsz + oldsize >= nb + 0x10)
+
+                /* into next chunk */
+                else if (((long)(nextsize + prevsize + newsize) >= (long)(nb)))
                 {
-                    newsize = psz + nsz + oldsize;
-                    cp = oldsize - 4;
-                    s = (u32 *)oldmem;
-                    d = (u32 *)((u8 *)prv + 8);
-                    prv->fd->bk = prv->bk;
-                    prv->bk->fd = prv->fd;
-                    if (cp > 36)
-                    {
-                        memcpy(d, s, cp);
-                    }
-                    else
-                    {
-                        REALLOC_COPY_WORDS(d, s, cp);
-                    }
-                    av[2] = (s32)((u8 *)prv + nb);
-                    rem = (struct malloc_chunk *)av[2];
-                    rem->size = (newsize - nb) | 1;
-                    prv->size = (prv->size & 1) | nb;
-                    __malloc_unlock(ptr);
-                    return (u8 *)prv + 8;
+                    unlink(next, bck, fwd);
+                    unlink(prev, bck, fwd);
+                    newp = prev;
+                    newsize += nextsize + prevsize;
+                    newmem = chunk2mem(newp);
+                    MALLOC_COPY(newmem, oldmem, oldsize - SIZE_SZ);
+                    goto split;
                 }
             }
-            if (psz + oldsize >= nb)
+
+            /* backward only */
+            if (prev != 0 && (long)(prevsize + newsize) >= (long)nb)
             {
-                newsize = psz + oldsize;
-                goto prev_merge;
+                unlink(prev, bck, fwd);
+                newp = prev;
+                newsize += prevsize;
+                newmem = chunk2mem(newp);
+                MALLOC_COPY(newmem, oldmem, oldsize - SIZE_SZ);
+                goto split;
             }
         }
-        goto to_malloc;
-    }
-    hdr = (u32)oldmem;
-    goto merged;
 
-prev_merge:
-    prv = (struct malloc_chunk *)((u8 *)oldp - oldp->prev_size);
-    prv->fd->bk = prv->bk;
-    prv->bk->fd = prv->fd;
-    newp = prv;
-    newmem = (u8 *)prv + 8;
-    hdr = prv->size;
-    cp = oldsize - 4;
-    s = (u32 *)oldmem;
-    d = (u32 *)newmem;
-    if (cp > 36)
-    {
-        memcpy(newmem, oldmem, cp);
-    }
-    else
-    {
-        REALLOC_COPY_WORDS(d, s, cp);
-    }
-    goto merged;
+        /* Must allocate */
 
-to_malloc:
-    newmem = _malloc_r(ptr, bytes);
-    if (newmem == 0)
-    {
-        __malloc_unlock(ptr);
-        return 0;
-    }
-    chunk = (struct malloc_chunk *)((u8 *)newmem - 8);
-    if (chunk == (struct malloc_chunk *)((u8 *)oldp + (oldp->size & ~1)))
-    {
-        newp = oldp;
-        newmem = (u8 *)oldp + 8;
-        newsize = oldsize + (chunk->size & ~3);
-        hdr = oldp->size;
-        goto merged;
-    }
-    cp = oldsize - 4;
-    s = (u32 *)oldmem;
-    d = (u32 *)newmem;
-    if (cp > 36)
-    {
-        memcpy(newmem, oldmem, cp);
-    }
-    else
-    {
-        REALLOC_COPY_WORDS(d, s, cp);
-    }
-    _free_r(ptr, oldmem);
-    __malloc_unlock(ptr);
-    return newmem;
+        newmem = _malloc_r(reent_ptr, bytes);
 
-merged:
-    if (newsize - nb < 16)
-    {
-        newp->size = (hdr & 1) | newsize;
-        nn = (struct malloc_chunk *)((u8 *)newp + newsize);
-        nn->size |= 1;
-        __malloc_unlock(ptr);
+        if (newmem == 0) /* propagate failure */
+        {
+            MALLOC_UNLOCK;
+            return 0;
+        }
+
+        /* Avoid copy if newp is next chunk after oldp. */
+        /* (This can only happen when new chunk is sbrk'ed.) */
+
+        if ((newp = mem2chunk(newmem)) == next_chunk(oldp))
+        {
+            newsize += chunksize(newp);
+            newp = oldp;
+            goto split;
+        }
+
+        /* Otherwise copy, free, and exit */
+        MALLOC_COPY(newmem, oldmem, oldsize - SIZE_SZ);
+        _free_r(reent_ptr, oldmem);
+        MALLOC_UNLOCK;
         return newmem;
     }
-    rem = (struct malloc_chunk *)((u8 *)newp + nb);
-    newp->size = (hdr & 1) | nb;
-    rem->size = (newsize - nb) | 1;
-    nn = (struct malloc_chunk *)((u8 *)rem + (newsize - nb));
-    nn->size |= 1;
-    _free_r(ptr, (u8 *)rem + 8);
-    __malloc_unlock(ptr);
-    return newmem;
+
+split: /* split off extra room in old or expanded chunk */
+
+    if (newsize - nb >= MINSIZE) /* split off remainder */
+    {
+        remainder = chunk_at_offset(newp, nb);
+        remainder_size = newsize - nb;
+        set_head_size(newp, nb);
+        set_head(remainder, remainder_size | PREV_INUSE);
+        set_inuse_bit_at_offset(remainder, remainder_size);
+        _free_r(reent_ptr, chunk2mem(remainder)); /* let free() deal with it */
+    }
+    else
+    {
+        set_head_size(newp, newsize);
+        set_inuse_bit_at_offset(newp, newsize);
+    }
+
+    check_inuse_chunk(newp);
+    MALLOC_UNLOCK;
+    return chunk2mem(newp);
 }
-#endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libc/writer", _realloc_r);

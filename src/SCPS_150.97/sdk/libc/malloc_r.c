@@ -1,7 +1,7 @@
 #include "common.h"
 
 /* NEARMISS-STUB _malloc_r */
-#if 0 /* NEARMISS 99.9% cat=struct-layout sub=splat-interior-symbol | newlib mALLOc instruction-identical; objdiff differs only in 7 reloc names: target D_00135D70 (splat interior symbol av_+8) vs ours D_00135D68+8; fix = symbol_a | attempts=3 */
+#if 0 /* NEARMISS 99.9% cat=struct-layout sub=splat-interior-symbol | verbatim newlib malloc is instruction-identical; objdiff only differs on reloc names D_00135D70 (splat interior symbol of av_) vs D_00135D68+8; fix = symbol_add | attempts=3 */
 /* newlib mallocr.c mALLOc verbatim (EE: MALLOC_ALIGNMENT 16, newlib long_sub_size_t). Instruction-identical to the target: the only objdiff differences are 7 reloc names, target %lo(D_00135D70) (splat interior symbol = av_+8) vs ours D_00135D68+8. Becomes 100 when D_00135D68 gets size 0x408 in symbol_addrs. Needs the freer.c mallocr header. */
 #define request2size(req) \
     (((long)((req) + (SIZE_SZ + MALLOC_ALIGN_MASK)) < \

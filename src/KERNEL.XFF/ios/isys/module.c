@@ -17,69 +17,50 @@ typedef struct MemoryInfo
     /* 0x20 */ struct { char path[0x40]; s32 stack_size; void *unk44; } module_info;
 } MemoryInfo;
 
-typedef struct ModPartEnt
-{
-    /* 0x00 */ void *ptr;
-    /* 0x04 */ u32 unk4[5];
-    /* 0x18 */ void *ptr18;
-    /* 0x1C */ u32 unk1C;
-} ModPartEnt;
+typedef struct t_xffEntPntHdr ModHdr;
+typedef struct t_xffSymEnt ModSymEnt;
+typedef struct t_xffSectEnt ModPartEnt;
 
-typedef struct ModSymEnt
+typedef struct ModFlags
 {
-    /* 0x00 */ u32 nameOff;
-    /* 0x04 */ u32 unk4;
-    /* 0x08 */ u32 unk8;
-    /* 0x0C */ u16 unkC;
-    /* 0x0E */ u16 sect;
-} ModSymEnt;
+    u32 expCount : 29;
+    u32 relocated : 1;
+    u32 sepImage : 1;
+    s32 hashed : 1;
+} ModFlags;
 
-typedef struct ModExpEnt
+typedef struct ModImpNode
 {
-    /* 0x00 */ u32 unk0;
-    /* 0x04 */ u32 unk4;
-    /* 0x08 */ void *sym;
-    /* 0x0C */ u32 unkC;
-} ModExpEnt;
+    /* 0x00 */ u32 hash;
+    /* 0x04 */ struct t_xffSymEnt *sym;
+    /* 0x08 */ u32 prev;
+    /* 0x0C */ struct ModImpNode *next;
+} ModImpNode;
 
-typedef struct ModImpEnt
+typedef struct ModExpNode
 {
-    /* 0x00 */ u32 unk0;
-    /* 0x04 */ void *sym;
-    /* 0x08 */ u32 unk8;
-    /* 0x0C */ u32 unkC;
-} ModImpEnt;
-
-typedef struct ModHdr
-{
-    /* 0x00 */ u32 unk0;
-    /* 0x04 */ u32 unk4;
-    /* 0x08 */ u32 unk8;
-    /* 0x0C */ u32 unkC;
-    /* 0x10 */ void (*unk10)(void *);
-    /* 0x14 */ s32 unk14;
-    /* 0x18 */ u32 unk18;
-    /* 0x1C */ u32 unk1C;
-    /* 0x20 */ u32 *impSymIxs;
-    /* 0x24 */ u32 unk24;
-    /* 0x28 */ ModSymEnt *symTab;
-    /* 0x2C */ u32 strTab;
-    /* 0x30 */ u8 *table;
-    /* 0x34 */ u32 unk34;
-    /* 0x38 */ s32 relocNrE;
-    /* 0x3C */ struct t_xffRelocEnt *relocTab;
-    /* 0x40 */ s32 symBase;
-} ModHdr;
+    /* 0x00 */ u32 hash;
+    /* 0x04 */ ModImpNode *importers;
+    /* 0x08 */ struct t_xffSymEnt *sym;
+    /* 0x0C */ struct t_hashedSym *next;
+} ModExpNode;
 
 typedef struct ModObj
 {
-    /* 0x00 */ u32 unk0[7];
-    /* 0x1C */ ModHdr *hdr;
+    /* 0x00 */ s32 partition;
+    /* 0x04 */ void *sourceFunc;
+    /* 0x08 */ u32 w8;
+    /* 0x0C */ u16 linkTail;
+    /* 0x0E */ u16 linkHead;
+    /* 0x10 */ void *pendNext;
+    /* 0x14 */ void *onDelete;
+    /* 0x18 */ void *immediateDeleteFunc;
+    /* 0x1C */ struct t_xffEntPntHdr *hdr;
     /* 0x20 */ void *entry;
-    /* 0x24 */ ModExpEnt *exp;
-    /* 0x28 */ ModImpEnt *imports;
-    /* 0x2C */ u32 flags;
-    /* 0x30 */ u32 pendCount;
+    /* 0x24 */ ModExpNode *exp;
+    /* 0x28 */ ModImpNode *imports;
+    /* 0x2C */ union { u32 flags; ModFlags bits; };
+    /* 0x30 */ s32 pendCount;
     /* 0x34 */ void *pending;
     /* 0x38 */ char *name;
     /* 0x3C */ u32 allocSize;
@@ -95,6 +76,7 @@ typedef struct ModPend
     ModPendEnt *arr;
 } ModPend;
 
+#define SPECN(x) (((u8 *)(x))[0xC] ? ((u8 *)(x))[0xC] + 1 : 2)
 extern char D_40047138[];
 extern char D_40046EC0[]; // "dld:\tError. this file no needs for allocate memory.\n"
 extern s32 D_40045820;
@@ -113,13 +95,17 @@ extern s32 iosLoadIopModule(char *, char *, s32, s32);
 extern ModObj *func_4001AD58(char *, s32, s32);
 extern s32 iosLoaderGetFileSizeName(char *);
 extern s32 func_4001C350(s32, char *, s32);
-extern void func_4001AB68(void *, char *, void *);
+extern s32 func_4001AB68(ModObj *, char *, struct t_xffEntPntHdr *);
 extern void *_isysCreateObj(s32, s32, s32, s32, void *, s32);
 extern void func_4001C5E8();
 extern s32 DldSysUndefSymbol;
 extern void *func_4001C3B0(s32, s32);
 extern s32 func_4001C440(void);
-extern void func_40019D68(void *, void *, u32, void *, void *, s32, void *, s32);
+extern s32 *func_40019D68(struct t_xffEntPntHdr *, ModObj *, s32, void *, void *, void *, void *, s32);
+extern void func_40019B58(ModObj *, s32);
+extern void func_4001C4F8();
+extern char *D_40045824;
+extern void *func_4001C3F8(s32);
 extern char D_40047058[];
 extern char D_40047028[];
 extern char D_40047030[];
@@ -253,7 +239,71 @@ void func_40019A00(ModObj *obj, s32 mode)
     }
 }
 #endif
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", func_40019A00);
+extern void RelocateCode(struct t_xffEntPntHdr *);
+extern void ResolveRelocation(struct t_xffEntPntHdr *, void *, u32);
+typedef struct ModPendEnt2
+{
+    struct t_xffRelocEnt *sec;
+    u32 relIdx;
+} ModPendEnt2;
+void func_40019A00(ModObj *obj, s32 mode)
+{
+    struct t_xffEntPntHdr *xff;
+    struct t_xffSymEnt *symTab;
+    struct t_xffImpSymIxs *ix;
+    ModPendEnt2 *r;
+    struct t_xffRelocAddrEnt *ent;
+    s32 n;
+    s32 m;
+    struct t_xffSymEnt *symTab2;
+    struct t_xffImpSymIxs *ix2;
+    s32 k;
+
+    if (obj->flags & 0x40000000)
+    {
+        return;
+    }
+    xff = (struct t_xffEntPntHdr *)obj->hdr;
+    if (mode != 0)
+    {
+        RelocateCode(xff);
+        if (xff->impSymIxsNrE != 0)
+        {
+            ix = xff->impSymIxs;
+            symTab = xff->symTab;
+            k = xff->impSymIxsNrE;
+            k--;
+            for (; k != -1; k--)
+            {
+                symTab[(ix++)->stIx].unk0D = 0;
+            }
+        }
+        return;
+    }
+    if (xff->impSymIxsNrE != 0)
+    {
+        r = (ModPendEnt2 *)obj->pending;
+        n = obj->pendCount;
+        n--;
+        for (; n != -1; n--)
+        {
+            ent = (struct t_xffRelocAddrEnt *)((u8 *)r->sec->addr + r->relIdx * 8);
+            if (xff->symTab[ent->tyIx >> 8].unk0D)
+            {
+                ResolveRelocation(xff, r->sec, r->relIdx);
+            }
+            r++;
+        }
+        symTab2 = xff->symTab;
+        ix2 = xff->impSymIxs;
+        m = xff->impSymIxsNrE;
+        m--;
+        for (; m != -1; m--)
+        {
+            symTab2[(ix2++)->stIx].unk0D = 0;
+        }
+    }
+}
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", func_40019B58);
 
@@ -273,7 +323,7 @@ s32 func_40019FF0(ModObj *obj)
 {
     ModHdr *h = obj->hdr;
     ModImpNode *imp;
-    u32 *idx;
+    struct t_xffImpSymIxs *idx;
     struct t_xffSymEnt *symTab;
     struct t_xffSymEnt *s;
     struct t_xffSymEnt *sym;
@@ -284,7 +334,7 @@ s32 func_40019FF0(ModObj *obj)
     s32 n;
     s32 count = 0;
 
-    n = h->unk1C;
+    n = h->impSymIxsNrE;
     if (n != 0)
     {
         symTab = (struct t_xffSymEnt *)h->symTab;
@@ -415,42 +465,35 @@ void func_4001A170(ModPend *out, void *ptn, struct t_xffEntPntHdr *xff)
     }
 }
 
-/* NEARMISS-STUB func_4001A2F8 */
-#if 0 /* NEARMISS 94.63% cat=regalloc sub=- | kK24 best (+0.01 to outrank asm-containing stored copy) | attempts=3 */
-typedef struct ModImpNode
-{
-    /* 0x00 */ u32 hash;
-    /* 0x04 */ struct t_xffSymEnt *sym;
-    /* 0x08 */ u32 prev;
-    /* 0x0C */ struct ModImpNode *next;
-} ModImpNode;
 void func_4001A2F8(ModObj *obj)
 {
-    t_hashedSym *exp;
+    ModExpNode *exp;
     ModImpNode *imp;
     ModImpNode *node;
     ModImpNode *next;
+    struct t_xffSymEnt *s;
     u32 prev;
+    u32 flags;
+    ModImpNode *next2;
+    struct t_xffSymEnt *s2;
+    u32 prev2;
     s32 n;
     s32 m;
-    struct t_xffSymEnt *s;
-    struct t_xffSymEnt *s2;
-    u32 flags;
 
     flags = obj->flags;
     if ((s32)flags < 0)
     {
-        exp = (t_hashedSym *)obj->exp;
+        exp = obj->exp;
         if (exp != NULL)
         {
             n = flags & 0x1FFFFFFF;
             n--;
             for (; n != -1; n--, exp++)
             {
-                if (exp->locSym != NULL)
+                if (exp->sym != NULL)
                 {
-                    node = (ModImpNode *)exp->extSym;
-                    exp->extSym = NULL;
+                    node = exp->importers;
+                    exp->importers = NULL;
                     if (node != NULL)
                     {
                         do
@@ -459,40 +502,40 @@ void func_4001A2F8(ModObj *obj)
                             s = node->sym;
                             s->unk0D = 1;
                             s->addr = (void *)DldSysUndefSymbol;
-                            node->prev = 0;
                             node->next = NULL;
+                            node->prev = 0;
                             node = next;
                         } while (node != NULL);
                     }
-                    DeleteStrHashKey(&D_40081A18, exp);
+                    DeleteStrHashKey(&D_40081A18, (t_hashedSym *)exp);
                 }
             }
             iosFree(obj->exp);
             obj->exp = NULL;
         }
-        imp = (ModImpNode *)obj->imports;
+        imp = obj->imports;
         if (imp != NULL)
         {
-            m = obj->hdr->unk1C;
+            m = obj->hdr->impSymIxsNrE;
             m--;
             for (; m != -1; m--, imp++)
             {
-                prev = imp->prev;
-                next = imp->next;
-                if (prev != 0)
+                prev2 = imp->prev;
+                next2 = imp->next;
+                if (prev2 != 0)
                 {
-                    if (prev & 0x80000000)
+                    if (prev2 & 0x80000000)
                     {
-                        ((t_hashedSym *)(prev & 0x7FFFFFFF))->extSym = (struct t_xffSymEnt *)next;
+                        ((ModExpNode *)(prev2 & 0x7FFFFFFF))->importers = next2;
                     }
                     else
                     {
-                        ((ModImpNode *)prev)->next = next;
+                        ((ModImpNode *)prev2)->next = next2;
                     }
                 }
-                if (next != NULL)
+                if (next2 != NULL)
                 {
-                    next->prev = prev;
+                    next2->prev = prev2;
                 }
                 imp->next = NULL;
                 imp->prev = 0;
@@ -507,24 +550,19 @@ void func_4001A2F8(ModObj *obj)
     }
 }
 
-
-// kK24b clean single-function cut
-#endif
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", func_4001A2F8);
-
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", isysMoveModuleObj);
 void isysMoveModuleObj(ModObj *obj, ModHdr *xff)
 {
-    ModExpEnt *exp;
+    ModExpNode *exp;
     ModSymEnt *sym;
-    ModImpEnt *imp;
-    u32 *idx;
+    ModImpNode *imp;
+    struct t_xffImpSymIxs *idx;
     s32 adj;
     s32 n;
     ModSymEnt *tab;
 
-    func_40019D68(xff, obj, obj->unk0[0], func_4001C3B0, func_4001C440, DldSysUndefSymbol, func_400199B0, 0);
-    obj->entry = xff->unk10;
+    func_40019D68(xff, obj, obj->partition, func_4001C3B0, func_4001C440, (void *)DldSysUndefSymbol, func_400199B0, 0);
+    obj->entry = xff->entryPnt;
     obj->flags = obj->flags & 0xDFFFFFFF;
     obj->hdr = xff;
     if ((s32)obj->flags < 0)
@@ -541,7 +579,7 @@ void isysMoveModuleObj(ModObj *obj, ModHdr *xff)
                 adj = 2;
             }
             sym = xff->symTab + adj;
-            adj = xff->unk24 - adj;
+            adj = xff->symTabNrE - adj;
             adj--;
             for (; adj != -1; adj--, sym++)
             {
@@ -558,17 +596,89 @@ void isysMoveModuleObj(ModObj *obj, ModHdr *xff)
         tab = xff->symTab;
         imp = obj->imports;
         idx = xff->impSymIxs;
-        n = xff->unk1C;
+        n = xff->impSymIxsNrE;
         n--;
         for (; n != -1; n--)
         {
-            imp->sym = (void *)((char *)tab + (*idx << 4));
+            imp->sym = (void *)((char *)tab + (idx->stIx << 4));
             idx++;
             imp++;
         }
     }
 }
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", isysCreateModuleObjExisted);
+ModObj *isysCreateModuleObjExisted(struct t_xffEntPntHdr *xff, s32 extra, s32 ptn, s32 symdef, s32 resolve, s32 build, s32 parent)
+{
+    s32 sign;
+    struct t_xffEntPntHdr *x;
+    s32 *ret;
+    s32 isRet;
+    ModObj *obj;
+    s32 sz;
+
+    if (build)
+    {
+        s32 adj = SPECN(xff);
+        s32 nExp = xff->symTabNrE - xff->impSymIxsNrE - adj;
+        s32 t;
+        s32 total;
+
+        t = nExp != 0 ? nExp * 16 + 0x33 : 0;
+        if (xff->impSymIxsNrE != 0)
+            total = t + xff->impSymIxsNrE * 16 + 0x33;
+        else
+            total = t;
+        sz = total + extra;
+    }
+    else
+    {
+        sz = extra;
+    }
+    obj = _isysCreateObj(ptn, 1, 0x38, sz, func_4001C4F8, 4);
+    obj->bits.hashed = 0;
+    ret = func_40019D68(xff, obj, obj->partition, func_4001C3B0, func_4001C440, (void *)DldSysUndefSymbol, func_400199B0, parent);
+    sign = 0;
+    if (ret != 0)
+    {
+        sign = obj->bits.hashed;
+    }
+    x = xff;
+    if (ret != 0)
+    {
+        x = (struct t_xffEntPntHdr *)ret;
+    }
+    obj->entry = ret ? (void *)*ret : xff->entryPnt;
+    obj->hdr = x;
+    obj->bits.hashed = 0;
+    obj->bits.sepImage = (isRet = (ret != 0));
+    obj->bits.relocated = 0;
+    if (isRet == 0)
+    {
+        if (x->symTabNrE)
+        {
+            if (symdef)
+            {
+                isysAddGroupWithLinkParam(obj, symbolDefModuleGroup, 0, 0);
+            }
+        }
+        if (x->impSymIxsNrE)
+        {
+            if (resolve)
+            {
+                isysAddGroupWithLinkParam(obj, needResolveModuleGroup, 0, 0);
+            }
+        }
+        if (build)
+        {
+            func_40019B58(obj, obj->partition);
+        }
+        func_4001A170((ModPend *)&obj->pendCount, &rootPtn, x);
+    }
+    if (ret != 0)
+    {
+        obj->bits.hashed = sign;
+    }
+    return obj;
+}
 
 s32 isysResolveAllModuleObjHasUndefSymbol(void)
 {
@@ -609,10 +719,61 @@ s32 isysResolveAllModuleObjHasUndefSymbol(void)
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", func_4001A918);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", func_4001AB68);
+extern void *func_4001C3F8(s32);
+s32 func_4001AB68(ModObj *obj, char *name, struct t_xffEntPntHdr *xff)
+{
+    s32 sign = 0;
+    struct t_xffEntPntHdr *x;
+    s32 *ret;
+    s32 isRet;
 
-/* NEARMISS-STUB func_4001AD58 */
-#if 0 /* NEARMISS 97.0% cat=regalloc sub=- | REA near-miss | attempts=2 */
+    obj->bits.hashed = 0;
+    ret = func_40019D68(xff, obj, obj->partition, func_4001C3B0, func_4001C3F8, (void *)DldSysUndefSymbol, func_400199B0, 0);
+    if (ret != 0)
+    {
+        sign = obj->bits.hashed;
+    }
+    x = xff;
+    if (ret != 0)
+    {
+        x = (struct t_xffEntPntHdr *)ret;
+    }
+    obj->entry = ret ? (void *)*ret : xff->entryPnt;
+    obj->hdr = x;
+    obj->bits.hashed = 0;
+    obj->bits.sepImage = (isRet = (ret != 0));
+    obj->bits.relocated = 0;
+    if (isRet == 0)
+    {
+        if (x->symTabNrE)
+        {
+            isysAddGroupWithLinkParam(obj, symbolDefModuleGroup, 0, 0);
+        }
+        if (x->impSymIxsNrE)
+        {
+            isysAddGroupWithLinkParam(obj, needResolveModuleGroup, 0, 0);
+        }
+        func_40019B58(obj, obj->partition);
+        func_4001A170((ModPend *)&obj->pendCount, &rootPtn, x);
+    }
+    if (ret != 0)
+    {
+        obj->bits.hashed = sign;
+    }
+    if (name != NULL)
+    {
+        obj->name = iosMallocAlign(obj->partition, strlen(name) + 1, 1);
+        strcpy(obj->name, name);
+    }
+    else
+    {
+        obj->name = D_40045824;
+    }
+    isysAddGroupWithLinkParam(obj, executableModuleGroup, 0, 0);
+    obj->allocSize = 0;
+    return 1;
+}
+
 ModObj *func_4001AD58(char *name, s32 fileSize, s32 parentPtn)
 {
     s32 before = D_40045820;
@@ -621,16 +782,18 @@ ModObj *func_4001AD58(char *name, s32 fileSize, s32 parentPtn)
     s32 nExp;
     s32 extra;
     s32 total;
+    s32 impBytes;
+    s32 nImp;
     ModObj *obj;
 
     func_4001C350((s32)h, name, fileSize);
-    adj = *(u8 *)&h->unkC != 0 ? *(u8 *)&h->unkC + 1 : 2;
-    adj = h->unk24 - h->unk1C - adj;
-    extra = 0;
-    if (adj != 0)
-        extra = adj * 16 + 0x33;
-    if (h->unk1C != 0)
-        total = extra + h->unk1C * 16 + 0x33;
+    adj = SPECN(h);
+    nImp = h->impSymIxsNrE;
+    impBytes = nImp << 4;
+    nExp = h->symTabNrE - h->impSymIxsNrE - adj;
+    extra = nExp != 0 ? nExp * 16 + 0x33 : 0;
+    if (h->impSymIxsNrE != 0)
+        total = extra + impBytes + 0x33;
     else
         total = extra;
     obj = _isysCreateObj(parentPtn, 2, 0x40, strlen(name) + total + 1, func_4001C5E8, 4);
@@ -639,8 +802,6 @@ ModObj *func_4001AD58(char *name, s32 fileSize, s32 parentPtn)
     obj->allocSize = D_40045820 - before;
     return obj;
 }
-#endif
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", func_4001AD58);
 /* NEARMISS-STUB func_4001AE88 */
 #if 0 /* NEARMISS 85.28% cat=branch-layout sub=- | movn if-conversion | attempts=1 */
 /* decls needed: extern ModObj *func_4001AE88(char *name, ModHdr *hdr, void *ptn); extern char *D_40045824; extern void func_40019B58(ModObj *obj, s32 arg1); extern void isysAddGroupWithLinkParam(); */
@@ -651,7 +812,7 @@ ModObj *func_4001AE88(char *name, ModHdr *hdr, void *ptn)
     s32 size;
     s32 t;
 
-    t = *(u8 *)&hdr->unkC;
+    t = *(u8 *)&hdr->specSectNrE;
     if (t == 0)
     {
         t = 2;
@@ -660,7 +821,7 @@ ModObj *func_4001AE88(char *name, ModHdr *hdr, void *ptn)
     {
         t = t + 1;
     }
-    size = hdr->unk24 - hdr->unk1C - t;
+    size = hdr->symTabNrE - hdr->impSymIxsNrE - t;
     if (size != 0)
     {
         size = (size << 4) + 0x33;
@@ -669,31 +830,31 @@ ModObj *func_4001AE88(char *name, ModHdr *hdr, void *ptn)
     {
         size = 0;
     }
-    if (hdr->unk1C != 0)
+    if (hdr->impSymIxsNrE != 0)
     {
-        size = size + (hdr->unk1C << 4) + 0x33;
+        size = size + (hdr->impSymIxsNrE << 4) + 0x33;
     }
     n = strlen(name);
     obj = _isysCreateObj((s32)ptn, 2, 0x40, n + size + 1, NULL, 4);
-    obj->entry = hdr->unk10;
+    obj->entry = hdr->entryPnt;
     obj->flags &= 0x7FFFFFFF;
     obj->hdr = hdr;
     obj->flags &= 0xBFFFFFFF;
     obj->flags &= 0xDFFFFFFF;
-    if (hdr->unk24 != 0)
+    if (hdr->symTabNrE != 0)
     {
         isysAddGroupWithLinkParam(obj, symbolDefModuleGroup, 0, 0);
     }
-    if (hdr->unk1C != 0)
+    if (hdr->impSymIxsNrE != 0)
     {
         isysAddGroupWithLinkParam(obj, needResolveModuleGroup, 0, 0);
     }
-    func_40019B58(obj, obj->unk0[0]);
+    func_40019B58(obj, obj->partition);
     func_4001A170((ModPend *)&obj->pendCount, &rootPtn, (struct t_xffEntPntHdr *)hdr);
     if (name != NULL)
     {
         n = strlen(name);
-        obj->name = iosMallocAlign(obj->unk0[0], n + 1, 1);
+        obj->name = iosMallocAlign(obj->partition, n + 1, 1);
         strcpy(obj->name, name);
     }
     else
@@ -755,9 +916,9 @@ void isysLaunchModule(ModObj *obj)
     OutputLinkerScriptFile(hdr, buf, printf);
     freed = 0;
     h2 = obj->hdr;
-    if (h2->unk0 == D_40045828)
+    if (h2->ident == D_40045828)
     {
-        n = h2->relocNrE >> 1;
+        n = h2->relocTabNrE >> 1;
         sum = 0;
         if (n > 0)
         {
@@ -774,7 +935,7 @@ void isysLaunchModule(ModObj *obj)
         {
             h2->relocTab[n + i].nrEnt = 0;
         }
-        freed = h2->unk14 - ((u32)h2->relocTab[n].addr - (u32)h2);
+        freed = h2->stack_Rel - ((u32)h2->relocTab[n].addr - (u32)h2);
     }
     obj->allocSize -= freed;
     D_40045820 -= freed;
@@ -790,13 +951,13 @@ void *isysGetXffEntryPointPreRelocation(ModHdr *xff)
     s32 i;
 
     xff->table = (u8 *)xff + xff->secTabOff;
-    ent = (ModPartEnt *)(xff->table + 0x20);
+    ent = (ModPartEnt *)(xff->sectTab + 1);
     i = 1;
-    if (i < xff->symBase)
+    if (i < xff->sectNrE)
     {
         do
         {
-            ent->unk4[0] = (u32)xff + ent->unk1C;
+            ent->unk4[0] = (u32)xff + ent->impSymIxsNrE;
             if (ent->unk4[1] != 0)
             {
                 switch (ent->unk4[3])
@@ -823,7 +984,7 @@ void *isysGetXffEntryPointPreRelocation(ModHdr *xff)
             }
             i++;
             ent++;
-        } while (i < xff->symBase);
+        } while (i < xff->sectNrE);
     }
     return NULL;
 }// kK24b clean single-function cut
@@ -894,18 +1055,18 @@ s32 isysSearchModuleFuncNameByAddr(char *buf, char *out, u32 addr)
         {
             obj = link->obj;
             hdr = obj->hdr;
-            strTab = hdr->strTab;
+            strTab = (u32)hdr->symTabStr;
             sym = hdr->symTab;
-            i = hdr->unk24 - 2;
+            i = hdr->symTabNrE - 2;
             if (i != -1)
             {
                 do
                 {
-                    if (sym->sect != 0xFFF1 && (*(u8 *)&sym->unkC & 0xF) == 2)
+                    if (sym->sect != 0xFFF1 && (*((u8 *)sym + 0xC) & 0xF) == 2)
                     {
-                        if (sym->unk4 == addr)
+                        if ((u32)sym->addr == addr)
                         {
-                            name = (char *)(strTab + sym->nameOff);
+                            name = (char *)(strTab + sym->nameOffs);
                             goto found;
                         }
                     }
@@ -992,14 +1153,14 @@ ModObj *isysSearchModuleSymbolByGroup(u32 *out, char *name, u16 *group, ModObj *
                 else
                 {
                     hdr = obj->hdr;
-                    strTab = hdr->strTab;
+                    strTab = (u32)hdr->symTabStr;
                     sym = hdr->symTab;
-                    i = hdr->unk24 - 2;
+                    i = hdr->symTabNrE - 2;
                     if (i != -1)
                     {
                         do
                         {
-                            if (sym->sect != 0 && strcmp((char *)(strTab + sym->nameOff), name) == 0)
+                            if (sym->sect != 0 && strcmp((char *)(strTab + sym->nameOffs), name) == 0)
                             {
                                 *out = sym->unk4;
                                 found = 1;
@@ -1030,11 +1191,11 @@ INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", isysSearchModuleSymbo
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", isysRemoveModuleObjGroup);
 void isysRemoveModuleObjGroup(ModObj *obj)
 {
-    if (obj->hdr->unk24)
+    if (obj->hdr->symTabNrE)
     {
         _isysDeleteGroup(obj, &symbolDefModuleGroup, 0);
     }
-    if (obj->hdr->unk1C)
+    if (obj->hdr->impSymIxsNrE)
     {
         _isysDeleteGroup(obj, &needResolveModuleGroup, 0);
     }
@@ -1108,7 +1269,7 @@ void isysLaunchExecModule(ModObj *obj)
 
     isysLaunchModule(obj);
     hdr = obj->hdr;
-    entry = hdr->unk10;
+    entry = hdr->entryPnt;
     FlushCache(0);
     FlushCache(2);
     entry(obj);
@@ -1124,7 +1285,7 @@ s32 isysFlushModuleObj(ModObj *obj)
     s32 i;
     if (obj->flags & 0x40000000)
     {
-        iosFree((void *)obj->hdr->unk4);
+        iosFree((void *)obj->hdr->u04);
         func_4001A2F8(obj);
     }
     else
@@ -1140,13 +1301,13 @@ s32 isysFlushModuleObj(ModObj *obj)
         hdr = obj->hdr;
         if (hdr != NULL)
         {
-            ent = (ModPartEnt *)(hdr->table + 0x20);
-            for (i = hdr->symBase - 2; i != -1; i--)
+            ent = (ModPartEnt *)(hdr->sectTab + 1);
+            for (i = hdr->sectNrE - 2; i != -1; i--)
             {
-                if (ent->ptr18 != NULL)
+                if (ent->moved != 0)
                 {
-                    ent->ptr18 = NULL;
-                    iosFree(ent->ptr);
+                    ent->moved = 0;
+                    iosFree(ent->memPt);
                 }
                 ent++;
             }
@@ -1160,7 +1321,7 @@ s32 isysFlushModuleObj(ModObj *obj)
 u32 GetSymbolByIndex(ModObj *arg0, s32 idx)
 {
     ModHdr *h = arg0->hdr;
-    return h->strTab + h->symTab[idx + h->symBase].nameOff;
+    return (u32)h->symTabStr + h->symTab[idx + h->sectNrE].nameOffs;
 }
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", isysRelocateModuleObj);
@@ -1168,14 +1329,14 @@ INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", isysRelocateModuleObj
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", isysGetXffWorkSize);
 s32 isysGetXffWorkSize(ModHdr *h)
 {
-    s32 adj = *(u8 *)&h->unkC != 0 ? *(u8 *)&h->unkC + 1 : 2;
-    s32 nExp = h->unk24 - h->unk1C - adj;
+    s32 adj = *(u8 *)&h->specSectNrE != 0 ? *(u8 *)&h->specSectNrE + 1 : 2;
+    s32 nExp = h->symTabNrE - h->impSymIxsNrE - adj;
     s32 sz;
 
     sz = nExp != 0 ? nExp * 16 + 0x33 : 0;
-    if (h->unk1C != 0)
+    if (h->impSymIxsNrE != 0)
     {
-        sz += h->unk1C * 16 + 0x33;
+        sz += h->impSymIxsNrE * 16 + 0x33;
     }
     return sz;
 }
@@ -1186,7 +1347,7 @@ u32 isysGetModuleObjMallocSize(ModObj *arg0)
     u32 *p;
     if (arg0->flags & 0x40000000)
     {
-        p = (u32 *)arg0->hdr->unk4 - 1;
+        p = (u32 *)arg0->hdr->u04 - 1;
     }
     else
     {
@@ -1211,7 +1372,7 @@ s32 isysDisposeModuleObjRelocationElement(ModObj *obj)
     {
         return 0;
     }
-    n = hdr->relocNrE >> 1;
+    n = hdr->relocTabNrE >> 1;
     sum = 0;
     if (n > 0)
     {
@@ -1229,7 +1390,7 @@ s32 isysDisposeModuleObjRelocationElement(ModObj *obj)
         hdr->relocTab[n + i].nrEnt = 0;
     }
     rel2 = &hdr->relocTab[n];
-    sum = hdr->unk14;
+    sum = hdr->stack_Rel;
     return sum - ((u32)rel2->addr - (u32)hdr);
 }
 #endif
@@ -1246,7 +1407,7 @@ s32 GetExecModuleSize(void)
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", getModuleSize);
 s32 getModuleSize(ModObj *arg0)
 {
-    return arg0->hdr->unk14;
+    return arg0->hdr->stack_Rel;
 }
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", func_4001C220);
@@ -1351,10 +1512,10 @@ void *func_4001C468(ModPartObj *arg0)
         ent = (ModPartEnt *)(arg0->table + 0x20);
         for (i = arg0->count - 2; i != -1; i--)
         {
-            if (ent->ptr18 != NULL)
+            if (ent->moved != 0)
             {
-                ent->ptr18 = NULL;
-                iosFree(ent->ptr);
+                ent->moved = 0;
+                iosFree(ent->memPt);
             }
             ent++;
         }
@@ -1372,7 +1533,7 @@ void func_4001C4F8(ModObj *obj)
 
     if (obj->flags & 0x40000000)
     {
-        iosFree((void *)obj->hdr->unk4);
+        iosFree((void *)obj->hdr->u04);
         func_4001A2F8(obj);
         return;
     }
@@ -1389,13 +1550,13 @@ void func_4001C4F8(ModObj *obj)
     hdr = obj->hdr;
     if (hdr != NULL)
     {
-        ent = (ModPartEnt *)(hdr->table + 0x20);
-        for (i = hdr->symBase - 2; i != -1; i--)
+        ent = (ModPartEnt *)(hdr->sectTab + 1);
+        for (i = hdr->sectNrE - 2; i != -1; i--)
         {
-            if (ent->ptr18 != NULL)
+            if (ent->moved != 0)
             {
-                ent->ptr18 = NULL;
-                iosFree(ent->ptr);
+                ent->moved = 0;
+                iosFree(ent->memPt);
             }
             ent++;
         }
@@ -1412,7 +1573,7 @@ void func_4001C5E8(ModObj *obj)
 
     if (obj->flags & 0x40000000)
     {
-        iosFree((void *)obj->hdr->unk4);
+        iosFree((void *)obj->hdr->u04);
         func_4001A2F8(obj);
     }
     else
@@ -1428,13 +1589,13 @@ void func_4001C5E8(ModObj *obj)
         hdr = obj->hdr;
         if (hdr != NULL)
         {
-            ent = (ModPartEnt *)(hdr->table + 0x20);
-            for (i = hdr->symBase - 2; i != -1; i--)
+            ent = (ModPartEnt *)(hdr->sectTab + 1);
+            for (i = hdr->sectNrE - 2; i != -1; i--)
             {
-                if (ent->ptr18 != NULL)
+                if (ent->moved != 0)
                 {
-                    ent->ptr18 = NULL;
-                    iosFree(ent->ptr);
+                    ent->moved = 0;
+                    iosFree(ent->memPt);
                 }
                 ent++;
             }
@@ -1812,7 +1973,7 @@ s32 func_4001D120(s32 arg0)
             obj = link->obj;
             hdr = obj->hdr;
             rel = hdr->relocTab;
-            for (ret = 0; ret < hdr->relocNrE; ret++, rel++)
+            for (ret = 0; ret < hdr->relocTabNrE; ret++, rel++)
             {
                 if (rel->type != 4 && rel->type != 9)
                 {
