@@ -972,11 +972,11 @@ segments:
 
         # sce
         #- [ 0x31a98, textbin, sce ]
-        - [ 0x31a98, asm, sdk/mktime ]
-        #- [ 0x31E68, asm, sdk/mktime ] # mktime
+        - [ 0x31a98, c, sdk/mktime ]
+        #- [ 0x31E68, c, sdk/mktime ] # mktime
         - [ 0x32100, c, sdk/strstr ] # strstr
         - [ 0x32188, c, sdk/div ] # div
-        - [ 0x32210, asm, sdk/atanf ] # atanf
+        - [ 0x32210, c, sdk/atanf ] # atanf
         - [ 0x324A0, c, sdk/cosf ] # cosf
         - [ 0x32578, c, sdk/fabsf ] # fabsf
         - [ 0x325A0, c, sdk/sinf] # sinf
@@ -987,16 +987,16 @@ segments:
         - [ 0x326E8, c, sdk/fmodf ] # fmodf
         - [ 0x32700, c, sdk/powf ] # powf
         - [ 0x32718, c, sdk/sqrtf ] # sqrtf
-        - [ 0x32730, asm, sdk/__ieee754_sqrt ] # __ieee754_sqrt
-        - [ 0x32A50, asm, sdk/__ieee754_acosf ] # __ieee754_acosf
-        - [ 0x32E78, asm, sdk/__ieee754_asinf ] # __ieee754_asinf
-        - [ 0x33218, asm, sdk/__ieee754_atan2f ] # __ieee754_atan2f
-        - [ 0x333F8, asm, sdk/__ieee754_fmodf ] # __ieee754_fmodf
-        - [ 0x335C8, asm, sdk/__ieee754_powf ] # __ieee754_powf
-        - [ 0x33DA8, asm, sdk/__ieee754_rem_pio2f ] # __ieee754_rem_pio2f
+        - [ 0x32730, c, sdk/__ieee754_sqrt ] # __ieee754_sqrt
+        - [ 0x32A50, c, sdk/__ieee754_acosf ] # __ieee754_acosf
+        - [ 0x32E78, c, sdk/__ieee754_asinf ] # __ieee754_asinf
+        - [ 0x33218, c, sdk/__ieee754_atan2f ] # __ieee754_atan2f
+        - [ 0x333F8, c, sdk/__ieee754_fmodf ] # __ieee754_fmodf
+        - [ 0x335C8, c, sdk/__ieee754_powf ] # __ieee754_powf
+        - [ 0x33DA8, c, sdk/__ieee754_rem_pio2f ] # __ieee754_rem_pio2f
         - [ 0x34158, c, sdk/__ieee754_sqrtf ] # __ieee754_sqrtf
         - [ 0x34228, c, sdk/__kernel_cosf ] # __kernel_cosf
-        - [ 0x34378, asm, sdk/__kernel_rem_pio2f ] # __kernel_rem_pio2f
+        - [ 0x34378, c, sdk/__kernel_rem_pio2f ] # __kernel_rem_pio2f
         - [ 0x34BE0, c, sdk/__kernel_sinf ] # __kernel_sinf
         - [ 0x34CE8, c, sdk/floorf ] # floorf
         - [ 0x34DC0, c, sdk/scalbnf ] # scalbnf
