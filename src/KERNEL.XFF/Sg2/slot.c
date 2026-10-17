@@ -3,15 +3,17 @@
 typedef struct {
     u32 flags;     /* 0x00 */
     s32 unk4;      /* 0x04 busy/refcount */
-    u8 pad8[4];
+    s32 age;       /* 0x08 */
     s32 slotClass; /* 0x0C */
     s32 vab;       /* 0x10 */
     s32 ch;        /* 0x14 */
-    u8 pad18[4];
+    s32 unk18;     /* 0x18 */
     s32 group;     /* 0x1C */
     u8 pad20[4];
     s32 note;      /* 0x24 */
-    u8 pad28[0xC];
+    s32 baseNote;  /* 0x28 */
+    s32 semi;      /* 0x2C */
+    s32 fine;      /* 0x30 */
     s32 masTune;   /* 0x34 */
     s32 masVolL;   /* 0x38 */
     s32 masVolR;   /* 0x3C */
@@ -23,7 +25,7 @@ typedef struct {
     s32 pan;       /* 0x54 */
     s32 bendRange; /* 0x58 */
     s32 bendValue; /* 0x5C */
-    u8 pad60[4];
+    s32 ssa;         /* 0x60 */
     u16 adsr1;       /* 0x64 */
     u16 adsr2;       /* 0x66 */
     s32 hwVoiceL;    /* 0x68 */
@@ -71,6 +73,7 @@ typedef struct {
 } Sg2Slot; /* size 0xE0 */
 
 extern Sg2Slot D_401117B0[];
+extern s32 D_401117A0;
 typedef struct {
     s32 v;
     u8 pad[0xDC];
@@ -85,6 +88,12 @@ extern void Sg2RemoteSend(s32, s32, s32, s32);
 extern s32 D_401117A4;
 extern s32 D_401117A8;
 extern s32 D_401117AC;
+extern u32 D_40111770[];
+extern u32 D_40111778[];
+extern u32 D_40111780[];
+extern u32 D_40111790[];
+s32 DIntr();
+s32 EIntr();
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotGetSlotClassIdx);
 s32 Sg2SlotGetSlotClassIdx(void)
@@ -193,9 +202,45 @@ s32 Sg2SlotFindVabCh(s32 *out, s32 vab, s32 ch)
     return n;
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotFindVabChNote);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotFindVabChNote);
+s32 Sg2SlotFindVabChNote(s32 *out, s32 vab, s32 ch, s32 note)
+{
+    s32 n = 0;
+    s32 i;
+    Sg2Slot *slot = D_401117B0;
+    for (i = 0; i < 0x30; i++, slot++)
+    {
+        if (slot->flags & 1)
+        {
+            if (slot->vab == vab && slot->ch == ch && slot->note == note)
+            {
+                *out++ = i;
+                n++;
+            }
+        }
+    }
+    return n;
+}
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotFindVabChSsaBaseNote);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotFindVabChSsaBaseNote);
+s32 Sg2SlotFindVabChSsaBaseNote(s32 *out, s32 vab, s32 ch, s32 ssa, s32 baseNote)
+{
+    s32 n = 0;
+    s32 i;
+    Sg2Slot *slot = D_401117B0;
+    for (i = 0; i < 0x30; i++, slot++)
+    {
+        if (slot->flags & 1)
+        {
+            if (slot->vab == vab && slot->ch == ch && slot->ssa == ssa && slot->baseNote == baseNote)
+            {
+                *out++ = i;
+                n++;
+            }
+        }
+    }
+    return n;
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotFindSlotClass);
 s32 Sg2SlotFindSlotClass(s32 *out, s32 slotClass)
@@ -255,7 +300,25 @@ s32 Sg2SlotFindSlotClassChNote(s32 *out, s32 slotClass, s32 ch, s32 note)
     return n;
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotFindSlotClassChSsaBaseNote);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotFindSlotClassChSsaBaseNote);
+s32 Sg2SlotFindSlotClassChSsaBaseNote(s32 *out, s32 slotClass, s32 ch, s32 ssa, s32 baseNote)
+{
+    s32 n = 0;
+    s32 i;
+    Sg2Slot *slot = D_401117B0;
+    for (i = 0; i < 0x30; i++, slot++)
+    {
+        if (slot->flags & 1)
+        {
+            if (slot->slotClass == slotClass && slot->ch == ch && slot->ssa == ssa && slot->baseNote == baseNote)
+            {
+                *out++ = i;
+                n++;
+            }
+        }
+    }
+    return n;
+}
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotSetBasicParam);
 
@@ -274,7 +337,16 @@ void Sg2SlotSetGroup(s32 idx, s32 v)
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotSetMute);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotSetMasVol);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotSetMasVol);
+void Sg2SlotSetMasVol(s32 i, s32 L, s32 R)
+{
+    D_401117B0[i].masVolL = L;
+    D_401117B0[i].masVolR = R;
+    if (D_401117B0[i].hwVoiceL != -1 && D_401117B0[i].hwVoiceR != -1)
+    {
+        D_401117B0[i].flags |= 0x1000;
+    }
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotSetSeMasVol);
 void Sg2SlotSetSeMasVol(s32 idx, s32 v)
@@ -485,17 +557,71 @@ INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotVabKeyOff);
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotVabKeyOffGroup);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotSetKeyOnBit);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotSetKeyOnBit);
+void Sg2SlotSetKeyOnBit(s32 idx, u32 mask)
+{
+    s32 intr = DIntr();
+    D_40111770[idx] |= mask;
+    if (intr)
+    {
+        EIntr();
+    }
+}
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotSetKeyOffBit);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotSetKeyOffBit);
+void Sg2SlotSetKeyOffBit(s32 idx, u32 mask)
+{
+    s32 intr = DIntr();
+    D_40111778[idx] |= mask;
+    if (intr)
+    {
+        EIntr();
+    }
+}
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotSetReverbOnBit);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotSetReverbOnBit);
+void Sg2SlotSetReverbOnBit(s32 idx, u32 mask)
+{
+    s32 intr = DIntr();
+    D_40111790[idx] |= mask;
+    if (intr)
+    {
+        EIntr();
+    }
+}
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotSetReverbOffBit);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotSetReverbOffBit);
+void Sg2SlotSetReverbOffBit(s32 idx, u32 mask)
+{
+    s32 intr = DIntr();
+    D_40111790[idx] &= ~mask;
+    if (intr)
+    {
+        EIntr();
+    }
+}
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotSetNoiseOnBit);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotSetNoiseOnBit);
+void Sg2SlotSetNoiseOnBit(s32 idx, u32 mask)
+{
+    s32 intr = DIntr();
+    D_40111780[idx] |= mask;
+    if (intr)
+    {
+        EIntr();
+    }
+}
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotSetNoiseOffBit);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotSetNoiseOffBit);
+void Sg2SlotSetNoiseOffBit(s32 idx, u32 mask)
+{
+    s32 intr = DIntr();
+    D_40111780[idx] &= ~mask;
+    if (intr)
+    {
+        EIntr();
+    }
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotSetOutputMode);
 s32 Sg2SlotSetOutputMode(s32 mode)
