@@ -26,6 +26,10 @@ s32 DIntr(void);
 void EIntr(void);
 void free(void *p);
 void func_40040710();
+extern s32 D_401157B0;
+void Sg2ExPcmInputCtrl(u32 arg0, s32 arg1);
+void func_4003FF10(void *a0, s32 a1, void *a2, s32 a3);
+s32 func_4003FAD0(void *arg0, s32 arg1);
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", func_4003F3C8);
 void func_4003F3C8(s32 *arg0, s32 arg1)
@@ -34,11 +38,62 @@ void func_4003F3C8(s32 *arg0, s32 arg1)
 }
 
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", func_4003F3E8);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", func_4003F3E8);
+void func_4003F3E8(s32 *arg0, s32 arg1)
+{
+    s16 *out = (s16 *)arg0[0] + arg0[4];
+    f32 *in = (f32 *)arg0[1];
+    s32 i;
+
+    for (i = 0; i < arg1; i++)
+    {
+        f32 v = in[i];
+
+        if (v > 32767.0f)
+        {
+            v = 32767.0f;
+        }
+        if (v < -32768.0f)
+        {
+            v = -32768.0f;
+        }
+        out[i] = (s32)v;
+    }
+}
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", func_4003F468);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", func_4003F528);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", func_4003F528);
+void func_4003F528(s32 *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5)
+{
+    f32 *out1 = (f32 *)arg0[1];
+    f32 *out2 = (f32 *)(arg0[1] + 0x400);
+    s16 *buf = (s16 *)arg0[0];
+    s32 idx = arg0[4];
+    s32 i;
+
+    for (i = 0; i < arg1; i += 0x100)
+    {
+        s32 div = 100;
+        s32 j;
+
+        for (j = 0xFF; j >= 0; j--)
+        {
+            s32 sample = buf[idx];
+
+            idx++;
+            if (arg5 < idx)
+            {
+                idx = arg4;
+            }
+            *out1++ = (sample * arg2) / div;
+            *out2++ = (sample * arg3) / div;
+        }
+        out1 += 0x100;
+        out2 += 0x100;
+    }
+    arg0[4] = idx;
+}
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", func_4003F5D0);
 
@@ -87,7 +142,21 @@ INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", func_4003F928);
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", func_4003FAD0);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", func_4003FBD8);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", func_4003FBD8);
+void func_4003FBD8(PcmInSlot *arg0, s32 arg1)
+{
+    s32 pos;
+    s32 ring;
+
+    ((s32 (*)(s32, s16 *, s16 *, s32))D_401160A8)(0, (s16 *)arg0->f[2] + arg0->f[6], (s16 *)arg0->f[105] + arg0->f[107], arg1 * 2);
+    pos = arg0->f[6] + arg1;
+    arg0->f[6] = pos;
+    pos = pos % arg0->f[4];
+    ring = arg0->f[107] + arg1;
+    arg0->f[107] = ring;
+    arg0->f[6] = pos;
+    arg0->f[107] = ring % arg0->f[106];
+}
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", func_4003FC78);
 
@@ -136,11 +205,8 @@ s32 Sg2ExPcmInputOpenDoubleBuffer(s32 arg0, s32 arg1, s32 arg2)
 }
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", Sg2ExPcmInputOpen);
-
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", Sg2ExPcmInputClose);
-
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", Sg2ExPcmInputCtrl);
-
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", Sg2ExPcmInputGetLipFrame);
 s32 Sg2ExPcmInputGetLipFrame(u32 arg0)
 {
@@ -222,7 +288,27 @@ void Sg2ExPcmInputAutoFilterInit(u32 arg0)
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", Sg2ExPcmInputSetAutoFilterDirect);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", Sg2ExPcmInputSetAutoFilter);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", Sg2ExPcmInputSetAutoFilter);
+s32 Sg2ExPcmInputSetAutoFilter(u32 arg0, u8 *arg1, s32 arg2)
+{
+    s32 r;
+
+    if (arg0 >= 4)
+    {
+        return -2;
+    }
+    r = func_400400A0(arg1);
+    if (r == -1)
+    {
+        return -1;
+    }
+    if (!(arg2 < r))
+    {
+        return -2;
+    }
+    func_4003FF10(func_400400F0((s32 *)arg1, arg2), arg0, arg1, arg2);
+    return 0;
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", Sg2ExPcmInputAutoFilterCtrl);
 void Sg2ExPcmInputAutoFilterCtrl(u32 arg0, s32 arg1, s32 arg2)
@@ -296,7 +382,23 @@ void Sg2ExPcmOutputAutoFilterInit(s32 arg0)
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", Sg2ExPcmOutputSetAutoFilterDirect);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", Sg2ExPcmOutputSetAutoFilter);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", Sg2ExPcmOutputSetAutoFilter);
+s32 Sg2ExPcmOutputSetAutoFilter(u8 *arg0, s32 arg1)
+{
+    s32 r;
+
+    r = func_400400A0(arg0);
+    if (r == -1)
+    {
+        return -1;
+    }
+    if (!(arg1 < r))
+    {
+        return -2;
+    }
+    func_4003FF10(func_400400F0((s32 *)arg0, arg1), 5, arg0, arg1);
+    return 0;
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", Sg2ExPcmOutputAutoFilterCtrl);
 void Sg2ExPcmOutputAutoFilterCtrl(s32 arg0, s32 arg1)
