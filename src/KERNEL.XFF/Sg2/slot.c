@@ -130,7 +130,16 @@ INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotSearchParamOlder1);
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotSearchTypeOlder);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotBlock);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotBlock);
+void Sg2SlotBlock(s32 kind, s32 idx)
+{
+    s32 age = D_401117A0;
+    D_401117B0[idx].flags = 0;
+    D_401117B0[idx].unk4 = kind;
+    D_401117B0[idx].slotClass = D_401117B0[idx].sub.ch = D_401117B0[idx].sub.prio = -1;
+    D_401117B0[idx].age = age;
+    D_401117A0 = age + 1;
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotFree);
 void Sg2SlotFree(s32 idx)
