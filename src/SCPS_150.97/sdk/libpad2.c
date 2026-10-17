@@ -1,6 +1,5 @@
 #include "common.h"
 
-extern u8 D_0014B718[];
 extern u32 D_00133AE8[];
 extern u32 D_00133AF8[];
 extern u8 D_001386B8[];
@@ -45,8 +44,12 @@ typedef struct
 typedef struct
 {
     u32 w[4];
-    u8 pad[0x334 - 0x10];
+    u8 *buf;           /* 0x10: two 0x80-byte receive buffers */
+    Pad2Button btn[50]; /* 0x14 */
 } Pad2Slot;
+
+extern Pad2Slot D_0014B718[];
+#define PAD2SLOT(i) (D_0014B718[i])
 
 int scePad2Init(int mode)
 {
@@ -55,10 +58,10 @@ int scePad2Init(int mode)
     D_00133AE8[0] = 1;
     for (i = 0; i < 16; i++)
     {
-        ((Pad2Slot *)D_0014B718)[i].w[0] = 0;
-        ((Pad2Slot *)D_0014B718)[i].w[1] = 0;
-        ((Pad2Slot *)D_0014B718)[i].w[2] = 0;
-        ((Pad2Slot *)D_0014B718)[i].w[3] = 0;
+        D_0014B718[i].w[0] = 0;
+        D_0014B718[i].w[1] = 0;
+        D_0014B718[i].w[2] = 0;
+        D_0014B718[i].w[3] = 0;
     }
     return 1;
 }
@@ -72,7 +75,7 @@ int scePad2End(void)
     D_00133AE8[0] = 0;
     for (i = 0; i < 16; i++)
     {
-        if (*(s32 *)(D_0014B718 + i * 0x334) != 0)
+        if (*(s32 *)((u8 *)D_0014B718 + i * 0x334) != 0)
         {
             ret = scePad2DeleteSocket(i);
             if (ret < 0)
@@ -119,8 +122,8 @@ int scePad2CreateSocket(Pad2SocketParam *param, void *buf)
     {
         return ret;
     }
-    *(s32 *)(D_0014B718 + ret * 0x334) = 1;
-    *(void **)(D_0014B718 + ret * 0x334 + 0x10) = buf;
+    *(s32 *)((u8 *)D_0014B718 + ret * 0x334) = 1;
+    *(void **)((u8 *)D_0014B718 + ret * 0x334 + 0x10) = buf;
     func_001156D8(ret);
     return ret;
 }
@@ -134,9 +137,9 @@ int scePad2DeleteSocket(int socket)
     {
         return ret;
     }
-    *(s32 *)(D_0014B718 + socket * 0x334) = 0;
-    *(s32 *)(D_0014B718 + socket * 0x334 + 4) = 0;
-    *(s32 *)(D_0014B718 + socket * 0x334 + 0xC) = 0;
+    *(s32 *)((u8 *)D_0014B718 + socket * 0x334) = 0;
+    *(s32 *)((u8 *)D_0014B718 + socket * 0x334 + 4) = 0;
+    *(s32 *)((u8 *)D_0014B718 + socket * 0x334 + 0xC) = 0;
     return 1;
 }
 
@@ -147,7 +150,7 @@ int scePad2Read(int socket, u8 *buf)
     u8 *slot;
     u8 *ptr;
 
-    slot = D_0014B718 + socket * 0x334;
+    slot = (u8 *)D_0014B718 + socket * 0x334;
     if (*(s32 *)slot == 0)
     {
         return -1;
@@ -170,17 +173,14 @@ int scePad2Read(int socket, u8 *buf)
 #endif
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libpad2", scePad2Read);
 
-/* NEARMISS-STUB scePad2GetButtonProfile */
-#if 0 /* NEARMISS 87.73% cat=regalloc sub=- | tail return layout (target bnezl w/ lbu delay slot, ours beqz); slot address/operand order; byte3 load placement before memcpy | attempts=1 */
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libpad2", scePad2GetButtonProfile);
 int scePad2GetButtonProfile(int socket, u8 *buf)
 {
     u8 *ptr;
-    u8 *slot;
     u8 n;
 
     scePad2GetState(socket);
-    slot = D_0014B718 + socket * 0x334;
-    if (*(s32 *)(slot + 4) == 0)
+    if (PAD2SLOT(socket).w[1] == 0)
     {
         if (func_00115750(socket) < 0)
         {
@@ -191,13 +191,14 @@ int scePad2GetButtonProfile(int socket, u8 *buf)
     n = ptr[3];
     if (n != 0 && ptr + 0x1C != 0)
     {
-        memcpy(buf, ptr + ptr[2] + 0x1C, n);
-        func_001158D8(ptr + ptr[2] + 0x1C, (s32 *)(D_0014B72C + socket * 0x334));
+        memcpy(buf, ptr + 0x1C + ptr[2], n);
+        func_001158D8(ptr + (ptr[2] + 0x1C), (s32 *)(D_0014B72C + socket * 0x334));
     }
-    return (*(s32 *)(ptr + 4) != 0) ? ptr[3] : -1;
+    if (*(s32 *)(ptr + 4) == 0)
+        return -1;
+    return ptr[3];
 }
-#endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libpad2", scePad2GetButtonProfile);
+
 
 /* NEARMISS-STUB scePad2GetState */
 #if 0 /* NEARMISS 64.16% cat=uncategorized sub=- | mask chain: target ands/ors an uninitialised callee-saved word (no folding), ours folds to constant 0x0101800C; frame 0x60 vs 0x50; st/rbuf stack order differs | attempts=1 */
@@ -209,7 +210,7 @@ int scePad2GetState(int socket)
     s32 flags;
     s32 ret;
 
-    if (((Pad2Slot *)D_0014B718)[socket].w[1] == 0)
+    if (D_0014B718[socket].w[1] == 0)
     {
         if (func_00115750(socket) < 0)
         {
@@ -239,7 +240,7 @@ int scePad2GetState(int socket)
             return st;
         }
     }
-    ((Pad2Slot *)D_0014B718)[socket].w[1] = 0;
+    D_0014B718[socket].w[1] = 0;
     func_001156D8(socket);
     return 0;
 }
@@ -254,7 +255,7 @@ int scePad2GetButtonInfo(int socket, u8 *buf, int idx)
     u8 v;
     u8 *base;
 
-    base = D_0014B718 + (idx * 16 + socket * 0x334);
+    base = (u8 *)D_0014B718 + (idx * 16 + socket * 0x334);
     rec = *(Pad2Button *)(base + 0x14);
     if (rec.valid != 0)
     {
@@ -277,17 +278,13 @@ int scePad2GetButtonInfo(int socket, u8 *buf, int idx)
 #endif
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libpad2", scePad2GetButtonInfo);
 
-/* NEARMISS-STUB func_001156D8 */
-#if 0 /* NEARMISS 99.67% cat=regalloc sub=- | addu operand order (D first in asm) | attempts=1 */
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libpad2", func_001156D8);
 void func_001156D8(s32 socket)
 {
     u8 *p;
-    u8 *base;
     s32 i;
 
-    base = (u8 *)D_0014B718;
-    base += socket * 0x334;
-    p = *(u8 **)(base + 0x10);
+    p = PAD2SLOT(socket).buf;
     i = 1;
     do
     {
@@ -302,14 +299,10 @@ void func_001156D8(s32 socket)
         p += 0x80;
     } while (i >= 0);
 }
-#endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libpad2", func_001156D8);
 
-/* NEARMISS-STUB func_00115750 */
-#if 0 /* NEARMISS 92.05% cat=regalloc sub=- | ret/const regs a3/a2 differ | attempts=1 */
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libpad2", func_00115750);
 s32 func_00115750(s32 socket)
 {
-    s32 *p;
     s32 ret;
 
     ret = sceDbcGetDepNumber(socket);
@@ -317,60 +310,42 @@ s32 func_00115750(s32 socket)
     {
         return ret;
     }
-    p = (s32 *)(D_0014B718 + socket * 0x334);
-    p[1] = 1;
-    p[3] = ret;
+    PAD2SLOT(socket).w[3] = ret;
+    PAD2SLOT(socket).w[1] = 1;
     return ret;
 }
-#endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libpad2", func_00115750);
 
-/* NEARMISS-STUB func_001157A8 */
-#if 0 /* NEARMISS 99.6% cat=regalloc sub=- | addu operand order | attempts=1 */
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libpad2", func_001157A8);
 u8 *func_001157A8(s32 socket)
 {
     u8 *bufs[2];
     u8 *p;
-    u8 *base;
 
-    base = (u8 *)D_0014B718;
-    base += socket * 0x334;
-    p = *(u8 **)(base + 0x10);
+    p = PAD2SLOT(socket).buf;
     bufs[0] = p;
     bufs[1] = p + 0x80;
     SyncDCache(p, p + 0xFF);
     return bufs[*(s32 *)(bufs[0] + 0x7C) < *(s32 *)(bufs[1] + 0x7C)];
 }
-#endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libpad2", func_001157A8);
 
-/* NEARMISS-STUB func_00115810 */
-#if 0 /* NEARMISS 99.6% cat=regalloc sub=- | addu operand order | attempts=1 */
-u8 *func_00115810(s32 socket)
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libpad2", func_00115810);
+void *func_00115810(s32 socket)
 {
     u8 *bufs[2];
     u8 *p;
-    u8 *base;
 
-    base = (u8 *)D_0014B718;
-    base += socket * 0x334;
-    p = *(u8 **)(base + 0x10);
+    p = PAD2SLOT(socket).buf;
     bufs[0] = p;
     bufs[1] = p + 0x80;
     SyncDCache(p, p + 0x100);
     return bufs[*(s32 *)(bufs[0] + 0x7C) < *(s32 *)(bufs[1] + 0x7C)];
 }
-#endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libpad2", func_00115810);
 
-/* NEARMISS-STUB func_00115878 */
-#if 0 /* NEARMISS 99.57% cat=regalloc sub=- | bnel operand order | attempts=1 */
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libpad2", func_00115878);
 s32 func_00115878(s32 socket)
 {
     u8 *p;
-    u8 *base;
     s32 val;
-    s32 *slot;
 
     p = func_001157A8(socket);
     val = *(s32 *)(p + 0x7C);
@@ -378,18 +353,13 @@ s32 func_00115878(s32 socket)
     {
         return 0;
     }
-    base = (u8 *)D_0014B718;
-    base += 8;
-    slot = (s32 *)(base + socket * 0x334);
-    if (*slot == val)
+    if (val == PAD2SLOT(socket).w[2])
     {
         return 0;
     }
-    *slot = val;
+    PAD2SLOT(socket).w[2] = val;
     return 1;
 }
-#endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libpad2", func_00115878);
 
 int func_001158D8(u8 *arg0, s32 *arg1)
 {
