@@ -26,6 +26,35 @@ INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/timer", func_00110A98);
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/timer", func_00110AD0);
 
+#if 0 /* NEARMISS 20.7% cat=bitops sub=ee-gcc2.9-991111 | 64-bit variable shift expression form (t2<<=16, v0<<=t1 as dsllv) codegen differs under ee-gcc2.9-991111; prior tag sdk-compiler | attempts=1 */
+u64 iGetTimerSystemTime(void)
+{
+    u64 v0;
+    s32 t0;
+    s32 t1;
+    u64 t2;
+
+    v0 = *(volatile u32 *)0x10001000;
+    t0 = *(volatile u32 *)0x10001010;
+    t2 = *(u64 *)0x00133A18;
+    t1 = 2;
+    if (t0 & 0x800)
+    {
+        v0 = *(volatile u32 *)0x10001000;
+        t2++;
+    }
+    t0 &= 3;
+    t2 <<= 16;
+    if (t0 == 0)
+    {
+        t1 = 0;
+    }
+    v0 |= t2;
+    t1 <<= t0;
+    v0 <<= t1;
+    return v0;
+}
+#endif
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/timer", iGetTimerSystemTime);
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/timer", GetTimerSystemTime);
