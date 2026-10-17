@@ -72,7 +72,36 @@ s32 _isysRecvSubMsg(s32 *q, void *dst, s32 size)
     return 1;
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/subthread", _isysSendSubMsg);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/subthread", _isysSendSubMsg);
+s32 _isysSendSubMsg(s32 *q, void *src, s32 size)
+{
+    s32 n;
+    s32 wrNext;
+
+    if (q[0] != size)
+    {
+        return 0;
+    }
+    wrNext = 0;
+    n = q[3] + 1;
+    if (n < q[2])
+    {
+        wrNext = n;
+    }
+    if (wrNext == q[4])
+    {
+        s32 m = wrNext + 1;
+        s32 z = 0;
+        if (m < q[2])
+        {
+            z = m;
+        }
+        q[4] = z;
+    }
+    memcpy((u8 *)q[1] + q[3] * q[0], src, size);
+    q[3] = wrNext;
+    return 1;
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/subthread", InitSubThread);
 void InitSubThread(void)
