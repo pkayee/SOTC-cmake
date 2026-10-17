@@ -8,9 +8,9 @@ typedef struct
     s32 unkC;
     s32 unk10[8];
     u8 *data;        /* 0x40 */
-    s32 unk34;
-    u8 runStatus;    /* 0x48 */
-    u8 pad39[3];
+    u8 skipWait;     /* 0x44 */
+    u8 pad35[3];
+    s32 runStatus;   /* 0x48 */
     s32 unk3C;
 } Sg2SepSub;
 
@@ -44,6 +44,53 @@ s32 Sg2CtrlEntryTickProcById(s32 id, void (*proc)(void));
 void Sg2SepTickProc(void);
 s32 Sg2SepPlaySelectCore(s32 vab, s32 prog, s32 flags, s32 arg3, s32 arg4);
 s32 Sg2SepStopSndOff(u32 id);
+
+typedef struct
+{
+    s32 idx;
+    u32 serial;
+} SepPick;
+
+typedef struct
+{
+    s32 mod;        /* sub+0x00 */
+    s32 unk4;
+    s32 unk8;
+    s32 unkC;
+    s64 step;       /* sub+0x10 (slot+0x20) */
+    s64 accum;      /* sub+0x18 */
+    s64 next;       /* sub+0x20 */
+    s32 counter;    /* sub+0x28 */
+    u8 *start;      /* sub+0x2C */
+    u8 *data;       /* sub+0x30 */
+    u8 skipWait;    /* sub+0x34 */
+    u8 pad35[3];
+    s32 runStatus;  /* sub+0x38 */
+    s32 unk3C;
+} Sg2SepSubD;
+
+typedef struct
+{
+    s32 status;
+    s32 savedStatus;
+    s32 unk8;
+    s32 vab;
+    Sg2SepSubD sub;
+} Sg2SepSlotD;
+
+extern void (*D_40046328[16])(Sg2SepSlotD *);
+s64 dpadd(s64, s64);
+s32 dpcmp(s64, s64);
+s64 __floatdidf(s64);
+void Sg2ModMidiout(s32 mod, s32 len, u8 *data);
+
+s64 dpdiv(s64, s64);
+s64 dpsub(s64, s64);
+s64 dpmul(s64, s64);
+s64 litodp(s32);
+s32 dptoli(s64);
+s32 sprintf(char *s, const char *fmt, ...);
+char *strcat(char *dst, const char *src);
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/sep", func_40037188);
 
@@ -303,6 +350,7 @@ s32 Sg2SepMasterVol(s32 vab, s32 vol)
     return vol;
 }
 
+
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/sep", Sg2SepTickProc);
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/sep", Sg2SepInit);
@@ -329,7 +377,23 @@ INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/sep", debug_sep_config);
 void func_40038100(void) {
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/sep", func_40038108);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/sep", func_40038108);
+void func_40038108(Sg2SepSlot *slot)
+{
+    u8 status = slot->sub.runStatus;
+    u8 b0 = *slot->sub.data++;
+    u8 b1 = *slot->sub.data++;
+    u8 b2 = *slot->sub.data++;
+
+    if (D_40111654 != status)
+    {
+        D_40111654 = status;
+        D_40111550[D_40111650++] = status;
+    }
+    D_40111550[D_40111650++] = b0;
+    D_40111550[D_40111650++] = b1;
+    D_40111550[D_40111650++] = b2;
+}
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/sep", func_400381B8);
 
