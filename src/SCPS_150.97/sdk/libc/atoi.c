@@ -30,65 +30,112 @@ void *memalign(size_t align, size_t nbytes)
     return ret;
 }
 
-/* NEARMISS-STUB _memalign_r */
-#if 0 /* NEARMISS 78.5% cat=regalloc sub=- | callee-saved s2/s3/s4 assignment and arg-reg moves differ; alignment-branch layout (beqzl) differs; best 78.5% single-function attempt | attempts=1 */
-void *_memalign_r(struct _reent *ptr, size_t alignment, size_t bytes)
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libc/atoi", _memalign_r);
+/* newlib mallocr.c mEMALIGn (EE: MALLOC_ALIGNMENT 16, no mmap) */
+typedef unsigned int INTERNAL_SIZE_T;
+#define SIZE_SZ (sizeof(INTERNAL_SIZE_T))
+#define MALLOC_ALIGNMENT 16
+#define MALLOC_ALIGN_MASK (MALLOC_ALIGNMENT - 1)
+struct malloc_chunk
 {
-    size_t nb;
-    char *p;
-    struct malloc_chunk *mem;
-    struct malloc_chunk *brk;
-    struct malloc_chunk *next;
-    s32 remainder;
-    s32 lead;
+    INTERNAL_SIZE_T prev_size;
+    INTERNAL_SIZE_T size;
+    struct malloc_chunk *fd;
+    struct malloc_chunk *bk;
+};
+typedef struct malloc_chunk *mchunkptr;
+#define MINSIZE (sizeof(struct malloc_chunk))
+#define PREV_INUSE 0x1
+#define IS_MMAPPED 0x2
+#define SIZE_BITS (PREV_INUSE | IS_MMAPPED)
+#define chunksize(p) ((p)->size & ~(SIZE_BITS))
+#define mem2chunk(mem) ((mchunkptr)((char *)(mem)-2 * SIZE_SZ))
+#define chunk2mem(p) ((void *)((char *)(p) + 2 * SIZE_SZ))
+#define chunk_at_offset(p, s) ((mchunkptr)(((char *)(p)) + (s)))
+#define set_head(p, s) ((p)->size = (s))
+#define set_head_size(p, s) ((p)->size = (((p)->size & PREV_INUSE) | (s)))
+#define set_inuse_bit_at_offset(p, s) (((mchunkptr)(((char *)(p)) + (s)))->size |= PREV_INUSE)
+#define long_sub_size_t(x, y) (sizeof(long) > sizeof(INTERNAL_SIZE_T) && x < y ? -(long)(y - x) : (long)(x - y))
+#define request2size(req) \
+    (((long)((req) + (SIZE_SZ + MALLOC_ALIGN_MASK)) < \
+      (long)(MINSIZE + MALLOC_ALIGN_MASK)) ? MINSIZE : \
+     (((req) + (SIZE_SZ + MALLOC_ALIGN_MASK)) & ~(MALLOC_ALIGN_MASK)))
+#define check_inuse_chunk(P)
+#define assert(x)
 
-    if (alignment <= 16)
+void _free_r(struct _reent *, void *);
+
+void *_memalign_r(struct _reent *reent_ptr, unsigned int alignment, unsigned int bytes)
+{
+    INTERNAL_SIZE_T nb;       /* padded  request size */
+    char *m;                  /* memory returned by malloc call */
+    mchunkptr p;              /* corresponding chunk */
+    char *brk;                /* alignment point within p */
+    mchunkptr newp;           /* chunk to return */
+    INTERNAL_SIZE_T newsize;  /* its size */
+    INTERNAL_SIZE_T leadsize; /* leading space befor alignment point */
+    mchunkptr remainder;      /* spare room at end to split off */
+    long remainder_size;      /* its size */
+
+    /* If need less alignment than we give anyway, just relay to malloc */
+
+    if (alignment <= MALLOC_ALIGNMENT)
+        return _malloc_r(reent_ptr, bytes);
+
+    /* Otherwise, ensure that it is at least a minimum chunk size */
+
+    if (alignment < MINSIZE)
+        alignment = MINSIZE;
+
+    /* Call malloc with worst case padding to hit alignment. */
+
+    nb = request2size(bytes);
+    m = (char *)(_malloc_r(reent_ptr, nb + alignment + MINSIZE));
+
+    if (m == 0)
+        return 0; /* propagate failure */
+
+    __malloc_lock(reent_ptr);
+
+    p = mem2chunk(m);
+
+    if ((((unsigned long)(m)) % alignment) == 0) /* aligned */
     {
-        return _malloc_r(ptr, bytes);
     }
-    if (alignment < 16)
+    else /* misaligned */
     {
-        alignment = 16;
+        brk = (char *)mem2chunk(((unsigned long)(m + alignment - 1)) & -alignment);
+        if ((long)(brk - (char *)(p)) < (long)MINSIZE)
+            brk = brk + alignment;
+
+        newp = (mchunkptr)brk;
+        leadsize = brk - (char *)(p);
+        newsize = chunksize(p) - leadsize;
+
+        /* give back leader, use the rest */
+
+        set_head(newp, newsize | PREV_INUSE);
+        set_inuse_bit_at_offset(newp, newsize);
+        set_head_size(p, leadsize);
+        _free_r(reent_ptr, chunk2mem(p));
+        p = newp;
+
+        assert(newsize >= nb && (((unsigned long)(chunk2mem(p))) % alignment) == 0);
     }
-    if (bytes + 19 < 31)
+
+    /* Also give back spare room at the end */
+
+    remainder_size = long_sub_size_t(chunksize(p), nb);
+
+    if (remainder_size >= (long)MINSIZE)
     {
-        nb = 16;
+        remainder = chunk_at_offset(p, nb);
+        set_head(remainder, remainder_size | PREV_INUSE);
+        set_head_size(p, nb);
+        _free_r(reent_ptr, chunk2mem(remainder));
     }
-    else
-    {
-        nb = (bytes + 19) & -16;
-    }
-    p = _malloc_r(ptr, nb + alignment + 16);
-    if (p == NULL)
-    {
-        return p;
-    }
-    __malloc_lock(ptr);
-    mem = (struct malloc_chunk *)(p - 8);
-    if ((unsigned long)p % (unsigned long)alignment)
-    {
-        brk = (struct malloc_chunk *)((((size_t)p + alignment - 1) & -alignment) - 8);
-        lead = (char *)brk - (char *)mem;
-        brk = (struct malloc_chunk *)((char *)brk + (lead < 16) * alignment);
-        lead = (char *)brk - (char *)mem;
-        remainder = (mem->head & -4) - lead;
-        brk->head = remainder | 1;
-        next = (struct malloc_chunk *)((char *)brk + remainder);
-        next->head |= 1;
-        mem->head = (mem->head & 1) | lead;
-        _free_r(ptr, p);
-        mem = brk;
-    }
-    remainder = (mem->head & -4) - nb;
-    if (remainder >= 16)
-    {
-        next = (struct malloc_chunk *)((char *)mem + nb);
-        next->head = remainder | 1;
-        mem->head = (mem->head & 1) | nb;
-        _free_r(ptr, (char *)next + 8);
-    }
-    __malloc_unlock(ptr);
-    return (char *)mem + 8;
+
+    check_inuse_chunk(p);
+    __malloc_unlock(reent_ptr);
+    return chunk2mem(p);
 }
-#endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libc/atoi", _memalign_r);
