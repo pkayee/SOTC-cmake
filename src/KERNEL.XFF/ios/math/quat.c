@@ -17,6 +17,7 @@ void iosGetSinCosf(f32 *out, f32 x);
 f32 iosGetTableSin(s16 angle);
 f32 iosGetTableCos(s16 angle);
 void GetDifferencialQuaternionWithNoRegularize(f32 *dst, f32 *a, f32 *b, f32 *c);
+void GetEulerYXZFromQuaternion(f32 *dst, f32 *src);
 void iosInverseMatrix(f32 *dst, f32 *src);
 void iosMulCurrentMatrixR(f32 *m);
 
@@ -737,7 +738,38 @@ INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/quat", GetQuaternionByEulerYXZ
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/quat", GetQuaternionByEulerYXZExact);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/quat", GetEulerYXZFromQuaternionZHalfPI);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/quat", GetEulerYXZFromQuaternionZHalfPI);
+void GetEulerYXZFromQuaternionZHalfPI(f32 *dst, f32 *src)
+{
+    GetEulerYXZFromQuaternion(dst, src);
+    if (dst[2] < 0.0f ? dst[2] < -1.5707963f : 1.5707963f < dst[2])
+    {
+        if (dst[1] < 0.0f)
+        {
+            dst[1] = dst[1] + 3.1415926f;
+        }
+        else
+        {
+            dst[1] = dst[1] - 3.1415926f;
+        }
+        if (dst[0] > 0.0f)
+        {
+            dst[0] = 3.1415926f - dst[0];
+        }
+        else
+        {
+            dst[0] = -3.1415926f - dst[0];
+        }
+        if (dst[2] > 0.0f)
+        {
+            dst[2] = dst[2] - 3.1415926f;
+        }
+        else
+        {
+            dst[2] = dst[2] + 3.1415926f;
+        }
+    }
+}
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/quat", GetQuaternionByEulerZXY);
 
