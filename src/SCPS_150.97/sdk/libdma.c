@@ -1,4 +1,5 @@
 #include "common.h"
+#include "sdk/ee/libdma.h"
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libdma", WaitDma);
 
@@ -16,7 +17,16 @@ INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libdma", sceDmaPutEnv);
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libdma", sceDmaGetEnv);
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libdma", sceDmaPutStallAddr);
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libdma", sceDmaPutStallAddr);
+void *sceDmaPutStallAddr(void *addr)
+{
+    void *ret;
+    volatile void **stall = (volatile void **)0x1000E060;
+
+    ret = *stall;
+    *stall = addr;
+    return ret;
+}
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libdma", sceDmaSend);
 
@@ -36,4 +46,12 @@ INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libdma", sceDmaWatch);
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libdma", sceDmaPause);
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libdma", sceDmaRestart);
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libdma", sceDmaRestart);
+int sceDmaRestart(sceDmaChan *d, u_int chcr)
+{
+    u_int old;
+
+    old = *(volatile u_int *)d;
+    *(volatile u_int *)d = chcr;
+    return (old >> 8) & 1;
+}
