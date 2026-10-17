@@ -30,10 +30,38 @@ typedef struct
     s32 f20;
     s32 remain;
     void *cur;
-    u8 pad2C[8];
+    void *loopPtr;
+    s32 loopCnt;
     PcmIir iir1;
     PcmIir iir2;
 } PcmAfRec;
+
+typedef struct
+{
+    s16 *pcm;       /* +0x00 sample ring (user buffer / IOP-bound buffer) */
+    f32 *work;      /* +0x04 malloc'd float work buffer (2 channels x 0x400 B blocks) */
+    s32 size;       /* +0x08 ring size in samples */
+    s32 chunk;      /* +0x0C */
+    s32 pos;        /* +0x10 read/write position */
+    PcmAfRec af[2]; /* +0x14, stride 0xC4 */
+} PcmStream;
+
+typedef struct
+{
+    s32 ctrl;       /* +0x000 bit0 play, bit1 stop; init 2 */
+    PcmStream st;   /* +0x004 */
+    s32 flags;      /* +0x1A0 2 = stop at end, 4 = loop region */
+    s32 mode;       /* +0x1A4 0 interleaved, 1 split halves */
+    s32 outMode;    /* +0x1A8 */
+    s32 vol;        /* +0x1AC */
+    s32 phase[2];   /* +0x1B0 */
+    s32 outVol[2];  /* +0x1B8 */
+    s32 pan;        /* +0x1C0 */
+    s32 lipLen;     /* +0x1C4 */
+    s32 loopStart;  /* +0x1C8 */
+    s32 loopEnd;    /* +0x1CC */
+    s32 playFrames; /* +0x1D0 */
+} PcmIn;
 extern PcmInSlot D_4011596C[];
 extern PcmInSlot D_40115B28[];
 extern PcmInSlot D_40115B00[];
@@ -63,7 +91,7 @@ void func_4003FC78();
 s32 Sg2StPcmIopTransOffset(void);
 void func_40040118(void);
 void IirParam(void *iir, s32 type, f32 freq, f32 gain);
-extern PcmInSlot D_40115958[];
+extern PcmIn D_40115958[];
 extern PcmInSlot D_4011595C[];
 extern PcmInSlot D_40115970[];
 extern PcmInSlot D_40115B04[];
@@ -314,10 +342,10 @@ void func_4003FAD0(s32 *arg0, s32 arg1)
     func_4003F3C8(arg0 + 2, arg1);
     for (i = 0; i < 4; i++)
     {
-        if (D_40115958[i].f[0] & 1)
+        if (D_40115958[i].ctrl & 1)
         {
             func_4003F928((s32 *)&D_40115958[i], arg1);
-            func_4003F8F0(arg0 + 2, D_40115958[i].f + 1, arg1);
+            func_4003F8F0(arg0 + 2, (s32 *)&D_40115958[i].st, arg1);
         }
     }
     func_4003F7E8(arg0 + 2, arg1);
@@ -417,7 +445,7 @@ s32 func_40040350(void)
     s32 i;
     for (i = 0; i < 4; i++)
     {
-        if (D_40115958[i].f[1] == 0)
+        if (D_40115958[i].st.pcm == 0)
         {
             return i;
         }
@@ -425,6 +453,59 @@ s32 func_40040350(void)
     return -1;
 }
 
+/* NEARMISS-STUB func_40040398 */
+#if 0 /* NEARMISS 91.55% cat=sched sub=- | addu base in jal malloc delay slot; post-SetPhase store order chunk,pcm,playFrames,size | attempts=1 */
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", func_40040398);
+s32 func_40040398(s16 *pcm, s32 size, s32 chunk, s32 mode, s32 flags, s32 ls, s32 le, s32 lipLen)
+{
+    s32 idx;
+    PcmIn *p;
+    f32 *work;
+    s32 intr;
+
+    idx = func_40040350();
+    if (idx == -1)
+    {
+        return idx;
+    }
+    p = &D_40115958[idx];
+    work = malloc(chunk * 4);
+    p->st.work = work;
+    if (work == 0)
+    {
+        return -2;
+    }
+    intr = DIntr();
+    p->mode = mode;
+    p->ctrl = 2;
+    p->flags = flags;
+    p->loopStart = ls;
+    p->loopEnd = le;
+    p->lipLen = lipLen;
+    p->outMode = mode;
+    Sg2ExPcmInputSetVol(idx, 100);
+    Sg2ExPcmInputSetPan(idx, 0x40);
+    Sg2ExPcmInputSetPhase(idx, 1, 1);
+    p->st.chunk = chunk;
+    p->st.pcm = pcm;
+    p->playFrames = 0;
+    p->st.size = size;
+    p->st.pos = 0;
+    Sg2ExPcmInputAutoFilterInit(idx, 0);
+    Sg2ExPcmInputAutoFilterInit(idx, 1);
+    if (intr)
+    {
+        EIntr();
+    }
+    return idx;
+}
+/* kR38 best 91.55% (typed PcmIn, mode/outMode store order flipped). Residual (compact):
+ *  - malloc delay slot: target has `addu s1,s1,a1` in jal malloc delay slot; ours hoists it before jal, nop in slot
+ *  - post-SetPhase tail: target order chunk(+0x10), pcm(+4), playFrames(+0x1D0), size(+0xC), pos(+0x14) in AutoFilterInit delay slot;
+ *    ours compiles pos(+0x14) early and size into the delay slot (reordering A3/A4 did not help)
+ *  - malloc arg `chunk*4` / implicit malloc prototype warns; codegen unaffected
+ */
+#endif
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", func_40040398);
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", Sg2ExPcmInputOpenDoubleBuffer);
@@ -434,7 +515,25 @@ s32 Sg2ExPcmInputOpenDoubleBuffer(s32 arg0, s32 arg1, s32 arg2)
 }
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", Sg2ExPcmInputOpen);
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", Sg2ExPcmInputClose);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", Sg2ExPcmInputClose);
+void Sg2ExPcmInputClose(u32 arg0)
+{
+    s32 intr;
+
+    if (arg0 >= 4)
+    {
+        return;
+    }
+    intr = DIntr();
+    Sg2ExPcmInputCtrl(arg0, 2);
+    free(D_40115958[arg0].st.work);
+    D_40115958[arg0].st.pcm = 0;
+    D_40115958[arg0].st.work = 0;
+    if (intr)
+    {
+        EIntr();
+    }
+}
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", Sg2ExPcmInputCtrl);
 void Sg2ExPcmInputCtrl(u32 arg0, s32 arg1)
 {
@@ -447,10 +546,10 @@ void Sg2ExPcmInputCtrl(u32 arg0, s32 arg1)
     intr = DIntr();
     if (arg1 & 1)
     {
-        D_40115958[arg0].f[5] = 0;
-        D_40115958[arg0].f[116] = 0;
+        D_40115958[arg0].st.pos = 0;
+        D_40115958[arg0].playFrames = 0;
     }
-    D_40115958[arg0].f[0] = arg1;
+    D_40115958[arg0].ctrl = arg1;
     if (intr)
     {
         EIntr();
@@ -483,6 +582,32 @@ s32 Sg2ExPcmInputGetRealPlayFrameCount(u32 arg0)
 
 
 extern u16 pan_tbl[];
+/* NEARMISS-STUB func_40040710 */
+#if 0 /* NEARMISS 88.48% cat=regalloc sub=- | target vol->a0 ph1->t0 ph0->v1 pan->a1; ours vol->a1 ph1->v0 pan->a0 | attempts=1 */
+void func_40040710(u32 idx)
+{
+    if (idx < 4)
+    {
+        s32 d = 127;
+        s32 d2 = 127;
+        PcmInSlot *p = &D_40115958[idx];
+        s32 vol = p->f[107];
+        s32 ph0 = p->f[108];
+        s32 ph1 = p->f[109];
+        s32 pan = p->f[112];
+        s32 l = vol * ph0;
+        s32 r = vol * ph1;
+        u16 tbl = pan_tbl[pan];
+        p->f[110] = l * (tbl >> 8) / d;
+        p->f[111] = r * (tbl & 0xFF) / d2;
+    }
+}
+
+/* kR38 (repair, not matched): best 88.48% = kR31 form (vol,ph0,ph1,pan load order; d/d2 locals; pan_tbl extern).
+   Tried: ph1-before-ph0 declare order 87.97; pan-table-as-u8 two loads 79.52; lo/hi split order swap 81.76;
+   tbl read before l/r products 88.48 (no change). Residual: target allocs vol->a0, ph1->t0, ph0->v1, pan->a1;
+   ours vol->a1, ph1->v0, pan->a0; mult1 operands differ. Needs an idea (register allocation), not a mechanical fix. */
+#endif
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", func_40040710);
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", Sg2ExPcmInputSetVol);
@@ -510,9 +635,9 @@ void Sg2ExPcmInputSetPhase(u32 arg0, s32 arg1, s32 arg2)
 {
     if (arg0 < 4)
     {
-        PcmInSlot *p = &D_40115958[arg0];
-        p->f[108] = arg1;
-        p->f[109] = arg2;
+        PcmIn *p = &D_40115958[arg0];
+        p->phase[0] = arg1;
+        p->phase[1] = arg2;
         func_40040710(arg0);
     }
 }
@@ -675,6 +800,24 @@ void Sg2ExPcmOutputAutoFilterInit(s32 arg0)
 }
 
 
+/* NEARMISS-STUB Sg2ExPcmOutputSetAutoFilterDirect */
+#if 0 /* NEARMISS 89.88% cat=regalloc sub=- | s1/s2/s3 swap: target base=s1,arg2=s2,arg1=s3 | attempts=1 */
+kR38 (Haiku repair) Sg2ExPcmOutputSetAutoFilterDirect: best 89.88% (kR31 baseline, not matched). pcm.c restored to INCLUDE_ASM; the function stays INCLUDE_ASM.
+Best C (= kR31 body, unchanged):
+void Sg2ExPcmOutputSetAutoFilterDirect(s32 arg0, s32 arg1, s32 arg2, f32 arg3, f32 arg4)
+{ s32 *base; s32 *p; s32 intr; base = D_401157A8; intr = DIntr(); p = base + arg0 * 49;
+  p[12] = 0; p[13] = -1; p[15] = 0; if (intr != 0) { EIntr(); }
+  func_4003FD60(D_401157A8, arg0, arg1, arg2 != -1000 ? arg2 : 0, arg3, arg4); }
+Compact diff (target vs best):
+- regs: target s1=&D_401157A8, s2=arg2, s3=arg1; ours s1=arg2, s2=arg1, s3=base (replace x3, arg_mism tail).
+- stores: target uses two pointers, v1=&base[49a] for p[12] and a1=&base[49a+12] (addiu a0,v1,0x30; addu a1,s1,a0) for p[13]/p[15]; ours one pointer with offsets 0x34/0x3c/0x30.
+Tried (kR38):
+- tail uses base instead of D_401157A8: 89.88 (CSE, identical).
+- base[arg0*49+k] indexing: 89.88 (CSE, identical).
+- second pointer q=(s32*)((u8*)base+arg0*196+0x30), q[1]=-1, q[3]=0: 88.44 (worse).
+- no base local (lui after DIntr, D_401157A8+arg0*49): 27.0 (much worse).
+Cause: callee-saved allocation (base gets s3, target s1); not fixed by mechanical edits. Needs an Opus idea for the two-pointer store pattern / reg priority.
+#endif
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", Sg2ExPcmOutputSetAutoFilterDirect);
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", Sg2ExPcmOutputSetAutoFilter);
@@ -742,26 +885,26 @@ void Sg2ExPcmSetSignal(s32 arg0)
 s32 Sg2ExPcmInit(void)
 {
     s32 i;
-    PcmInSlot *p;
+    PcmIn *p;
 
     Sg2StPcmInit(0);
     memset(&D_401157A0, 0, 0x1B4);
     p = D_40115958;
     for (i = 0; i < 4; i++)
     {
-        p->f[0] = 2;
-        p->f[104] = 0;
-        p->f[6] = 0;
-        p->f[7] = 0;
-        p->f[13] = 0;
-        p->f[16] = 0;
-        p->f[55] = 0;
-        p->f[56] = 0;
-        p->f[62] = 0;
-        p->f[65] = 0;
-        p->f[1] = 0;
-        p->f[3] = 0;
-        p->f[5] = 0;
+        p->ctrl = 2;
+        p->flags = 0;
+        p->st.af[0].f00 = 0;
+        p->st.af[0].flags = 0;
+        p->st.af[0].f1C = 0;
+        p->st.af[0].cur = 0;
+        p->st.af[1].f00 = 0;
+        p->st.af[1].flags = 0;
+        p->st.af[1].f1C = 0;
+        p->st.af[1].cur = 0;
+        p->st.pcm = 0;
+        p->st.size = 0;
+        p->st.pos = 0;
         p++;
     }
     Sg2ExPcmOutputCtrl(2);
