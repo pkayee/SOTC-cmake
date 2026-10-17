@@ -285,6 +285,46 @@ s32 Sg2ExStAdpcmVolumePercent(void* p, s32 vol)
     return ret;
 }
 
+/* NEARMISS-STUB Sg2ExStAdpcmTrkVolumeDirect */
+#if 0 /* NEARMISS 91.44% cat=regalloc sub=- | p in t2 trk in t1 vs a5/a4; volR cvt after L store | attempts=1 */
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/st_adpcm", Sg2ExStAdpcmTrkVolumeDirect);
+s32 Sg2ExStAdpcmTrkVolumeDirect(StAdpcmVolCtx* p, s32 trk, s32 volL, s32 volR)
+{
+    StAdpcmSendSub *d = &p->u.d.d;
+    StAdpcmVolSub *c = &p->u.c;
+    s32 n;
+    u64 i;
+    f32 full = 8191.0f;
+    f32 div = 127.0f;
+
+    c->lr[trk][0] = (s32)(full / (f32)d->l[trk] * (f32)volL / div);
+    c->lr[trk][1] = (s32)(full / (f32)d->r[trk] * (f32)volR / div);
+    if (*(s32*)((u8*)p + 0) < 16)
+    {
+        return -1;
+    }
+    n = trk;
+    for (i = 0; i < 48; i++)
+    {
+        if (*(u64*)((u8*)p + 0xA0) & (1LL << i))
+        {
+            if (--trk < 0)
+            {
+                func_40031C08(p, (s32)i, n);
+                return 0;
+            }
+        }
+    }
+    return -1;
+}
+
+/* kR38 repair (haiku): best stays 91.44 (= kR29 C, unchanged). Tried, all <=91.44:
+   v1 c-before-d local order 91.44; v2 f32 temp for (f32)volR set after the L store 91.44;
+   v3 u64 t=(u32)trk index 75.3 (stride goes 64-bit, target uses 32-bit sll); v4 s32 *row=c->lr[trk] 77.0.
+   Diff (target vs ours): ours hoists `mtc1 a3`+`cvt.s.w` (volR->f32) into the div.s latency nops
+   right after the L-channel addu (target has nops there, volR conversion sits AFTER the swc1 0x240 store).
+   Also p/trk regalloc: target p=t2(a6), trk=t1(a5); ours p=a5, trk=a4 (arg_mism cascade). */
+#endif
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/st_adpcm", Sg2ExStAdpcmTrkVolumeDirect);
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/st_adpcm", Sg2ExStAdpcmTrkVolumePercent);

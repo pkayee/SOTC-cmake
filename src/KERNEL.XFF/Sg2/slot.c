@@ -342,7 +342,24 @@ s32 Sg2SlotFindSlotClassChSsaBaseNote(s32 *out, s32 slotClass, s32 ch, s32 ssa, 
     return n;
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotSetBasicParam);
+void Sg2SlotSetReverbOffBit(s32 idx, u32 mask);
+void Sg2SlotSetNoiseOffBit(s32 idx, u32 mask);
+
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotSetBasicParam);
+void Sg2SlotSetBasicParam(s32 kind, s32 idx, s32 slotClass, s32 vab, s32 ch, s32 prio)
+{
+    s32 age = D_401117A0;
+    D_401117B0[idx].flags = 1;
+    D_401117B0[idx].unk4 = kind;
+    D_401117B0[idx].slotClass = slotClass;
+    D_401117B0[idx].sub.vab = vab;
+    D_401117B0[idx].sub.ch = ch;
+    D_401117B0[idx].sub.prio = prio;
+    D_401117B0[idx].age = age;
+    D_401117A0 = age + 1;
+    Sg2SlotSetReverbOffBit(idx >= 0x18, idx < 0x18 ? 1 << idx : 1 << (idx - 0x18));
+    Sg2SlotSetNoiseOffBit(idx >= 0x18, idx < 0x18 ? 1 << idx : 1 << (idx - 0x18));
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotSetSsa);
 void Sg2SlotSetSsa(s32 idx, s32 ssa)
@@ -534,6 +551,31 @@ void Sg2SlotSetLfoPitchTbl(s32 i, s32 tbl)
     }
 }
 
+/* NEARMISS-STUB Sg2SlotSetLfoPitchSpeed */
+#if 0 /* NEARMISS 95.76% cat=regalloc sub=- | target copies v to a2 at entry, a1 as i*7 temp | attempts=1 */
+// kR38 best 95.76 (not matched; repair attempt). slot.c reverted to INCLUDE_ASM.
+// Tried: (v1) kR23 variant, v reused as speed -> 95.76 ; (v2) Sg2Slot *s = &D_401117B0[i] -> 64.67 (worse) ;
+// (v3) s32 sp = v local, kR18-style if (sp != 0) -> 95.76 ; (v4) s32 sp; sp = v; if (sp) -> 95.76.
+// Residual (all variants): target copies v into a2 at entry (daddu a2,a1,zero) and reuses a1 as i*7 temp;
+// ours keeps v in a1 and allocates i*0xE0 to a6/a4 differently. Needs a source shape that makes gcc 2.96 copy the arg.
+void Sg2SlotSetLfoPitchSpeed(s32 i, s32 v)
+{
+    if (v != 0)
+    {
+        v = 0xF0 / (0x3C - (v * 58) / 0x7F);
+    }
+    D_401117B0[i].lfoPitchSpeed = v;
+    D_401117B0[i].u80.f.lfoPitchPhase = 0;
+    if (v != 0 && D_401117B0[i].lfoPitchDepth != 0)
+    {
+        D_401117B0[i].flags |= 0x400;
+    }
+    else
+    {
+        D_401117B0[i].flags &= ~0x400;
+    }
+}
+#endif
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotSetLfoPitchSpeed);
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotSetLfoPitchDepth);
@@ -570,8 +612,66 @@ void Sg2SlotSetLfoVolTbl(s32 idx, s32 tbl)
     }
 }
 
+/* NEARMISS-STUB Sg2SlotSetLfoVolSpeed */
+#if 0 /* NEARMISS 94.4% cat=struct-layout sub=- | target hi(D_40111840) no addend, ours D_401117B0+0x90; needs u32 lfoVol fields | attempts=1 */
+/* kR38 repair: best C 94.40% (same as kR23). Needs u32 lfoVolSpeed/u32 lfoVolDepth in Sg2Slot (0x90/0x94) - reverted, slot.c left INCLUDE_ASM.
+ Residual: target stores via separate symbol D_40111840 (offset 0, no addend); ours emits D_401117B0+0x90 (addend).
+ Tried (all worse): A) extern u32 D_40111840[] + D_40111840[i*56] -> 77.3; B) swap flag-test order -> 75.9; C) extern s32 D_40111840 + *(u32*)((u8*)&D_40111840 + i*0xE0) -> 77.3.
+ Notes: never got the lui %hi(D_40111840) reloc with the struct-based code. */
+void Sg2SlotSetLfoVolSpeed(s32 i, s32 v)
+{
+    f32 f;
+    if (v != 0)
+    {
+        f = v;
+        f = f / 6.35f;
+    }
+    else
+    {
+        f = 0.0f;
+    }
+    D_401117B0[i].lfoVolSpeed = (u32)f;
+    if (f != 0.0 && (f32)D_401117B0[i].lfoVolDepth != 0.0f)
+    {
+        D_401117B0[i].flags |= 0x800;
+    }
+    else
+    {
+        D_401117B0[i].flags &= ~0x800;
+    }
+}
+#endif
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotSetLfoVolSpeed);
 
+/* NEARMISS-STUB Sg2SlotSetLfoVolDepth */
+#if 0 /* NEARMISS 94.27% cat=struct-layout sub=- | target stores via separate symbol D_40111844 (no addend); needs u32 lfoVol fields | attempts=1 */
+/* kR38 best C: 94.27% (identical to kR23). REQUIRES struct fields u32 lfoVolSpeed/u32 lfoVolDepth in slot.c Sg2Slot (0x90/0x94).
+ Residual: target stores via separate symbol D_40111844 (offset 0, stride 0xE0). Tried: extern s32 D_40111844 + ((Sg2SlotWord*)&D_40111844)[i].v -> 76.8;
+ extern Sg2SlotWord D_40111844[] + [i].v with s32 fields -> 70.3. Both worse. Left INCLUDE_ASM. */
+
+void Sg2SlotSetLfoVolDepth(s32 i, s32 v)
+{
+    f32 f;
+    if (v != 0)
+    {
+        f = v;
+        f = f / 127.0f;
+    }
+    else
+    {
+        f = 0.0f;
+    }
+    D_401117B0[i].lfoVolDepth = (u32)f;
+    if (f != 0.0 && (f32)D_401117B0[i].lfoVolSpeed != 0.0f)
+    {
+        D_401117B0[i].flags |= 0x800;
+    }
+    else
+    {
+        D_401117B0[i].flags &= ~0x800;
+    }
+}
+#endif
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotSetLfoVolDepth);
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotSetTimeVolParam);
@@ -809,6 +909,78 @@ s32 Sg2SlotGetVolShiftDownParam(void)
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotTickProc);
 
+/* NEARMISS-STUB Sg2SlotInit */
+#if 0 /* NEARMISS 91.55% cat=cse-hoist sub=- | float zero stores sw zero vs mtc1/swc1, [1] globals hoisted before [0], loop bias 0x70 vs 0x94 | attempts=1 */
+// kR38 repair of kR33/kR23 Sg2SlotInit. Best = kR23 body (no helper), 91.55%. Not matched; slot.c restored to INCLUDE_ASM.
+// Tried: kR33 helper variant 90.76 (repro); pointer walk count-up 87.19; pointer walk count-down 86.96; shared f32 zero local 91.55 (no change).
+s32 Sg2SlotInit(void)
+{
+    s32 i;
+    s32 tbl;
+    tbl = (s32)D_40046398;
+    D_401117A8 = 2;
+    D_401117AC = 1;
+    D_40111788[0] = -1;
+    D_40111778[0] = 0xFFFFFF;
+    D_401117A0 = 0;
+    D_401117A4 = 0;
+    D_40111790[0] = 0;
+    D_40111780[0] = 0;
+    D_40111798[0] = -1;
+    D_40111770[0] = 0;
+    D_40111790[1] = 0;
+    D_40111780[1] = 0;
+    D_40111798[1] = -1;
+    D_40111788[1] = -1;
+    D_40111770[1] = 0;
+    D_40111778[1] = 0xFFFFFF;
+    for (i = 0; i < 0x30; i++)
+    {
+        D_401117B0[i].flags = 0;
+        D_401117B0[i].age = 0;
+        D_401117B0[i].unk4 = 0;
+        D_401117B0[i].pit.tick = 0;
+        D_401117B0[i].sub.group = -1;
+        D_401117B0[i].sub.prio = -1;
+        D_401117B0[i].masVolR = 0x7F;
+        D_401117B0[i].masVolL = 0x7F;
+        D_401117B0[i].baseVol = 0x7F;
+        D_401117B0[i].seMasVol = 0x7F;
+        D_401117B0[i].basePan = 0x40;
+        D_401117B0[i].masPan = 0x40;
+        D_401117B0[i].pan = -1;
+        D_401117B0[i].vol = -1;
+        D_401117B0[i].directPitch = 0x1000;
+        D_401117B0[i].masTune = 0x1000;
+        D_401117B0[i].fine = 0;
+        D_401117B0[i].bendRange = 0;
+        D_401117B0[i].bendValue = 0x40;
+        D_401117B0[i].volPhase1 = 1;
+        D_401117B0[i].volPhase0 = 1;
+        D_401117B0[i].u80.lp.cur = tbl;
+        D_401117B0[i].u80.lp.tbl = tbl;
+        D_401117B0[i].u80.lp.end = tbl + 0x3C;
+        D_401117B0[i].lfoPitchSpeed = 0;
+        D_401117B0[i].lfoVolDepth = 0;
+        D_401117B0[i].lfoVolSpeed = 0;
+        D_401117B0[i].lfoVolTbl = tbl;
+        D_401117B0[i].tv.cur = tbl;
+        D_401117B0[i].tv.end = tbl + 0x3C;
+        D_401117B0[i].hwVoiceL = -1;
+        D_401117B0[i].hwVoiceR = -1;
+        D_401117B0[i].polTarget = -1;
+        D_401117B0[i].polCur = -1;
+        D_401117B0[i].polStart = -1;
+        D_401117B0[i].tp.x = 0.0f;
+        D_401117B0[i].padBC = 0.0f;
+        D_401117B0[i].padC8 = 0.0f;
+        D_401117B0[i].polStep = 0.0f;
+        *(f32 *)&D_401117B0[i].polCnt = 0.0f;
+    }
+    Sg2CtrlEntryTickProcById(3, Sg2SlotTickProc);
+    return 0;
+}
+#endif
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotInit);
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotTbl);

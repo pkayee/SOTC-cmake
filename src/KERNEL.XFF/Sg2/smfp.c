@@ -333,6 +333,38 @@ s32 Sg2SmfpInit(void)
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/smfp", debug_smfp_mod_config);
 
+/* NEARMISS-STUB debug_set_smfp_time_count_delta_per */
+#if 0 /* NEARMISS 89.8% cat=sched sub=- | target writes unk30 back in dpdiv delay slot; tick copies s2/s0; $at for lui | attempts=1 */
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/smfp", debug_set_smfp_time_count_delta_per);
+void debug_set_smfp_time_count_delta_per(s32 arg0, s32 arg1)
+{
+    Sg2SmfpSlot *slot;
+    s32 tick;
+    s64 x;
+
+    slot = &D_40114200[arg0];
+    if (slot->unk8 >= 0)
+    {
+        s64 tick64;
+
+        slot->unk78 = litodp(arg1);
+        x = dpdiv(D_40049388, slot->unk30);
+        x = dpdiv(D_40049390, x);
+        x = dpmul(x, slot->unk38);
+        tick = Sg2CtrlGetTickMode();
+        tick64 = tick;
+        x = litodp(tick);
+        if (tick < 0)
+        {
+            x = dpadd(x, 0x41F0000000000000LL);
+        }
+        x = dpdiv(tick64, x);
+        slot->unk40 = x;
+        x = dpmul(x, slot->unk78);
+        slot->unk40 = dpdiv(x, 0x4059000000000000LL);
+    }
+}
+#endif
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/smfp", debug_set_smfp_time_count_delta_per);
 
 void func_4003E2A0(void) {

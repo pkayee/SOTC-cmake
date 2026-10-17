@@ -2,12 +2,22 @@
 
 typedef struct Sg2ModUnit {
     /* 0x00 */ s32 unk0;
-    /* 0x04 */ u8 unk4[0xC];
+    /* 0x04 */ s32 unk4;
+    /* 0x08 */ s32 unk8;
+    /* 0x0C */ s32 unkC;
     /* 0x10 */ s32 unk10;
-    /* 0x14 */ u8 unk14[0x34 - 0x14];
+    /* 0x14 */ u8 unk14[0x18 - 0x14];
+    /* 0x18 */ s32 unk18;
+    /* 0x1C */ u8 unk1C[0x34 - 0x1C];
     /* 0x34 */ s32 unk34;
     /* 0x38 */ s32 unk38;
-    /* 0x3C */ u8 unk3C[0x9B0 - 0x3C];
+    /* 0x3C */ u8 unk3C[0x4C - 0x3C];
+    /* 0x4C */ void *unk4C;
+    /* 0x50 */ s32 unk50;
+    /* 0x54 */ void *unk54;
+    /* 0x58 */ s32 unk58;
+    /* 0x5C */ s32 unk5C;
+    /* 0x60 */ u8 unk60[0x9B0 - 0x60];
 } Sg2ModUnit;
 
 typedef struct Sg2ModTrack {
@@ -57,6 +67,7 @@ typedef struct Sg2ModMain {
 } Sg2ModMain;
 
 extern u8 *D_400F904C;
+extern s32 D_400F9048;
 extern Sg2ModMain *D_400F9050;
 extern Sg2ModUnit D_400F9058[];
 extern Sg2ModUnit D_400F9068[];
@@ -92,6 +103,7 @@ s32 EIntr(void);
 void *memset(void *p, s32 c, u32 n);
 void *memcpy(void *d, const void *s, u32 n);
 void func_40032AC0(s32 arg0);
+void func_40032C10(s32 arg0);
 s32 Sg2CtrlEntryTickProcById(s32 id, void (*proc)(void));
 void Sg2ModTickProc(void);
 s32 vab_get_progchunk(s32 vab, s32 prog);
@@ -107,10 +119,260 @@ void Sg2SlotSetLfoVolSpeed(s32 slot, s32 v);
 void Sg2SlotSetBendValue(s32 slot, s32 v);
 void Sg2SlotSetAdsr(s32 slot, s32 a, s32 b);
 void Sg2SlotSetKeyOffBit(s32 slot, s32 bit);
+s32 Sg2SlotGetSlotClassIdx(s32 slot);
+s32 vab_check_alive(s32 vab);
+s32 vab_get_info(s32 vab, s32 *a, s32 *b);
+s32 vab_get_veltbl(s32 vab, void **p);
+s32 vab_get_lfotbl_param(s32 vab, void **p, s32 *q);
+extern u8 D_40045FF0[];
 
 
+/* NEARMISS-STUB func_40032AC0 */
+#if 0 /* NEARMISS 88.08% cat=regalloc sub=- | constants hoisted across loop in target (a1=1,0x40,0x7F), drum via xor+movz, sb 0x64 order | attempts=1 */
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/mod", func_40032AC0);
+typedef struct Sg2ModBgmTrack {
+    /* 0x00 */ s32 unk0;
+    /* 0x04 */ s32 unk4;
+    /* 0x08 */ s32 unk8;
+    /* 0x0C */ s32 unkC;
+    /* 0x10 */ s32 unk10;
+    /* 0x14 */ s32 unk14;
+    /* 0x18 */ u8 unk18[8];
+    /* 0x20 */ s32 unk20;
+    /* 0x24 */ s32 unk24;
+    /* 0x28 */ s32 drum;
+    /* 0x2C */ s32 unk2C;
+    /* 0x30 */ s32 unk30;
+    /* 0x34 */ s32 unk34;
+    /* 0x38 */ s32 unk38;
+    /* 0x3C */ s32 unk3C;
+    /* 0x40 */ u8 unk40[4];
+    /* 0x44 */ s16 unk44;
+    /* 0x46 */ s16 unk46;
+    /* 0x48 */ s32 unk48;
+    /* 0x4C */ s32 unk4C;
+    /* 0x50 */ s32 unk50;
+    /* 0x54 */ s32 unk54;
+    /* 0x58 */ s32 unk58;
+    /* 0x5C */ s16 unk5C;
+    /* 0x5E */ s16 unk5E;
+    /* 0x60 */ s16 unk60;
+    /* 0x62 */ s16 unk62;
+    /* 0x64 */ u8 unk64[4];
+    /* 0x68 */ s32 unk68;
+    /* 0x6C */ s32 unk6C;
+} Sg2ModBgmTrack;
+
+typedef struct Sg2ModBgmHead {
+    /* 0x000 */ s32 state;
+    /* 0x004 */ u8 unk4[0xC];
+    /* 0x010 */ s32 unk10;
+    /* 0x014 */ s32 unk14;
+    /* 0x018 */ u8 unk18[4];
+    /* 0x01C */ s32 unk1C;
+    /* 0x020 */ s32 unk20;
+    /* 0x024 */ s32 unk24;
+    /* 0x028 */ s32 unk28;
+    /* 0x02C */ s32 unk2C;
+    /* 0x030 */ s32 unk30;
+    /* 0x034 */ s32 unk34;
+    /* 0x038 */ s32 unk38;
+    /* 0x03C */ s32 unk3C;
+    /* 0x040 */ s32 unk40;
+    /* 0x044 */ s32 unk44;
+    /* 0x048 */ u8 unk48[0x60 - 0x48];
+    /* 0x060 */ s32 unk60;
+    /* 0x064 */ u8 unk64[4];
+    /* 0x068 */ u8 unk68[0x2AC - 0x68];
+    /* 0x2AC */ s32 unk2AC;
+    /* 0x2B0 */ Sg2ModBgmTrack trk[16];
+} Sg2ModBgmHead;
+
+void func_40032AC0(s32 arg0) {
+    Sg2ModBgmHead *m = (Sg2ModBgmHead *)&D_400F9058[arg0];
+    Sg2ModBgmTrack *t;
+    s32 i;
+
+    m->unk38 = 0x7F;
+    m->unk44 = 0x1000;
+    m->unk30 = 0;
+    m->unk34 = 0x7F;
+    m->unk2C = 0;
+    m->unk24 = 0;
+    m->unk28 = 0;
+    m->unk1C = 0;
+    m->unk20 = 0;
+    m->unk40 = 0;
+    m->unk60 = 0;
+    m->unk10 = 0;
+    m->unk2AC = 1;
+    m->unk64[0] = 0x80;
+    m->unk14 = 1;
+    m->unk3C = 0x40;
+    m->state = -1;
+
+    t = m->trk;
+    for (i = 0; i < 16; i++) {
+        s32 drum = (i == 9);
+
+        t->unk0 = arg0;
+        t->unk4 = 0;
+        t->unk8 = 0xFF;
+        t->unkC = 0x40;
+        t->unk10 = 0;
+        t->unk14 = 0x7F;
+        t->unk20 = 0x7F;
+        t->unk24 = 0;
+        t->unk30 = 0;
+        t->unk34 = 0x40;
+        t->unk64[0] = 0;
+        t->unk64[1] = 0;
+        t->unk64[2] = 0;
+        t->unk64[3] = 0;
+        t->unk48 = 0x1000;
+        t->unk68 = 0;
+        t->unk6C = 0;
+        t->unk5C = 0;
+        t->unk5E = 0;
+        t->unk60 = 0;
+        t->unk62 = 0;
+        t->unk38 = 0;
+        t->unk3C = 0;
+        t->unk4C = 0;
+        t->unk50 = 0;
+        t->unk54 = 0;
+        t->unk58 = 0;
+        t->unk46 = 1;
+        t->unk44 = 1;
+        t->drum = drum;
+        t->unk2C = 1 - drum;
+        t++;
+    }
+}
+#endif
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/mod", func_40032AC0);
 
+/* NEARMISS-STUB func_40032C10 */
+#if 0 /* NEARMISS 93.5% cat=regalloc sub=- | constant materialization regs/order (0x1000,-1,1,0x40,-0x80,2) and loop counter/ptr regs | attempts=1 */
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/mod", func_40032C10);
+
+typedef struct Sg2ModSeTrack {
+    /* 0x00 */ s32 unk0;
+    /* 0x04 */ s32 unk4;
+    /* 0x08 */ s32 unk8;
+    /* 0x0C */ s32 unkC;
+    /* 0x10 */ s32 unk10;
+    /* 0x14 */ s32 unk14;
+    /* 0x18 */ u8 unk18[8];
+    /* 0x20 */ s32 unk20;
+    /* 0x24 */ s32 unk24;
+    /* 0x28 */ u8 unk28[8];
+    /* 0x30 */ s32 unk30;
+    /* 0x34 */ s32 unk34;
+    /* 0x38 */ s32 unk38;
+    /* 0x3C */ s32 unk3C;
+    /* 0x40 */ u8 unk40[4];
+    /* 0x44 */ s16 unk44;
+    /* 0x46 */ s16 unk46;
+    /* 0x48 */ s32 unk48;
+    /* 0x4C */ s32 unk4C;
+    /* 0x50 */ s32 unk50;
+    /* 0x54 */ s32 unk54;
+    /* 0x58 */ s32 unk58;
+    /* 0x5C */ s16 unk5C;
+    /* 0x5E */ s16 unk5E;
+    /* 0x60 */ s16 unk60;
+    /* 0x62 */ s16 unk62;
+    /* 0x64 */ u8 unk64[4];
+    /* 0x68 */ s32 unk68;
+    /* 0x6C */ s32 unk6C;
+} Sg2ModSeTrack;
+
+typedef struct Sg2ModSeHead {
+    /* 0x000 */ s32 state;
+    /* 0x004 */ u8 unk4[0xC];
+    /* 0x010 */ s32 unk10;
+    /* 0x014 */ s32 unk14;
+    /* 0x018 */ u8 unk18[4];
+    /* 0x01C */ s32 unk1C;
+    /* 0x020 */ s32 unk20;
+    /* 0x024 */ s32 unk24;
+    /* 0x028 */ s32 unk28;
+    /* 0x02C */ s32 unk2C;
+    /* 0x030 */ s32 unk30;
+    /* 0x034 */ s32 unk34;
+    /* 0x038 */ s32 unk38;
+    /* 0x03C */ s32 unk3C;
+    /* 0x040 */ s32 unk40;
+    /* 0x044 */ s32 unk44;
+    /* 0x048 */ u8 unk48[0x60 - 0x48];
+    /* 0x060 */ s32 unk60;
+    /* 0x064 */ u8 unk64[4];
+    /* 0x068 */ u8 unk68[0x2AC - 0x68];
+    /* 0x2AC */ s32 unk2AC;
+    /* 0x2B0 */ Sg2ModSeTrack trk[16];
+} Sg2ModSeHead;
+
+void func_40032C10(s32 arg0) {
+    Sg2ModSeHead *m = (Sg2ModSeHead *)&D_400F9058[arg0];
+    Sg2ModSeTrack *t;
+    s32 i;
+
+    m->unk38 = 0x7F;
+    m->unk44 = 0x1000;
+    m->unk30 = 0;
+    m->unk34 = 0x7F;
+    m->unk2C = 0;
+    m->unk24 = 0;
+    m->unk28 = 0;
+    m->unk1C = 0;
+    m->unk20 = 0;
+    m->unk40 = 0;
+    m->unk60 = 0;
+    m->unk10 = 0;
+    m->unk2AC = 1;
+    m->unk64[0] = 0x80;
+    m->unk14 = 2;
+    m->unk3C = 0x40;
+    m->state = -1;
+
+    t = m->trk;
+    i = 0xF;
+    do {
+        i--;
+        t->unk0 = arg0;
+        t->unk4 = 0;
+        t->unk8 = 0xFF;
+        t->unkC = 0x40;
+        t->unk10 = 0;
+        t->unk14 = 0x64;
+        t->unk20 = 0x7F;
+        t->unk24 = 0;
+        t->unk30 = 0;
+        t->unk34 = 0x40;
+        t->unk64[0] = 0;
+        t->unk64[1] = 0;
+        t->unk64[2] = 0;
+        t->unk64[3] = 0;
+        t->unk48 = 0x1000;
+        t->unk68 = 0;
+        t->unk6C = 0;
+        t->unk5C = 0;
+        t->unk5E = 0;
+        t->unk60 = 0;
+        t->unk62 = 0;
+        t->unk38 = 0;
+        t->unk3C = 0;
+        t->unk4C = 0;
+        t->unk50 = 0;
+        t->unk54 = 0;
+        t->unk58 = 0;
+        t->unk46 = 1;
+        t->unk44 = 1;
+        t++;
+    } while (i >= 0);
+}
+#endif
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/mod", func_40032C10);
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/mod", all_keyoff);
@@ -220,9 +482,91 @@ void Sg2ModMidiout(s32 mod, s32 len, u8 *data) {
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/mod", Sg2ModTickProc);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/mod", Sg2ModOpenBgm);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/mod", Sg2ModOpenBgm);
+s32 Sg2ModOpenBgm(s32 vab, s32 mode) {
+    s32 intr;
+    s32 slot;
+    s32 start;
+    s32 i;
+    s32 *serial;
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/mod", Sg2ModOpenSe);
+    if (!vab_check_alive(vab)) {
+        return -1;
+    }
+    intr = DIntr();
+    i = 0;
+    serial = &D_4010C658;
+    start = *serial;
+    slot = -1;
+    for (; i < 0x20; i++) {
+        s32 k = (start + i) % 0x20;
+
+        if (D_400F9058[k].unk0 == -1) {
+            slot = k;
+            *serial = start + 1;
+            D_400F9058[k].unk4 = Sg2SlotGetSlotClassIdx(k);
+            break;
+        }
+    }
+    if (intr != 0) {
+        EIntr();
+    }
+    if (slot != -1) {
+        func_40032AC0(slot);
+        D_400F9058[slot].unk18 = mode;
+        vab_get_info(vab, &D_400F9058[slot].unkC, &D_400F9058[slot].unk8);
+        D_400F9058[slot].unk0 = vab;
+        D_400F9058[slot].unk5C = vab_get_lfotbl_param(vab, &D_400F9058[slot].unk54, &D_400F9058[slot].unk58);
+        if ((s32)D_400F9058[slot].unk54 < 0) {
+            D_400F9058[slot].unk58 = (s32)D_40045FF0;
+        }
+        D_400F9058[slot].unk50 = vab_get_veltbl(vab, &D_400F9058[slot].unk4C);
+    }
+    return slot;
+}
+
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/mod", Sg2ModOpenSe);
+s32 Sg2ModOpenSe(s32 vab, s32 mode) {
+    s32 intr;
+    s32 slot;
+    s32 start;
+    s32 i;
+    s32 *serial;
+
+    if (!vab_check_alive(vab)) {
+        return -1;
+    }
+    intr = DIntr();
+    i = 0;
+    serial = &D_4010C658;
+    start = *serial;
+    slot = -1;
+    for (; i < 0x20; i++) {
+        s32 k = (start + i) % 0x20;
+
+        if (D_400F9058[k].unk0 == -1) {
+            slot = k;
+            *serial = start + 1;
+            D_400F9058[k].unk4 = Sg2SlotGetSlotClassIdx(k);
+            break;
+        }
+    }
+    if (intr != 0) {
+        EIntr();
+    }
+    if (slot != -1) {
+        func_40032C10(slot);
+        D_400F9058[slot].unk18 = mode;
+        vab_get_info(vab, &D_400F9058[slot].unkC, &D_400F9058[slot].unk8);
+        D_400F9058[slot].unk0 = vab;
+        D_400F9058[slot].unk5C = vab_get_lfotbl_param(vab, &D_400F9058[slot].unk54, &D_400F9058[slot].unk58);
+        if ((s32)D_400F9058[slot].unk54 < 0) {
+            D_400F9058[slot].unk58 = (s32)D_40045FF0;
+        }
+        D_400F9058[slot].unk50 = vab_get_veltbl(vab, &D_400F9058[slot].unk4C);
+    }
+    return slot;
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/mod", Sg2ModCheckSndOn);
 s32 Sg2ModCheckSndOn(s32 arg0) {
@@ -338,6 +682,18 @@ void func_40035C68(void) {
     }
 }
 
+/* NEARMISS-STUB func_40035D10 */
+#if 0 /* NEARMISS 87.14% cat=sched sub=- | dpdiv delay slot: target fills it with addiu s0,0x2EC, ours with move a0 | attempts=1 */
+/* best 87.14% (kR26 form reproduced; 4 new attempts in kR38 all <= 87.14: pointer local after dpdiv 85.5, inline store 85.5, in-place base += 0x2EC before call 87.14 (same diff), Sg2ModTrack* + 0x3C 84.6).
+   Target: addiu s0,0x2EC sits in dpdiv's delay slot after `daddu a0,v0` (litodp result) and before jal dpdiv; move a0,v0 for dptofp follows dpdiv.
+   Ours: move a0,v0 fills dpdiv's delay slot and addiu lands after the call. Still open. */
+void func_40035D10(void) {
+    s32 base = (D_400F904C[0] & 0xF) * 0x70 + (s32)D_400F9050;
+    s64 d = litodp(D_400F904C[2]);
+    f32 *p = (f32 *)(base + 0x2EC);
+    *p = dptofp(dpdiv(d, 0x4028000000000000LL));
+}
+#endif
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/mod", func_40035D10);
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/mod", func_40035D80);
@@ -499,6 +855,30 @@ void func_40036528(void) {
 void func_400365B0(void) {
 }
 
+/* NEARMISS-STUB func_400365B8 */
+#if 0 /* NEARMISS 93.09% cat=sched sub=- | lui order: target lui D_400F904C before lui D_400F9050 | attempts=1 */
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/mod", func_400365B8);
+void func_400365B8(void) {
+    u8 *p = D_400F904C;
+    s32 buf[48];
+    s32 t = p[0] & 0xF;
+    s32 v = (p[1] + (p[2] << 7)) >> 7;
+    Sg2ModBody *b;
+    s32 i;
+
+    b = &D_400F9050->b;
+    b->trk[t].unk30 = v;
+    i = Sg2SlotFindSlotClassCh(buf, b->unk0, t) - 1;
+    while (i >= 0) {
+        Sg2SlotSetBendValue(buf[i], v);
+        i--;
+    }
+}
+
+/* kR38 best: 93.09%. Remaining diff is lui order only: target lui v0(D_400F904C) then lui a1(D_400F9050);
+   ours emits lui for D_400F9050 first. Tried: (a) local b after p (same 93.09), (b) no local b, D->b.trk direct (same 93.09),
+   (c) all event reads via D_400F904C global, b = &D->b declared-init (same 93.09). Not reached 100%. */
+#endif
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/mod", func_400365B8);
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/mod", func_40036660);
@@ -515,6 +895,35 @@ void func_40036BF0(void) {
 void func_40036BF8(void) {
 }
 
+/* NEARMISS-STUB func_40036C00 */
+#if 0 /* NEARMISS 95.61% cat=regalloc sub=- | &D_400F9048 in s0 for 0x40/0x41 arms; target duplicates default epilogue, beql at 0x41 | attempts=1 */
+/* Best attempt for KERNEL.XFF/Sg2/mod func_40036C00: 95.61% (not matched). Needs: extern s32 D_400F9048; (next to extern u8 *D_400F904C;).
+ * Pointer local p=&D_400F9048 used only in cases 0x40/0x41 (95.6). Hoisting p to the top (all arms use *p) scores lower (SCORE line not kept). Remaining diff: target computes the pointer in s0 (lui s0/addiu s0) for 0x40/0x41; ours uses v0 then addiu s0,v0. Target 0x41 uses beql at the 0x41 test; default epilogue duplicated.
+ */
+void func_40036C00(void) {
+    u8 *ev = D_400F904C;
+    s32 *p;
+
+    switch (ev[1]) {
+    case 0x2F:
+        all_keyoff(D_400F9048);
+        return;
+    case 0x3F:
+        Sg2ModClose(D_400F9048);
+        return;
+    case 0x40:
+        p = &D_400F9048;
+        all_keyoff(*p);
+        Sg2ModClose(*p);
+        return;
+    case 0x41:
+        p = &D_400F9048;
+        all_soundoff(*p);
+        Sg2ModClose(*p);
+        return;
+    }
+}
+#endif
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/mod", func_40036C00);
 
 void func_40036CE0(void) {
