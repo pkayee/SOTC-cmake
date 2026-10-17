@@ -78,7 +78,7 @@ segments:
         - [0x108c0, asm, sdk/libkernl/tlbtrap]
         - [0x10c20, c, sdk/libkernl/diei]
         - [0x10c88, c, sdk/libkernl/initsys]
-        - [0x110b0, c, sdk/libkernl/exit]
+        - [0x110b0, c, sdk/libkernl/exit, "-O2 -G0 cc=ee-gcc2.9-991111"]
         - [0x11350, c, sdk/libkernl/alarm]
         - [0x11490, c, sdk/libkernl/timer]
         - [0x12800, c, sdk/libkernl/alarmtimer]
