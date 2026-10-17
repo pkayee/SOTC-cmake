@@ -1,4 +1,5 @@
 #include "common.h"
+#include "sdk/ee/eekernel.h"
 #include "sdk/ee/eeregs.h"
 
 extern s32 D_40092BD0;
@@ -17,6 +18,8 @@ void waitVscheduler(void);
 void func_400268A8(void);
 s32 iosDlGetWorkBufId(void);
 void iosResetDC(void *dc);
+void iosSetDCParam(void *dc, s32 a, s32 b, s32 c, s32 d);
+void iosSetDCViewPort(void *dc, s32 x, s32 y, s32 w, s32 h);
 void sceGsResetGraph(short mode, short inter, short omode, short ffmode);
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosDumpDMAStatus);
@@ -31,7 +34,20 @@ INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", func_400268A8);
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", func_40026BE0);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosGsResizeRootDC);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosGsResizeRootDC);
+void iosGsResizeRootDC(void)
+{
+    s32 *p = (s32 *)&D_40092BD0;
+    s32 i = 1;
+    s32 off = 0;
+
+    do
+    {
+        iosSetDCParam((u8 *)p[0x22] + off, ((p[0] * p[1]) >> 11) + ((p[2] * p[3]) >> 11), (p[0] * p[1]) >> 11, p[2], p[3]);
+        iosSetDCViewPort((u8 *)p[0x22] + off, 0, 0, p[2], p[3]);
+        off += 0x190;
+    } while (--i >= 0);
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosGsSetMode);
 void iosGsSetMode(void)
@@ -202,15 +218,51 @@ s32 *getProgressiveMode(void)
     return &D_40092C74;
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosResetGraph);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosResetGraph);
+void iosResetGraph(s16 arg0, s16 arg1, s16 arg2, s16 arg3)
+{
+    if (arg0 != 0)
+    {
+        *GS_CSR = 0x100;
+        return;
+    }
+    *GS_CSR = 0x200;
+    sceGsResetGraph(0, arg1 & 1, arg2, arg3 & 1);
+}
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosDmaSendPath1);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosDmaSendPath1);
+void iosDmaSendPath1(s64 arg0, s64 arg1)
+{
+    u32 stat;
+
+    do
+    {
+        asm volatile("cfc2.ni %0, $vi29" : "=r"(stat));
+    } while ((*D1_CHCR & 0x100) || (*D2_CHCR & 0x100) || (*VIF1_STAT & 0x1F000003) || (stat & 0x100) || (*GIF_STAT & 0xC00));
+    *D1_QWC = arg1;
+    *D1_MADR = arg0 & 0x0FFFFFFF;
+    FlushCache(0);
+    *D1_CHCR = 0x101;
+}
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosDmaSendPath2);
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosDmaSendPath3);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosDmaSendSChainPath1);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosDmaSendSChainPath1);
+void iosDmaSendSChainPath1(u32 arg0)
+{
+    u32 stat;
+
+    do
+    {
+        asm volatile("cfc2.ni %0, $vi29" : "=r"(stat));
+    } while ((*D1_CHCR & 0x100) || (*D2_CHCR & 0x100) || (*VIF1_STAT & 0x1F000003) || (stat & 0x100) || (*GIF_STAT & 0xC00));
+    *D1_QWC = 0;
+    *D1_TADR = arg0 & 0x7FFFFFFF;
+    FlushCache(0);
+    *D1_CHCR = 0x145;
+}
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosDmaSendSChainPath2);
 
