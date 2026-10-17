@@ -231,6 +231,8 @@ segments:
         - [0x38d40, .rodata, putString]
         
         - [0x38D88, rodatabin] # SDK rodata
+        - [0x3A360, .rodata, sdk/libgcc/frame]
+        - [0x3A420, rodatabin] # SDK rodata
         - [0x3AE80, .lit4, putString] # .lit4
         - [0x3AE84, pad] # .data_nop
         - [0x3AF00, .sdata, loaderSys]
