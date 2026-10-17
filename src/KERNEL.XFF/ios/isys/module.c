@@ -1,6 +1,7 @@
 #include "common.h"
 #include <stdarg.h>
 #include "ios/kernel.h"
+#include "ios/hash.h"
 
 typedef struct ModHdr
 {
@@ -32,11 +33,28 @@ extern char D_40047138[];
 extern char D_40046EC0[]; // "dld:\tError. this file no needs for allocate memory.\n"
 extern s32 D_40045820;
 extern s32 D_40081A20;
+extern t_hashTable D_40081A18;
+extern char D_40047400[];
+extern char D_400474A8[];
+extern char D_40047068[];
+extern char D_40047088[];
+extern char D_40047090[];
+extern char D_400470A8[];
+extern char D_400470B8[];
+extern char D_400470D8[];
+extern s32 iosLoadIopModule(char *, char *, s32, s32);
+extern s32 func_4001AD58(char *, s32, s32);
+extern s32 iosLoaderGetFileSizeName(char *);
+extern s32 func_4001D120(s32);
 typedef struct DldSlot { s32 unk0; s32 unk4; } DldSlot;
 extern DldSlot D_40081A28[8];
 extern void *iosMallocAlign(s32, s32, s32);
 extern void iosFreeParts(void *, void *, s32);
 extern void func_4001CFE0(s32);
+extern s32 rootPtn;
+extern s32 iosLoaderFOpen(char *, s32, s32);
+extern s32 iosLoaderFRead(s32, void *, s32);
+extern s32 iosLoaderFClose(s32);
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", func_400199B0);
 s32 func_400199B0(s32 arg0, ...)
@@ -78,7 +96,13 @@ INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", isysGetXffEntryPointP
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", InitDld);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", IosLoadIrxSimulation);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", IosLoadIrxSimulation);
+void IosLoadIrxSimulation(void)
+{
+    iosLoadIopModule(D_40047068, D_40047088, 0, 0);
+    iosLoadIopModule(D_40047090, D_400470A8, 0, 0);
+    iosLoadIopModule(D_400470B8, D_400470D8, 0, 0);
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", IosGetMergeDataFileName);
 char *IosGetMergeDataFileName(void)
@@ -86,7 +110,23 @@ char *IosGetMergeDataFileName(void)
     return D_40047138;
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", isysSearchSymbol);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", isysSearchSymbol);
+s32 isysSearchSymbol(u32 *arg0, u32 arg1)
+{
+    t_hashedSym *entry;
+
+    if (arg1 == 0)
+    {
+        *arg0 = 0;
+        return 1;
+    }
+    entry = SearchStrHashKey(&D_40081A18, arg1);
+    if (entry != NULL)
+    {
+        *arg0 = (u32)entry->locSym->addr;
+    }
+    return entry != NULL;
+}
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", isysSearchModuleFuncNameByAddr);
 
@@ -162,7 +202,13 @@ INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", isysGetUndefModuleObj
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", isysGetSymdefModuleObjNum);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", func_4001C350);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", func_4001C350);
+s32 func_4001C350(s32 arg0, char *arg1, s32 arg2)
+{
+    s32 fd = iosLoaderFOpen(arg1, 1, 0);
+    iosLoaderFRead(fd, (void *)arg0, arg2);
+    return iosLoaderFClose(fd);
+}
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", func_4001C3B0);
 
@@ -193,7 +239,18 @@ void func_4001C8F0(void *arg0, void *arg1)
     iosFreeParts(arg0, arg1, 0);
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", loadtest);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", loadtest);
+s32 loadtest(char *arg0, s32 arg1)
+{
+    s32 ret = 0;
+    s32 size = iosLoaderGetFileSizeName(arg0);
+
+    if (size >= 0)
+    {
+        ret = func_4001AD58(arg0, size, arg1);
+    }
+    return ret;
+}
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", iosLoaderGetFileSizeName);
 
