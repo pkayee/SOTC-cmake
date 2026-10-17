@@ -1,18 +1,44 @@
 #include "common.h"
 
+extern s32 D_40131B28;
+extern s32 D_40131ABC;
+extern u8 D_40131AB0[];
+extern u8 D_40131AC0[];
+extern u8 D_40131AC4[];
+extern u8 D_40131AC8[];
+extern u8 D_40131ACC[];
+extern u8 D_40203FE0[];
+
+s32 _optionWorkChk(s32 idx);
+
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0099_OptionMenuStart", OptionMenuStart);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0099_OptionMenuStart", PauseMenuStart);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0099_OptionMenuStart", func_40087520);
+s32 func_40087520(void)
+{
+    return _optionWorkChk(1);
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0099_OptionMenuStart", func_40087538);
+s32 func_40087538(void)
+{
+    return _optionWorkChk(4);
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0099_OptionMenuStart", func_40087550);
+s32 func_40087550(void)
+{
+    return _optionWorkChk(5);
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0099_OptionMenuStart", func_40087568);
+s32 func_40087568(void)
+{
+    return _optionWorkChk(2);
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0099_OptionMenuStart", func_40087580);
+s32 func_40087580(void)
+{
+    return _optionWorkChk(6);
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0099_OptionMenuStart", func_40087598);
 
@@ -58,23 +84,50 @@ void initSavePoint(void) {
 void deleteSavePoint(void) {
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0099_OptionMenuStart", SetMapLogDispMode);
+void SetMapLogDispMode(s32 mode)
+{
+    D_40131ABC = mode;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0099_OptionMenuStart", getSprLogWorkSize);
+s32 getSprLogWorkSize(void)
+{
+    return 0x2D00;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0099_OptionMenuStart", getSprLogWorkAddress);
+u8* getSprLogWorkAddress(void)
+{
+    return D_40203FE0;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0099_OptionMenuStart", getSprLogStatusSize);
+s32 getSprLogStatusSize(void)
+{
+    return 0xC;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0099_OptionMenuStart", getSprLogStatusAddress);
+u8* getSprLogStatusAddress(void)
+{
+    return D_40131AB0;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0099_OptionMenuStart", getLogLineColorR);
+u8* getLogLineColorR(void)
+{
+    return D_40131AC0;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0099_OptionMenuStart", getLogLineColorG);
+u8* getLogLineColorG(void)
+{
+    return D_40131AC4;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0099_OptionMenuStart", getLogLineColorB);
+u8* getLogLineColorB(void)
+{
+    return D_40131AC8;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0099_OptionMenuStart", getLogLineColorA);
+u8* getLogLineColorA(void)
+{
+    return D_40131ACC;
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0099_OptionMenuStart", mapLogReset);
 
@@ -90,7 +143,10 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0099_OptionMenuStart", loadMap
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0099_OptionMenuStart", mapScript);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0099_OptionMenuStart", LoadWaitCancel);
+void LoadWaitCancel(void)
+{
+    D_40131B28 = 0;
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0099_OptionMenuStart", LoadWaitScript);
 
@@ -98,7 +154,10 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0099_OptionMenuStart", LoadWai
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0099_OptionMenuStart", execPause);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0099_OptionMenuStart", GetMenuFade);
+f32 GetMenuFade(void)
+{
+    return 0.0f;
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0099_OptionMenuStart", func_40087D50);
 
