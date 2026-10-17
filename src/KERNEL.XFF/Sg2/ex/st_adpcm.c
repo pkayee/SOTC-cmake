@@ -27,6 +27,18 @@ extern s32 Sg2ExStAdpcmIopReadAdr(void*, s32);
 extern s32 Sg2SlotFreeSearchTerm(s32);
 extern void Sg2SlotBlock(s32, s32);
 
+typedef struct { u8 pad[0x240]; s32 lr[16][2]; } StAdpcmVolSub;          /* starts at ctx+0xC */
+typedef struct { u8 pad[0x30]; s32 l[8]; s32 r[8]; } StAdpcmSendSub;     /* starts at ctx+0x10 */
+typedef struct
+{
+    u8 pad0[0xC];
+    union
+    {
+        StAdpcmVolSub c;
+        struct { s32 pad; StAdpcmSendSub d; } d;
+    } u;
+} StAdpcmVolCtx;
+
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/st_adpcm", Sg2ExStAdpcmInit);
 void Sg2ExStAdpcmInit(void)
 {
@@ -134,7 +146,27 @@ s32 Sg2ExStAdpcmOpenFake(void* p)
 
 extern void* memcpy(void*, const void*, u32);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/st_adpcm", Sg2ExStAdpcmOpen);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/st_adpcm", Sg2ExStAdpcmOpen);
+s32 Sg2ExStAdpcmOpen(void* p, void* hdr, s32 a, s32 b, s32 c, s32 d)
+{
+    s32 i;
+
+    memcpy((u8*)p + 0x28, hdr, 0x78);
+    *(s32*)((u8*)p + 0x230) = a;
+    *(s32*)((u8*)p + 0x234) = b;
+    *(s32*)((u8*)p + 0x238) = c;
+    *(s32*)((u8*)p + 0x23C) = d;
+    *(s32*)((u8*)p + 0x2D8) = 0;
+    *(s32*)((u8*)p + 0x2DC) = 0;
+    *(s32*)((u8*)p + 0x240) = *(s32*)((u8*)hdr + 0x10) << 11;
+    *(s32*)((u8*)p + 0x244) = *(s32*)((u8*)hdr + 0x14) << 11;
+    for (i = 0; i < 8; i++)
+    {
+        ((StAdpcmVolCtx*)p)->u.c.lr[i][1] = ((StAdpcmVolCtx*)p)->u.c.lr[i][0] = 100;
+    }
+    *(s32*)((u8*)p + 0x2CC) = 100;
+    return Sg2ExStAdpcmOpenFake(p);
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/st_adpcm", Sg2ExStAdpcmSetFd);
 s32 Sg2ExStAdpcmSetFd(void* p, s32 v)
@@ -186,17 +218,6 @@ s32 Sg2ExStAdpcmGetUserParam(void* p)
    Two embedded views of the ctx: track vol bank pairs at ctx+0xC+0x240 = ctx+0x24C (stride 8, [16][2]),
    per-track send L/R arrays at ctx+0x10+0x30 = ctx+0x40 / ctx+0x60 ([8] each).
    The pointer locals MUST be declared d first, then c (that gives addiu p+0x10 before addiu p+0xC). */
-typedef struct { u8 pad[0x240]; s32 lr[16][2]; } StAdpcmVolSub;          /* starts at ctx+0xC */
-typedef struct { u8 pad[0x30]; s32 l[8]; s32 r[8]; } StAdpcmSendSub;     /* starts at ctx+0x10 */
-typedef struct
-{
-    u8 pad0[0xC];
-    union
-    {
-        StAdpcmVolSub c;
-        struct { s32 pad; StAdpcmSendSub d; } d;
-    } u;
-} StAdpcmVolCtx;
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/st_adpcm", func_40031C08);
 s32 func_40031C08(StAdpcmVolCtx* p, s32 voice, s32 idx)

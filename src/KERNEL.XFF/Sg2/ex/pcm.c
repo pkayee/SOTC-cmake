@@ -2,6 +2,38 @@
 
 typedef struct { s32 f[117]; } PcmInSlot;
 typedef struct { s32 f[49]; } PcmAfSlot;
+typedef struct
+{
+    s32 type;
+    f32 a0;
+    f32 a1;
+    f32 a2;
+    f32 b0;
+    f32 b1;
+    f32 b2;
+    f32 z[4];
+    f32 gain;
+    f32 freq;
+    f32 nb[5];
+} PcmIir;
+
+typedef struct
+{
+    s32 f00;
+    s32 flags;
+    s32 type8;
+    f32 targetA;
+    f32 targetB;
+    f32 rateA;
+    f32 rateB;
+    void *f1C;
+    s32 f20;
+    s32 remain;
+    void *cur;
+    u8 pad2C[8];
+    PcmIir iir1;
+    PcmIir iir2;
+} PcmAfRec;
 extern PcmInSlot D_4011596C[];
 extern PcmInSlot D_40115B28[];
 extern PcmInSlot D_40115B00[];
@@ -30,6 +62,7 @@ void *memset(void *s, int c, unsigned long n);
 void func_4003FC78();
 s32 Sg2StPcmIopTransOffset(void);
 void func_40040118(void);
+void IirParam(void *iir, s32 type, f32 freq, f32 gain);
 extern PcmInSlot D_40115958[];
 extern PcmInSlot D_4011595C[];
 extern PcmInSlot D_40115970[];
@@ -50,6 +83,7 @@ void func_4003FAD0(s32 *arg0, s32 arg1);
 void func_4003F928(s32 *arg0, s32 arg1);
 void func_4003F7E8(s32 *arg0, s32 arg1);
 s32 Sg2StPcmInit(s32 arg0);
+s32 Sg2CtrlGetTickMode(void);
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", func_4003F3C8);
 void func_4003F3C8(s32 *arg0, s32 arg1)
@@ -312,7 +346,51 @@ void func_4003FBD8(PcmInSlot *arg0, s32 arg1)
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", func_4003FC78);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", func_4003FD60);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", func_4003FD60);
+void func_4003FD60(s32 *a0, s32 a1, s32 a2, s32 a3, f32 f12, f32 f13)
+{
+    PcmAfRec *rec;
+    s32 intr;
+    f32 curA;
+    f32 curB;
+    f32 ticks;
+
+    rec = (PcmAfRec *)((u8 *)a0 + a1 * 0xC4 + 0x14);
+    intr = DIntr();
+    curA = rec->iir1.freq;
+    curB = rec->iir1.gain;
+    ticks = 1000.0f / (f32)Sg2CtrlGetTickMode();
+    ticks = (f32)a2 / ticks;
+    if (ticks < 1.0f)
+    {
+        ticks = 1.0f;
+    }
+    if (a3 != 0)
+    {
+        rec->type8 = a3;
+        rec->flags |= 4;
+    }
+    if ((f32)(s32)f12 != -1000.0f)
+    {
+        rec->targetA = f12;
+        rec->flags |= 1;
+        rec->rateA = (f12 - curA) / ticks;
+    }
+    if ((f32)(s32)f13 != -1000.0f)
+    {
+        rec->targetB = f13;
+        rec->flags |= 2;
+        rec->rateB = (f13 - curB) / ticks;
+    }
+    if (rec->flags != 0)
+    {
+        rec->f00 = 1;
+    }
+    if (intr != 0)
+    {
+        EIntr();
+    }
+}
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", func_4003FF10);
 
