@@ -87,4 +87,8 @@ unsigned long _strtoul_r(struct _reent *ptr, const char *nptr, char **endptr, in
     return acc;
 }
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libc/strtoul", strtoul);
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libc/strtoul", strtoul);
+unsigned long strtoul(const char *nptr, char **endptr, int base)
+{
+    return _strtoul_r(D_00135D60[0], nptr, endptr, base);
+}
