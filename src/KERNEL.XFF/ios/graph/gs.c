@@ -21,6 +21,12 @@ void iosResetDC(void *dc);
 void iosSetDCParam(void *dc, s32 a, s32 b, s32 c, s32 d);
 void iosSetDCViewPort(void *dc, s32 x, s32 y, s32 w, s32 h);
 void sceGsResetGraph(short mode, short inter, short omode, short ffmode);
+void iosDumpDMAStatus(s32);
+void iosDumpVIF1Status(void);
+void iosDumpGIFStatus(void);
+void func_40026BE0(s32 field);
+extern s32 D_40045A5C;
+extern char D_40048060[], D_40048098[], D_400480D0[], D_40048100[], D_40048130[];
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosDumpDMAStatus);
 
@@ -28,7 +34,95 @@ INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosDumpVIF1Status);
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosDumpGIFStatus);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosSyncPath);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosSyncPath);
+s32 iosSyncPath(s32 mode, s32 timeout)
+{
+    u32 stat;
+    s32 count;
+    s32 limit;
+    s32 r, r2, r3, r4, r5;
+
+    limit = 0x2000000;
+    timeout &= 0xFFFF;
+    if (timeout)
+        limit = timeout;
+    count = 0;
+    if (mode != 0)
+    {
+        asm volatile("cfc2.ni %0, $vi29" : "=r"(stat));
+        r = ((s32)*D1_CHCR >> 8) & 1;
+        r2 = (*D2_CHCR & 0x100) ? (r | 2) : r;
+        r3 = (*VIF1_STAT & 0x1F000003) ? (r2 | 4) : r2;
+        r4 = (stat & 0x100) ? (r3 | 8) : r3;
+        r5 = (*GIF_STAT & 0xC00) ? (r4 | 0x10) : r4;
+        return r5;
+    }
+    while (*D1_CHCR & 0x100)
+    {
+        count++;
+        if (limit < count)
+        {
+            iosDumpDMAStatus(0);
+            iosDumpVIF1Status();
+            iosDumpGIFStatus();
+            LoaderSysPrintf(D_40048060);
+            ((void (*)(u32))D_40045A90)(*VIF1_MARK);
+            return -1;
+        }
+    }
+    while (*D2_CHCR & 0x100)
+    {
+        count++;
+        if (limit < count)
+        {
+            iosDumpDMAStatus(1);
+            LoaderSysPrintf(D_40048098);
+            return -1;
+        }
+    }
+    while (*VIF1_STAT & 0x1F000003)
+    {
+        count++;
+        if (limit < count)
+        {
+            iosDumpDMAStatus(0);
+            iosDumpVIF1Status();
+            iosDumpGIFStatus();
+            LoaderSysPrintf(D_400480D0);
+            ((void (*)(u32))D_40045A90)(*VIF1_MARK);
+            return -1;
+        }
+    }
+    asm volatile("cfc2.ni %0, $vi29" : "=r"(stat));
+    while (stat & 0x100)
+    {
+        count++;
+        if (limit < count)
+        {
+            iosDumpDMAStatus(0);
+            iosDumpVIF1Status();
+            LoaderSysPrintf(D_40048100);
+            ((void (*)(u32))D_40045A90)(*VIF1_MARK);
+            return -1;
+        }
+        asm volatile("cfc2.ni %0, $vi29" : "=r"(stat));
+    }
+    while (*GIF_STAT & 0xC00)
+    {
+        count++;
+        if (limit < count)
+        {
+            iosDumpDMAStatus(0);
+            iosDumpDMAStatus(1);
+            iosDumpVIF1Status();
+            iosDumpGIFStatus();
+            LoaderSysPrintf(D_40048130);
+            ((void (*)(u32))D_40045A90)(*VIF1_MARK);
+            return -1;
+        }
+    }
+    return 0;
+}
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", func_400268A8);
 
@@ -78,7 +172,34 @@ void iosGsSetMode(void)
     }
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosGsSetDrawContext);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosGsSetDrawContext);
+void iosGsSetDrawContext(void)
+{
+    u32 stat;
+    u8 *dc;
+    s64 qwc;
+    s64 addr;
+
+    do
+    {
+        asm volatile("cfc2.ni %0, $vi29" : "=r"(stat));
+    } while ((*D1_CHCR & 0x100) || (*D2_CHCR & 0x100) || (*VIF1_STAT & 0x1F000003) || (stat & 0x100) || (*GIF_STAT & 0xC00));
+    func_40026BE0((*(volatile u64 *)0x12001000 >> 13) & 1);
+    dc = D_40092C58;
+    if (iosDlGetWorkBufId() == 0)
+        dc += 0x190;
+    dc += 0x10;
+    qwc = (s32)(*(u64 *)dc & 0x7FFF) + 1;
+    addr = (u32)dc;
+    do
+    {
+        asm volatile("cfc2.ni %0, $vi29" : "=r"(stat));
+    } while ((*D1_CHCR & 0x100) || (*D2_CHCR & 0x100) || (*VIF1_STAT & 0x1F000003) || (stat & 0x100) || (*GIF_STAT & 0xC00));
+    *D2_QWC = qwc;
+    *D2_MADR = addr & 0x0FFFFFFF;
+    FlushCache(0);
+    *D2_CHCR = 0x141;
+}
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosCopyFrameBuffer);
 
@@ -333,7 +454,17 @@ void iosResetPath(void)
     *GIF_CTRL = 1;
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosSyncV);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosSyncV);
+s32 iosSyncV(s32 arg0)
+{
+    s32 i;
+
+    for (i = 0; i < arg0 + 1; i++)
+    {
+        waitVscheduler();
+    }
+    return (*GS_CSR >> 13) & 1;
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosGetField);
 s32 iosGetField(void)
@@ -375,9 +506,44 @@ s32 iosSetSyncNoReturnFunc(s32 func)
     return 1;
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosSetScreenEnv);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosSetScreenEnv);
+void iosSetScreenEnv(s32 w, s32 h, s32 dw, s32 dh)
+{
+    s16 a = D_40045A50;
+    s16 b = D_40045A54;
+    s16 c = D_40045A58;
+    s32 *p = (s32 *)&D_40092BD0;
+    u32 stat;
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosCheckDrawFinish);
+    p[2] = dw;
+    p[3] = dh;
+    p[0] = w;
+    p[1] = h;
+    p[0xAC / 4] = 0;
+    p[0xB0 / 4] = 0;
+    *GS_CSR = 0x200;
+    sceGsResetGraph(0, a & 1, b, c & 1);
+    func_400268A8();
+    waitVscheduler();
+    *GS_CSR;
+    do
+    {
+        asm volatile("cfc2.ni %0, $vi29" : "=r"(stat));
+    } while ((*D1_CHCR & 0x100) || (*D2_CHCR & 0x100) || (*VIF1_STAT & 0x1F000003) || (stat & 0x100) || (*GIF_STAT & 0xC00));
+    func_40026BE0((*(volatile u64 *)0x12001000 >> 13) & 1);
+}
+
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosCheckDrawFinish);
+s32 iosCheckDrawFinish(void)
+{
+    u32 stat;
+
+    D_40045A5C++;
+    asm volatile("cfc2.ni %0, $vi29" : "=r"(stat));
+    if ((*D1_CHCR & 0x100) || (*D2_CHCR & 0x100) || (*VIF1_STAT & 0x1F000003) || (stat & 0x100) || (*GIF_STAT & 0xC00))
+        return 0;
+    return 1;
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosGsInitDC);
 void iosGsInitDC(void)
