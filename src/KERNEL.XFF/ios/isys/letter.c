@@ -311,6 +311,24 @@ void open_letter_post(LetterPost* arg0)
     arg0->reading = arg0->letters_tail;
 }
 
+/* NEARMISS-STUB get_next_letter_in_post */
+#if 0 /* NEARMISS 91.67% cat=regalloc sub=- | ret kept in a1; target keeps ret in link reg v1 (beql delay-slot v1=0) | attempts=1 */
+// kR39 get_next_letter_in_post partial best 91.67%: target beql v1,zero w/ delay v1=0 (link reg = return reg); ours keeps ret in a1 (beqz+daddu a1,zero,zero). Tried: ret-before-link (91.67), link-only-ternary (46), early return (52), split-if-else reuse link (64), ret assign after reading (91.67), link=(LetterLink*)link->letter reuse (64). Cause: regalloc
+Letter* get_next_letter_in_post(LetterPost* arg0)
+{
+    LetterLink* link;
+    Letter* ret = NULL;
+
+    link = arg0->reading;
+    if (link != NULL)
+    {
+        arg0->read = link;
+        ret = (Letter*)link->letter;
+        arg0->reading = link->next;
+    }
+    return ret;
+}
+#endif
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/letter", get_next_letter_in_post);
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/letter", close_letter_post);

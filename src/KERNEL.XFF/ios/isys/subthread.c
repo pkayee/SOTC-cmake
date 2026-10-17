@@ -118,6 +118,23 @@ void isysInitSubThreadExecEnv(SubThread *t, s32 arg1)
     e->unk10 = e->unkC + e->unk14;
 }
 
+/* NEARMISS-STUB isysStartSubThread */
+#if 0 /* NEARMISS 58.76% cat=regalloc sub=- | t in a4/e in a3 in target; unk4 load hoisted in ours | attempts=1 */
+// kR39 isysStartSubThread best 58.76% (variants: early unk4 load 58.8; reorder unk4 after sq 52.6). cause=regalloc/flags: target keeps t in a4 and e in a3, ld ra before sq, sp reloaded after store; ours loads unk4 early.
+void isysStartSubThread(SubThread *t, s32 arg1)
+{
+    SubThreadEnv *e = SUBTHREAD_ENV(t);
+    u32 sp = e->unk10;
+    u32 a = arg1;
+    u32 b = e->unk4;
+
+    e->unk10 = sp - 0x2C0;
+    *(u_long128 *)(sp - 0x200) = a;
+    *(u_long128 *)(e->unk10 + 0x270) = b;
+    e->state = 0;
+    isysWakeupSubThread(t);
+}
+#endif
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/subthread", isysStartSubThread);
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/subthread", isysDeleteSubThread);
@@ -228,6 +245,35 @@ s32 isysGetSubThreadWorkSize(s32 arg0)
     return arg0 + 0x33;
 }
 
+/* NEARMISS-STUB isysGetSubThreadStackUse */
+#if 0 /* NEARMISS 93.95% cat=regalloc sub=- | 0xFE hoisted into a4/a3 in target; used=size in v0 vs v1 | attempts=1 */
+// kR39 isysGetSubThreadStackUse best 93.95% (do-while loop with break; target keeps used=size in v0 and i in a1; remaining diff = regalloc of size/i/0xFE const, no change from separate i init)
+f32 isysGetSubThreadStackUse(SubThread *t)
+{
+    SubThreadEnv *e = SUBTHREAD_ENV(t);
+    s32 size = e->unk14;
+    s32 used = size;
+
+    if (size > 0)
+    {
+        u8 *p = (u8 *)e->unkC;
+        s32 i;
+
+        i = 0;
+
+        do
+        {
+            if (p[i] != 0xFE)
+            {
+                break;
+            }
+            i++;
+        } while (i < size);
+        used = i;
+    }
+    return 1.0f - (f32)used / (f32)size;
+}
+#endif
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/subthread", isysGetSubThreadStackUse);
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/subthread", isysGetSubThreadStackSize);

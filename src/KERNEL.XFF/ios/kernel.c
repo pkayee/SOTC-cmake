@@ -47,6 +47,45 @@ static char D_40081188[0x400];
 
 
 
+/* NEARMISS-STUB ioskernel */
+#if 0 /* NEARMISS 91.43% cat=regalloc sub=- | arg1 s2 / version ptr s1 swapped | attempts=1 */
+// kR39 ioskernel 91.43% (partial). cause=regalloc: asm has arg1 in s2, version ptr in s1 (lui/addiu hoisted before if); C gives arg1->s1, tmp->s2. Tried hoisting tmp (same 91.43), inlining &__loader_version_id__ (90.71, worse).
+s32 ioskernel(s32 arg0, void* arg1) {
+    memory_info meminfo;
+    void (*LoaderSysPrintf)(char*,...);
+    void (*LoaderSysJumpRecoverPoint)(char*,...);
+    void* tmp;
+
+    LoaderSysPrintf = *(void**)0x100000;
+    LoaderSysJumpRecoverPoint = *(void**)0x100004;
+    tmp = &__loader_version_id__;
+    if (arg0 != 0) {
+        LoaderSysPrintf("krnl:\tThis is a CD boot environment. \x1b[36mNeed loader version check:\x1b[m\n");
+        LoaderSysPrintf("krnl:\t\t   boot loader version: %x\n", arg1);
+        LoaderSysPrintf("krnl:\t\tcurrent loader version: %x\n", tmp);
+        if (arg1 == tmp)
+            LoaderSysPrintf("krnl:\t\t\x1b[36mloader version check passed.\x1b[m\n");
+        else
+            LoaderSysJumpRecoverPoint("krnl:\t\x1b[31mloader version does not match. (boot:%x != current:%x)\x1b[m\nkrnl:\tsystem down.\n", arg1, tmp);
+    }
+    atof("1.f");
+    LoaderSysGetMemoryInfo(&meminfo);
+    iosInitIntrSystem();
+    iosInitMallocSystem(meminfo.unk18, meminfo.stack_base2, 0xDAE000);
+    initDldSys();
+    InitMath();
+    InitNet();
+    InitGp();
+    iosInit();
+    isysInitObjSystem();
+    InitDld();
+    InitIopDev();
+    InitSubThread();
+    D_40081588 = iosCreateThreadS(func_40018D30, 0, &rootPtn, 0x10000, 0x2d, 0);
+    iosStartThread(D_40081588, 0);
+    return 0;
+}
+#endif
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/kernel", ioskernel);
 // 91% matched
 /*s32 ioskernel(s32 arg0, void* arg1) {

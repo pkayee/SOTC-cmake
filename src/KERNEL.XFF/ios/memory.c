@@ -37,6 +37,63 @@ extern char D_400468C0[];
 extern char D_40046908[];
 extern char D_40046948[];
 
+/* NEARMISS-STUB func_40013160 */
+#if 0 /* NEARMISS 93.54% cat=stack-frame sub=- | stack-resident 8-slot DMA addr table + jal epilogue in target | attempts=1 */
+// kR39 best: func_40013160 93.54 (cause=regalloc/other: stack table variant 79.45, the target keeps lui/ori in table-init loop path and tail is jal+epilogue not j)
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/memory", func_40013160);
+void func_40015F58(void);
+
+#define DMA_REG(a) (*(volatile u32 *)(a))
+
+void func_40013160(void *arg0, void *arg1, u32 arg2)
+{
+    u32 dst;
+    u32 src;
+    u32 n;
+
+    dst = (u32)arg0;
+    src = (u32)arg1;
+    n = arg2 >> 4;
+    while (n > 0x400)
+    {
+        DMA_REG(0x1000E020) = 0xFFFFFC00;
+        DMA_REG(0x1000E010) = 0x200;
+        n -= 0x400;
+        DMA_REG(0x1000D410) = src;
+        src += 0x4000;
+        DMA_REG(0x1000D420) = 0x400;
+        DMA_REG(0x1000D480) = 0x70000000;
+        DMA_REG(0x1000E020) |= 0x200;
+        DMA_REG(0x1000D400) = 0x101;
+        func_40015F58();
+        DMA_REG(0x1000E020) = 0xFFFFFC00;
+        DMA_REG(0x1000E010) = 0x100;
+        DMA_REG(0x1000D010) = dst;
+        dst += 0x4000;
+        DMA_REG(0x1000D020) = 0x400;
+        DMA_REG(0x1000D080) = 0x70000000;
+        DMA_REG(0x1000E020) |= 0x100;
+        DMA_REG(0x1000D000) = 0x100;
+        func_40015F58();
+    }
+    DMA_REG(0x1000E020) = 0xFFFFFC00;
+    DMA_REG(0x1000E010) = 0x200;
+    DMA_REG(0x1000D410) = src;
+    DMA_REG(0x1000D420) = n;
+    DMA_REG(0x1000D480) = 0x70000000;
+    DMA_REG(0x1000E020) |= 0x200;
+    DMA_REG(0x1000D400) = 0x101;
+    func_40015F58();
+    DMA_REG(0x1000E020) = 0xFFFFFC00;
+    DMA_REG(0x1000E010) = 0x100;
+    DMA_REG(0x1000D010) = dst;
+    DMA_REG(0x1000D020) = n;
+    DMA_REG(0x1000D080) = 0x70000000;
+    DMA_REG(0x1000E020) |= 0x100;
+    DMA_REG(0x1000D000) = 0x100;
+    func_40015F58();
+}
+#endif
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/memory", func_40013160);
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/memory", func_400133C8);
@@ -139,6 +196,138 @@ INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/memory", func_40013A78);
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/memory", iosMallocInGarbagePtn);
 
+/* NEARMISS-STUB func_400142E0 */
+#if 0 /* NEARMISS 85.94% cat=regalloc sub=- | prev/next relink regs, class ladder slti order | attempts=1 */
+// kR39 best: func_400142E0 85.94 (cause=regalloc: register choice in prev/next relink and class ladder; ladder structure matches)
+static inline s32 PtnClassCnt(Ptn *ptn, s32 sz)
+{
+    s32 n;
+    s32 v;
+    s32 w;
+
+    if ((void *)ptn == (void *)&rootPtn)
+    {
+        if (sz <= 0x400)
+        {
+            if (sz <= 0x80)
+            {
+                n = D_40045570[sz];
+            }
+            else
+            {
+                v = (sz <= 0xC0) ? 8 : ((sz <= 0x100) ? 9 : ((sz <= 0x200) ? 10 : 11));
+                n = v;
+            }
+        }
+        else
+        {
+            v = sz >> 10;
+            if ((v & 0xFF00) == 0)
+            {
+                n = 0xC;
+            }
+            else
+            {
+                v = sz >> 18;
+                n = 0x14;
+            }
+            v >>= 1;
+            while (v != 0)
+            {
+                v >>= 1;
+                n++;
+            }
+        }
+    }
+    else
+    {
+        w = (u32)sz >> 11;
+        n = 1;
+        while (w != 0)
+        {
+            w >>= 1;
+            n++;
+        }
+    }
+    return n;
+}
+
+static inline void UnlinkFreeBlk(Ptn *ptn, Bin *bins, Blk *x)
+{
+    Bin *bn;
+    Blk *pp;
+    Blk *nx;
+
+    bn = &bins[PtnClassCnt(ptn, (x->w00 & 0xFFFFFF) << 2) - 1];
+    pp = (Blk *)((x->w14 & 0xFFFFFF) << 2);
+    nx = x->next;
+    if (pp != NULL)
+    {
+        pp->next = nx;
+    }
+    else
+    {
+        bn->head = nx;
+    }
+    if (nx != NULL)
+    {
+        nx->w14 = (nx->w14 & 0xFF000000) | (x->w14 & 0xFFFFFF);
+    }
+    else
+    {
+        bn->tail = pp;
+    }
+}
+
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/memory", func_400142E0);
+void func_400142E0(void *user)
+{
+    Blk *blk;
+    Blk *next;
+    Blk *prev;
+    Blk *nn;
+    Ptn *ptn;
+    Bin *bins;
+    u32 own;
+
+    blk = ((Blk **)user)[-1];
+    own = ((u8 *)blk)[0xB] << 16;
+    own |= ((u8 *)blk)[7] << 8;
+    own |= ((u8 *)blk)[3];
+    ptn = (Ptn *)(own << 2);
+    next = (Blk *)((blk->w08 & 0xFFFFFF) << 2);
+    prev = (Blk *)((blk->w0C & 0xFFFFFF) << 2);
+    bins = (Bin *)((ptn->binsP24 & 0xFFFFFF) << 2);
+    if ((void *)ptn == (void *)&rootPtn)
+    {
+        D_40045560 += blk->w00 & 0xFFFFFF;
+    }
+    if (prev != NULL && !((prev->w0C >> 24) & 1))
+    {
+        prev->w08 = (prev->w08 & 0xFF000000) | (blk->w08 & 0xFFFFFF);
+        if (next != NULL)
+        {
+            next->w0C = (next->w0C & 0xFF000000) | (blk->w0C & 0xFFFFFF);
+        }
+        UnlinkFreeBlk(ptn, bins, prev);
+        prev->w00 = (prev->w00 & 0xFF000000) | ((((u8 *)blk + ((blk->w00 & 0xFFFFFF) << 2) - (u8 *)prev) >> 2) & 0xFFFFFF);
+        blk = prev;
+    }
+    if (next != NULL && !((next->w0C >> 24) & 1))
+    {
+        blk->w08 = (blk->w08 & 0xFF000000) | (next->w08 & 0xFFFFFF);
+        blk->w00 = (blk->w00 & 0xFF000000) | ((((u8 *)next + ((next->w00 & 0xFFFFFF) << 2) - (u8 *)blk) >> 2) & 0xFFFFFF);
+        nn = (Blk *)((next->w08 & 0xFFFFFF) << 2);
+        if (nn != NULL)
+        {
+            nn->w0C = (nn->w0C & 0xFF000000) | (next->w0C & 0xFFFFFF);
+        }
+        UnlinkFreeBlk(ptn, bins, next);
+    }
+    blk->w0C &= 0xFEFFFFFF;
+    func_400133C8(blk, bins, ptn->nbins, ptn);
+}
+#endif
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/memory", func_400142E0);
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/memory", func_40014770);

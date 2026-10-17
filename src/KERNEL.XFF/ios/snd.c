@@ -319,6 +319,25 @@ void sndVabDelete(u32 *arg0)
     *arg0 &= ~1;
 }
 
+/* NEARMISS-STUB sndVabHDOpen */
+#if 0 /* NEARMISS 90.45% cat=regalloc sub=- | daddu a0,v0 hoisted above bltz in ours | attempts=1 */
+// kR39 sndVabHDOpen 90.45% partial: gcc hoists `daddu a0,v0,zero` (ret copied for the Sg2VabBdOpen arg) above bltz, target keeps v0 through bltz and copies only on the Bd path. Tried: g-form (arg0[1] reload) 86.36; short-circuit `ret >= 0 && arg0[4]` 90.45; early-return ordering 90.45.
+extern s32 Sg2VabHdOpen(s32);
+extern s32 Sg2VabBdOpen(s32, s32);
+
+s32 sndVabHDOpen(s32 *arg0, s32 arg1, s32 arg2)
+{
+    s32 ret;
+
+    arg0[2] = arg2;
+    arg0[3] = arg1;
+    ret = Sg2VabHdOpen(arg1);
+    arg0[1] = ret;
+    if (ret < 0) { return ret; }
+    if (arg0[4] != 0) { return Sg2VabBdOpen(ret, arg0[4]); }
+    return ret;
+}
+#endif
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/snd", sndVabHDOpen);
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/snd", sndVabHDClose);
