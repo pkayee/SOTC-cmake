@@ -97,26 +97,26 @@ void iosIColAddVec(u32 *dst, u32 a, u32 b)
     *dst = r.w[0];
 }
 
-//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/mvec", iosSwClip255Mvec);
-void iosSwClip255Mvec(u_long128 *dst)
-{
-    register u_long128 r asm("$2");
-    asm volatile(
-        "pceqw $8, $0, $0;"
-        "psrlw $9, $8, 23;"
-        "psrlw $11, $8, 1;"
-        "psubsw $9, $11, $9;"
-        "paddsw $2, $2, $9;"
-        "psrlw $10, $8, 31;"
-        "psubsw $2, $2, $9;"
-        "paddw $10, $11, $10;"
-        "paddsw $2, $2, $10;"
-        "psubsw $2, $2, $10"
-        : "+r"(r) : : "$8", "$9", "$10", "$11");
-    *dst = r;
-}
+INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/mvec", iosSwClip255Mvec);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/mvec", iosIColAddVecXYZ);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/mvec", iosIColAddVecXYZ);
+void iosIColAddVecXYZ(u32 *dst, u32 a, u32 b, u32 c, u32 d, u32 e)
+{
+    MvecU x;
+    MvecU y;
+    MvecU r;
+    u32 t;
+    x.w[0] = a;
+    t = e & 0xFFFFFF00;
+    t |= b & 0xFF;
+    t &= 0xFFFF00FF;
+    t |= (c & 0xFF) << 8;
+    t &= 0xFF00FFFF;
+    t |= (d & 0xFF) << 16;
+    y.w[0] = t | 0xFF000000;
+    asm volatile("paddub %0, %1, %2" : "=r"(r.q) : "r"(x.q), "r"(y.q));
+    *dst = r.w[0];
+}
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/mvec", iosUcharColClampAdd);
 
