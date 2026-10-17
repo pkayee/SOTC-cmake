@@ -42,6 +42,10 @@ extern u8 D_40114E20[];
 extern s32 D_40115620;
 extern s64 D_40049388;
 extern s64 D_40049390;
+extern s32 D_40114210[][0x20];
+extern s32 D_40114218[][0x20];
+extern s32 D_4011421C[][0x20];
+extern s64 D_40114230[][0x10];
 
 s64 litodp(s32);
 s64 dpdiv(s64, s64);
@@ -53,6 +57,8 @@ s64 __floatdidf(s64);
 s32 Sg2SmfpSetParam(s32 arg0, s32 arg1, s32 arg2, s32 arg3);
 
 s32 Sg2SmfpOpenSelCore(s32 arg0, s32 arg1, s32 arg2);
+s32 func_4003CE68(Sg2SmfpSlot *arg0);
+s32 Sg2ModOpenBgm(s32 arg0, s32 arg1);
 s32 Sg2SmfpStopSndOff(s32 arg0);
 s32 Sg2SmfpPause(s32 arg0, s32 arg1);
 s32 Sg2SmfpCont(s32 arg0);
@@ -163,7 +169,20 @@ s32 Sg2SmfpStopSndOff(s32 arg0)
 }
 
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/smfp", Sg2SmfpPause);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/smfp", Sg2SmfpPause);
+s32 Sg2SmfpPause(s32 arg0, s32 arg1)
+{
+ if (arg0 >= 0) {
+ if (arg1 != 0) {
+ Sg2ModSetParam(D_40114200[arg0].unk8, 0x20, 1, 0);
+ D_40114200[arg0].status = 3;
+ } else {
+ Sg2ModSetParam(D_40114200[arg0].unk8, 0x40, 1, 0);
+ D_40114200[arg0].status = 4;
+ }
+ }
+ return 0;
+}
 
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/smfp", Sg2SmfpCont);
@@ -205,7 +224,32 @@ s32 Sg2SmfpCheckSndOn(s32 arg0)
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/smfp", Sg2SmfpSetParam);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/smfp", Sg2SmfpGetParam);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/smfp", Sg2SmfpGetParam);
+s32 Sg2SmfpGetParam(s32 arg0, s32 arg1)
+{
+    s32 ret;
+
+    if (arg0 >= 0)
+    {
+    switch (arg1)
+    {
+    case 2:
+        ret = D_40114210[arg0][0];
+        break;
+    case 4:
+        ret = D_40114218[arg0][0];
+        break;
+    case 8:
+        ret = D_4011421C[arg0][0];
+        break;
+    case 512:
+        ret = dptoli(D_40114230[arg0][0]);
+        break;
+    }
+    }
+    else ret = 0;
+    return ret;
+}
 
 
 
@@ -284,7 +328,62 @@ void func_4003E2A8(Sg2SmfpSlot *arg0)
     D_40114610[D_40114E10++] = d1;
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/smfp", func_4003E338);
+void func_4003E338(Sg2SmfpSlot *arg0)
+{
+    s32 emit = 0;
+    u8 d0 = *arg0->unk60++;
+    u8 d1 = *arg0->unk60++;
+
+    switch (d0)
+    {
+    case 0x63:
+        switch (d1)
+        {
+        case 0x14:
+            arg0->unk69 = arg0->unk68;
+            arg0->unk6C = (s32)arg0->unk60;
+            break;
+        case 0x1E:
+            if (arg0->unk70 != 0x7F)
+            {
+                arg0->unk70--;
+            }
+            if (arg0->unk70 > 0)
+            {
+                arg0->unk68 = arg0->unk69;
+                arg0->unk60 = (u8 *)arg0->unk6C;
+            }
+            break;
+        default:
+            emit = 1;
+            break;
+        }
+        break;
+    case 0x66:
+        arg0->unk70 = d1;
+        break;
+    case 0x5A:
+        if (D_40114608 != 0)
+        {
+            ((void (*)(u8, s32, u8))D_40114608)(D_40114600, arg0->unk68 & 0xF, d1);
+        }
+        break;
+    default:
+        emit = 1;
+        break;
+    }
+
+    if (emit)
+    {
+        if (D_40114E14 != arg0->unk68)
+        {
+            D_40114E14 = arg0->unk68;
+            D_40114610[D_40114E10++] = arg0->unk68;
+        }
+        D_40114610[D_40114E10++] = d0;
+        D_40114610[D_40114E10++] = d1;
+    }
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/smfp", func_4003E4C8);
 void func_4003E4C8(Sg2SmfpSlot *arg0)
