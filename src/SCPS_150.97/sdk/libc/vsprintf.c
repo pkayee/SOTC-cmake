@@ -24,4 +24,18 @@ int vsprintf(char *buf, const char *fmt, va_list ap)
 
 // last function in TU has size 4 mod 8 (pad nop), so it stays asm (INFRA-PAD, kS1).
 // C draft that scored 100% in isolation: saved to decomp/notes/batches/kS3_vsprintf_r.c.txt
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libc/vsprintf", vsprintf_r);
+int vsprintf_r(struct _reent *ptr, char *buf, const char *fmt, va_list ap)
+{
+    FILE f;
+    int ret;
+
+    f._flags = 0x208;
+    f._p = (unsigned char *)buf;
+    f._w = 0x7FFFFFFF;
+    f._bf._base = (unsigned char *)buf;
+    f._bf._size = 0x7FFFFFFF;
+    f._data = ptr;
+    ret = vfprintf(&f, fmt, ap);
+    *f._p = 0;
+    return ret;
+}
