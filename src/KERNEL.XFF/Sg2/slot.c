@@ -5,14 +5,18 @@ typedef struct {
     s32 unk4;      /* 0x04 busy/refcount */
     s32 age;       /* 0x08 */
     s32 slotClass; /* 0x0C */
-    s32 vab;       /* 0x10 */
-    s32 ch;        /* 0x14 */
-    s32 unk18;     /* 0x18 */
-    s32 group;     /* 0x1C */
-    u8 pad20[4];
-    s32 note;      /* 0x24 */
-    s32 baseNote;  /* 0x28 */
-    s32 semi;      /* 0x2C */
+    struct {
+        s32 vab;   /* 0x10 */
+        s32 ch;    /* 0x14 */
+        s32 prio;  /* 0x18 */
+        s32 group; /* 0x1C */
+    } sub;
+    struct {
+        s32 tick;     /* 0x20 */
+        s32 note;     /* 0x24 */
+        s32 baseNote; /* 0x28 */
+        s32 semi;     /* 0x2C */
+    } pit;
     s32 fine;      /* 0x30 */
     s32 masTune;   /* 0x34 */
     s32 masVolL;   /* 0x38 */
@@ -173,7 +177,7 @@ s32 Sg2SlotFindVab(s32 *out, s32 vab)
     {
         if (D_401117B0[i].flags & 1)
         {
-            if (D_401117B0[i].vab == vab)
+            if (D_401117B0[i].sub.vab == vab)
             {
                 *out++ = i;
                 n++;
@@ -192,7 +196,7 @@ s32 Sg2SlotFindVabCh(s32 *out, s32 vab, s32 ch)
     {
         if (D_401117B0[i].flags & 1)
         {
-            if (D_401117B0[i].vab == vab && D_401117B0[i].ch == ch)
+            if (D_401117B0[i].sub.vab == vab && D_401117B0[i].sub.ch == ch)
             {
                 *out++ = i;
                 n++;
@@ -212,7 +216,7 @@ s32 Sg2SlotFindVabChNote(s32 *out, s32 vab, s32 ch, s32 note)
     {
         if (slot->flags & 1)
         {
-            if (slot->vab == vab && slot->ch == ch && slot->note == note)
+            if (slot->sub.vab == vab && slot->sub.ch == ch && slot->pit.note == note)
             {
                 *out++ = i;
                 n++;
@@ -232,7 +236,7 @@ s32 Sg2SlotFindVabChSsaBaseNote(s32 *out, s32 vab, s32 ch, s32 ssa, s32 baseNote
     {
         if (slot->flags & 1)
         {
-            if (slot->vab == vab && slot->ch == ch && slot->ssa == ssa && slot->baseNote == baseNote)
+            if (slot->sub.vab == vab && slot->sub.ch == ch && slot->ssa == ssa && slot->pit.baseNote == baseNote)
             {
                 *out++ = i;
                 n++;
@@ -270,7 +274,7 @@ s32 Sg2SlotFindSlotClassCh(s32 *out, s32 slotClass, s32 ch)
     {
         if (D_401117B0[i].flags & 1)
         {
-            if (D_401117B0[i].slotClass == slotClass && D_401117B0[i].ch == ch)
+            if (D_401117B0[i].slotClass == slotClass && D_401117B0[i].sub.ch == ch)
             {
                 *out++ = i;
                 n++;
@@ -290,7 +294,7 @@ s32 Sg2SlotFindSlotClassChNote(s32 *out, s32 slotClass, s32 ch, s32 note)
     {
         if (slot->flags & 1)
         {
-            if (slot->slotClass == slotClass && slot->ch == ch && slot->note == note)
+            if (slot->slotClass == slotClass && slot->sub.ch == ch && slot->pit.note == note)
             {
                 *out++ = i;
                 n++;
@@ -310,7 +314,7 @@ s32 Sg2SlotFindSlotClassChSsaBaseNote(s32 *out, s32 slotClass, s32 ch, s32 ssa, 
     {
         if (slot->flags & 1)
         {
-            if (slot->slotClass == slotClass && slot->ch == ch && slot->ssa == ssa && slot->baseNote == baseNote)
+            if (slot->slotClass == slotClass && slot->sub.ch == ch && slot->ssa == ssa && slot->pit.baseNote == baseNote)
             {
                 *out++ = i;
                 n++;
@@ -415,7 +419,20 @@ void Sg2SlotSetBendValue(s32 idx, s32 v)
     D_401117B0[idx].flags |= 0x80;
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotSetPitch);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotSetPitch);
+void Sg2SlotSetPitch(s32 idx, s32 note, s32 semi, s32 baseNote, s32 fine, s32 direct)
+{
+    s32 a, b, c, q, r, f;
+    D_401117B0[idx].pit.note = note;
+    D_401117B0[idx].pit.semi = semi;
+    D_401117B0[idx].pit.baseNote = baseNote;
+    D_401117B0[idx].fine = fine;
+    D_401117B0[idx].directPitch = direct;
+    q = semi / 12;
+    r = semi % 12;
+    f = r * 4 / 3;
+    D_401117B0[idx].flags |= 0x80;
+}
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotSetPause);
 
@@ -526,8 +543,8 @@ void Sg2SlotSetPoltamentParam(s32 idx, s32 target, f32 step)
     {
         slot->flags |= 0x200;
         slot->polCnt = 0;
-        slot->polStart = slot->note;
-        slot->polCur = slot->note;
+        slot->polStart = slot->pit.note;
+        slot->polCur = slot->pit.note;
     }
     slot->polTarget = target;
     if (target < slot->polCur)
