@@ -1,51 +1,59 @@
 #include "common.h"
 
 /* NEARMISS-STUB memcpy */
-#if 0 /* NEARMISS 8.0% cat=inline-unroll sub=- | target is 16-byte unrolled ld/sd pipeline with different alignment-test and tail branch order; ours 32-byte do-while + scalar tail; re-score 8.5% (db 8.0) | attempts=1 */
+#if 0 /* NEARMISS 82.1% cat=regalloc sub=dst0-copy-minus1-cse | EE newlib memcpy (2 quadword lq/sq big blocks, long middle, byte tail) structure identical 8->82; target copies dst0 to t0 and CSEs -1 into a0 | attempts=2 */
+/* newlib memcpy.c EE variant: UNALIGNED mask 15 (u_long128), BIGBLOCKSIZE 32 = 2 quadwords (lq/sq), LITTLEBLOCKSIZE sizeof(long)=8, int len. Needs `typedef unsigned int size_t;`. 82.1: structure identical; target keeps dst0 in t0 and CSEs the -1 loop constant into a0 (ours rematerialises li -1 in the byte loop). */
+/* newlib libc/string/memcpy.c, EE build: 128-bit (quadword) big blocks */
+#define UNALIGNED(X, Y) \
+    (((long)X & (sizeof(u_long128) - 1)) | ((long)Y & (sizeof(u_long128) - 1)))
+#define BIGBLOCKSIZE (sizeof(u_long128) << 1)
+#define LITTLEBLOCKSIZE (sizeof(long))
+#define TOO_SMALL(LEN) ((LEN) < BIGBLOCKSIZE)
 
-typedef struct
+void *memcpy(void *dst0, const void *src0, size_t len0)
 {
-    u64 lo;
-    u64 hi;
-} Chunk16;
+    char *dst = dst0;
+    const char *src = src0;
+    u_long128 *aligned_dst;
+    const u_long128 *aligned_src;
+    long *ldst;
+    const long *lsrc;
+    int len = len0;
 
-void *memcpy(void *dst, const void *src, size_t n)
-{
-    void *ret = dst;
-    u8 *d = dst;
-    const u8 *s = src;
-
-    if (n >= 0x20 && !(((u32)s | (u32)d) & 0xF))
+    /* If the size is small, or either SRC or DST is unaligned,
+       then punt into the byte copy loop.  This should be rare.  */
+    if (!TOO_SMALL(len) && !UNALIGNED(src, dst))
     {
-        Chunk16 *dc = (Chunk16 *)d;
-        const Chunk16 *sc = (const Chunk16 *)s;
+        aligned_dst = (u_long128 *)dst;
+        aligned_src = (u_long128 *)src;
 
-        do
+        /* Copy 2X quad words at a time if possible.  */
+        while (len >= BIGBLOCKSIZE)
         {
-            *dc++ = *sc++;
-            *dc++ = *sc++;
-            n -= 0x20;
-        } while (n >= 0x20);
-        d = (u8 *)dc;
-        s = (const u8 *)sc;
+            *aligned_dst++ = *aligned_src++;
+            *aligned_dst++ = *aligned_src++;
+            len -= BIGBLOCKSIZE;
+        }
+
+        /* Copy one long word at a time if possible.  */
+        ldst = (long *)aligned_dst;
+        lsrc = (const long *)aligned_src;
+        while (len >= LITTLEBLOCKSIZE)
+        {
+            *ldst++ = *lsrc++;
+            len -= LITTLEBLOCKSIZE;
+        }
+
+        /* Pick up any residual with a byte copier.  */
+        dst = (char *)ldst;
+        src = (char *)lsrc;
     }
 
-    while (n >= 8)
-    {
-        *(u64 *)d = *(const u64 *)s;
-        d += 8;
-        s += 8;
-        n -= 8;
-    }
+    while (len--)
+        *dst++ = *src++;
 
-    while (n-- != 0)
-    {
-        *d++ = *s++;
-    }
-
-    return ret;
+    return dst0;
 }
-
 #endif
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libc/memcpy", memcpy);
 
