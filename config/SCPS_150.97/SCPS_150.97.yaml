@@ -134,7 +134,7 @@ segments:
         - [0x25C90, c, sdk/libgcc/__floatdisf]
         - [0x25D78, c, sdk/libgcc/__fixunsdfdi]
         - [0x25E90, c, sdk/libgcc/__fixunssfdi]
-        - [0x25fB8, c, sdk/libgcc/__main]
+        - [0x25fB8, c, sdk/libgcc/__main, "-O2 -fno-strict-aliasing"]
         - [0x26140, c, sdk/libgcc/_sf_to_df]
         - [0x263e0, c, sdk/libgcc/_addsub_df]
         - [0x264a0, c, sdk/libgcc/_mul_df]
