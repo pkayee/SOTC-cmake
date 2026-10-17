@@ -24,6 +24,9 @@ extern VabSlot D_40115650[8];
 void Sg2SmfpVabStopSndOff(s32);
 void Sg2SepVabStopSndOff(s32);
 s32 Sg2VabHdClose(s32);
+s32 DIntr(void);
+void EIntr(void);
+s32 func_4003EBE0(VabSlot *arg0, void *arg1);
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/vab", get_vabid);
 s32 get_vabid(void)
@@ -75,11 +78,107 @@ s32 vab_get_info(s32 arg0, s32 *arg1, s32 *arg2)
     return 0;
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/vab", vab_get_seseq);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/vab", vab_get_seseq);
+s32 vab_get_seseq(s32 arg0, u32 arg1, u32 arg2)
+{
+    VabSlot *slot = &D_40115640[arg0];
+    u8 *hd;
+    u16 *c;
+    u32 v;
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/vab", vab_get_seprogchunk);
+    if (!vab_check_alive(arg0))
+    {
+        return 0;
+    }
+    hd = (u8 *)slot->sub.unk4;
+    if (!hd)
+    {
+        return 0;
+    }
+    c = *(u16 **)(hd + 0x3C);
+    if (!c)
+    {
+        return 0;
+    }
+    if (c[0] < arg1)
+    {
+        return 0;
+    }
+    v = c[1 + arg1] >> 1;
+    if (c[v] < arg2)
+    {
+        return 0;
+    }
+    return (s32)c + c[v + arg2 + 1];
+}
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/vab", vab_get_progchunk);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/vab", vab_get_seprogchunk);
+s32 vab_get_seprogchunk(s32 arg0, u32 arg1)
+{
+    VabSlot *slot = &D_40115640[arg0];
+    u8 *hd;
+    u16 *c;
+
+    if (!vab_check_alive(arg0))
+    {
+        return 0;
+    }
+    hd = (u8 *)slot->sub.unk4;
+    if (!hd)
+    {
+        return 0;
+    }
+    c = *(u16 **)(hd + 0x44);
+    if (!c)
+    {
+        return 0;
+    }
+    if ((s32)c & 1)
+    {
+        return 0;
+    }
+    if (c[0] < arg1)
+    {
+        return 0;
+    }
+    return (s32)c + c[1 + arg1];
+}
+
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/vab", vab_get_progchunk);
+s32 vab_get_progchunk(s32 arg0, u32 arg1)
+{
+    VabSlot *slot = &D_40115640[arg0];
+    u8 *hd;
+    u16 *c;
+
+    if (!vab_check_alive(arg0))
+    {
+        return 0;
+    }
+    hd = (u8 *)slot->sub.unk4;
+    if (!hd)
+    {
+        return 0;
+    }
+    c = *(u16 **)(hd + 0x30);
+    if (!c)
+    {
+        return 0;
+    }
+    if ((s32)c & 1)
+    {
+        return 0;
+    }
+    if (c[0] < arg1)
+    {
+        return 0;
+    }
+    if (c[1 + arg1] == 0xFFFF)
+    {
+        return 0;
+    }
+    return (s32)c + c[1 + arg1];
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/vab", vab_get_splitchunk);
 s32 vab_get_splitchunk(s32 arg0)
@@ -121,9 +220,44 @@ s32 vab_get_semastervol(s32 arg0)
     return D_40115650[arg0].unk0;
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/vab", Sg2VabHdOpen);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/vab", Sg2VabHdOpen);
+s32 Sg2VabHdOpen(void *arg0)
+{
+    s32 intr;
+    s32 id;
+    s32 ret;
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/vab", Sg2VabGetBdSize);
+    intr = DIntr();
+    id = get_vabid();
+    ret = (func_4003EBE0(&D_40115640[id], arg0) == -1) ? -1 : id;
+    if (intr)
+    {
+        EIntr();
+    }
+    return ret;
+}
+
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/vab", Sg2VabGetBdSize);
+s32 Sg2VabGetBdSize(s32 arg0)
+{
+    VabSlot *slot = &D_40115640[arg0];
+    s32 ret;
+
+    if (!vab_check_alive(arg0))
+    {
+        return -1;
+    }
+    ret = slot->unk0;
+    if (ret != 0)
+    {
+        ret = ((s32 *)D_40115640[arg0].sub.unk4)[1];
+    }
+    else
+    {
+        ret = -1;
+    }
+    return ret;
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/vab", Sg2VabBdOpen);
 s32 Sg2VabBdOpen(s32 arg0, s32 arg1)
