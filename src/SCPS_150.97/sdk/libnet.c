@@ -98,6 +98,11 @@ INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceSifMExitRpc);
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_00119AF8);
 
+/* NEARMISS-STUB func_00119BA0 */
+#if 0 /* NEARMISS 73.6% cat=regalloc sub=ee-gcc2.9-991111 | 73.6% best: v & -2 materialised lui/ori with different reg alloc (mask 0xFFFFFFFE); sdk segment ee-gcc2.9 -O2 -G0; attempt comment from kS10 diff | attempts=1 */
+// 73.6% best (mask 0xFFFFFFFE lui/ori reg alloc)
+void func_00119BA0(s32 *arg0) { s32 v = arg0[4]; arg0[6] = 0; arg0[4] = v & -2; }
+#endif
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_00119BA0);
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_00119BC0);
