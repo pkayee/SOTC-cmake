@@ -43,7 +43,8 @@ segments:
       subalign: 8
       align: 8
       subsegments:
-        - [ 0x608, asm, all_text ]
+        - [ 0x608, c, chunk/c0000_func_40010608 ]
+        - [ 0x3dc8, c, chunk/c0001_CreateMapWindow ]
         - { type: bss, vram: 0x40018c80, name: bss, size: 0x8 }
     - name: data
       type: data

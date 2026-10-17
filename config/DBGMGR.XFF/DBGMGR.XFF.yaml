@@ -43,7 +43,17 @@ segments:
       subalign: 8
       align: 8
       subsegments:
-        - [ 0x948, asm, all_text ]
+        - [ 0x948, c, chunk/c0000_getUserName ]
+        - [ 0x1d80, c, chunk/c0001_SnapShot ]
+        - [ 0x29b8, c, chunk/c0002_isT10000 ]
+        - [ 0x35e0, c, chunk/c0003_iosgluAddCylinderObject ]
+        - [ 0x50c8, c, chunk/c0004_iosgluAddLineCylinderObject ]
+        - [ 0x6ba8, c, chunk/c0005_func_40016BA8 ]
+        - [ 0x7c10, c, chunk/c0006_func_40017C10 ]
+        - [ 0x94f8, c, chunk/c0007_DebugDispLineCircle ]
+        - [ 0xa870, c, chunk/c0008_DebugDispQuaternion ]
+        - [ 0xbe18, c, chunk/c0009_trianglePolyColor ]
+        - [ 0xd580, c, chunk/c0010_VRAMViewer ]
         - { type: bss, vram: 0x400288c0, name: bss, size: 0x120 }
     - name: data
       type: data

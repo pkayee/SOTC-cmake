@@ -43,7 +43,15 @@ segments:
       subalign: 8
       align: 8
       subsegments:
-        - [ 0x618, asm, all_text ]
+        - [ 0x618, c, chunk/c0000_func_40010618 ]
+        - [ 0x1ef8, c, chunk/c0001_func_40011EF8 ]
+        - [ 0x37c0, c, chunk/c0002_drawPathData ]
+        - [ 0x59f8, c, chunk/c0003_deleteDataForPathTool ]
+        - [ 0x7728, c, chunk/c0004_func_40017728 ]
+        - [ 0x9028, c, chunk/c0005_func_40019028 ]
+        - [ 0xa9c0, c, chunk/c0006_func_4001A9C0 ]
+        - [ 0xc278, c, chunk/c0007_func_4001C278 ]
+        - [ 0xd6b0, c, chunk/c0008_initPathTool ]
         - { type: bss, vram: 0x4002df80, name: bss, size: 0x10fc }
     - name: data
       type: data

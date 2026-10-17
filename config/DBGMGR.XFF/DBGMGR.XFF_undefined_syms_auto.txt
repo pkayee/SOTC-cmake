@@ -1,0 +1,1 @@
+jtbl_00000CE0_text = 0xCE0;

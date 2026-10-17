@@ -43,7 +43,10 @@ segments:
       subalign: 8
       align: 8
       subsegments:
-        - [ 0x908, asm, all_text ]
+        - [ 0x908, c, chunk/c0000_createLayerMenu ]
+        - [ 0x1b50, c, chunk/c0001_create_fog_col_param_menu ]
+        - [ 0x2790, c, chunk/c0002_func_40012790 ]
+        - [ 0x3d28, c, chunk/c0003_create_global_light_param_menu ]
         - { type: bss, vram: 0x40021e00, name: bss, size: 0x780 }
     - name: data
       type: data

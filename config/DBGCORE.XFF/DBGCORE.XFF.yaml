@@ -43,7 +43,13 @@ segments:
       subalign: 8
       align: 8
       subsegments:
-        - [ 0x998, asm, all_text ]
+        - [ 0x998, c, chunk/c0000_initdebuggamecore ]
+        - [ 0x22a0, c, chunk/c0001_func_400122A0 ]
+        - [ 0x3c48, c, chunk/c0002_func_40013C48 ]
+        - [ 0x5258, c, chunk/c0003_toggleMemMonSw ]
+        - [ 0x6460, c, chunk/c0004_func_40016460 ]
+        - [ 0x8190, c, chunk/c0005_togglePerCounterSw ]
+        - [ 0x8d90, c, chunk/c0006_loadToolModule ]
         - { type: bss, vram: 0x40021300, name: bss, size: 0xb58 }
     - name: data
       type: data

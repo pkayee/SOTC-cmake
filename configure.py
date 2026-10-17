@@ -254,11 +254,13 @@ COMMENT_PART = r"\/\* (.+) ([0-9A-Z]{2})([0-9A-Z]{2})([0-9A-Z]{2})([0-9A-Z]{2}) 
 INSTRUCTION_PART = r"(\b(bne|bnel|beq|beql|bnez|bnezl|beqzl|bgez|bgezl|bgtz|bgtzl|blez|blezl|bltz|bltzl|b)\b.*)"
 OPCODE_PATTERN = re.compile(f"{COMMENT_PART}  {INSTRUCTION_PART}")
 
-# Phase 2 (v4): a branch whose operand is a `func_XXXXXXXX` label (splat made a function out of a branch target that
-# follows a `jr ra`) is left unresolved by `as` (global symbol -> PC16 reloc survives `ld -r`, bytes stay 0xFFFF).
-# Same fix as above, computed instead of listed: embed the opcode for every such branch, in every module.
-FUNC_BRANCH_PART = r"(\b(bne|bnel|beq|beql|bnez|bnezl|beqz|beqzl|bgez|bgezl|bgtz|bgtzl|blez|blezl|bltz|bltzl|b|bc1f|bc1t|bc1fl|bc1tl)\b[^\n]*\bfunc_[0-9A-F]+)"
-FUNC_BRANCH_PATTERN = re.compile(f"{COMMENT_PART}  {FUNC_BRANCH_PART}")
+# Phase 2 (v4): a branch whose target is not a local `.L` label of the same .s file is left unresolved by `as` (a global symbol such as a
+# splat `func_XXXXXXXX` false function start keeps a PC16 reloc through `ld -r`, bytes stay 0xFFFF; a `.L` label that lives in another
+# function's file cannot be represented at all). Same fix as below, computed instead of listed: embed the opcode as `.word` for every such
+# branch, in every module (a no-op where every branch is local, as in KERNEL and the loader).
+BRANCH_MNEMS = r"(?:bne|bnel|beq|beql|bnez|bnezl|beqz|beqzl|bgez|bgezl|bgtz|bgtzl|blez|blezl|bltz|bltzl|b|bc1f|bc1t|bc1fl|bc1tl)"
+FUNC_BRANCH_PATTERN = re.compile(f"{COMMENT_PART}  (\\b({BRANCH_MNEMS})\\b[^\\n]*?[ ,]([A-Za-z_.$][\\w.$]*))[ \\t]*$", re.M)
+LOCAL_LABEL = re.compile(r"^\s*(?:glabel\s+)?(\.L\w+):?[ \t]*$", re.M)
 
 PROBLEMATIC_FUNCS = set(
     [
@@ -279,26 +281,36 @@ def replace_instructions_with_opcodes(asm_folder: Path) -> None:
             continue
 
         named = p.stem in PROBLEMATIC_FUNCS and "nonmatchings" in p.parts
-        pattern = OPCODE_PATTERN if named else FUNC_BRANCH_PATTERN
 
         with p.open("r") as file:
             content = file.read()
 
-        if "func_" not in content and not named:
-            continue
-
-        if re.search(pattern, content):
+        if named:
+            if not re.search(OPCODE_PATTERN, content):
+                continue
             # Reference found
             # Embed the opcode, we have to swap byte order for correct endianness
             content = re.sub(
-                pattern,
+                OPCODE_PATTERN,
                 r"/* \1 \2\3\4\5 */  .word      0x\5\4\3\2 /* \6 */",
                 content,
             )
+        else:
+            local = set(LOCAL_LABEL.findall(content))
 
-            # Write the updated content back to the file
-            with p.open("w") as file:
-                file.write(content)
+            def fix(m):
+                if m.group(8) in local:
+                    return m.group(0)
+                return f"/* {m.group(1)} {m.group(2)}{m.group(3)}{m.group(4)}{m.group(5)} */  .word      0x{m.group(5)}{m.group(4)}{m.group(3)}{m.group(2)} /* {m.group(6)} */"
+
+            new = FUNC_BRANCH_PATTERN.sub(fix, content)
+            if new == content:
+                continue
+            content = new
+
+        # Write the updated content back to the file
+        with p.open("w") as file:
+            file.write(content)
 
 
 # alias -> module (file name under iso/ and config/). Order = build order. swarm/bin/modules parses this dict, keep the layout.
