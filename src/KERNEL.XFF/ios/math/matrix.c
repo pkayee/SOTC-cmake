@@ -1,6 +1,9 @@
 #include "common.h"
 
 void func_4001D5E0(s32, void *, void *);
+void iosGetAlignSinCosf(f32 *arg0, f32 arg1);
+void iosGetSinCosf(f32 *out, f32 x);
+extern u8 UnitMatrix[];
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/matrix", func_4001D5E0);
 
@@ -97,17 +100,258 @@ void iosClearTransCurrentMatrix(void)
         : : : "memory");
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/matrix", iosGetRotXVector);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/matrix", iosGetRotXVector);
+void iosGetRotXVector(f32 angle, void *dst, void *src)
+{
+    f32 m[16] __attribute__((aligned(16)));
+    f32 sc[2];
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/matrix", iosGetRotYVector);
+    iosGetSinCosf(sc, angle);
+    asm volatile(
+        "vmove.xyzw $vf17, $vf0;"
+        "vmr32.xyzw $vf16, $vf17;"
+        "vmr32.xyzw $vf15, $vf16;"
+        "vmr32.xyzw $vf14, $vf15;"
+        "lwc1 $f1, %0;"
+        "lwc1 $f0, %3;"
+        "mfc1 $8, $f1;"
+        "mfc1 $9, $f0;"
+        "qmtc2.ni $8, $vf5;"
+        "qmtc2.ni $9, $vf6;"
+        "vaddx.y $vf15, $vf0, $vf5x;"
+        "vsubx.y $vf16, $vf0, $vf6x;"
+        "vaddx.z $vf15, $vf0, $vf6x;"
+        "vaddx.z $vf16, $vf0, $vf5x;"
+        "sqc2 $vf14, %4;"
+        "sqc2 $vf15, %5;"
+        "sqc2 $vf16, %6;"
+        "sqc2 $vf17, %7;"
+        "lqc2 $vf8, 0(%2);"
+        "lqc2 $vf14, %4;"
+        "lqc2 $vf15, %5;"
+        "lqc2 $vf16, %6;"
+        "lqc2 $vf17, %7;"
+        "vmulax.xyzw ACC, $vf14, $vf8x;"
+        "vmadday.xyzw ACC, $vf15, $vf8y;"
+        "vmaddaz.xyzw ACC, $vf16, $vf8z;"
+        "vmaddw.xyzw $vf10, $vf17, $vf8w;"
+        "sqc2 $vf10, 0(%1)"
+        : : "m"(sc[0]), "r"(dst), "r"(src), "m"(sc[1]), "m"(m[0]), "m"(m[4]), "m"(m[8]), "m"(m[12]) : "$8", "$9", "$f0", "$f1", "memory");
+}
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/matrix", iosRotCurrentMatrixX);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/matrix", iosGetRotYVector);
+void iosGetRotYVector(f32 angle, void *dst, void *src)
+{
+    f32 m[16] __attribute__((aligned(16)));
+    f32 sc[2];
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/matrix", iosRotCurrentMatrixY);
+    iosGetSinCosf(sc, angle);
+    asm volatile(
+        "vmove.xyzw $vf17, $vf0;"
+        "vmr32.xyzw $vf16, $vf17;"
+        "vmr32.xyzw $vf15, $vf16;"
+        "vmr32.xyzw $vf14, $vf15;"
+        "lwc1 $f1, %0;"
+        "lwc1 $f0, %3;"
+        "mfc1 $8, $f1;"
+        "mfc1 $9, $f0;"
+        "qmtc2.ni $8, $vf5;"
+        "qmtc2.ni $9, $vf6;"
+        "vaddx.x $vf14, $vf0, $vf5x;"
+        "vaddx.x $vf16, $vf0, $vf6x;"
+        "vsubx.z $vf14, $vf0, $vf6x;"
+        "vaddx.z $vf16, $vf0, $vf5x;"
+        "sqc2 $vf14, %4;"
+        "sqc2 $vf15, %5;"
+        "sqc2 $vf16, %6;"
+        "sqc2 $vf17, %7;"
+        "lqc2 $vf8, 0(%2);"
+        "lqc2 $vf14, %4;"
+        "lqc2 $vf15, %5;"
+        "lqc2 $vf16, %6;"
+        "lqc2 $vf17, %7;"
+        "vmulax.xyzw ACC, $vf14, $vf8x;"
+        "vmadday.xyzw ACC, $vf15, $vf8y;"
+        "vmaddaz.xyzw ACC, $vf16, $vf8z;"
+        "vmaddw.xyzw $vf10, $vf17, $vf8w;"
+        "sqc2 $vf10, 0(%1)"
+        : : "m"(sc[0]), "r"(dst), "r"(src), "m"(sc[1]), "m"(m[0]), "m"(m[4]), "m"(m[8]), "m"(m[12]) : "$8", "$9", "$f0", "$f1", "memory");
+}
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/matrix", iosRotCurrentMatrixZ);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/matrix", iosRotCurrentMatrixX);
+void iosRotCurrentMatrixX(f32 angle)
+{
+    f32 sc[2];
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/matrix", iosScaleCurrentMatrix);
+    iosGetSinCosf(sc, angle);
+    asm volatile(
+        "vmove.xyzw $vf17, $vf0;"
+        "vmr32.xyzw $vf16, $vf17;"
+        "vmr32.xyzw $vf15, $vf16;"
+        "vmr32.xyzw $vf14, $vf15;"
+        "lwc1 $f1, 0(%0);"
+        "lwc1 $f0, 4(%0);"
+        "mfc1 $8, $f1;"
+        "mfc1 $9, $f0;"
+        "qmtc2.ni $8, $vf5;"
+        "qmtc2.ni $9, $vf6;"
+        "vaddx.y $vf15, $vf0, $vf5x;"
+        "vsubx.y $vf16, $vf0, $vf6x;"
+        "vaddx.z $vf15, $vf0, $vf6x;"
+        "vaddx.z $vf16, $vf0, $vf5x;"
+        "vmulax.xyzw ACC, $vf1, $vf14x;"
+        "vmadday.xyzw ACC, $vf2, $vf14y;"
+        "vmaddaz.xyzw ACC, $vf3, $vf14z;"
+        "vmaddw.xyzw $vf14, $vf4, $vf14w;"
+        "vmulax.xyzw ACC, $vf1, $vf15x;"
+        "vmadday.xyzw ACC, $vf2, $vf15y;"
+        "vmaddaz.xyzw ACC, $vf3, $vf15z;"
+        "vmaddw.xyzw $vf15, $vf4, $vf15w;"
+        "vmulax.xyzw ACC, $vf1, $vf16x;"
+        "vmadday.xyzw ACC, $vf2, $vf16y;"
+        "vmaddaz.xyzw ACC, $vf3, $vf16z;"
+        "vmaddw.xyzw $vf16, $vf4, $vf16w;"
+        "vmulax.xyzw ACC, $vf1, $vf17x;"
+        "vmadday.xyzw ACC, $vf2, $vf17y;"
+        "vmaddaz.xyzw ACC, $vf3, $vf17z;"
+        "vmaddw.xyzw $vf17, $vf4, $vf17w;"
+        "vmove.xyzw $vf1, $vf14;"
+        "vmove.xyzw $vf2, $vf15;"
+        "vmove.xyzw $vf3, $vf16;"
+        "vmove.xyzw $vf4, $vf17"
+        : : "r"(sc) : "$8", "$9", "$f0", "$f1", "memory");
+}
+
+
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/matrix", iosRotCurrentMatrixY);
+void iosRotCurrentMatrixY(f32 angle)
+{
+    f32 sc[2];
+
+    iosGetSinCosf(sc, angle);
+    asm volatile(
+        "vmove.xyzw $vf17, $vf0;"
+        "vmr32.xyzw $vf16, $vf17;"
+        "vmr32.xyzw $vf15, $vf16;"
+        "vmr32.xyzw $vf14, $vf15;"
+        "lwc1 $f1, 0(%0);"
+        "lwc1 $f0, 4(%0);"
+        "mfc1 $8, $f1;"
+        "mfc1 $9, $f0;"
+        "qmtc2.ni $8, $vf5;"
+        "qmtc2.ni $9, $vf6;"
+        "vaddx.x $vf14, $vf0, $vf5x;"
+        "vaddx.x $vf16, $vf0, $vf6x;"
+        "vsubx.z $vf14, $vf0, $vf6x;"
+        "vaddx.z $vf16, $vf0, $vf5x;"
+        "vmulax.xyzw ACC, $vf1, $vf14x;"
+        "vmadday.xyzw ACC, $vf2, $vf14y;"
+        "vmaddaz.xyzw ACC, $vf3, $vf14z;"
+        "vmaddw.xyzw $vf14, $vf4, $vf14w;"
+        "vmulax.xyzw ACC, $vf1, $vf15x;"
+        "vmadday.xyzw ACC, $vf2, $vf15y;"
+        "vmaddaz.xyzw ACC, $vf3, $vf15z;"
+        "vmaddw.xyzw $vf15, $vf4, $vf15w;"
+        "vmulax.xyzw ACC, $vf1, $vf16x;"
+        "vmadday.xyzw ACC, $vf2, $vf16y;"
+        "vmaddaz.xyzw ACC, $vf3, $vf16z;"
+        "vmaddw.xyzw $vf16, $vf4, $vf16w;"
+        "vmulax.xyzw ACC, $vf1, $vf17x;"
+        "vmadday.xyzw ACC, $vf2, $vf17y;"
+        "vmaddaz.xyzw ACC, $vf3, $vf17z;"
+        "vmaddw.xyzw $vf17, $vf4, $vf17w;"
+        "vmove.xyzw $vf1, $vf14;"
+        "vmove.xyzw $vf2, $vf15;"
+        "vmove.xyzw $vf3, $vf16;"
+        "vmove.xyzw $vf4, $vf17"
+        : : "r"(sc) : "$8", "$9", "$f0", "$f1", "memory");
+}
+
+
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/matrix", iosRotCurrentMatrixZ);
+void iosRotCurrentMatrixZ(f32 angle)
+{
+    f32 sc[2];
+
+    iosGetSinCosf(sc, angle);
+    asm volatile(
+        "vmove.xyzw $vf17, $vf0;"
+        "vmr32.xyzw $vf16, $vf17;"
+        "vmr32.xyzw $vf15, $vf16;"
+        "vmr32.xyzw $vf14, $vf15;"
+        "lwc1 $f1, 0(%0);"
+        "lwc1 $f0, 4(%0);"
+        "mfc1 $8, $f1;"
+        "mfc1 $9, $f0;"
+        "qmtc2.ni $8, $vf5;"
+        "qmtc2.ni $9, $vf6;"
+        "vaddx.x $vf14, $vf0, $vf5x;"
+        "vsubx.x $vf15, $vf0, $vf6x;"
+        "vaddx.y $vf14, $vf0, $vf6x;"
+        "vaddx.y $vf15, $vf0, $vf5x;"
+        "vmulax.xyzw ACC, $vf1, $vf14x;"
+        "vmadday.xyzw ACC, $vf2, $vf14y;"
+        "vmaddaz.xyzw ACC, $vf3, $vf14z;"
+        "vmaddw.xyzw $vf14, $vf4, $vf14w;"
+        "vmulax.xyzw ACC, $vf1, $vf15x;"
+        "vmadday.xyzw ACC, $vf2, $vf15y;"
+        "vmaddaz.xyzw ACC, $vf3, $vf15z;"
+        "vmaddw.xyzw $vf15, $vf4, $vf15w;"
+        "vmulax.xyzw ACC, $vf1, $vf16x;"
+        "vmadday.xyzw ACC, $vf2, $vf16y;"
+        "vmaddaz.xyzw ACC, $vf3, $vf16z;"
+        "vmaddw.xyzw $vf16, $vf4, $vf16w;"
+        "vmulax.xyzw ACC, $vf1, $vf17x;"
+        "vmadday.xyzw ACC, $vf2, $vf17y;"
+        "vmaddaz.xyzw ACC, $vf3, $vf17z;"
+        "vmaddw.xyzw $vf17, $vf4, $vf17w;"
+        "vmove.xyzw $vf1, $vf14;"
+        "vmove.xyzw $vf2, $vf15;"
+        "vmove.xyzw $vf3, $vf16;"
+        "vmove.xyzw $vf4, $vf17"
+        : : "r"(sc) : "$8", "$9", "$f0", "$f1", "memory");
+}
+
+
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/matrix", iosScaleCurrentMatrix);
+void iosScaleCurrentMatrix(f32 sx, f32 sy, f32 sz)
+{
+    asm volatile(
+        "vmove.xyzw $vf17, $vf0;"
+        "vmr32.xyzw $vf16, $vf17;"
+        "vmr32.xyzw $vf15, $vf16;"
+        "vmr32.xyzw $vf14, $vf15;"
+        "mfc1 $6, $f12;"
+        "mfc1 $7, $f13;"
+        "mfc1 $8, $f14;"
+        "qmtc2.ni $6, $vf5;"
+        "qmtc2.ni $7, $vf6;"
+        "qmtc2.ni $8, $vf7;"
+        "vaddx.x $vf14, $vf0, $vf5x;"
+        "vaddx.y $vf15, $vf0, $vf6x;"
+        "vaddx.z $vf16, $vf0, $vf7x;"
+        "vmulax.xyzw ACC, $vf1, $vf14x;"
+        "vmadday.xyzw ACC, $vf2, $vf14y;"
+        "vmaddaz.xyzw ACC, $vf3, $vf14z;"
+        "vmaddw.xyzw $vf14, $vf4, $vf14w;"
+        "vmulax.xyzw ACC, $vf1, $vf15x;"
+        "vmadday.xyzw ACC, $vf2, $vf15y;"
+        "vmaddaz.xyzw ACC, $vf3, $vf15z;"
+        "vmaddw.xyzw $vf15, $vf4, $vf15w;"
+        "vmulax.xyzw ACC, $vf1, $vf16x;"
+        "vmadday.xyzw ACC, $vf2, $vf16y;"
+        "vmaddaz.xyzw ACC, $vf3, $vf16z;"
+        "vmaddw.xyzw $vf16, $vf4, $vf16w;"
+        "vmulax.xyzw ACC, $vf1, $vf17x;"
+        "vmadday.xyzw ACC, $vf2, $vf17y;"
+        "vmaddaz.xyzw ACC, $vf3, $vf17z;"
+        "vmaddw.xyzw $vf17, $vf4, $vf17w;"
+        "vmove.xyzw $vf1, $vf14;"
+        "vmove.xyzw $vf2, $vf15;"
+        "vmove.xyzw $vf3, $vf16;"
+        "vmove.xyzw $vf4, $vf17"
+        : : : "$6", "$7", "$8", "memory");
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/matrix", iosGetCurrentMatrix);
 void iosGetCurrentMatrix(void *dst)
@@ -139,7 +383,36 @@ void iosSetCurrentMatrix(void *src)
         : : "r"(src) : "memory");
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/matrix", iosMulCurrentMatrixR);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/matrix", iosMulCurrentMatrixR);
+void iosMulCurrentMatrixR(void *src)
+{
+    asm volatile(
+        "lqc2 $vf14, 0(%0);"
+        "lqc2 $vf15, 16(%0);"
+        "lqc2 $vf16, 32(%0);"
+        "lqc2 $vf17, 48(%0);"
+        "vmulax.xyzw ACC, $vf1, $vf14x;"
+        "vmadday.xyzw ACC, $vf2, $vf14y;"
+        "vmaddaz.xyzw ACC, $vf3, $vf14z;"
+        "vmaddw.xyzw $vf14, $vf4, $vf14w;"
+        "vmulax.xyzw ACC, $vf1, $vf15x;"
+        "vmadday.xyzw ACC, $vf2, $vf15y;"
+        "vmaddaz.xyzw ACC, $vf3, $vf15z;"
+        "vmaddw.xyzw $vf15, $vf4, $vf15w;"
+        "vmulax.xyzw ACC, $vf1, $vf16x;"
+        "vmadday.xyzw ACC, $vf2, $vf16y;"
+        "vmaddaz.xyzw ACC, $vf3, $vf16z;"
+        "vmaddw.xyzw $vf16, $vf4, $vf16w;"
+        "vmulax.xyzw ACC, $vf1, $vf17x;"
+        "vmadday.xyzw ACC, $vf2, $vf17y;"
+        "vmaddaz.xyzw ACC, $vf3, $vf17z;"
+        "vmaddw.xyzw $vf17, $vf4, $vf17w;"
+        "vmove.xyzw $vf1, $vf14;"
+        "vmove.xyzw $vf2, $vf15;"
+        "vmove.xyzw $vf3, $vf16;"
+        "vmove.xyzw $vf4, $vf17"
+        : : "r"(src) : "memory");
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/matrix", iosMulCurrentMatrixL);
 void iosMulCurrentMatrixL(void *src)
@@ -371,7 +644,38 @@ void iosTransposeMatrix(void *dst, void *src)
         : "$8", "$9", "$10", "$11", "$12", "$13", "$14", "$15", "memory");
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/matrix", iosInverseMatrix);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/matrix", iosInverseMatrix);
+void iosInverseMatrix(void *dst, void *src)
+{
+    asm volatile(
+        "lq $8, 0x0(%1);"
+        "lq $9, 0x10(%1);"
+        "lq $10, 0x20(%1);"
+        "lqc2 $vf1, 0x30(%1);"
+        "vmove.xyzw $vf2, $vf1;"
+        "vsub.xyz $vf1, $vf1, $vf1;"
+        "vmove.xyzw $vf9, $vf1;"
+        "qmfc2.ni $11, $vf1;"
+        "pextlw $12, $9, $8;"
+        "pextuw $13, $9, $8;"
+        "pextlw $14, $11, $10;"
+        "pextuw $15, $11, $10;"
+        "pcpyld $8, $14, $12;"
+        "pcpyud $9, $12, $14;"
+        "pcpyld $10, $15, $13;"
+        "qmtc2.ni $8, $vf3;"
+        "qmtc2.ni $9, $vf4;"
+        "qmtc2.ni $10, $vf8;"
+        "vmulax.xyz ACC, $vf3, $vf2x;"
+        "vmadday.xyz ACC, $vf4, $vf2y;"
+        "vmaddz.xyz $vf1, $vf8, $vf2z;"
+        "vsub.xyz $vf1, $vf9, $vf1;"
+        "sq $8, 0x0(%0);"
+        "sq $9, 0x10(%0);"
+        "sq $10, 0x20(%0);"
+        "sqc2 $vf1, 0x30(%0)"
+        : : "r"(dst), "r"(src) : "$8", "$9", "$10", "$11", "$12", "$13", "$14", "$15", "memory");
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/matrix", iosInverseMatrixPerfect);
 void iosInverseMatrixPerfect(void *dst, void *src)
@@ -472,7 +776,39 @@ void iosTransMatrix(void *dst, void *src, void *trans)
         : "+r"(dst) : "r"(src), "r"(trans) : "$6", "$7", "$8", "$9", "memory");
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/matrix", iosTransMatrixF);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/matrix", iosTransMatrixF);
+void iosTransMatrixF(void *dst, void *src, f32 x, f32 y, f32 z)
+{
+    f32 t[4];
+    f32 *p = t;
+
+    t[0] = x;
+    t[1] = y;
+    t[2] = z;
+    t[3] = 1.0f;
+
+    asm volatile(
+        "lq $9, 0x30(%1);"
+        "sq $9, 0x30(%0);"
+        "lq $8, 0x20(%1);"
+        "sq $8, 0x20(%0);"
+        "lq $7, 0x10(%1);"
+        "sq $7, 0x10(%0);"
+        "lq $6, 0x0(%1);"
+        "sq $6, 0x0(%0);"
+        "addiu %0, %0, 0x30;"
+        "lqc2 $vf8, 0(%2);"
+        "lqc2 $vf14, 0(%1);"
+        "lqc2 $vf15, 16(%1);"
+        "lqc2 $vf16, 32(%1);"
+        "lqc2 $vf17, 48(%1);"
+        "vmulax.xyzw ACC, $vf14, $vf8x;"
+        "vmadday.xyzw ACC, $vf15, $vf8y;"
+        "vmaddaz.xyzw ACC, $vf16, $vf8z;"
+        "vmaddw.xyzw $vf10, $vf17, $vf8w;"
+        "sqc2 $vf10, 0(%0)"
+        : "+r"(dst), "+r"(src), "+r"(p) : : "$6", "$7", "$8", "$9", "memory");
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/matrix", iosScaleMatrix);
 void iosScaleMatrix(void *dst, f32 sx, f32 sy, f32 sz)
@@ -496,11 +832,74 @@ void iosScaleMatrix(void *dst, f32 sx, f32 sy, f32 sz)
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/matrix", iosMulRotMatrixXInt16);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/matrix", iosRotMatrixX);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/matrix", iosRotMatrixX);
+void iosRotMatrixX(void *dst, f32 angle)
+{
+    f32 sp[2];
+    f32 *m = dst;
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/matrix", iosRotMatrixY);
+    iosGetAlignSinCosf(sp, angle);
+    asm volatile(
+        "lq $9, 0x30(%1);"
+        "sq $9, 0x30(%0);"
+        "lq $8, 0x20(%1);"
+        "sq $8, 0x20(%0);"
+        "lq $7, 0x10(%1);"
+        "sq $7, 0x10(%0);"
+        "lq $6, 0x0(%1);"
+        "sq $6, 0x0(%0)"
+        : : "r"(dst), "r"(UnitMatrix) : "$6", "$7", "$8", "$9", "memory");
+    m[5] = sp[1];
+    m[6] = sp[0];
+    m[9] = -sp[0];
+    m[10] = sp[1];
+}
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/matrix", iosRotMatrixZ);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/matrix", iosRotMatrixY);
+void iosRotMatrixY(void *dst, f32 angle)
+{
+    f32 sp[2];
+    f32 *m = dst;
+
+    iosGetAlignSinCosf(sp, angle);
+    asm volatile(
+        "lq $9, 0x30(%1);"
+        "sq $9, 0x30(%0);"
+        "lq $8, 0x20(%1);"
+        "sq $8, 0x20(%0);"
+        "lq $7, 0x10(%1);"
+        "sq $7, 0x10(%0);"
+        "lq $6, 0x0(%1);"
+        "sq $6, 0x0(%0)"
+        : : "r"(dst), "r"(UnitMatrix) : "$6", "$7", "$8", "$9", "memory");
+    m[0] = sp[1];
+    m[2] = -sp[0];
+    m[8] = sp[0];
+    m[10] = sp[1];
+}
+
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/matrix", iosRotMatrixZ);
+void iosRotMatrixZ(void *dst, f32 angle)
+{
+    f32 sp[2];
+    f32 *m = dst;
+
+    iosGetAlignSinCosf(sp, angle);
+    asm volatile(
+        "lq $9, 0x30(%1);"
+        "sq $9, 0x30(%0);"
+        "lq $8, 0x20(%1);"
+        "sq $8, 0x20(%0);"
+        "lq $7, 0x10(%1);"
+        "sq $7, 0x10(%0);"
+        "lq $6, 0x0(%1);"
+        "sq $6, 0x0(%0)"
+        : : "r"(dst), "r"(UnitMatrix) : "$6", "$7", "$8", "$9", "memory");
+    m[0] = sp[1];
+    m[1] = sp[0];
+    m[4] = -sp[0];
+    m[5] = sp[1];
+}
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/matrix", iosDumpMatrix);
 
