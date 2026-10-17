@@ -68,7 +68,34 @@ static inline s32 iosMcErrConv(u16 code)
     return ret;
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/mc", iosMcInit);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/mc", iosMcInit);
+void iosMcInit(void)
+{
+    s32 i;
+    u8* buf;
+    McSlot* slot;
+
+    for (i = 1; i >= 0; i--)
+    {
+        D_4007CE80[i].socket = -1;
+    }
+    iosLoaderResetEntry(func_400167B0);
+    if (sceMc2Init(0) != 0)
+    {
+        LoaderSysPrintf(D_40046BF0);
+    }
+    for (i = 0; i < 2; i++)
+    {
+        slot = &D_4007CE80[i];
+        buf = D_4007CC80 + i * 0x100;
+        slot->unk0 = buf;
+        slot->unk8 = 2;
+        slot->unkC = (i == 0) ? 2 : 3;
+        slot->unk10 = 0;
+        slot->socket = sceMc2CreateSocket(&slot->unk8, buf);
+        sceMc2Sync(0, 0);
+    }
+}
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/mc", iosMcGetInfo);
 
