@@ -54,6 +54,20 @@ extern struct unkstrc {
     s32 unk10, unk14, unk18, unk1C;
 } *D_40045AF4;
 extern s32 D_40045AF8;
+extern void iosFTOI4Vector(s32 *dst, f32 *src);
+
+static inline void gsRegI(s64 addr, s64 data)
+{
+    if (D_40045AF4->unk1C == 0)
+    {
+        *(D_40045AF4->unkC++) = data;
+        *(D_40045AF4->unkC++) = addr;
+    }
+}
+#define GSREG(addr, data) gsRegI((addr), (data))
+#define GSVERT(x, y) (((u64)((x) + 0x8000) | ((u64)((y) + 0x8000) << 16)) | 0xFFFFFFFF00000000ULL)
+#define GSVERTZ(x, y, z) (((u64)((x) + 0x8000) | ((u64)((y) + 0x8000) << 16)) | ((u64)(z) << 32))
+#define GSRGBAQ(c) ((u64)(c)[0] | ((u64)(c)[1] << 8) | ((u64)(c)[2] << 16) | ((u64)(c)[3] << 24) | 0x3F80000000000000LL)
 
 
 // .bss
@@ -491,13 +505,85 @@ void gsReglistEnd(s32 prim)
     D_40045AF4->unkC = 0;
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gp", gsBox);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gp", gsBox);
+void gsBox(f32 *rect, s32 *fill, s32 *line)
+{
+    s32 xy[4] __attribute__((aligned(16)));
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gp", gsBox2);
+    gsRegBegin();
+    iosFTOI4Vector(xy, rect);
+    GSREG(0, 0x4E);
+    GSREG(1, GSRGBAQ(fill));
+    GSREG(4, GSVERT(xy[0], xy[1]));
+    GSREG(4, GSVERT(xy[2], xy[3]));
+    GSREG(0, (line[3] == 0x80) ? 0xCA : 0x4A);
+    GSREG(1, GSRGBAQ(line));
+    GSREG(4, GSVERT(xy[0], xy[1]));
+    GSREG(4, GSVERT(xy[0], xy[3]));
+    GSREG(4, GSVERT(xy[2], xy[3]));
+    GSREG(4, GSVERT(xy[2], xy[1]));
+    GSREG(4, GSVERT(xy[0], xy[1]));
+    gsRegEnd();
+}
+
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gp", gsBox2);
+void gsBox2(f32 *rect, s32 *fill, s32 *line, s32 w)
+{
+    s32 xy[4] __attribute__((aligned(16)));
+
+    gsRegBegin();
+    iosFTOI4Vector(xy, rect);
+    GSREG(0, 0x4E);
+    GSREG(1, GSRGBAQ(fill));
+    GSREG(4, GSVERT(xy[0], xy[1]));
+    GSREG(4, GSVERT(xy[2], xy[3]));
+    GSREG(0, (line[3] == 0x80) ? 0xC9 : 0x49);
+    GSREG(1, GSRGBAQ(line));
+    GSREG(4, GSVERT(xy[0], xy[1] - w));
+    GSREG(4, GSVERT(xy[0], xy[3] + w));
+    GSREG(4, GSVERT(xy[0] - w, xy[3]));
+    GSREG(4, GSVERT(xy[2] + w, xy[3]));
+    GSREG(4, GSVERT(xy[2], xy[3] + w));
+    GSREG(4, GSVERT(xy[2], xy[1] - w));
+    GSREG(4, GSVERT(xy[2] + w, xy[1]));
+    GSREG(4, GSVERT(xy[0] - w, xy[1]));
+    gsRegEnd();
+}
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gp", gsBoxLine);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gp", spriteNoTexFast);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gp", spriteNoTexFast);
+void spriteNoTexFast(s32 x, s32 y, s32 w, s32 h, s32 z, s32 *rgba, s32 abe)
+{
+    if (D_40045AF8 == 0)
+    {
+        GSREG(0, (abe << 6) | 6);
+        GSREG(1, GSRGBAQ(rgba));
+        GSREG(4, GSVERTZ(x, y, z));
+        GSREG(4, GSVERTZ(x + w, y + h, z));
+    }
+    else
+    {
+        s32 tile = 64;
+        s32 pw = w >> 4;
+        s32 ph = h >> 4;
+        s32 rem = (pw % tile) != 0;
+        s32 cols;
+        s32 i;
+        u32 zz = z;
+
+        GSREG(1, GSRGBAQ(rgba));
+        GSREG(0, (abe << 6) | 6);
+        cols = (w >> 10) + rem;
+        for (i = 0; i < cols; i++)
+        {
+            GSREG(0x40, (u64)(i * tile) | ((u64)((i + 1) * tile - 1) << 16) | ((u64)(ph - 1) << 48));
+            GSREG(4, GSVERTZ(x, y, zz));
+            GSREG(4, GSVERTZ(x + w, y + h, zz));
+        }
+        GSREG(0x40, ((u64)(pw - 1) << 16) | ((u64)(ph - 1) << 48));
+    }
+}
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gp", spriteTexFast);
 
