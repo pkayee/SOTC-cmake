@@ -54,11 +54,29 @@ s32 getDrawScreenHeight(void)
     return D_40092BDC;
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", getFrameBufferSize);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", getFrameBufferSize);
+s32 getFrameBufferSize(void)
+{
+    s32 *p = (s32 *)&D_40092BD0;
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", getFrameBufferSizeFBP);
+    return (p[0] * p[1]) + (p[2] * p[3]) * 2;
+}
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", getFrameBufferSizeTBP);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", getFrameBufferSizeFBP);
+s32 getFrameBufferSizeFBP(void)
+{
+    s32 *p = (s32 *)&D_40092BD0;
+
+    return ((p[0] * p[1]) + (p[2] * p[3]) * 2) >> 11;
+}
+
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", getFrameBufferSizeTBP);
+s32 getFrameBufferSizeTBP(void)
+{
+    s32 *p = (s32 *)&D_40092BD0;
+
+    return ((p[0] * p[1]) + (p[2] * p[3]) * 2) >> 6;
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", getDispBufferAddressTBP);
 s32 getDispBufferAddressTBP(void)
@@ -72,11 +90,29 @@ s32 getDispBufferAddressFBP(void)
     return 0;
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", getDrawBufferAddressTBP);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", getDrawBufferAddressTBP);
+s32 getDrawBufferAddressTBP(void)
+{
+    s32 *p = (s32 *)&D_40092BD0;
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", getDrawBufferAddressFBP);
+    return ((p[0] * p[1]) >> 6) + ((p[2] * p[3]) >> 6);
+}
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", getZBufferAddressTBP);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", getDrawBufferAddressFBP);
+s32 getDrawBufferAddressFBP(void)
+{
+    s32 *p = (s32 *)&D_40092BD0;
+
+    return ((p[0] * p[1]) >> 11) + ((p[2] * p[3]) >> 11);
+}
+
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", getZBufferAddressTBP);
+s32 getZBufferAddressTBP(void)
+{
+    s32 *p = (s32 *)&D_40092BD0;
+
+    return (p[0] * p[1]) >> 6;
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", getZBufferAddressFBP);
 s32 getZBufferAddressFBP(void)
@@ -86,9 +122,25 @@ s32 getZBufferAddressFBP(void)
     return (p[0] * p[1]) >> 11;
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", getTextureAreaAddressTBP);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", getTextureAreaAddressTBP);
+s32 getTextureAreaAddressTBP(void)
+{
+    s32 *p = (s32 *)&D_40092BD0;
+    s32 t = (p[0] * p[1]) >> 6;
+    s32 u = (p[2] * p[3]) >> 6;
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", getTextureAreaAddressFBP);
+    return t + u + u;
+}
+
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", getTextureAreaAddressFBP);
+s32 getTextureAreaAddressFBP(void)
+{
+    s32 *p = (s32 *)&D_40092BD0;
+    s32 t = (p[0] * p[1]) >> 11;
+    s32 u = (p[2] * p[3]) >> 11;
+
+    return t + u + u;
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", getScreenOffsetX);
 s32 *getScreenOffsetX(void)
