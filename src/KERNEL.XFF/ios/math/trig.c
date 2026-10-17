@@ -64,41 +64,7 @@ void func_40023498(f32 *arg0)
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/trig", iosGetSinf);
 
-//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/trig", func_400235DC);
-/* File-level asm so gcc does not emit .align 3 before this 4-aligned function. */
-asm(
-    ".set push\n"
-    ".set noreorder\n"
-    ".globl func_400235DC\n"
-    ".type func_400235DC,@function\n"
-    "func_400235DC:\n"
-    "mfc1 $t0, $f3\n"
-    "qmtc2.ni $t0, $vf16\n"
-    "lqc2 $vf15, 0($v0)\n"
-    "vmr32.w $vf16, $vf16\n"
-    "vaddx.x $vf18, $vf0, $vf16x\n"
-    "vmul.x $vf16, $vf16, $vf16\n"
-    "vmulx.yzw $vf18, $vf18, $vf0x\n"
-    "vmulw.xyzw $vf19, $vf15, $vf16w\n"
-    "vmulx.xyzw $vf19, $vf19, $vf16x\n"
-    "vmulx.xyz $vf19, $vf19, $vf16x\n"
-    "vaddw.x $vf18, $vf18, $vf19w\n"
-    "vmulx.xy $vf19, $vf19, $vf16x\n"
-    "vaddz.x $vf18, $vf18, $vf19z\n"
-    "vmulx.x $vf19, $vf19, $vf16x\n"
-    "vaddy.x $vf18, $vf18, $vf19y\n"
-    "vaddx.x $vf18, $vf18, $vf19x\n"
-    "bnez $a3, .L40023628\n"
-    "nop\n"
-    "vsubx.xyzw $vf18, $vf0, $vf18x\n"
-    ".L40023628:\n"
-    "qmfc2.ni $t0, $vf18\n"
-    "mtc1 $t0, $f12\n"
-    "jr $ra\n"
-    "mov.s $f0, $f12\n"
-    ".size func_400235DC, . - func_400235DC\n"
-    ".set pop\n"
-);
+INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/trig", func_400235DC);
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/trig", iosGetCosf);
 
