@@ -88,4 +88,8 @@ long _strtol_r(struct _reent *ptr, const char *nptr, char **endptr, int base)
     return acc;
 }
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libc/_strtol_r", strtol);
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libc/_strtol_r", strtol);
+long strtol(const char *nptr, char **endptr, int base)
+{
+    return _strtol_r(D_00135D60[0], nptr, endptr, base);
+}
