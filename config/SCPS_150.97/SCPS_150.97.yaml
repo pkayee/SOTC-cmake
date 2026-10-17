@@ -73,8 +73,8 @@ segments:
         - [0xb1b0, c, sdk/libkernl/filestub, "-O2 -G0 cc=ee-gcc2.9-991111"]
         - [0xede8, c, sdk/libkernl/iopheap, "-O2 -G0 cc=ee-gcc2.9-991111"]
         - [0xf338, c, sdk/libkernl/eeloadfile, "-O2 -G0 cc=ee-gcc2.9-991111"]
-        - [0x10098, asm, sdk/libkernl/iopreset]
-        - [0x10378, asm, sdk/libkernl/tlbfunc]
+        - [0x10098, c, sdk/libkernl/iopreset, "-O2 -G0 cc=ee-gcc2.9-991111"]
+        - [0x10378, c, sdk/libkernl/tlbfunc, "-O2 -G0 cc=ee-gcc2.9-991111"]
         - [0x108c0, asm, sdk/libkernl/tlbtrap]
         - [0x10c20, c, sdk/libkernl/diei, "-O2 -G0 cc=ee-gcc2.9-991111"]
         - [0x10c88, c, sdk/libkernl/initsys, "-O2 -G0 cc=ee-gcc2.9-991111"]
@@ -122,8 +122,8 @@ segments:
         - [0x16b88, c, sdk/libdbc, "-O2 -G0 cc=ee-gcc2.9-991111"]
         # libcdvd.a
         - [0x17d58, c, sdk/libcdvd/cdvd000, "-O2 -G0 cc=ee-gcc2.9-991111"]
-        - [0x192d0, asm, sdk/libcdvd/cdvd035]
-        - [0x19458, asm, sdk/libcdvd/cdvd036]
+        - [0x192d0, c, sdk/libcdvd/cdvd035, "-O2 -G0 cc=ee-gcc2.9-991111"]
+        - [0x19458, c, sdk/libcdvd/cdvd036, "-O2 -G0 cc=ee-gcc2.9-991111"]
         # libnet.a
         - [0x19480, c, sdk/libnet, "-O2 -G0 cc=ee-gcc2.9-991111"]
         # libgcc.a

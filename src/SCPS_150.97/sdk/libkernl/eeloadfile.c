@@ -409,8 +409,7 @@ s32 sceSifGetIopAddr(s32 addr, void *dst, s32 type)
     return 0;
 }
 
-/* NEARMISS-STUB sceSifSetIopAddr */
-#if 0 /* NEARMISS 100.0% cat=linker-pad sub=- | 100% objdiff but last fn of segment breaks SHA1 (pad trap) | attempts=1 */
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/eeloadfile", sceSifSetIopAddr);
 s32 sceSifSetIopAddr(s32 addr, const void *src, s32 type)
 {
     s32 ret;
@@ -445,5 +444,3 @@ s32 sceSifSetIopAddr(s32 addr, const void *src, s32 type)
     }
     return 0;
 }
-#endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/eeloadfile", sceSifSetIopAddr);
