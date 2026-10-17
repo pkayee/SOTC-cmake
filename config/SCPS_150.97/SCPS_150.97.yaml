@@ -65,13 +65,13 @@ segments:
     #################
         # libkernl.a
         - [0x7cc0, asm, sdk/libkernl/klib]
-        - [0x8560, asm, sdk/libkernl/intr]
+        - [0x8560, c, sdk/libkernl/intr, "-O2 -G0 cc=ee-gcc2.9-991111"]
         - [0x8790, c, sdk/libkernl/thread, "-O2 -G0 cc=ee-gcc2.9-991111"]
 
         - [0x9f08, c, sdk/libkernl/kprintf2, "-O2 -G0 cc=ee-gcc2.9-991111"]
         - [0xa0f8, c, sdk/libkernl/sifrpc, "-O2 -G0 cc=ee-gcc2.9-991111"]
         - [0xb1b0, asm, sdk/libkernl/filestub]
-        - [0xede8, asm, sdk/libkernl/iopheap]
+        - [0xede8, c, sdk/libkernl/iopheap, "-O2 -G0 cc=ee-gcc2.9-991111"]
         - [0xf338, asm, sdk/libkernl/eeloadfile]
         - [0x10098, asm, sdk/libkernl/iopreset]
         - [0x10378, asm, sdk/libkernl/tlbfunc]
@@ -83,7 +83,7 @@ segments:
         - [0x11490, c, sdk/libkernl/timer, "-O2 -G0 cc=ee-gcc2.9-991111"]
         - [0x12800, c, sdk/libkernl/alarmtimer, "-O2 -G0 cc=ee-gcc2.9-991111"]
         - [0x12e50, c, sdk/libkernl/glue, "-O2 -G0 cc=ee-gcc2.9-991111"]
-        - [0x13220, asm, sdk/libkernl/deci2]
+        - [0x13220, c, sdk/libkernl/deci2, "-O2 -G0 cc=ee-gcc2.9-991111"]
         - [0x13458, c, sdk/libkernl/tty, "-O2 -G0 cc=ee-gcc2.9-991111"]
         - [0x139d0, c, sdk/libkernl/sifcmd, "-O2 -G0 cc=ee-gcc2.9-991111"]
         - [0x14178, c, sdk/libkernl/vifpk025, "-O2 -G0 cc=ee-gcc2.9-991111"]
