@@ -450,43 +450,29 @@ struct Bigint *_lshift(struct _reent *ptr, struct Bigint *b, int k)
     return b1;
 }
 
-/* NEARMISS-STUB __mcmp */
-#if 0 /* NEARMISS 97.88% cat=regalloc sub=- | sll v1 in place, b->x in v0 vs ours j in v1/xb in a4 | attempts=1 */
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libc/mprec", __mcmp);
 int __mcmp(struct Bigint *a, struct Bigint *b)
 {
-    u32 *xa;
-    u32 *xa0;
-    u32 *xb;
-    int i;
-    int j;
+    u32 *xa, *xa0, *xb, *xb0;
+    int i, j;
 
-    i = a->wds - b->wds;
-    if (i)
-    {
-        return i;
-    }
+    i = a->wds;
     j = b->wds;
+    if (i -= j)
+        return i;
     xa0 = a->x;
-    xa = a->x;
-    xb = b->x;
-    xa += j;
-    xb += j;
+    xa = xa0 + j;
+    xb0 = b->x;
+    xb = xb0 + j;
     for (;;)
     {
         if (*--xa != *--xb)
-        {
             return *xa < *xb ? -1 : 1;
-        }
         if (xa <= xa0)
-        {
             break;
-        }
     }
     return 0;
 }
-#endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libc/mprec", __mcmp);
 
 
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libc/mprec", __mdiff);

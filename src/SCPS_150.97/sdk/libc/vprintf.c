@@ -77,28 +77,21 @@ int __sbprintf(FILE *fp, const char *fmt, va_list ap)
     return ret;
 }
 
-/* NEARMISS-STUB vfprintf */
-#if 0 /* NEARMISS 86.14% cat=regalloc sub=- | fmt/ap s1/s2 swapped, NULL _data path load into a0 | attempts=1 */
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libc/vprintf", vfprintf);
-int vfprintf(FILE *fp, const char *fmt, va_list ap)
-{
-    struct _reent *ptr;
+#define CHECK_INIT(fp) \
+    do \
+    { \
+        if ((fp)->_data == 0) \
+            (fp)->_data = D_00135D60[0]; \
+        if (!(fp)->_data->__sdidinit) \
+            __sinit((fp)->_data); \
+    } while (0)
 
-    ptr = fp->_data;
-    if (!ptr)
-    {
-        ptr = D_00135D60[0];
-        fp->_data = ptr;
-    }
-    if (!ptr->__sdidinit)
-    {
-        __sinit(ptr);
-        ptr = fp->_data;
-    }
-    return _vfprintf_r(ptr, fp, fmt, ap);
+int vfprintf(FILE *fp, const char *fmt0, va_list ap)
+{
+    CHECK_INIT(fp);
+    return _vfprintf_r(fp->_data, fp, fmt0, ap);
 }
-#endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libc/vprintf", vfprintf);
 
 /* NEARMISS-STUB _vfprintf_r */
 #if 0 /* NEARMISS 57.19% cat=branch-layout sub=- | goto-threaded shared PRINT tails, frame 0x290, s-reg allocation | attempts=1 */
