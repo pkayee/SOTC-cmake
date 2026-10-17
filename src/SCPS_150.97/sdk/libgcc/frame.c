@@ -156,11 +156,9 @@ struct frame_state_internal
     struct frame_state_internal *saved_state;
 };
 
-/* decode_uleb128 / decode_sleb128 (func_00125A98 / func_00125AE0) */
-#define decode_uleb128 func_00125A98
-#define decode_sleb128 func_00125AE0
-void *decode_uleb128(unsigned char *buf, unsigned *r);
-void *decode_sleb128(unsigned char *buf, int *r);
+/* func_00125A98 / func_00125AE0 (func_00125A98 / func_00125AE0) */
+void *func_00125A98(unsigned char *buf, unsigned *r);
+void *func_00125AE0(unsigned char *buf, int *r);
 
 /* Read unaligned data from the instruction buffer.  */
 
@@ -236,27 +234,18 @@ static inline void fde_insert(fde_accumulator *accu, fde *this_fde)
         accu->linear.array[accu->linear.count++] = this_fde;
 }
 
-/* end_fde_sort (func_00125C30) */
-#define end_fde_sort func_00125C30
-fde **end_fde_sort(fde_accumulator *accu, size_t count);
+/* func_00125C30 (func_00125C30) */
+fde **func_00125C30(fde_accumulator *accu, size_t count);
 
-#define count_fdes func_001263B8
-#define add_fdes func_001263F8
-#define search_fdes func_00126488
-#define frame_init func_001264E0
-#define find_fde func_00126648
-#define extract_cie_info func_001267F0
-#define decode_stack_op func_00126900
-#define execute_cfa_insn func_00126A20
 
-size_t count_fdes(fde *this_fde);
-void add_fdes(fde *this_fde, fde_accumulator *accu, void **beg_ptr, void **end_ptr);
-fde *search_fdes(fde *this_fde, void *pc);
-void frame_init(struct object *ob);
-fde *find_fde(void *pc);
-void *extract_cie_info(fde *f, struct cie_info *c);
-void *decode_stack_op(unsigned char *buf, struct frame_state *state);
-void *execute_cfa_insn(void *p, struct frame_state_internal *state, struct cie_info *info, void **pc);
+size_t func_001263B8(fde *this_fde);
+void func_001263F8(fde *this_fde, fde_accumulator *accu, void **beg_ptr, void **end_ptr);
+fde *func_00126488(fde *this_fde, void *pc);
+void func_001264E0(struct object *ob);
+fde *func_00126648(void *pc);
+void *func_001267F0(fde *f, struct cie_info *c);
+void *func_00126900(unsigned char *buf, struct frame_state *state);
+void *func_00126A20(void *p, struct frame_state_internal *state, struct cie_info *info, void **pc);
 
 void __register_frame_info(void *begin, struct object *ob);
 void __register_frame_info_table(void *begin, struct object *ob);
@@ -323,8 +312,9 @@ void __deregister_frame(void *begin)
     free(__deregister_frame_info(begin));
 }
 
+/* gcc frame.c: count_fdes */
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libgcc/frame", func_001263B8);
-size_t count_fdes(fde *this_fde)
+size_t func_001263B8(fde *this_fde)
 {
     size_t count;
 
@@ -340,8 +330,9 @@ size_t count_fdes(fde *this_fde)
     return count;
 }
 
+/* gcc frame.c: add_fdes */
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libgcc/frame", func_001263F8);
-void add_fdes(fde *this_fde, fde_accumulator *accu, void **beg_ptr, void **end_ptr)
+void func_001263F8(fde *this_fde, fde_accumulator *accu, void **beg_ptr, void **end_ptr)
 {
     void *pc_begin = *beg_ptr;
     void *pc_end = *end_ptr;
@@ -364,8 +355,9 @@ void add_fdes(fde *this_fde, fde_accumulator *accu, void **beg_ptr, void **end_p
     *end_ptr = pc_end;
 }
 
+/* gcc frame.c: search_fdes */
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libgcc/frame", func_00126488);
-fde *search_fdes(fde *this_fde, void *pc)
+fde *func_00126488(fde *this_fde, void *pc)
 {
     for (; this_fde->length != 0; this_fde = next_fde(this_fde))
     {
@@ -384,8 +376,9 @@ fde *search_fdes(fde *this_fde, void *pc)
    be faster.  We can be called multiple times, should we have failed to
    allocate a sorted fde array on a previous occasion.  */
 
+/* gcc frame.c: frame_init */
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libgcc/frame", func_001264E0);
-void frame_init(struct object *ob)
+void func_001264E0(struct object *ob)
 {
     size_t count;
     fde_accumulator accu;
@@ -398,10 +391,10 @@ void frame_init(struct object *ob)
     {
         fde **p = ob->fde_array;
         for (count = 0; *p; ++p)
-            count += count_fdes(*p);
+            count += func_001263B8(*p);
     }
     else
-        count = count_fdes(ob->fde_begin);
+        count = func_001263B8(ob->fde_begin);
     ob->count = count;
 
     if (!start_fde_sort(&accu, count) && ob->pc_begin)
@@ -414,12 +407,12 @@ void frame_init(struct object *ob)
     {
         fde **p = ob->fde_array;
         for (; *p; ++p)
-            add_fdes(*p, &accu, &pc_begin, &pc_end);
+            func_001263F8(*p, &accu, &pc_begin, &pc_end);
     }
     else
-        add_fdes(ob->fde_begin, &accu, &pc_begin, &pc_end);
+        func_001263F8(ob->fde_begin, &accu, &pc_begin, &pc_end);
 
-    array = end_fde_sort(&accu, count);
+    array = func_00125C30(&accu, count);
     if (array)
         ob->fde_array = array;
     ob->pc_begin = pc_begin;
@@ -428,8 +421,9 @@ void frame_init(struct object *ob)
 
 /* Return a pointer to the FDE for the function containing PC.  */
 
+/* gcc frame.c: find_fde */
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libgcc/frame", func_00126648);
-fde *find_fde(void *pc)
+fde *func_00126648(void *pc)
 {
     struct object *ob;
     size_t lo, hi;
@@ -441,7 +435,7 @@ fde *find_fde(void *pc)
     for (ob = objects; ob; ob = ob->next)
     {
         if (ob->pc_begin == 0)
-            frame_init(ob);
+            func_001264E0(ob);
         if (pc >= ob->pc_begin && pc < ob->pc_end)
             break;
     }
@@ -453,7 +447,7 @@ fde *find_fde(void *pc)
     }
 
     if (!ob->fde_array || (void *)ob->fde_array == (void *)ob->fde_begin)
-        frame_init(ob);
+        func_001264E0(ob);
 
     if (ob->fde_array && (void *)ob->fde_array != (void *)ob->fde_begin)
     {
@@ -484,14 +478,14 @@ fde *find_fde(void *pc)
 
             do
             {
-                f = search_fdes(*p, pc);
+                f = func_00126488(*p, pc);
                 if (f)
                     break;
                 p++;
             } while (*p);
         }
         else
-            f = search_fdes(ob->fde_begin, pc);
+            f = func_00126488(ob->fde_begin, pc);
         __gthread_mutex_unlock(&object_mutex);
         return f;
     }
@@ -510,8 +504,9 @@ static inline struct dwarf_cie *get_cie(fde *f)
 extern char D_00139350[];
 extern char D_00139358[];
 
+/* gcc frame.c: extract_cie_info */
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libgcc/frame", func_001267F0);
-void *extract_cie_info(fde *f, struct cie_info *c)
+void *func_001267F0(fde *f, struct cie_info *c)
 {
     void *p;
     int i;
@@ -531,15 +526,15 @@ void *extract_cie_info(fde *f, struct cie_info *c)
     else
         c->eh_ptr = 0;
 
-    p = decode_uleb128(p, &c->code_align);
-    p = decode_sleb128(p, &c->data_align);
+    p = func_00125A98(p, &c->code_align);
+    p = func_00125AE0(p, &c->data_align);
     c->ra_regno = *(unsigned char *)p++;
 
     /* If the augmentation starts with 'z', we now see the length of the
        augmentation fields.  */
     if (c->augmentation[0] == 'z')
     {
-        p = decode_uleb128(p, &i);
+        p = func_00125A98(p, &i);
         p += i;
     }
 
@@ -548,8 +543,9 @@ void *extract_cie_info(fde *f, struct cie_info *c)
 
 /* Decode a DW_OP stack operation.  */
 
+/* gcc frame.c: decode_stack_op */
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libgcc/frame", func_00126900);
-void *decode_stack_op(unsigned char *buf, struct frame_state *state)
+void *func_00126900(unsigned char *buf, struct frame_state *state)
 {
     enum dwarf_location_atom op;
     int offset;
@@ -561,24 +557,24 @@ void *decode_stack_op(unsigned char *buf, struct frame_state *state)
         state->cfa_reg = op - DW_OP_reg0;
         break;
     case DW_OP_regx:
-        buf = decode_sleb128(buf, &offset);
+        buf = func_00125AE0(buf, &offset);
         state->cfa_reg = offset;
     case DW_OP_breg0 ... DW_OP_breg31:
         state->cfa_reg = op - DW_OP_breg0;
-        buf = decode_sleb128(buf, &offset);
+        buf = func_00125AE0(buf, &offset);
         state->base_offset = offset;
         break;
     case DW_OP_bregx:
-        buf = decode_sleb128(buf, &offset);
+        buf = func_00125AE0(buf, &offset);
         state->cfa_reg = offset;
-        buf = decode_sleb128(buf, &offset);
+        buf = func_00125AE0(buf, &offset);
         state->base_offset = offset;
         break;
     case DW_OP_deref:
         state->indirect = 1;
         break;
     case DW_OP_plus_uconst:
-        buf = decode_uleb128(buf, &offset);
+        buf = func_00125A98(buf, &offset);
         state->cfa_offset = offset;
         break;
     default:
@@ -593,7 +589,161 @@ void *decode_stack_op(unsigned char *buf, struct frame_state *state)
    current CIE information, and PC to the current PC value.  Returns a
    pointer to the next instruction.  */
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libgcc/frame", func_00126A20);
+/* gcc frame.c: execute_cfa_insn */
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libgcc/frame", func_00126A20);
+void *func_00126A20(void *p, struct frame_state_internal *state, struct cie_info *info, void **pc)
+{
+    unsigned insn = *(unsigned char *)p++;
+    unsigned reg;
+    int offset;
+
+    if (insn & DW_CFA_advance_loc)
+        *pc += ((insn & 0x3f) * info->code_align);
+    else if (insn & DW_CFA_offset)
+    {
+        reg = (insn & 0x3f);
+        p = func_00125A98(p, &offset);
+        if (reg == state->s.cfa_reg)
+            /* Don't record anything about this register; it's only used to
+               reload SP in the epilogue.  We don't want to copy in SP
+               values for outer frames; we handle restoring SP specially.  */
+            ;
+        else
+        {
+            offset *= info->data_align;
+            state->s.saved[reg] = REG_SAVED_OFFSET;
+            state->s.reg_or_offset[reg] = offset;
+        }
+    }
+    else if (insn & DW_CFA_restore)
+    {
+        reg = (insn & 0x3f);
+        state->s.saved[reg] = REG_UNSAVED;
+    }
+    else
+        switch (insn)
+        {
+        case DW_CFA_set_loc:
+            *pc = read_pointer(p);
+            p += sizeof(void *);
+            break;
+        case DW_CFA_advance_loc1:
+            *pc += read_1byte(p);
+            p += 1;
+            break;
+        case DW_CFA_advance_loc2:
+            *pc += read_2byte(p);
+            p += 2;
+            break;
+        case DW_CFA_advance_loc4:
+            *pc += read_4byte(p);
+            p += 4;
+            break;
+
+        case DW_CFA_offset_extended:
+            p = func_00125A98(p, &reg);
+            p = func_00125A98(p, &offset);
+            if (reg == state->s.cfa_reg)
+                /* Don't record anything; see above.  */
+                ;
+            else
+            {
+                offset *= info->data_align;
+                state->s.saved[reg] = REG_SAVED_OFFSET;
+                state->s.reg_or_offset[reg] = offset;
+            }
+            break;
+        case DW_CFA_restore_extended:
+            p = func_00125A98(p, &reg);
+            state->s.saved[reg] = REG_UNSAVED;
+            break;
+
+        case DW_CFA_undefined:
+        case DW_CFA_same_value:
+        case DW_CFA_nop:
+            break;
+
+        case DW_CFA_register:
+        {
+            unsigned reg2;
+            p = func_00125A98(p, &reg);
+            p = func_00125A98(p, &reg2);
+            state->s.saved[reg] = REG_SAVED_REG;
+            state->s.reg_or_offset[reg] = reg2;
+        }
+        break;
+
+        case DW_CFA_def_cfa:
+            p = func_00125A98(p, &reg);
+            p = func_00125A98(p, &offset);
+            state->s.cfa_reg = reg;
+            state->s.cfa_offset = offset;
+            break;
+        case DW_CFA_def_cfa_register:
+            p = func_00125A98(p, &reg);
+            state->s.cfa_reg = reg;
+            break;
+        case DW_CFA_def_cfa_offset:
+            p = func_00125A98(p, &offset);
+            state->s.cfa_offset = offset;
+            break;
+        case DW_CFA_def_cfa_expression:
+        {
+            void *end;
+            state->s.cfa_reg = 0;
+            state->s.cfa_offset = 0;
+            state->s.base_offset = 0;
+            state->s.indirect = 0;
+
+            p = func_00125A98(p, &offset);
+            end = p + offset;
+            while (p < end)
+                p = func_00126900(p, &(state->s));
+            break;
+        }
+
+        case DW_CFA_remember_state:
+        {
+            struct frame_state_internal *save = (struct frame_state_internal *)malloc(sizeof(struct frame_state_internal));
+            memcpy(save, state, sizeof(struct frame_state_internal));
+            state->saved_state = save;
+        }
+        break;
+        case DW_CFA_restore_state:
+        {
+            struct frame_state_internal *save = state->saved_state;
+            memcpy(state, save, sizeof(struct frame_state_internal));
+            free(save);
+        }
+        break;
+
+            /* Hardcoded for SPARC register window configuration.  */
+        case DW_CFA_GNU_window_save:
+            for (reg = 16; reg < 32; ++reg)
+            {
+                state->s.saved[reg] = REG_SAVED_OFFSET;
+                state->s.reg_or_offset[reg] = (reg - 16) * sizeof(void *);
+            }
+            break;
+
+        case DW_CFA_GNU_args_size:
+            p = func_00125A98(p, &offset);
+            state->s.args_size = offset;
+            break;
+
+        case DW_CFA_GNU_negative_offset_extended:
+            p = func_00125A98(p, &reg);
+            p = func_00125A98(p, &offset);
+            offset *= info->data_align;
+            state->s.saved[reg] = REG_SAVED_OFFSET;
+            state->s.reg_or_offset[reg] = -offset;
+            break;
+
+        default:
+            abort();
+        }
+    return p;
+}
 
 /* Called from __throw to find the registers to restore for a given
    PC_TARGET.  The caller should allocate a local variable of `struct
@@ -607,11 +757,11 @@ struct frame_state *__frame_state_for(void *pc_target, struct frame_state *state
     struct cie_info info;
     struct frame_state_internal state;
 
-    f = find_fde(pc_target);
+    f = func_00126648(pc_target);
     if (f == 0)
         return 0;
 
-    insn = extract_cie_info(f, &info);
+    insn = func_001267F0(f, &info);
     if (insn == 0)
         return 0;
 
@@ -622,14 +772,14 @@ struct frame_state *__frame_state_for(void *pc_target, struct frame_state *state
     /* First decode all the insns in the CIE.  */
     end = next_fde((fde *)get_cie(f));
     while (insn < end)
-        insn = execute_cfa_insn(insn, &state, &info, 0);
+        insn = func_00126A20(insn, &state, &info, 0);
 
     insn = ((fde *)f) + 1;
 
     if (info.augmentation[0] == 'z')
     {
         int i;
-        insn = decode_uleb128(insn, &i);
+        insn = func_00125A98(insn, &i);
         insn += i;
     }
 
@@ -637,7 +787,7 @@ struct frame_state *__frame_state_for(void *pc_target, struct frame_state *state
     end = next_fde(f);
     pc = f->pc_begin;
     while (insn < end && pc <= pc_target)
-        insn = execute_cfa_insn(insn, &state, &info, &pc);
+        insn = func_00126A20(insn, &state, &info, &pc);
 
     memcpy(state_in, &state.s, sizeof(state.s));
     return state_in;
