@@ -92,6 +92,47 @@ s32 dptoli(s64);
 s32 sprintf(char *s, const char *fmt, ...);
 char *strcat(char *dst, const char *src);
 
+/* NEARMISS-STUB func_40037188 */
+#if 0 /* NEARMISS 91.86% cat=cse-hoist sub=- | scan-loop induction pointer slot vs slot+0x10; min-loop q=sp+8 element vs serial address | attempts=1 */
+void func_40037188(s32 vab, s32 prog, s32 flags, u32 maxN)
+{
+    SepPick *w;
+    SepPick *q;
+    Sg2SepSlot *p;
+    s32 i;
+    u32 n;
+    u32 k;
+    SepPick list[49];
+
+    n = 0;
+    w = list;
+    for (i = 0, p = D_40110B40; i < 32; i++, p++)
+    {
+        if (p->vab == vab && p->sub.unk4 == prog && p->sub.unk8 == flags)
+        {
+            w->idx = i;
+            w->serial = p->unk8;
+            w++;
+            n++;
+        }
+    }
+    if (n > maxN)
+    {
+        list[48].idx = list[0].idx;
+        list[48].serial = list[0].serial;
+        for (k = 1, q = &list[1]; k < n; k++, q++)
+        {
+            if (q->serial < list[48].serial)
+            {
+                list[48].idx = q->idx;
+                list[48].serial = q->serial;
+            }
+        }
+        Sg2SepStopSndOff(list[48].idx);
+        D_40110B40[list[48].idx].sub.unk4 = -1;
+    }
+}
+#endif
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/sep", func_40037188);
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/sep", Sg2SepPlay);
@@ -397,4 +438,31 @@ void func_40038108(Sg2SepSlot *slot)
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/sep", func_400381B8);
 
+/* NEARMISS-STUB func_40038720 */
+#if 0 /* NEARMISS 91.67% cat=regalloc sub=- | slot in a3/rs in a2 in target; lui hoist of D_40111550/650; 0x3F loaded early | attempts=1 */
+void func_40038720(Sg2SepSlot *slot)
+{
+    u8 type;
+    u8 len;
+    s32 rs = slot->sub.runStatus;
+
+    if (rs == 0xFF)
+    {
+        type = *slot->sub.data++;
+        len = *slot->sub.data++;
+        if (type == 0x2F)
+        {
+            slot->sub.data = NULL;
+            slot->status = 2;
+            if (rs != D_40111654)
+            {
+                D_40111654 = rs;
+                D_40111550[D_40111650++] = rs;
+            }
+            D_40111550[D_40111650++] = 0x3F;
+            D_40111550[D_40111650++] = len;
+        }
+    }
+}
+#endif
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/sep", func_40038720);
