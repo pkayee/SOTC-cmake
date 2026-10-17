@@ -121,7 +121,7 @@ segments:
         # libdbc.a
         - [0x16b88, asm, sdk/libdbc]
         # libcdvd.a
-        - [0x17d58, asm, sdk/libcdvd/cdvd000]
+        - [0x17d58, c, sdk/libcdvd/cdvd000]
         - [0x192d0, asm, sdk/libcdvd/cdvd035]
         - [0x19458, asm, sdk/libcdvd/cdvd036]
         # libnet.a
