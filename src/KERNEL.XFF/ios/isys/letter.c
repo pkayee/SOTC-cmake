@@ -166,7 +166,23 @@ void increment_letter_refcount(Letter* arg0)
     arg0->refCount += 1;
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/letter", decrement_letter_refcount);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/letter", decrement_letter_refcount);
+s32 decrement_letter_refcount(LetterLink* arg0)
+{
+    s32 ret = 0;
+
+    if (arg0->letter != NULL)
+    {
+        arg0->letter->refCount -= 1;
+        if (arg0->letter->refCount == 0)
+        {
+            iosFree((void*)arg0->letter);
+            ret = 1;
+        }
+        arg0->letter = NULL;
+    }
+    return ret;
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/letter", is_letter_reach_time);
 s32 is_letter_reach_time(Letter* arg0, f32 arg1)
@@ -314,7 +330,28 @@ void func_4002D638(LetterPost* arg0)
     arg0->reading = NULL;
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/letter", push_back_letter_in_post);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/letter", push_back_letter_in_post);
+void push_back_letter_in_post(LetterPost* arg0, Letter* arg1)
+{
+    LetterLink* link = iosMallocAlign((s32)g_pLetterMem, 0xC, 0x10);
+
+    link->letter = arg1;
+    link->next = NULL;
+    increment_letter_refcount(arg1);
+    if (arg0->letterCount == 0)
+    {
+        link->prev = NULL;
+        arg0->letters_tail = link;
+        arg0->letters_head = link;
+    }
+    else
+    {
+        link->prev = arg0->letters_head;
+        arg0->letters_head->next = link;
+        arg0->letters_head = link;
+    }
+    arg0->letterCount += 1;
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/letter", discard_selecting_letter_in_post);
 void discard_selecting_letter_in_post(LetterPost* arg0)
