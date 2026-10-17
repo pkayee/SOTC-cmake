@@ -70,7 +70,32 @@ void *memset(void *s, s32 c, u32 n);
 s32 Sg2CtrlEntryTickProcById(s32 id, void (*proc)(void));
 void Sg2SmfpTickProc(void);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/smfp", func_4003CE68);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/smfp", func_4003CE68);
+s32 func_4003CE68(Sg2SmfpSlot *arg0)
+{
+    s32 ret = -1;
+    u8 *hdr = arg0->unk60;
+    s32 len = (hdr[4] << 24) | (hdr[5] << 16) | (hdr[6] << 8) | hdr[7];
+    s32 fmt = (hdr[8] << 8) | hdr[9];
+    s32 ntrk = (hdr[10] << 8) | hdr[11];
+    s32 division = (hdr[12] << 8) | hdr[13];
+
+    if (len != 6)
+    {
+        return ret;
+    }
+    if (fmt != 0)
+    {
+        return ret;
+    }
+    if (ntrk != 1)
+    {
+        return ret;
+    }
+    arg0->unk38 = litodp(division);
+    arg0->unk60 = hdr + 0xE;
+    return 0;
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/smfp", func_4003CF28);
 s32 func_4003CF28(Sg2SmfpSlot *arg0)
