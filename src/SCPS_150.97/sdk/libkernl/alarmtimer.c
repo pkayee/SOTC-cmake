@@ -34,7 +34,39 @@ s32 func_00111850(s32 a0, s32 a1, s32 a2, AlarmNode *a3)
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/alarmtimer", func_00111850);
 
 /* NEARMISS-STUB SetTimerAlarm */
-#if 0 /* NEARMISS 89.5% cat=branch-layout sub=- | DIntr-wrapped free-list pop: target conditional pop branch and push-back ordering differ | attempts=1 */
+#if 0 /* NEARMISS 97.8% cat=branch-layout sub=inline-pop-helper | inline AllocAlarmNode pop helper: 89.5->97.8 | attempts=2 */
+/* 2.9: free-list pop as static inline AllocAlarmNode(): 89.5 -> 97.8. */
+typedef struct AlarmNode
+{
+    struct AlarmNode *next;
+    s32 field4;
+    void *handler;
+    void *arg;
+} AlarmNode;
+
+extern AlarmNode *D_0014AE00[];
+s32 iAllocTimerCounter(void);
+s32 iSetTimerHandler(s32 id, u32 clock, void *handler, void *arg);
+s32 iStartTimerCounter(s32 id);
+s32 func_00111850(s32 a0, s32 a1, s32 a2, AlarmNode *a3);
+
+s32 AllocTimerCounter(void);
+s32 SetTimerHandler(s32 id, u32 clock, void *handler, void *arg);
+s32 StartTimerCounter(s32 id);
+int DIntr(void);
+int EIntr(void);
+
+static inline AlarmNode *AllocAlarmNode(void)
+{
+    AlarmNode *node = D_0014AE00[0];
+
+    if (node != NULL)
+    {
+        D_0014AE00[0] = node->next;
+    }
+    return node;
+}
+
 s32 SetTimerAlarm(u32 ulClock, u32 (*cbHandler)(s32, u32, u32, void *, void *), void *arg)
 {
     AlarmNode *node;
@@ -47,7 +79,7 @@ s32 SetTimerAlarm(u32 ulClock, u32 (*cbHandler)(s32, u32, u32, void *, void *), 
         return 0x80000016;
     }
     intr = DIntr();
-    node = D_0014AE00[0];
+    node = AllocAlarmNode();
     if (node == NULL)
     {
         if (intr != 0)
@@ -56,7 +88,6 @@ s32 SetTimerAlarm(u32 ulClock, u32 (*cbHandler)(s32, u32, u32, void *, void *), 
         }
         return 0x80008005;
     }
-    D_0014AE00[0] = node->next;
     id = AllocTimerCounter();
     if (id < 0)
     {
@@ -85,7 +116,42 @@ s32 SetTimerAlarm(u32 ulClock, u32 (*cbHandler)(s32, u32, u32, void *, void *), 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/alarmtimer", SetTimerAlarm);
 
 /* NEARMISS-STUB iSetTimerAlarm */
-#if 0 /* NEARMISS 88.6% cat=branch-layout sub=- | free-list pop: target uses beqz skip-pop branch; ours emits bnezl (pop in delay slot) | attempts=1 */
+#if 0 /* NEARMISS 97.25% cat=branch-layout sub=inline-pop-helper | free-list pop is an inline helper (separate null tests, no threading): 88.6->97.25; error-path delay slot left | attempts=2 */
+/* 2.9: free-list pop as a static inline AllocAlarmNode() (keeps the separate `if (node) pop; if (!node) fail` tests, no jump threading): 88.6 -> 97.25; left: error-path delay slot (sw field4 vs ld ra). Needs AlarmNode typedef + protos (see func_00111850 stub). */
+typedef struct AlarmNode
+{
+    struct AlarmNode *next;
+    s32 field4;
+    void *handler;
+    void *arg;
+} AlarmNode;
+
+extern AlarmNode *D_0014AE00[];
+s32 iAllocTimerCounter(void);
+s32 iSetTimerHandler(s32 id, u32 clock, void *handler, void *arg);
+s32 iStartTimerCounter(s32 id);
+s32 func_00111850(s32 a0, s32 a1, s32 a2, AlarmNode *a3);
+
+static inline AlarmNode *AllocAlarmNode(void)
+{
+    AlarmNode *node = D_0014AE00[0];
+
+    if (node != NULL)
+    {
+        D_0014AE00[0] = node->next;
+    }
+    return node;
+}
+
+static inline void FreeAlarmNode(AlarmNode *node)
+{
+    AlarmNode *head = D_0014AE00[0];
+
+    D_0014AE00[0] = node;
+    node->next = head;
+    node->field4 = 0;
+}
+
 s32 iSetTimerAlarm(u32 ulClock, u32 (*cbHandler)(s32, u32, u32, void *, void *), void *arg)
 {
     AlarmNode *node;
@@ -96,19 +162,15 @@ s32 iSetTimerAlarm(u32 ulClock, u32 (*cbHandler)(s32, u32, u32, void *, void *),
     {
         return 0x80000016;
     }
-    node = D_0014AE00[0];
+    node = AllocAlarmNode();
     if (node == NULL)
     {
         return 0x80008005;
     }
-    D_0014AE00[0] = node->next;
     id = iAllocTimerCounter();
     if (id < 0)
     {
-        head = D_0014AE00[0];
-        D_0014AE00[0] = node;
-        node->next = head;
-        node->field4 = 0;
+        FreeAlarmNode(node);
         return id;
     }
     node->handler = cbHandler;
@@ -198,8 +260,7 @@ void sceSifInitRebootNotify(void)
 }
 
 
-/* NEARMISS-STUB sceSifSetRebootNotifyBuffer */
-#if 0 /* NEARMISS 98.9% cat=regalloc sub=- | lui register choice swapped (target lui v1 for D_00133A38, a1 for D_00133A3C); otherwise identical | attempts=1 */
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/alarmtimer", sceSifSetRebootNotifyBuffer);
 void *sceSifSetRebootNotifyBuffer(void *buf, s32 size)
 {
     s32 intr;
@@ -207,8 +268,8 @@ void *sceSifSetRebootNotifyBuffer(void *buf, s32 size)
 
     intr = DIntr();
     old = (void *)D_00133A38[0];
-    D_00133A3C[0] = size;
     D_00133A38[0] = (s32)buf;
+    D_00133A3C[0] = size;
     memset(buf, 0, size << 4);
     if (intr != 0)
     {
@@ -216,8 +277,7 @@ void *sceSifSetRebootNotifyBuffer(void *buf, s32 size)
     }
     return old;
 }
-#endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/alarmtimer", sceSifSetRebootNotifyBuffer);
+
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/alarmtimer", sceSifAddRebootNotifyHandler);
 
