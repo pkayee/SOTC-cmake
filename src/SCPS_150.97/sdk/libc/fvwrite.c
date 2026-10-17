@@ -1,13 +1,13 @@
 #include "common.h"
+#include <sys/reent.h>
+#include <stdio.h>
 
-/* NEARMISS-STUB __sfvwrite */
-#if 0 /* NEARMISS 26.8% cat=branch-layout sub=- | min(len,0x400) ternary if-converted to movn in target, branch in ours; loop branch layout (blezl) and arg regs differ | attempts=2 */
+/* newlib libc/stdio/fvwrite.h */
 struct __siov
 {
-    char *iov_base;
-    int iov_len;
+    const void *iov_base;
+    size_t iov_len;
 };
-
 struct __suio
 {
     struct __siov *uio_iov;
@@ -15,188 +15,178 @@ struct __suio
     int uio_resid;
 };
 
+int __swsetup(FILE *fp);
+int fflush(FILE *fp);
+void *memmove(void *, const void *, size_t);
+void *memchr(const void *, int, size_t);
 
-int __sfvwrite(FILE *fp, struct __suio *uio)
+/* newlib local.h */
+#define cantwrite(fp) \
+    ((((fp)->_flags & __SWR) == 0 || (fp)->_bf._base == NULL) && __swsetup(fp))
+
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
+#define COPY(n) (void)memmove((void *)fp->_p, (void *)p, (size_t)(n))
+
+#define GETIOV(extra_work) \
+    while (len == 0) \
+    { \
+        extra_work; \
+        p = iov->iov_base; \
+        len = iov->iov_len; \
+        iov++; \
+    }
+
+/*
+ * Write some memory regions.  Return zero on success, EOF on error.
+ *
+ * This routine is large and unsightly, but most of the ugliness due
+ * to the three different kinds of output buffering is handled here.
+ */
+
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libc/fvwrite", __sfvwrite);
+int __sfvwrite(register FILE *fp, register struct __suio *uio)
 {
-    struct __siov *iov;
-    char *p;
-    int len;
-    int n;
-    int m;
-    int w;
-    int r;
-    int nldist;
-    int nlknown;
+    register size_t len;
+    register const char *p;
+    register struct __siov *iov;
+    register int w, s;
     char *nl;
+    int nlknown, nldist;
 
-    if (uio->uio_resid == 0)
-    {
+    if ((len = uio->uio_resid) == 0)
         return 0;
-    }
-    if (!(fp->_flags & 0x8) || fp->_bf._base == NULL)
-    {
-        if (__swsetup(fp))
-        {
-            return -1;
-        }
-    }
+
+    /* make sure we can write */
+    if (cantwrite(fp))
+        return EOF;
+
     iov = uio->uio_iov;
     len = 0;
-    if (fp->_flags & 0x2)
+    if (fp->_flags & __SNBF)
     {
+        /*
+         * Unbuffered: write up to BUFSIZ bytes at a time.
+         */
         do
         {
-            if (len == 0)
-            {
-                do
-                {
-                    len = iov->iov_len;
-                    p = iov->iov_base;
-                    iov++;
-                } while (len == 0);
-            }
-            n = (len <= 0x400) ? len : 0x400;
-            r = fp->_write(fp->_cookie, p, n);
-            if (r <= 0)
-            {
+            GETIOV(;);
+            w = (*fp->_write)(fp->_cookie, p, MIN(len, BUFSIZ));
+            if (w <= 0)
                 goto err;
-            }
-            p += r;
-            len -= r;
-            uio->uio_resid -= r;
-        } while (uio->uio_resid != 0);
-        return 0;
+            p += w;
+            len -= w;
+        } while ((uio->uio_resid -= w) != 0);
     }
-    if (fp->_flags & 0x1)
+    else if ((fp->_flags & __SLBF) == 0)
     {
+        /*
+         * Fully buffered: fill partially full buffer, if any,
+         * and then flush.  If there is no partial buffer, write
+         * one _bf._size byte chunk directly (without copying).
+         *
+         * String output is a special case: write as many bytes
+         * as fit, but pretend we wrote everything.  This makes
+         * snprintf() return the number of bytes needed, rather
+         * than the number used, and avoids its write function
+         * (so that the write function can be invalid).
+         */
         do
         {
-            if (len == 0)
-            {
-                nlknown = 0;
-                do
-                {
-                    len = iov->iov_len;
-                    p = iov->iov_base;
-                    iov++;
-                } while (len == 0);
-            }
-            if (!nlknown)
-            {
-                nl = memchr(p, '\n', len);
-                if (nl == NULL)
-                {
-                    nldist = len + 1;
-                }
-                else
-                {
-                    nldist = (nl - p) + 1;
-                }
-                nlknown = 1;
-            }
-            m = (len < nldist) ? len : nldist;
+            GETIOV(;);
             w = fp->_w;
-            n = w + fp->_bf._size;
-            if (fp->_bf._base < fp->_p && n < m)
+            if (fp->_flags & __SSTR)
             {
-                memmove(fp->_p, p, n);
-                fp->_p += n;
-                nldist -= n;
-                if (fflush(fp) != 0)
-                {
+                if (len < w)
+                    w = len;
+                COPY(w); /* copy MIN(fp->_w,len), */
+                fp->_w -= w;
+                fp->_p += w;
+                w = len; /* but pretend copied all */
+            }
+            else if (fp->_p > fp->_bf._base && len > w)
+            {
+                /* fill and flush */
+                COPY(w);
+                /* fp->_w -= w; */ /* unneeded */
+                fp->_p += w;
+                if (fflush(fp))
                     goto err;
-                }
+            }
+            else if (len >= (w = fp->_bf._size))
+            {
+                /* write directly */
+                w = (*fp->_write)(fp->_cookie, p, w);
+                if (w <= 0)
+                    goto err;
             }
             else
             {
-                n = fp->_bf._size;
-                if (m < n)
-                {
-                    n = m;
-                    memmove(fp->_p, p, n);
-                    fp->_w -= n;
-                    fp->_p += n;
-                    nldist -= n;
-                }
-                else
-                {
-                    r = fp->_write(fp->_cookie, p, n);
-                    if (r <= 0)
-                    {
-                        goto err;
-                    }
-                    n = r;
-                    nldist -= n;
-                }
+                /* fill and done */
+                w = len;
+                COPY(w);
+                fp->_w -= w;
+                fp->_p += w;
             }
-            if (nldist == 0)
+            p += w;
+            len -= w;
+        } while ((uio->uio_resid -= w) != 0);
+    }
+    else
+    {
+        /*
+         * Line buffered: like fully buffered, but we
+         * must check for newlines.  Compute the distance
+         * to the first newline (including the newline),
+         * or `infinity' if there is none, then pretend
+         * that the amount to write is MIN(len,nldist).
+         */
+        nlknown = 0;
+        do
+        {
+            GETIOV(nlknown = 0);
+            if (!nlknown)
             {
-                if (fflush(fp) != 0)
-                {
+                nl = memchr((void *)p, '\n', len);
+                nldist = nl ? nl + 1 - p : len + 1;
+                nlknown = 1;
+            }
+            s = MIN(len, nldist);
+            w = fp->_w + fp->_bf._size;
+            if (fp->_p > fp->_bf._base && s > w)
+            {
+                COPY(w);
+                /* fp->_w -= w; */
+                fp->_p += w;
+                if (fflush(fp))
                     goto err;
-                }
+            }
+            else if (s >= (w = fp->_bf._size))
+            {
+                w = (*fp->_write)(fp->_cookie, p, w);
+                if (w <= 0)
+                    goto err;
+            }
+            else
+            {
+                w = s;
+                COPY(w);
+                fp->_w -= w;
+                fp->_p += w;
+            }
+            if ((nldist -= w) == 0)
+            {
+                /* copied the newline: flush and forget */
+                if (fflush(fp))
+                    goto err;
                 nlknown = 0;
             }
-            p += n;
-            len -= n;
-            uio->uio_resid -= n;
-        } while (uio->uio_resid != 0);
-        return 0;
+            p += w;
+            len -= w;
+        } while ((uio->uio_resid -= w) != 0);
     }
-    do
-    {
-        if (len == 0)
-        {
-            do
-            {
-                len = iov->iov_len;
-                p = iov->iov_base;
-                iov++;
-            } while (len == 0);
-        }
-        w = fp->_w;
-        if (fp->_flags & 0x200)
-        {
-            n = (len < w) ? len : w;
-            memmove(fp->_p, p, n);
-            fp->_w -= n;
-            fp->_p += n;
-            n = len;
-        }
-        else if (fp->_bf._base < fp->_p && w < len)
-        {
-            memmove(fp->_p, p, w);
-            fp->_p += w;
-            if (fflush(fp) != 0)
-            {
-                goto err;
-            }
-            n = w;
-        }
-        else if (len < fp->_bf._size)
-        {
-            n = len;
-            memmove(fp->_p, p, n);
-            fp->_w -= n;
-            fp->_p += n;
-        }
-        else
-        {
-            n = fp->_write(fp->_cookie, p, fp->_bf._size);
-            if (n <= 0)
-            {
-                goto err;
-            }
-        }
-        p += n;
-        len -= n;
-        uio->uio_resid -= n;
-    } while (uio->uio_resid != 0);
     return 0;
 
 err:
-    fp->_flags |= 0x40;
-    return -1;
+    fp->_flags |= __SERR;
+    return EOF;
 }
-#endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libc/fvwrite", __sfvwrite);
