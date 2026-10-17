@@ -19,7 +19,7 @@ float cosf(float);
 float powf(float, float);
 double fptodp(f32);
 f32 dptofp(s64);
-s64 sqrt_(double) __asm__("sqrt");
+s64 sqrt(double);
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/iir", func_40041048);
 void func_40041048(Iir *iir)
@@ -72,7 +72,7 @@ void func_40041370(Iir *iir)
     f32 A = powf(10.0f, iir->gain / 40.0f);
     f32 w0 = iir->freq / 48000.0f * 2.0f * 3.14159265f;
     f32 x = A * A + 1.0f - (A - 1.0f) * (A - 1.0f);
-    f32 sq = dptofp(sqrt_(fptodp(x)));
+    f32 sq = dptofp(sqrt(fptodp(x)));
 
     iir->b0 = A * ((A + 1.0f) - (A - 1.0f) * cosf(w0) + sq * sinf(w0));
     iir->b1 = (A + A) * ((A - 1.0f) - (A + 1.0f) * cosf(w0));
@@ -87,7 +87,7 @@ void func_40041538(Iir *iir)
 {
     f32 A = powf(10.0f, iir->gain / 40.0f);
     f32 w0 = iir->freq / 48000.0f * 2.0f * 3.14159265f;
-    f32 sq = dptofp(sqrt_(fptodp(A * A + 1.0f - (A - 1.0f) * (A - 1.0f))));
+    f32 sq = dptofp(sqrt(fptodp(A * A + 1.0f - (A - 1.0f) * (A - 1.0f))));
 
     iir->b0 = A * ((A + 1.0f) + (A - 1.0f) * cosf(w0) + sq * sinf(w0));
     iir->b1 = (A * -2.0f) * ((A - 1.0f) + (A + 1.0f) * cosf(w0));
