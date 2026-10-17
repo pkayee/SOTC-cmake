@@ -61,7 +61,35 @@ void func_4003F3E8(s32 *arg0, s32 arg1)
     }
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", func_4003F468);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", func_4003F468);
+void func_4003F468(s32 *arg0, s32 arg1, s32 arg2, s32 arg3)
+{
+    s32 pos = arg0[4];
+    f32 *out1 = (f32 *)arg0[1];
+    f32 *out2 = (f32 *)(arg0[1] + 0x400);
+    s16 *buf = (s16 *)arg0[0] + pos;
+    s32 i;
+    s32 j;
+
+    for (i = 0; i < arg1;)
+    {
+        for (j = 0; j < 0x100; j++)
+        {
+            s32 sample = buf[i];
+
+            i++;
+            *out1++ = (sample * arg2) / 100;
+            *out2++ = (sample * arg3) / 100;
+        }
+        out1 += 0x100;
+        out2 += 0x100;
+    }
+    arg0[4] = pos + arg1;
+    if (arg0[4] >= arg0[2])
+    {
+        arg0[4] = 0;
+    }
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", func_4003F528);
 void func_4003F528(s32 *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5)
@@ -95,7 +123,32 @@ void func_4003F528(s32 *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5)
     arg0[4] = idx;
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", func_4003F5D0);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", func_4003F5D0);
+void func_4003F5D0(s32 *arg0, s32 arg1, s32 arg2, s32 arg3)
+{
+    s32 pos = arg0[4];
+    f32 *out = (f32 *)arg0[1];
+    s16 *buf = (s16 *)arg0[0] + pos;
+    s32 i;
+    s32 j;
+
+    for (i = 0; i < arg1; i += 0x200)
+    {
+        for (j = 0; j < 0x100; j++)
+        {
+            *out++ = (*buf++ * arg2) / 100;
+        }
+        for (j = 0; j < 0x100; j++)
+        {
+            *out++ = (*buf++ * arg3) / 100;
+        }
+    }
+    arg0[4] = pos + arg1;
+    if (arg0[4] >= arg0[2])
+    {
+        arg0[4] = 0;
+    }
+}
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", func_4003F6A0);
 
