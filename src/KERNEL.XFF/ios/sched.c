@@ -36,8 +36,109 @@ extern s64 iosGetTCountExtension(void);
 extern s32 func_4002C8F0();
 extern s32 func_4002CDB0();
 extern s32 func_4002CE70(void);
+extern s32 rootPtn;
+extern s32 gpMainCallCounter;
+extern s32 D_40045C80;
+extern s32 schedGarbageDisableFlag;
+extern s32 ischedExecSubThread;
+extern void iosCdSetErrorCallback(void *arg0, void *arg1);
+extern void iosCreateMsgQueue(t_iosMessageQueue *arg0, void *arg1, s32 arg2);
+extern void bootGPThread(void *arg0);
+extern void init_letter_manager(void *arg0, s32 arg1);
+extern void isysDeleteObjManager(s32 arg0);
+extern void sndSepTickProc(void);
+extern void iosWaitIdleThread(void);
+extern void iosMallocGarbageTickProc(s32 (*cb)(void *), void *cbArg);
+extern s32 iosChkGpDlTransExec(void);
+extern void iosGPFrameInit(void);
+extern s64 getIntrGpCount(void);
+extern void iStart(void);
+extern void iFinish(void);
+extern void doit_letter_manager(void);
+extern void ischedStop(void);
+extern void ischedRestart(void);
+extern void func_4002CD88(void);
+extern s32 func_4002CEA0(s32 arg0);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/sched", func_4002C8F0);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/sched", func_4002C8F0);
+s32 func_4002C8F0(void)
+{
+    s32 garbageFlag;
+    s32 vintSnap;
+    s32 i;
+
+    D_400F2B20 = 0;
+    iosCdSetErrorCallback((void *)ischedStop, (void *)ischedRestart);
+    iosCreateMsgQueue(&D_400F2B28, 0, 0);
+    bootGPThread((void *)func_4002CD88);
+    memset(D_400F3B70, 0, sizeof(D_400F3B70));
+    init_letter_manager((void *)&rootPtn, 0x4CCCC);
+
+    while (1)
+    {
+        isysDeleteObjManager(gpMainCallCounter);
+        gpMainCallCounter = 0;
+        iStart();
+        sndSepTickProc();
+        if (D_40045C7C != 0)
+        {
+            ischedExecSubThread = 1;
+            ((void (*)(void))D_40045C7C)();
+            ischedExecSubThread = 0;
+        }
+        for (i = 0; i < 3; i++)
+        {
+            if (D_400F3B70[i].unk0 != 0)
+            {
+                ((void (*)(s32))D_400F3B70[i].unk0)(D_400F3B70[i].unk4);
+            }
+        }
+        D_40045C74++;
+        while (D_400F2B20 != 0)
+        {
+        }
+        doit_letter_manager();
+        D_400F2B18 = 0;
+        if (D_40045C80 == 0 && schedGarbageDisableFlag == 0)
+        {
+            vintSnap = D_40045C64;
+            while (iosChkGpDlTransExec() != 0)
+            {
+            }
+            garbageFlag = 1;
+            if (D_40045C68 == 0)
+            {
+                garbageFlag = 0;
+                if (vintSnap == D_40045C64 &&
+                    (float)(u64)(iosGetTCountExtension() - D_400F2B10) < 2124999.75f)
+                {
+                    garbageFlag = 1;
+                }
+            }
+            if (garbageFlag)
+            {
+                s64 t = iosGetTCountExtension();
+                iosMallocGarbageTickProc((s32 (*)(void *))func_4002CEA0, (void *)vintSnap);
+                D_40045C68 = 0;
+                D_400F2B18 = iosGetTCountExtension() - t;
+            }
+            iFinish();
+        }
+        else
+        {
+            iFinish();
+            D_40045C80 = 0;
+        }
+        if (D_40045C6C != 0)
+        {
+            iosWaitIdleThread();
+            continue;
+        }
+        iosSendMsg(&D_400F2B28, 0, 1);
+        getIntrGpCount();
+        iosGPFrameInit();
+    }
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/sched", getVIntrCnt);
 s32 getVIntrCnt(void)
