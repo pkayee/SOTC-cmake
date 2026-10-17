@@ -44,7 +44,9 @@ typedef struct ShockPlayer
 typedef struct ShockCtrl
 {
     /* 0x0 */ u16 unk0;
-    /* 0x2 */ u16 unk2;
+    /* 0x2 */ s16 unk2;
+    /* 0x4 */ u8 unk4;
+    /* 0x5 */ u8 unk5;
 } ShockCtrl;
 
 typedef struct ShockObj
@@ -55,16 +57,40 @@ typedef struct ShockObj
 
 typedef struct ShockNode
 {
-    /* 0x0 */ u8 unk0;
-    /* 0x1 */ u8 pad1[0x2F];
+    /* 0x00 */ u8 unk0;
+    /* 0x01 */ u8 unk1;
+    /* 0x02 */ u8 unk2;
+    /* 0x03 */ u8 unk3;
+    /* 0x04 */ u8* unk4;
+    /* 0x08 */ u16 unk8;
+    /* 0x0A */ u16 unkA;
+    /* 0x0C */ u16 unkC;
+    /* 0x0E */ u16 unkE;
+    /* 0x10 */ u16 unk10;
+    /* 0x12 */ u16 unk12;
+    /* 0x14 */ u8* unk14;
+    /* 0x18 */ u16 unk18;
+    /* 0x1A */ u16 unk1A;
+    /* 0x1C */ u16 unk1C;
+    /* 0x1E */ u16 unk1E;
+    /* 0x20 */ u16 unk20;
+    /* 0x22 */ u16 unk22;
+    /* 0x24 */ u8 unk24;
+    /* 0x25 */ u8 unk25;
+    /* 0x26 */ u8 unk26;
+    /* 0x27 */ u8 unk27;
+    /* 0x28 */ s32 unk28;
+    /* 0x2C */ s32 unk2C;
     /* 0x30 */ struct ShockNode* unk30;
     /* 0x34 */ struct ShockNode* unk34;
+    /* 0x38 */ u8 unk38;
+    /* 0x3C */ u32* unk3C;
 } ShockNode;
 
 typedef struct ShockList
 {
-    /* 0x0 */ ShockNode* head;
-    /* 0x4 */ u8 pad4[4];
+    /* 0x0 */ struct ShockNode* head;
+    /* 0x4 */ void* unk4;
     /* 0x8 */ void (*unk8)(ShockNode*, void*);
     /* 0xC */ void* unkC;
 } ShockList;
@@ -80,7 +106,7 @@ s32 func_40019960();
 void func_400199A8(u8* arg0);
 s32 func_40019018(ShockNode* arg0, s32 arg1);
 s32 func_40018D88(ShockNode* arg0, s32 arg1);
-ShockObj* func_400192E0(void* arg0, u32* arg1, ShockParam arg2, s32 arg3, s32 arg4);
+ShockNode* func_400192E0(ShockList* arg0, u8* arg1, ShockParam arg2, s32 arg3, s32 arg4);
 
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/shock", func_40018D88);
@@ -184,9 +210,68 @@ void Init_Controler(ShockCtrl* arg0)
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/shock", Shock_Request);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/shock", Shock_Decode);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/shock", Shock_Decode);
+void Shock_Decode(ShockList* arg0, u8* arg1, u8* arg2)
+{
+    s32 sum = 0;
+    s32 flags = 0;
+    ShockNode* n;
+    ShockNode* p;
+
+    if (arg0 != NULL)
+    {
+        n = arg0->head;
+        if (n != NULL)
+        {
+            do
+            {
+                sum += func_40019018(n, D_40045818->unk8);
+                flags |= func_40018D88(n, D_40045818->unk8);
+                n = n->unk34;
+            } while (n != NULL);
+        }
+        if (sum > 0xFF)
+        {
+            sum = 0xFF;
+        }
+        *arg2 = sum;
+        *arg1 = flags;
+        p = arg0->head;
+        while (p != NULL)
+        {
+            if (p->unk0 == 0)
+            {
+                if (p->unk30 != NULL)
+                {
+                    p->unk30->unk34 = p->unk34;
+                }
+                else
+                {
+                    arg0->head = p->unk34;
+                }
+                n = p->unk34;
+                if (n != NULL)
+                {
+                    n->unk30 = p->unk30;
+                    n = p->unk34;
+                }
+                if (arg0->unk8 != NULL)
+                {
+                    arg0->unk8(p, arg0->unkC);
+                }
+                p = n;
+            }
+            else
+            {
+                p = p->unk34;
+            }
+        }
+    }
+}
+
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/shock", Shock_SetMotor);
+
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/shock", func_40019958);
 s32 func_40019958()

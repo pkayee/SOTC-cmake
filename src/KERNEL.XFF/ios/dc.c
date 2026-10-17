@@ -2,7 +2,16 @@
 
 typedef struct DC
 {
-    u8 pad0[0xD0];
+    u8 pad0[0x60];
+    u64 unk60;
+    u64 unk68;
+    u64 unk70;
+    u64 unk78;
+    u64 unk80;
+    u64 unk88;
+    u64 unk90;
+    u64 unk98;
+    u8 padA0[0x30];
     u8 unkD0[0x90];
     s32 unk160;
     s32 unk164;
@@ -12,7 +21,19 @@ typedef struct DC
     u8 unk16D;
     u8 unk16E;
     u8 unk16F;
-    u64 unk170;
+    union
+    {
+        u64 unk170;
+        struct
+        {
+            u32 unk170lo;
+            s32 unk174;
+        };
+    };
+    s32 unk178;
+    s32 unk17C;
+    s32 unk180;
+    void *unk184;
 } DC;
 
 extern u8 D_40092688[];
@@ -22,15 +43,46 @@ extern DC *D_40045A00;
 extern DC *D_40045A04;
 extern s32 D_40045A08;
 
+typedef struct DCObj
+{
+    s32 unk0;
+    u8 pad4[0x18];
+    DC *unk1C;
+    s32 unk20;
+} DCObj;
+
+DCObj *_isysCreateObj();
+void isysSetObjImmediateDeleteFunc(void *obj, void *func);
+void *iosMallocAlign(s32, s32, s32);
+void isysAddGroupWithLinkParam();
+void func_40024A30(void);
+void func_40024A38(void);
 void func_40024218(DC *dc);
 void iosDlChainTailCurrent();
+void iosDlPushLayer();
+void iosDlPopLayer();
 void isysInitGroup(void *group);
 void _isysDeleteGroup(void *obj, void *group, s32 flag);
 void isysRequestDeleteObj(void *obj);
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dc", func_40024218);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dc", iosCreateDC);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dc", iosCreateDC);
+DCObj *iosCreateDC(s32 arg0, s32 n)
+{
+    DCObj *obj;
+    s32 size = n * 0x190;
+
+    obj = _isysCreateObj(arg0, 0x1F, 0x24, size + 0x33, func_40024A30, 0x10);
+    isysSetObjImmediateDeleteFunc(obj, func_40024A38);
+    obj->unk20 = n;
+    obj->unk1C = iosMallocAlign(obj->unk0, size, 0x10);
+    obj->unk1C->unk184 = obj;
+    obj->unk1C->unk170 &= ~1;
+    obj->unk1C->unk170 &= ~2;
+    isysAddGroupWithLinkParam(obj, &D_40092688, 0, 0);
+    return obj;
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dc", iosReleaseDC);
 void iosReleaseDC(void *dc)
@@ -138,8 +190,44 @@ void func_40024A30(void)
 void func_40024A38(void)
 {}
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dc", iosSetDCWithClear);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dc", iosSetDCWithClear);
+void iosSetDCWithClear(DC *dc, s32 clear)
+{
+    iosDlChainTailCurrent(dc);
+    if (*(u32 *)&dc->unk170 & 1)
+    {
+        if (clear != 0)
+        {
+            iosDlChainTailCurrent(dc->unkD0);
+        }
+    }
+}
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dc", _iosPushDC);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dc", _iosPushDC);
+void _iosPushDC(DC *dc, s32 clear)
+{
+    D_40092288[D_40045A08] = dc;
+    D_40045A08++;
+    iosDlChainTailCurrent(dc);
+    if (*(u32 *)&dc->unk170 & 1)
+    {
+        if (clear != 0)
+        {
+            iosDlChainTailCurrent(dc->unkD0);
+        }
+    }
+    D_40045A00 = dc;
+}
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dc", iosPushDCWithClear);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dc", iosPushDCWithClear);
+void iosPushDCWithClear(DC *dc)
+{
+    D_40092288[D_40045A08] = dc;
+    D_40045A08++;
+    iosDlChainTailCurrent(dc);
+    if (*(u32 *)&dc->unk170 & 1)
+    {
+        iosDlChainTailCurrent(dc->unkD0);
+    }
+    D_40045A00 = dc;
+}

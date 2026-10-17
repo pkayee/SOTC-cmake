@@ -1,4 +1,6 @@
 #include "common.h"
+#include "sdk/ee/eetypes.h"
+#include "sdk/ee/eestruct.h"
 #include "sdk/ee/eekernel.h"
 #include "sdk/ee/libgraph.h"
 #include "sdk/ee/eeregs.h"
@@ -19,6 +21,8 @@ extern void iosPushVu0Registers(void);
 extern void iosPopVu0Registers(void);
 extern s32 iosCheckDrawFinish(void);
 extern volatile s64* iosGetPacketPtrPath1();
+extern void iosSetPacketPtrPath1();
+extern void iosDlChainTailCurrent();
 
 extern void InitDL(s32, s32);
 extern void iosSetScreenEnv(s32, s32, s32, s32);
@@ -44,11 +48,11 @@ extern void (*D_40045AE4)(); // v scheduler function
 extern void (*D_40045AE8)();
 extern s32 D_40045AEC;
 extern struct unkstrc {
-    struct unkstrc *unk0;
+    volatile s64 *unk0;
     s64 *unk4, *unk8;
     volatile s64* unkC;
     s32 unk10, unk14, unk18, unk1C;
-} volatile *D_40045AF4;
+} *D_40045AF4;
 extern s32 D_40045AF8;
 
 
@@ -309,10 +313,64 @@ void func_400286E8(void)
     }
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gp", gsRegBegin);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gp", gsRegBegin);
+volatile s64* gsRegBegin(void)
+{
+    D_40045AF4->unk1C = 0;
+    D_40045AF4->unkC = iosGetPacketPtrPath1();
+    if (D_40045AF4->unkC == NULL)
+    {
+        D_40045AF4->unk1C = 1;
+    }
+    else
+    {
+        D_40045AF4->unk0 = D_40045AF4->unkC;
+        D_40045AF4->unkC += 1;
+    }
+    if (D_40045AF4->unk1C == 0)
+    {
+        D_40045AF4->unk4 = (s64*)D_40045AF4->unkC;
+        *(D_40045AF4->unkC++) = 0;
+        if (((u32)D_40045AF4->unkC & 3) != 0)
+        {
+            *(D_40045AF4->unkC++) = 0;
+        }
+        D_40045AF4->unk8 = (s64*)D_40045AF4->unkC;
+        D_40045AF4->unkC += 2;
+    }
+    return D_40045AF4->unkC;
+}
+#define GTAG ((sceGifTag *)D_40045AF4->unk8)
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gp", gsRegEnd);
+
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gp", gsRegEndWithPtr);
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gp", gsReglistBegin);
+
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gp", gsReglistBegin);
+void gsReglistBegin(void)
+{
+    D_40045AF4->unk1C = 0;
+    D_40045AF4->unkC = iosGetPacketPtrPath1();
+    if (D_40045AF4->unkC == NULL)
+    {
+        D_40045AF4->unk1C = 1;
+    }
+    else
+    {
+        D_40045AF4->unk0 = D_40045AF4->unkC;
+        D_40045AF4->unkC += 1;
+    }
+    if (D_40045AF4->unk1C == 0)
+    {
+        D_40045AF4->unk4 = (s64*)D_40045AF4->unkC;
+        *(D_40045AF4->unkC++) = 0;
+        if (((u32)D_40045AF4->unkC & 3) != 0)
+        {
+            *(D_40045AF4->unkC++) = 0;
+        }
+        D_40045AF4->unk8 = (s64*)D_40045AF4->unkC;
+        D_40045AF4->unkC += 2;
+    }
+}
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gp", gsReglistEnd);
 
