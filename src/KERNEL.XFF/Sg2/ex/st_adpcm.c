@@ -1,7 +1,7 @@
 #include "common.h"
 
 extern s32 D_400F8F7C;
-extern s32 D_400F9040;
+extern s32 (*D_400F9040)(void*, s32, s32, s32);
 extern s32 Sg2StAdpcmQuit(void);
 extern s32 Sg2StAdpcmSetPitch(u64, u32);
 extern s32 Sg2ExStAdpcmSlotFree(void);
@@ -12,7 +12,7 @@ extern s32 Sg2StAdpcmPlay(u64);
 extern s32 Sg2StAdpcmClose(s32);
 extern s32 Sg2StAdpcmStop(u64);
 extern s32 Sg2StAdpcmSetVolume(u64, s32, s32);
-extern s32 Sg2StAdpcmIopReadAdr(void);
+extern s32 Sg2StAdpcmIopReadAdr(s32);
 extern s32 Sg2SlotFree(s32);
 extern void* memset(void*, s32, u32);
 extern void ____VolReflection(void*);
@@ -24,6 +24,8 @@ extern void Sg2SlotSetReverbOnBit(s32, s32);
 extern void Sg2SlotSetReverbOffBit(s32, s32);
 extern void func_40032420(void*, s32, s32, s32);
 extern s32 Sg2ExStAdpcmIopReadAdr(void*, s32);
+extern s32 Sg2SlotFreeSearchTerm(s32);
+extern void Sg2SlotBlock(s32, s32);
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/st_adpcm", Sg2ExStAdpcmInit);
 void Sg2ExStAdpcmInit(void)
@@ -58,7 +60,25 @@ s32 Sg2ExStAdpcmSlotMalloc(s32 arg0)
     return Sg2ExStAdpcmSlotReserv(0, arg0);
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/st_adpcm", Sg2ExStAdpcmSlotReserv);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/st_adpcm", Sg2ExStAdpcmSlotReserv);
+s32 Sg2ExStAdpcmSlotReserv(s32 isTerm, s32 n)
+{
+    s32 i;
+    s32 s;
+    s32 cnt = 0;
+    s32 term = isTerm != 0;
+    for (i = 0; i < n; i++)
+    {
+        s = Sg2SlotFreeSearchTerm(term);
+        if (s != -1)
+        {
+            Sg2SlotBlock(3, s);
+            D_400F8F80[s] = 1;
+            cnt++;
+        }
+    }
+    return cnt;
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/st_adpcm", Sg2ExStAdpcmSlotFree);
 s32 Sg2ExStAdpcmSlotFree(void)
@@ -111,6 +131,8 @@ s32 Sg2ExStAdpcmOpenFake(void* p)
     *(s32*)((u8*)p + 8) = *(s32*)((u8*)p + 0xC);
     return func_40031728(p) ? -2 : 0;
 }
+
+extern void* memcpy(void*, const void*, u32);
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/st_adpcm", Sg2ExStAdpcmOpen);
 
@@ -214,15 +236,117 @@ s32 func_40031C08(StAdpcmVolCtx* p, s32 voice, s32 idx)
 }
 
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/st_adpcm", Sg2ExStAdpcmVolumePercent);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/st_adpcm", Sg2ExStAdpcmVolumePercent);
+s32 Sg2ExStAdpcmVolumePercent(void* p, s32 vol)
+{
+    u64 i;
+    s32 cnt;
+    s32 ret = -1;
+    s32* q = (s32*)((u8*)p + 0x24C);
+
+    for (i = 0; i < 8; i++)
+    {
+        q[0] = q[1] = vol;
+        q += 2;
+    }
+    if (*(s32*)((u8*)p + 0) < 16)
+    {
+        return -1;
+    }
+    for (i = 0, cnt = 0; i < 48; i++)
+    {
+        if (*(u64*)((u8*)p + 0xA0) & (1LL << i))
+        {
+            func_40031C08(p, (s32)i, cnt++);
+            ret = 0;
+        }
+    }
+    return ret;
+}
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/st_adpcm", Sg2ExStAdpcmTrkVolumeDirect);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/st_adpcm", Sg2ExStAdpcmTrkVolumePercent);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/st_adpcm", Sg2ExStAdpcmTrkVolumePercent);
+s32 Sg2ExStAdpcmTrkVolumePercent(void* p, s32 trk, s32 volL, s32 volR)
+{
+    StAdpcmVolSub *c = &((StAdpcmVolCtx*)p)->u.c;
+    u64 i;
+    s32 n;
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/st_adpcm", Sg2ExStAdpcmTrkDspSw);
+    c->lr[trk][0] = volL;
+    c->lr[trk][1] = volR;
+    if (*(s32*)((u8*)p + 0) < 16)
+    {
+        return -1;
+    }
+    n = trk;
+    for (i = 0; i < 48; i++)
+    {
+        if (*(u64*)((u8*)p + 0xA0) & (1LL << i))
+        {
+            if (--trk < 0)
+            {
+                func_40031C08(p, (s32)i, n);
+                return 0;
+            }
+        }
+    }
+    return -1;
+}
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/st_adpcm", ____VolReflection);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/st_adpcm", Sg2ExStAdpcmTrkDspSw);
+s32 Sg2ExStAdpcmTrkDspSw(void* p, s32 trk, s32 mode)
+{
+    u64 i;
+
+    if (*(s32*)((u8*)p + 0) < 16)
+    {
+        return -1;
+    }
+    if (mode == -1)
+    {
+        mode = *(s32*)((u8*)p + 0x80 + trk * 4);
+    }
+    for (i = 0; i < 48; i++)
+    {
+        if (*(u64*)((u8*)p + 0xA0) & (1LL << (s32)i))
+        {
+            if (--trk < 0)
+            {
+                switch (mode)
+                {
+                case 0:
+                    Sg2SlotSetReverbOffBit(i >= 24, 1 << (i < 24 ? (s32)i : (s32)(i - 24)));
+                    break;
+                case 1:
+                    Sg2SlotSetReverbOnBit(i >= 24, 1 << (i < 24 ? (s32)i : (s32)(i - 24)));
+                    break;
+                }
+                return 0;
+            }
+        }
+    }
+    return -1;
+}
+
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/st_adpcm", ____VolReflection);
+void ____VolReflection(void* p)
+{
+    u64 i;
+    s32 cnt;
+
+    if (*(s32*)((u8*)p + 0) < 16)
+    {
+        return;
+    }
+    for (i = 0, cnt = 0; i < 48; i++)
+    {
+        if (*(u64*)((u8*)p + 0xA0) & (1LL << i))
+        {
+            func_40031C08(p, (s32)i, cnt++);
+        }
+    }
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/st_adpcm", ____VolPerBackup);
 void ____VolPerBackup(void* p, s32 flag)
@@ -325,7 +449,26 @@ s32 Sg2ExStAdpcmStop(void* p)
     return Sg2StAdpcmStop(*(u64*)((u8*)p + 0xA0));
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/st_adpcm", Sg2ExStAdpcmIopReadAdr);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/st_adpcm", Sg2ExStAdpcmIopReadAdr);
+s32 Sg2ExStAdpcmIopReadAdr(void* p, s32 n)
+{
+    u64 i;
+    u64 id;
+
+    i = 0;
+    id = *(u64*)((u8*)p + 0xA0);
+    for (; i < 48; i++)
+    {
+        if (id & (1LL << (s32)i))
+        {
+            if (--n < 0)
+            {
+                return Sg2StAdpcmIopReadAdr(i);
+            }
+        }
+    }
+    return 0;
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/st_adpcm", Sg2ExStAdpcmSetOutputMode);
 void Sg2ExStAdpcmSetOutputMode(void* p, s32 mode)
@@ -359,7 +502,7 @@ s32 Sg2ExStAdpcmGetBuffer(void* p, s32* a, s32* b, s32* c, s32* d)
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/st_adpcm", Sg2ExStAdpcmSetSignal);
 void Sg2ExStAdpcmSetSignal(s32 arg0)
 {
-    D_400F9040 = arg0;
+    D_400F9040 = (s32 (*)(void*, s32, s32, s32))arg0;
 }
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/st_adpcm", func_40032420);
@@ -390,7 +533,32 @@ s32 Sg2ExStAdpcmPreLoad(void* p)
     return 0;
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/st_adpcm", Sg2ExStAdpcmClose);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/st_adpcm", Sg2ExStAdpcmClose);
+s32 Sg2ExStAdpcmClose(void* p)
+{
+    u64 i;
+    s32 ret = -1;
+
+    if (*(s32*)((u8*)p + 0) >= 16)
+    {
+        Sg2ExStAdpcmStop(p);
+    }
+    *(s32*)((u8*)p + 0) = 0;
+    for (i = 0; i < 48; i++)
+    {
+        if (*(u64*)((u8*)p + 0xA0) & (1LL << i))
+        {
+            Sg2StAdpcmClose(i);
+            ret = 0;
+            D_400F8F80[i] = 1;
+        }
+    }
+    if (!(*(s32*)((u8*)p + 0x8) & 2))
+    {
+        D_400F9040(p, 4, 0, 0);
+    }
+    return ret;
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/st_adpcm", Sg2ExStAdpcmTickProc);
 void Sg2ExStAdpcmTickProc(void* p)
