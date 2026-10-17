@@ -109,8 +109,305 @@ s32 func_40018D88(ShockNode* arg0, s32 arg1);
 ShockNode* func_400192E0(ShockList* arg0, u8* arg1, ShockParam arg2, s32 arg3, s32 arg4);
 
 
+/* NEARMISS-STUB func_40018D88 */
+#if 0 /* NEARMISS 17.0% cat=branch-layout sub=- | structural: target has early bnezl/beql exits and fewer blocks, ours restructures the loop; 17 pct, needs control-flow rewrite | attempts=2 */
+s32 func_40018D88(ShockNode* arg0, s32 arg1)
+{
+    s32 ret = 0;
+    u8* base;
+    s32 dur;
+    u16 pc;
+    s32 op;
+    s32 low;
+    s32 lvl;
+    s32 tgt;
+    s32 diff;
+    s32 counter;
+    s32 hi;
+    s32 d;
+    s32 rem;
+
+    if (!(arg0->unk0 & 0x1))
+    {
+        return ret;
+    }
+    base = arg0->unk4;
+    if (base == NULL)
+    {
+        arg0->unk0 &= 0xFE;
+        return ret;
+    }
+    pc = arg0->unk8;
+    dur = arg0->unk12;
+
+L_check:
+    op = base[pc];
+    if ((u16)dur != 0)
+    {
+        goto L_counter;
+    }
+
+L_dispatch:
+    if (op == 0x80)
+    {
+        arg0->unk0 &= 0xFE;
+        return ret;
+    }
+    if (!(op & 0x80))
+    {
+        lvl = arg0->unkA + (op & 0x3F);
+        arg0->unkA = lvl;
+        counter = arg0->unk10;
+        arg0->unkC = counter;
+        tgt = (arg0->unk3 * lvl) >> 6;
+        arg0->unkE = tgt;
+        diff = tgt - counter;
+        arg0->unk12 = diff;
+        dur = diff;
+        if ((s16)diff <= 0)
+        {
+            arg0->unkE = counter + 1;
+            arg0->unk12 = 1;
+            dur = 1;
+        }
+    }
+    else
+    {
+        low = op & 0x3F;
+        switch (low)
+        {
+        case 1:
+            pc = pc + (s8)base[pc + 1];
+            arg0->unk8 = pc;
+            break;
+        case 2:
+            arg0->unk26 = base[pc + 1];
+            pc += 2;
+            arg0->unk8 = pc;
+            break;
+        case 3:
+            if (arg0->unk26 == 0)
+            {
+                pc += 2;
+            }
+            else
+            {
+                arg0->unk26--;
+                pc = pc + (s8)base[pc + 1];
+            }
+            arg0->unk8 = pc;
+            break;
+        case 0x3F:
+            pc = pc + (s8)base[pc + 1] + 2;
+            arg0->unk8 = pc;
+            if (arg1 != 0)
+            {
+                ((void (*)(ShockNode*, u8*))arg1)(arg0, base + pc);
+                base = arg0->unk4;
+                pc = arg0->unk8;
+                dur = arg0->unk12;
+            }
+            break;
+        default:
+            break;
+        }
+    }
+    goto L_check;
+
+L_counter:
+    counter = (u16)(arg0->unk10 + 1);
+    arg0->unk10 = counter;
+    op = base[pc];
+    if (op & 0x40)
+    {
+        hi = arg0->unk2;
+        if (hi & 0x80)
+        {
+            d = (hi >> 4) - 5;
+            if (d != 0)
+            {
+                rem = (s16)counter % d;
+                if (rem != 0)
+                {
+                    ret = 1;
+                }
+                else
+                {
+                    ret = ((hi >> 4) == 0xF);
+                }
+            }
+        }
+        else
+        {
+            d = 9 - (hi >> 4);
+            rem = (s16)counter % d;
+            ret = (rem == 0);
+        }
+    }
+    if ((s16)counter < (s32)(u16)arg0->unkE)
+    {
+        return ret;
+    }
+    arg0->unk12 = 0;
+    pc = pc + 1;
+    arg0->unk8 = pc;
+    if (base[pc] == 0x80)
+    {
+        arg0->unk0 &= 0xFE;
+    }
+    return ret;
+}
+#endif
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/shock", func_40018D88);
 
+/* NEARMISS-STUB func_40019018 */
+#if 0 /* NEARMISS 43.9% cat=branch-layout sub=- | control flow shape differs (target branch-likely beql/bnezl chains around s3=0x80 compare; ours extra blocks); 43.9 pct | attempts=2 */
+s32 func_40019018(ShockNode* arg0, s32 arg1)
+{
+    s32 ret = 0;
+    u8* base;
+    u16 pc;
+    s32 dur;
+    s32 op;
+    s32 low;
+    s32 lvl;
+    s32 tgt;
+    s32 diff;
+    s32 counter;
+    s32 step;
+    s32 mix;
+    s32 cnt = 0;
+    s32 sum = 0;
+
+    if (!(arg0->unk0 & 0x10))
+    {
+        return ret;
+    }
+    base = arg0->unk14;
+    if (base == NULL)
+    {
+        arg0->unk0 &= 0xEF;
+        return ret;
+    }
+    pc = arg0->unk18;
+    dur = (s16)arg0->unk22;
+
+    for (;;)
+    {
+        if (dur == 0)
+        {
+            op = base[pc];
+            if (op == 0x80)
+            {
+                arg0->unk0 &= 0xEF;
+                return ret;
+            }
+            if (op & 0x80)
+            {
+                low = op & 0x3F;
+                switch (low)
+                {
+                case 1:
+                    arg0->unk27 = base[pc + 1];
+                    pc += 2;
+                    arg0->unk18 = pc;
+                    break;
+                case 0:
+                    pc = pc + (s8)base[pc + 1];
+                    arg0->unk18 = pc;
+                    break;
+                case 2:
+                    if (arg0->unk27 == 0)
+                    {
+                        pc += 2;
+                    }
+                    else
+                    {
+                        arg0->unk27--;
+                        pc = pc + (s8)base[pc + 1];
+                    }
+                    arg0->unk18 = pc;
+                    break;
+                case 0x3F:
+                    arg0->unk8 = arg0->unk8 + (s8)base[pc + 1] + 2;
+                    if (arg1 != 0)
+                    {
+                        ((void (*)(ShockNode*, u8*))arg1)(arg0, base + pc);
+                        base = arg0->unk14;
+                        pc = arg0->unk18;
+                        dur = (s16)arg0->unk22;
+                    }
+                    break;
+                default:
+                    break;
+                }
+                continue;
+            }
+
+            step = op & 0x3F;
+            lvl = arg0->unk1A + step;
+            arg0->unk25 = base[pc + 1];
+            counter = arg0->unk20;
+            arg0->unk1C = counter;
+            arg0->unk1A = lvl;
+            tgt = (arg0->unk3 * lvl) >> 6;
+            arg0->unk1E = tgt;
+            diff = tgt - counter;
+            arg0->unk22 = diff;
+            if ((s16)diff > 0)
+            {
+                if (cnt == 0)
+                {
+                    dur = diff;
+                }
+                else
+                {
+                    pc -= 2;
+                    arg0->unk18 = pc;
+                    arg0->unk1E = counter + 1;
+                    arg0->unk1A = lvl - step;
+                    dur = 1;
+                    arg0->unk22 = 1;
+                    arg0->unk25 = sum / cnt;
+                    sum = 0;
+                    cnt = 0;
+                }
+            }
+            else
+            {
+                pc += 2;
+                arg0->unk18 = pc;
+                cnt++;
+                sum += arg0->unk25;
+                arg0->unk22 = 0;
+                dur = 0;
+            }
+            if (dur == 0)
+            {
+                continue;
+            }
+        }
+
+        counter = (u16)(arg0->unk20 + 1);
+        arg0->unk20 = counter;
+        mix = arg0->unk24 * (arg0->unk1E - (s16)counter) + arg0->unk25 * ((s16)counter - arg0->unk1C);
+        ret = ((mix / dur) * arg0->unk2) / 0xFF;
+        if ((s16)counter < (s32)arg0->unk1E)
+        {
+            return ret;
+        }
+        pc += 2;
+        arg0->unk18 = pc;
+        arg0->unk24 = arg0->unk25;
+        arg0->unk22 = 0;
+        if (base[pc] == 0x80)
+        {
+            arg0->unk0 &= 0xEF;
+        }
+        return ret;
+    }
+}
+#endif
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/shock", func_40019018);
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/shock", func_400192E0);
@@ -208,6 +505,47 @@ void Init_Controler(ShockCtrl* arg0)
 }
 
 
+/* NEARMISS-STUB Shock_Request */
+#if 0 /* NEARMISS 75.0% cat=inline-unroll sub=- | static inline GetShockVoiceSet/GetShockData: ours loads D_40045818 and table count early and reuses a5; target loads table/count later, index shift order differ | attempts=2 */
+static inline ShockVoiceSet* Shock_GetShockVoiceSet(u32 id)
+{
+    ShockVoiceSet* ret = NULL;
+    if (id < D_40045818->count)
+    {
+        ret = D_40045818->table[id];
+    }
+    return ret;
+}
+
+static inline u32* Shock_GetShockData(ShockVoiceSet* set, u32 no)
+{
+    u32* ret = NULL;
+    if (set != NULL && no < set->hdr->unk8)
+    {
+        ret = set->unkC + no;
+    }
+    return ret;
+}
+
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/shock", Shock_Request);
+ShockObj* Shock_Request(void* arg0, u32 arg1, ShockParam arg2, s32 arg3, s32 arg4)
+{
+    u32* ptr;
+    ShockObj* ret;
+
+    ptr = Shock_GetShockData(Shock_GetShockVoiceSet(arg2.set), arg1);
+    if (ptr == NULL)
+    {
+        return NULL;
+    }
+    ret = func_400192E0(arg0, ptr, arg2, arg3, arg4);
+    if (ret != NULL)
+    {
+        ret->unk3C = ptr;
+    }
+    return ret;
+}
+#endif
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/shock", Shock_Request);
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/shock", Shock_Decode);
@@ -270,6 +608,78 @@ void Shock_Decode(ShockList* arg0, u8* arg1, u8* arg2)
 }
 
 
+/* NEARMISS-STUB Shock_SetMotor */
+#if 0 /* NEARMISS 97.59% cat=regalloc sub=alloc-priority | register choice (decomper2 notes); best 97.59 attempts stored | attempts=2 */
+void Shock_SetMotor(s32 arg0, s32 arg1, ShockCtrl* arg2, s32 arg3, s32 arg4)
+{
+    s32 prev = arg2->unk0;
+    s32 m1 = arg1 & 0xFF;
+    s32 m0 = arg0 & 0xFF;
+    s32 diff = m1 - prev;
+    s32 val = m1;
+    s32 t;
+    s32 n;
+    s32 cur;
+    u8 v8;
+
+    if (diff > 0)
+    {
+        if (diff < 0x29)
+        {
+            if (m1 < 0x3D && prev < 0x3D)
+            {
+                if (prev < 0x33)
+                {
+                    val = 0xFF;
+                    goto L;
+                }
+                t = 0x3C - m1;
+                t = (t * t * 0xFF) / 100;
+            }
+            else
+            {
+                t = (diff * 0xFF) / 0x28;
+            }
+            if (prev < t)
+            {
+                val = t;
+            }
+        }
+        else
+        {
+            val = 0xFF;
+        }
+    }
+    else if (diff < 0)
+    {
+        val = 0;
+        if (diff >= -0x1E)
+        {
+            t = 0xFF + (diff * 0xFF) / 0x1E;
+            val = (t < prev) ? t : m1;
+        }
+    }
+L:
+    v8 = val;
+    n = (u16)arg2->unk2 + v8;
+    arg2->unk2 = n;
+    n = (s16)n;
+    if (n > 0x40A)
+    {
+        arg2->unk2 = 0x40A;
+    }
+    else if (n < 0)
+    {
+        arg2->unk2 = 0;
+    }
+    cur = arg2->unk2;
+    t = (u32)(cur << 8) / 0x40B;
+    arg2->unk4 = m0;
+    arg2->unk5 = v8;
+    arg2->unk0 = t;
+    arg2->unk2 = (u32)(cur * 3) >> 2;
+}
+#endif
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/shock", Shock_SetMotor);
 
 
