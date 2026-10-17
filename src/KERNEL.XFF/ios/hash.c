@@ -17,7 +17,34 @@ s32 GetStrHashWorkBuffer(s32 shift, s32 index)
     return (4 << shift) + (index * 0x10) + 0x66;
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/hash", InitStrHash);
+void* iosMallocAlign(s32, s32, s32);
+
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/hash", InitStrHash);
+void InitStrHash(t_hashTable* hTable, s32 arg1, s32 arg2)
+{
+    s32 i;
+    s32 bits = -2;
+    s32 size;
+
+    if (arg2 != 0)
+    {
+        do
+        {
+            arg2 >>= 1;
+            bits++;
+        } while (arg2 != 0);
+    }
+
+    bits = (bits < 0) ? 0 : bits;
+    size = 1 << bits;
+    hTable->maxValue = size;
+    hTable->table = iosMallocAlign(arg1, size << 2, 0x10);
+
+    for (i = 0; i < (s32)hTable->maxValue; i++)
+    {
+        hTable->table[i] = NULL;
+    }
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/hash", AddStrHashKey);
 void AddStrHashKey(volatile t_hashTable* hTable, volatile t_hashedSym* hSym)
