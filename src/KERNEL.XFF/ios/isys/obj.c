@@ -79,7 +79,63 @@ static inline void isysLinkReserve(isysLink* link)
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/obj", isysDeleteObjManager);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/obj", func_4002AF90);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/obj", func_4002AF90);
+extern char D_40048940[];
+void func_4002AF90(isysLink* prev, isysLink* link, s32 flag)
+{
+    u16* group;
+
+    if (prev == NULL)
+    {
+        link->group[0] = LINK_IDX(link);
+        link->group[1] = LINK_IDX(link);
+        link->next = 0;
+        link->prev = 0;
+        return;
+    }
+    switch (flag)
+    {
+    case 0:
+    {
+        u16* group;
+
+        link->prev = prev->prev;
+        if (link->prev)
+        {
+            LINK_AT(prev->prev)->next = LINK_IDX(link);
+        }
+        else
+        {
+            group = prev->group;
+            group[0] = LINK_IDX(link);
+        }
+        link->next = LINK_IDX(prev);
+        prev->prev = LINK_IDX(link);
+    }
+    break;
+    case 1:
+    {
+        u16* group;
+
+        link->prev = LINK_IDX(prev);
+        link->next = prev->next;
+        if (link->next)
+        {
+            LINK_AT(prev->next)->prev = LINK_IDX(link);
+        }
+        else
+        {
+            group = prev->group;
+            group[1] = LINK_IDX(link);
+        }
+        prev->next = LINK_IDX(link);
+    }
+    break;
+    default:
+        iosJumpRecoverPoint(D_40048940);
+        break;
+    }
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/obj", func_4002B218);
 void func_4002B218(isysLink* link)
