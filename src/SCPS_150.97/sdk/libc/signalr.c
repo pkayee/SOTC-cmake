@@ -23,8 +23,4 @@ int _kill_r(struct _reent *ptr, int pid, int sig)
     return ret;
 }
 
-//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libc/signalr", _getpid_r);
-int _getpid_r(struct _reent *ptr)
-{
-    return getpid();
-}
+INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libc/signalr", _getpid_r);
