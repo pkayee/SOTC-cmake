@@ -22,6 +22,32 @@ s32 func_00119808(void *, void *, s32 *, s32, void *, s32);
 s32 ChangeThreadPriority(s32, s32);
 s32 iChangeThreadPriority(s32, s32);
 s32 sceDbcGetConnection(s32);
+s32 sce_call_rpc(void *, void *, s32);
+s32 sceNetcnfifSetup(void);
+s32 sceNetcnfifInit(void);
+s32 sceNetcnfifFreeWorkarea(void);
+void *memset(void *, s32, u32);
+s32 CallRpc(void *, s32, void *, s32, s32);
+s32 _sceMcCoreReadPage(s32, s32, s32, s32);
+s32 _sceMcCoreWritePage(s32, s32, s32, s32);
+s32 _sceMcpIsSpeckOutBlock(s32, s32);
+s32 sceMc2GetInfoAsync(s32, void *);
+s32 sceMc2FormatAsync(s32);
+s32 sceMc2UnformatAsync(s32);
+s32 sceMc2ReadFileAsync(s32, s32, s32, s32);
+s32 sceMc2WriteFileAsync(s32, s32, s32, s32);
+s32 sceMc2CreateFileAsync(s32, s32);
+s32 sceMc2DeleteAsync(s32, s32);
+s32 sceMc2RenameAsync(s32, s32, s32);
+s32 sceMc2MkdirAsync(s32, s32);
+s32 sceMc2ChdirAsync(s32, s32, s32);
+s32 sceMc2GetDirAsync(s32, s32, s32, s32);
+s32 sceMc2ChmodAsync(s32, s32, s32);
+s32 sceMc2GetEntSpaceAsync(s32, s32);
+s32 sceMc2SearchFileAsync(s32, s32, s32, s32);
+extern s32 D_00168040[];
+extern s32 D_00168080[];
+extern s32 D_00135A5C[];
 char *strcpy(char *, const char *);
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", CallRpc);
@@ -80,7 +106,16 @@ INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceInetChangeThreadPriori
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceInetGetLog);
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceInetAbortLog);
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceInetAbortLog);
+s32 sceInetAbortLog(void *cd, s32 *net_buf)
+{
+    s32 ret = CallRpc(cd, 0x10, net_buf, 0, 4);
+    if (ret < 0)
+    {
+        return -0x21E;
+    }
+    return net_buf[0];
+}
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceInetCtlUpInterface);
 
@@ -94,9 +129,27 @@ INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceLibnetInitialize);
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceLibnetTerminate);
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceLibnetRegisterHandler);
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceLibnetRegisterHandler);
+s32 sceLibnetRegisterHandler(void *cd, s32 *net_buf)
+{
+    s32 ret = CallRpc(cd, 0x1E, net_buf, 0, 4);
+    if (ret < 0)
+    {
+        return -0x21E;
+    }
+    return net_buf[0];
+}
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceLibnetUnregisterHandler);
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceLibnetUnregisterHandler);
+s32 sceLibnetUnregisterHandler(void *cd, s32 *net_buf)
+{
+    s32 ret = CallRpc(cd, 0x1F, net_buf, 0, 4);
+    if (ret < 0)
+    {
+        return -0x21E;
+    }
+    return net_buf[0];
+}
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceLibnetSetConfiguration);
 
@@ -247,33 +300,173 @@ s32 sceMc2Sync(s32 a0, s32 a1)
     return func_0011B770(0, a0, a1);
 }
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceMc2GetInfo);
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceMc2GetInfo);
+s32 sceMc2GetInfo(s32 a0, void *a1)
+{
+    s32 ret = sceMc2GetInfoAsync(a0, a1);
+    if (ret != 0)
+    {
+        return ret;
+    }
+    func_0011B770(0, 0, (s32)&ret);
+    return ret;
+}
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceMc2Format);
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceMc2Format);
+s32 sceMc2Format(s32 a0)
+{
+    s32 ret = sceMc2FormatAsync(a0);
+    if (ret != 0)
+    {
+        return ret;
+    }
+    func_0011B770(0, 0, (s32)&ret);
+    return ret;
+}
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceMc2Unformat);
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceMc2Unformat);
+s32 sceMc2Unformat(s32 a0)
+{
+    s32 ret = sceMc2UnformatAsync(a0);
+    if (ret != 0)
+    {
+        return ret;
+    }
+    func_0011B770(0, 0, (s32)&ret);
+    return ret;
+}
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceMc2ReadFile);
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceMc2ReadFile);
+s32 sceMc2ReadFile(s32 a0, s32 a1, s32 a2, s32 a3)
+{
+    s32 ret = sceMc2ReadFileAsync(a0, a1, a2, a3);
+    if (ret != 0)
+    {
+        return ret;
+    }
+    func_0011B770(0, 0, (s32)&ret);
+    return ret;
+}
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceMc2WriteFile);
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceMc2WriteFile);
+s32 sceMc2WriteFile(s32 a0, s32 a1, s32 a2, s32 a3)
+{
+    s32 ret = sceMc2WriteFileAsync(a0, a1, a2, a3);
+    if (ret != 0)
+    {
+        return ret;
+    }
+    func_0011B770(0, 0, (s32)&ret);
+    return ret;
+}
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceMc2CreateFile);
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceMc2CreateFile);
+s32 sceMc2CreateFile(s32 a0, s32 a1)
+{
+    s32 ret = sceMc2CreateFileAsync(a0, a1);
+    if (ret != 0)
+    {
+        return ret;
+    }
+    func_0011B770(0, 0, (s32)&ret);
+    return ret;
+}
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceMc2Delete);
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceMc2Delete);
+s32 sceMc2Delete(s32 a0, s32 a1)
+{
+    s32 ret = sceMc2DeleteAsync(a0, a1);
+    if (ret != 0)
+    {
+        return ret;
+    }
+    func_0011B770(0, 0, (s32)&ret);
+    return ret;
+}
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceMc2Rename);
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceMc2Rename);
+s32 sceMc2Rename(s32 a0, s32 a1, s32 a2)
+{
+    s32 ret = sceMc2RenameAsync(a0, a1, a2);
+    if (ret != 0)
+    {
+        return ret;
+    }
+    func_0011B770(0, 0, (s32)&ret);
+    return ret;
+}
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceMc2Mkdir);
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceMc2Mkdir);
+s32 sceMc2Mkdir(s32 a0, s32 a1)
+{
+    s32 ret = sceMc2MkdirAsync(a0, a1);
+    if (ret != 0)
+    {
+        return ret;
+    }
+    func_0011B770(0, 0, (s32)&ret);
+    return ret;
+}
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceMc2Chdir);
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceMc2Chdir);
+s32 sceMc2Chdir(s32 a0, s32 a1, s32 a2)
+{
+    s32 ret = sceMc2ChdirAsync(a0, a1, a2);
+    if (ret != 0)
+    {
+        return ret;
+    }
+    func_0011B770(0, 0, (s32)&ret);
+    return ret;
+}
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceMc2GetDir);
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceMc2GetDir);
+s32 sceMc2GetDir(s32 a0, s32 a1, s32 a2, s32 a3)
+{
+    s32 ret = sceMc2GetDirAsync(a0, a1, a2, a3);
+    if (ret != 0)
+    {
+        return ret;
+    }
+    func_0011B770(0, 0, (s32)&ret);
+    return ret;
+}
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceMc2Chmod);
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceMc2Chmod);
+s32 sceMc2Chmod(s32 a0, s32 a1, s32 a2)
+{
+    s32 ret = sceMc2ChmodAsync(a0, a1, (u16)a2);
+    if (ret != 0)
+    {
+        return ret;
+    }
+    func_0011B770(0, 0, (s32)&ret);
+    return ret;
+}
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceMc2SearchFile);
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceMc2SearchFile);
+s32 sceMc2SearchFile(s32 a0, s32 a1, s32 a2, s32 a3)
+{
+    s32 ret = sceMc2SearchFileAsync(a0, a1, a2, a3);
+    if (ret != 0)
+    {
+        return ret;
+    }
+    func_0011B770(0, 0, (s32)&ret);
+    return ret;
+}
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceMc2GetEntSpace);
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceMc2GetEntSpace);
+s32 sceMc2GetEntSpace(s32 a0, s32 a1)
+{
+    s32 ret = sceMc2GetEntSpaceAsync(a0, a1);
+    if (ret != 0)
+    {
+        return ret;
+    }
+    func_0011B770(0, 0, (s32)&ret);
+    return ret;
+}
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_0011BBE8);
 
@@ -380,8 +573,36 @@ INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", _sceMcpReadSysInfo);
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", _sceMcpWriteSysInfo);
 
+/* NEARMISS-STUB _sceMcpReadClust */
+#if 0 /* NEARMISS 90.0% cat=sched sub=- | target puts mflo a2 in jal delay slot (mult;jal;mflo); gcc 2.9 keeps mflo before jal and nop in slot; struct McpClust 0x184 with u16 2A/2C matched the rest; n*a | attempts=1 */
+typedef struct
+{
+    u8 unk00[0x2A];
+    u16 unk2A;
+    u16 unk2C;
+    u8 unk2E[0x184 - 0x2E];
+} McpClust;
+
+extern McpClust D_00135738[];
+
+s32 _sceMcpReadClust(s32 a0, s32 a1, s32 a2, s32 a3)
+{
+    McpClust *p = &D_00135738[a0];
+    u16 n = p->unk2A;
+    return _sceMcCoreReadPage(a0, a1, a2 * n, n * a3);
+}
+#endif
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", _sceMcpReadClust);
 
+/* NEARMISS-STUB _sceMcpWriteClust */
+#if 0 /* NEARMISS 90.0% cat=sched sub=- | same as ReadClust: mflo a2 belongs in jal delay slot, gcc 2.9 leaves nop | attempts=1 */
+s32 _sceMcpWriteClust(s32 a0, s32 a1, s32 a2, s32 a3)
+{
+    McpClust *p = &D_00135738[a0];
+    u16 n = p->unk2A;
+    return _sceMcCoreWritePage(a0, a1, a2 * n, n * a3);
+}
+#endif
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", _sceMcpWriteClust);
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", _sceMcpFlushCache);
@@ -402,6 +623,16 @@ s32 _sceMcpWriteUserClust(void)
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", _sceMcpIsSpeckOutBlock);
 
+/* NEARMISS-STUB _sceMcpIsSpeckOutClust */
+#if 0 /* NEARMISS 91.1% cat=sched sub=- | same as ReadClust: mflo a1 belongs in div/jal delay slot (target), gcc 2.9 leaves nop | attempts=1 */
+s32 _sceMcpIsSpeckOutClust(s32 a0, s32 a1)
+{
+    McpClust *p = &D_00135738[a0];
+    u16 n = p->unk2A;
+    u16 m = p->unk2C;
+    return _sceMcpIsSpeckOutBlock(a0, a1 * n / m);
+}
+#endif
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", _sceMcpIsSpeckOutClust);
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", _sceMcpMakeSpecoutBlock);
@@ -472,7 +703,13 @@ INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", _sceMcCoreChangeSocketTyp
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceNetcnfifSetup);
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceNetcnfifInit);
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceNetcnfifInit);
+s32 sceNetcnfifInit(void)
+{
+    s32 ret = sceNetcnfifSetup();
+    memset(D_00168080, 0, 0x310);
+    return ret;
+}
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceNetcnfifCreateCallbackThread);
 
@@ -521,15 +758,38 @@ INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceNetcnfifCheckAdditiona
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceNetcnfifCheckSpecialProvider);
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceNetcnfifGetAddr);
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceNetcnfifGetAddr);
+s32 sceNetcnfifGetAddr(void)
+{
+    sceNetcnfifInit();
+    return sce_call_rpc(D_00168040, D_00168080, 0x64);
+}
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceNetcnfifAllocWorkarea);
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceNetcnfifAllocWorkarea);
+s32 sceNetcnfifAllocWorkarea(s32 a0)
+{
+    sceNetcnfifInit();
+    D_00168080[0] = a0;
+    return sce_call_rpc(D_00168040, D_00168080, 0x65);
+}
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceNetcnfifFreeWorkarea);
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceNetcnfifFreeWorkarea);
+s32 sceNetcnfifFreeWorkarea(void)
+{
+    sceNetcnfifInit();
+    return sce_call_rpc(D_00168040, D_00168080, 0x66);
+}
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceNetcnfifSetEnv);
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceNetcnfifTerm);
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceNetcnfifTerm);
+s32 sceNetcnfifTerm(void)
+{
+    s32 ret = sceNetcnfifFreeWorkarea();
+    sce_sync(0);
+    D_00135A5C[0] = 0;
+    return ret;
+}
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_00122FA8);
 
