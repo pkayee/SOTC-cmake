@@ -183,7 +183,7 @@ segments:
         - [0x2D1F8, c, sdk/libc/swsetup]
         - [0x2D308, c, sdk/libc/atof]
         - [0x2D320, c, sdk/libc/atol]
-        - [0x2D570, asm, sdk/libc/dtoa]
+        - [0x2D570, c, sdk/libc/dtoa]
         - [0x2E7D8, c, sdk/libc/fflush]
         - [0x2E8F0, c, sdk/libc/findfp]
         - [0x2eb90, c, sdk/libc/fread]
