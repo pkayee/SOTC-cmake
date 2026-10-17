@@ -313,7 +313,6 @@ void func_400286E8(void)
     }
 }
 
-//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gp", gsRegBegin);
 volatile s64* gsRegBegin(void)
 {
     D_40045AF4->unk1C = 0;
@@ -341,11 +340,89 @@ volatile s64* gsRegBegin(void)
     return D_40045AF4->unkC;
 }
 #define GTAG ((sceGifTag *)D_40045AF4->unk8)
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gp", gsRegEnd);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gp", gsRegEnd);
+void gsRegEnd(void)
+{
+    if (D_40045AF4->unk1C == 0)
+    {
+        D_40045AF4->unk14 = ((u32)D_40045AF4->unkC - (u32)D_40045AF4->unk8) >> 4;
+        D_40045AF4->unk18 = D_40045AF4->unk14 - 1;
+        if (D_40045AF4->unk18 > 0)
+        {
+            SCE_GIF_CLEAR_TAG(GTAG);
+            GTAG->FLG = 0;
+            GTAG->PRE = 0;
+            GTAG->EOP = 1;
+            GTAG->NREG = 1;
+            GTAG->REGS0 = 0xE;
+            GTAG->NLOOP = D_40045AF4->unk18;
+            ((u32 *)D_40045AF4->unk8)[-1] = 0x50000000 | D_40045AF4->unk14;
+            ((u32 *)D_40045AF4->unk8)[-2] = 0x10000000;
+        }
+        else
+        {
+            D_40045AF4->unkC = D_40045AF4->unk4;
+        }
+    }
+    if (D_40045AF4->unk1C != 0)
+    {
+        D_40045AF4->unkC = 0;
+        return;
+    }
+    D_40045AF4->unk10 = (((u32)D_40045AF4->unkC - (u32)D_40045AF4->unk0) >> 4) - 1;
+    if (D_40045AF4->unk10 > 1)
+    {
+        *D_40045AF4->unk0 = D_40045AF4->unk10 | 0x60000000;
+        iosSetPacketPtrPath1(D_40045AF4->unkC);
+        iosDlChainTailCurrent(D_40045AF4->unk0);
+        D_40045AF4->unkC = 0;
+        return;
+    }
+    D_40045AF4->unkC = 0;
+}
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gp", gsRegEndWithPtr);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gp", gsRegEndWithPtr);
+volatile s64 *gsRegEndWithPtr(void)
+{
+    if (D_40045AF4->unk1C == 0)
+    {
+        D_40045AF4->unk14 = ((u32)D_40045AF4->unkC - (u32)D_40045AF4->unk8) >> 4;
+        D_40045AF4->unk18 = D_40045AF4->unk14 - 1;
+        if (D_40045AF4->unk18 > 0)
+        {
+            SCE_GIF_CLEAR_TAG(GTAG);
+            GTAG->FLG = 0;
+            GTAG->PRE = 0;
+            GTAG->EOP = 1;
+            GTAG->NREG = 1;
+            GTAG->REGS0 = 0xE;
+            GTAG->NLOOP = D_40045AF4->unk18;
+            ((u32 *)D_40045AF4->unk8)[-1] = 0x50000000 | D_40045AF4->unk14;
+            ((u32 *)D_40045AF4->unk8)[-2] = 0x10000000;
+        }
+        else
+        {
+            D_40045AF4->unkC = D_40045AF4->unk4;
+        }
+    }
+    if (D_40045AF4->unk1C != 0)
+    {
+        D_40045AF4->unkC = 0;
+        return NULL;
+    }
+    D_40045AF4->unk10 = (((u32)D_40045AF4->unkC - (u32)D_40045AF4->unk0) >> 4) - 1;
+    if (D_40045AF4->unk10 > 1)
+    {
+        *D_40045AF4->unk0 = D_40045AF4->unk10 | 0x60000000;
+        iosSetPacketPtrPath1(D_40045AF4->unkC);
+        iosDlChainTailCurrent(D_40045AF4->unk0);
+        D_40045AF4->unkC = 0;
+        return D_40045AF4->unk0;
+    }
+    D_40045AF4->unkC = 0;
+    return NULL;
+}
 
-//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gp", gsReglistBegin);
 void gsReglistBegin(void)
 {
     D_40045AF4->unk1C = 0;
@@ -372,7 +449,47 @@ void gsReglistBegin(void)
     }
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gp", gsReglistEnd);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gp", gsReglistEnd);
+void gsReglistEnd(s32 prim)
+{
+    if (D_40045AF4->unk1C == 0)
+    {
+        D_40045AF4->unk14 = ((u32)D_40045AF4->unkC - (u32)D_40045AF4->unk8) >> 4;
+        D_40045AF4->unk18 = (D_40045AF4->unk14 - 1) / 3;
+        if (D_40045AF4->unk18 > 0)
+        {
+            SCE_GIF_CLEAR_TAG(GTAG);
+            GTAG->FLG = 0;
+            GTAG->PRE = 1;
+            GTAG->EOP = 1;
+            GTAG->NREG = 3;
+            GTAG->REGS0 = 2;
+            GTAG->REGS1 = 1;
+            GTAG->REGS2 = 4;
+            GTAG->NLOOP = D_40045AF4->unk18 * 3;
+            GTAG->PRIM = prim;
+        }
+        else
+        {
+            D_40045AF4->unkC = D_40045AF4->unk4;
+        }
+    }
+    if (D_40045AF4->unk1C != 0)
+    {
+        D_40045AF4->unkC = 0;
+        return;
+    }
+    D_40045AF4->unk10 = (((u32)D_40045AF4->unkC - (u32)D_40045AF4->unk0) >> 4) - 1;
+    if (D_40045AF4->unk10 > 1)
+    {
+        *D_40045AF4->unk0 = D_40045AF4->unk10 | 0x60000000;
+        iosSetPacketPtrPath1(D_40045AF4->unkC);
+        iosDlChainTailCurrent(D_40045AF4->unk0);
+        D_40045AF4->unkC = 0;
+        return;
+    }
+    D_40045AF4->unkC = 0;
+}
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gp", gsBox);
 
