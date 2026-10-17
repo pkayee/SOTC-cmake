@@ -185,7 +185,47 @@ void iosSignalMalloc(void)
     SignalSema(D_4007CC78);
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/memory", iosMallocGarbageTickProc);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/memory", iosMallocGarbageTickProc);
+void iosMallocGarbageTickProc(s32 (*cb)(void *), void *cbArg)
+{
+    Blk *blk;
+    Blk *next;
+    u32 w10;
+    void *cbFn;
+    void *arg;
+    void *res;
+
+    WaitSema(D_4007CC78);
+    blk = (Blk *)((((Ptn *)gbPtn)->firstBlkP24 & 0xFFFFFF) << 2);
+    while (blk != NULL)
+    {
+        if (cb(cbArg) == 0)
+        {
+            break;
+        }
+        next = (Blk *)((blk->w08 & 0xFFFFFF) << 2);
+        if (!(((blk->w0C) >> 24) & 1) && next != NULL)
+        {
+            if (((next->w0C) >> 24) & 1)
+            {
+                w10 = next->w10 & 0xFFFFFF;
+                if (w10 != 0xFFFFFF)
+                {
+                    cbFn = (void *)(w10 << 2);
+                    arg = (void *)((next->w14 & 0xFFFFFF) << 2);
+                    res = func_40013A78(blk, next, gbPtn);
+                    if (cbFn != NULL)
+                    {
+                        ((void (*)(void *, void *))cbFn)(arg, res);
+                    }
+                    next = (Blk *)((blk->w08 & 0xFFFFFF) << 2);
+                }
+            }
+        }
+        blk = next;
+    }
+    SignalSema(D_4007CC78);
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/memory", iosMallocAlign);
 void *iosMallocAlign(void *ptn, s32 size, s32 align)
@@ -230,7 +270,17 @@ void *iosMallocAlignNoCheck(void *ptn, s32 size, s32 align)
     return r;
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/memory", iosMallocSetExecGarbageCallback);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/memory", iosMallocSetExecGarbageCallback);
+void iosMallocSetExecGarbageCallback(void *user, s32 cb, s32 arg)
+{
+    u32 *blk;
+
+    WaitSema(D_4007CC78);
+    blk = ((u32 **)user)[-1];
+    blk[4] = (blk[4] & 0xFF000000) | ((cb >> 2) & 0xFFFFFF);
+    blk[5] = (blk[5] & 0xFF000000) | ((arg >> 2) & 0xFFFFFF);
+    SignalSema(D_4007CC78);
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/memory", iosReallocAlign);
 void *iosReallocAlign(void *ptn, void *oldUser, s32 size, s32 align)
