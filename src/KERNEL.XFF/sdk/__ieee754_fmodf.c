@@ -24,6 +24,8 @@ typedef union
         (d) = sf_u.value;               \
     } while (0)
 
+#define FLT_UWORD_IS_SUBNORMAL(x) 0
+
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/sdk/__ieee754_fmodf", __ieee754_fmodf);
 float __ieee754_fmodf(float x, float y)
 {
@@ -34,6 +36,7 @@ float __ieee754_fmodf(float x, float y)
     s32 ix;
     s32 iy;
     s32 sx;
+    s32 i;
 
     GET_FLOAT_WORD(hx, x);
     GET_FLOAT_WORD(hy, y);
@@ -54,10 +57,31 @@ float __ieee754_fmodf(float x, float y)
         return D_40049528[(u32)sx >> 31];
     }
 
-    ix = (hx >> 23) - 127;
-    do
+    /* determine ix = ilogb(x) */
+    if (FLT_UWORD_IS_SUBNORMAL(hx))
     {
-    iy = (hy >> 23) - 127;
+        for (ix = -126, i = (hx << 8); i > 0; i <<= 1)
+        {
+            ix -= 1;
+        }
+    }
+    else
+    {
+        ix = (hx >> 23) - 127;
+    }
+
+    /* determine iy = ilogb(y) */
+    if (FLT_UWORD_IS_SUBNORMAL(hy))
+    {
+        for (iy = -126, i = (hy << 8); i >= 0; i <<= 1)
+        {
+            iy -= 1;
+        }
+    }
+    else
+    {
+        iy = (hy >> 23) - 127;
+    }
     if (ix >= -126)
     {
         hx = 0x00800000 | (0x007fffff & hx);
@@ -95,7 +119,6 @@ float __ieee754_fmodf(float x, float y)
             hx = hz + hz;
         }
     }
-    } while (0);
     hz = hx - hy;
     if (hz >= 0)
     {
