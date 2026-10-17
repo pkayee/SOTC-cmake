@@ -1,17 +1,14 @@
 #include "common.h"
 
-typedef union ShockVoiceSetHdr
+typedef struct ShockVoiceSetHdr
 {
-    struct
-    {
-        /* 0x0 */ u16 unk0;
-        /* 0x2 */ u16 unk2;
-        /* 0x4 */ u16 unk4;
-        /* 0x6 */ u16 unk6;
-        /* 0x8 */ u16 unk8;
-        /* 0xA */ u16 unkA;
-    };
-} ShockVoiceSetHdr; // union: accesses get alias set 0, which keeps the loads after the stores (see Init_ShockVoiceSet)
+    /* 0x0 */ u16 unk0;
+    /* 0x2 */ u16 unk2;
+    /* 0x4 */ u16 unk4;
+    /* 0x6 */ u16 unk6;
+    /* 0x8 */ u16 unk8;
+    /* 0xA */ u16 unkA;
+} ShockVoiceSetHdr;
 
 typedef struct ShockVoiceSet
 {
@@ -27,6 +24,14 @@ typedef struct ShockTable
     /* 0x4 */ ShockVoiceSet** table;
     /* 0x8 */ s32 unk8;
 } ShockTable;
+
+typedef struct ShockParam
+{
+    /* 0x0 */ u8 set;
+    /* 0x1 */ u8 unk1;
+    /* 0x2 */ u8 unk2;
+    /* 0x3 */ u8 unk3;
+} ShockParam;
 
 typedef struct ShockPlayer
 {
@@ -75,7 +80,7 @@ s32 func_40019960();
 void func_400199A8(u8* arg0);
 s32 func_40019018(ShockNode* arg0, s32 arg1);
 s32 func_40018D88(ShockNode* arg0, s32 arg1);
-ShockObj* func_400192E0(void* arg0, u32* arg1, s64 arg2);
+ShockObj* func_400192E0(void* arg0, u32* arg1, ShockParam arg2, s32 arg3, s32 arg4);
 
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/shock", func_40018D88);
@@ -93,7 +98,48 @@ void Init_ShockVoiceSet(ShockVoiceSet* arg0, ShockVoiceSetHdr* arg1)
     arg0->unk8 = (u32*)arg1 + arg1->unk6;
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/shock", Init_Shock);
+static inline void Init_ShockTable(ShockTable* t, ShockVoiceSet** tbl, s32 n)
+{
+    s32 i;
+
+    if (t != NULL && tbl != NULL)
+    {
+        t->table = tbl;
+        t->count = n;
+        D_40045818 = t;
+        for (i = 0; i < n; i++)
+        {
+            D_40045818->table[i] = NULL;
+        }
+        D_40045818->unk8 = 0;
+    }
+}
+
+static inline void Init_ShockPlayerBuf(ShockPlayer* p, u8 (*buf)[0x40], s32 n)
+{
+    s32 i;
+
+    if (p != NULL && buf != NULL)
+    {
+        p->unk0 = n;
+        p->unk4 = buf;
+        for (i = 0; i < n; i++)
+        {
+            buf[i][0] = 0;
+        }
+    }
+    else
+    {
+        p->unk0 = 0;
+    }
+}
+
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/shock", Init_Shock);
+void Init_Shock(void)
+{
+    Init_ShockTable(&D_40081590, D_400815A0, 2);
+    Init_ShockPlayerBuf(&D_400815A8, D_400815B0, 16);
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/shock", Shock_SetShockVoiceSet);
 s32 Shock_SetShockVoiceSet(u32 id, ShockVoiceSet* vs)
