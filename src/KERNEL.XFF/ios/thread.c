@@ -29,6 +29,64 @@ extern s32 D_40081184;
 
 
 
+/* NEARMISS-STUB iosCreateThread */
+#if 0 /* NEARMISS 73.0% cat=regalloc sub=- | prologue s0-s5 frame 0x40, 2nd NULL check missing, address arithmetic hoisted | attempts=1 */
+// kK27 iosCreateThread best C (73.46% objdiff, v2). Needs in thread.c: extern char D_40046CC0; extern char D_40046CD0; extern char D_40046CE0; extern s32 D_40045814;
+// Residual diff: prologue saves s0..s4 (target s0..s5, arg0 in s4, hi of iosSystemSema in s5); gcc hoists lui/addu address computations above the list ops and the fail-block lui; counter lowered as branch (matches). Not reached 100 by mechanical edits.
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/thread", iosCreateThread);
+iosThread* iosCreateThread(void* arg0, void* arg1, s32 arg2, s32 arg3, s32 arg4)
+{
+    iosThread* thread;
+    s32 id;
+    s32 old;
+    s32 tid;
+
+    WaitSema(iosSystemSema);
+    thread = D_4007F160;
+    if (thread != NULL)
+    {
+        D_4007F160 = thread->unk20;
+        if (D_4007F160 != NULL)
+            D_4007F160->unk1C = NULL;
+        thread->unk1C = NULL;
+        thread->unk20 = D_4007F164;
+        if (D_4007F164 != NULL)
+            D_4007F164->unk1C = thread;
+        D_4007F164 = thread;
+        thread->unk18 &= ~1;
+    }
+    if (thread != NULL)
+    {
+        old = D_40045814;
+        id = old + 1;
+        D_40045814 = id;
+        if (id == 0)
+        {
+            id = old + 2;
+            D_40045814 = id;
+        }
+        thread->unk0 = id;
+        thread->unk8->entry = (void (*)(void*))arg0;
+        thread->unk8->stack = arg1;
+        memcpy(arg1, &D_40046CC0, 16);
+        memcpy((u8*)arg1 + arg2 - 16, &D_40046CD0, 16);
+        thread->unk8->stackSize = arg2 - 16;
+        thread->unk8->gpReg = &_gp;
+        thread->unk14 = arg3;
+        thread->unk8->initPriority = arg3;
+        tid = CreateThread(thread->unk8);
+        thread->unk4 = tid;
+        D_4007ED60[tid] = thread;
+        LoaderSysEntryExternalThreadList(thread->unk4);
+    }
+    else
+    {
+        iosJumpRecoverPoint(&D_40046CE0);
+    }
+    SignalSema(iosSystemSema);
+    return thread;
+}
+#endif
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/thread", iosCreateThread);
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/thread", func_40018530);
