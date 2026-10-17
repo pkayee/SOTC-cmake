@@ -2,8 +2,21 @@
 #include <sys/reent.h>
 
 extern s32 D_0013A30C[];
+#define errno (*D_0013A30C)
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libc/writer", _write_r);
+int write(int fd, const void *buf, unsigned int cnt);
+int read(int fd, void *buf, unsigned int cnt);
+
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libc/writer", _write_r);
+long _write_r(struct _reent *ptr, int fd, const void *buf, unsigned int cnt)
+{
+    long ret;
+
+    errno = 0;
+    if ((ret = (long)write(fd, buf, cnt)) == -1 && errno != 0)
+        ptr->_errno = errno;
+    return ret;
+}
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libc/writer", _calloc_r);
 
@@ -58,7 +71,16 @@ long _lseek_r(struct _reent *ptr, s32 fd, long offset, s32 whence)
 }
 
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libc/writer", _read_r);
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libc/writer", _read_r);
+long _read_r(struct _reent *ptr, int fd, void *buf, unsigned int cnt)
+{
+    long ret;
+
+    errno = 0;
+    if ((ret = (long)read(fd, buf, cnt)) == -1 && errno != 0)
+        ptr->_errno = errno;
+    return ret;
+}
 
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libc/writer", _realloc_r);
