@@ -120,39 +120,35 @@ int InitTimer(int arg)
 #endif
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/timer", InitTimer);
 
-/* NEARMISS-STUB EndTimer */
-#if 0 /* NEARMISS 95.2% cat=branch-layout sub=- | bgezl with delay-slot lw vs ours beqz | attempts=1 */
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/timer", EndTimer);
 int EndTimer(void)
 {
-    TimerTable *tt;
     int stat;
 
-    tt = (TimerTable *)D_00133A18;
-    if (tt->intcId < 0)
+    if (((volatile TimerTable *)D_00133A18)->intcId < 0)
     {
         return 0x80008001;
     }
-    if (tt->numUsed != 0)
+    if (((volatile TimerTable *)D_00133A18)->numUsed != 0)
     {
         return 0x80000010;
     }
     stat = DIntr();
-    if (RemoveIntcHandler(0xB, tt->intcId) == 0)
+    if (RemoveIntcHandler(0xB, ((volatile TimerTable *)D_00133A18)->intcId) == 0)
     {
         DisableIntc(0xB);
         SetT2_MODE(0xC00);
         SetT2_COUNT(0);
     }
     *(u64 *)D_00133A18 = 0;
-    tt->intcId = -1;
+    ((TimerTable *)D_00133A18)->intcId = -1;
     if (stat != 0)
     {
         EIntr();
     }
     return 0;
 }
-#endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/timer", EndTimer);
+
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/timer", GetTimerPreScaleFactor);
 
