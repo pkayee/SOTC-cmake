@@ -40,22 +40,20 @@ void iosMvecAllOne(u_long128 *dst)
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/mvec", iosAddMvec);
 void iosAddMvec(u_long128 *dst, u_long128 *a, u_long128 *b)
 {
-    union { MvecRaw m; u_long128 q; } x, y;
+    MvecRaw x = *(MvecRaw *)a;
+    MvecRaw y = *(MvecRaw *)b;
     u_long128 r;
-    x.m = *(MvecRaw *)a;
-    y.m = *(MvecRaw *)b;
-    asm volatile("paddw %0, %1, %2" : "=r"(r) : "r"(x.q), "r"(y.q));
+    asm volatile("paddw %0, %1, %2" : "=r"(r) : "r"(*(u_long128 *)&x), "r"(*(u_long128 *)&y));
     *dst = r;
 }
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/mvec", iosClampSW_AddMvec);
 void iosClampSW_AddMvec(u_long128 *dst, u_long128 *a, u_long128 *b)
 {
-    union { MvecRaw m; u_long128 q; } x, y;
+    MvecRaw x = *(MvecRaw *)a;
+    MvecRaw y = *(MvecRaw *)b;
     u_long128 r;
-    x.m = *(MvecRaw *)a;
-    y.m = *(MvecRaw *)b;
-    asm volatile("paddsw %0, %1, %2" : "=r"(r) : "r"(x.q), "r"(y.q));
+    asm volatile("paddsw %0, %1, %2" : "=r"(r) : "r"(*(u_long128 *)&x), "r"(*(u_long128 *)&y));
     *dst = r;
 }
 

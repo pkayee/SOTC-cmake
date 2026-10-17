@@ -311,7 +311,23 @@ void isysSetObjImmediateDeleteFunc(isysObj* obj, void* func)
     obj->immediateDeleteFunc = func;
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/obj", isysRequestDeleteObj);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/obj", isysRequestDeleteObj);
+void isysRequestDeleteObj(isysObj* obj)
+{
+    register void* ra asm("ra");
+
+    if (obj->immediateDeleteFunc != NULL)
+    {
+        ((void (*)(void))obj->immediateDeleteFunc)();
+        obj->immediateDeleteFunc = NULL;
+    }
+    isysLock();
+    obj->sourceFunc = ra;
+    obj->flags |= 0x10000;
+    obj->unk10 = D_400F2B08;
+    D_400F2B08 = obj;
+    isysUnlock();
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/obj", isysInitGroup);
 void isysInitGroup(u16* group)
