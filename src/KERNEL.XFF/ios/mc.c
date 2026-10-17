@@ -97,7 +97,48 @@ void iosMcInit(void)
     }
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/mc", iosMcGetInfo);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/mc", iosMcGetInfo);
+s32 iosMcGetInfo(s32 port, s32 verbose, s32* out)
+{
+    s32 info[4];
+    McSlot* slot;
+    u16 res;
+    s32 last;
+    s32 retry;
+    s32 next;
+
+    if (verbose)
+    {
+        LoaderSysPrintf(D_40046B08);
+    }
+    slot = &D_4007CE80[port];
+    last = 0;
+    retry = 0;
+    do
+    {
+        res = sceMc2GetInfo(slot->socket, info);
+        *out = info[2];
+        switch (res)
+        {
+            case 0:
+            case 0x13:
+            case 0x9003:
+                retry = 0;
+                break;
+            default:
+                if (res != last)
+                {
+                    last = res;
+                    retry = 8;
+                }
+                last = res;
+                break;
+        }
+        next = retry - 1;
+        retry = next;
+    } while (next > 0);
+    return iosMcErrConv(res);
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/mc", iosMcChDir);
 s32 iosMcChDir(s32 slot, s32 arg1, void* arg2)
