@@ -2,12 +2,7 @@
 
 s32 iosWaitDMA(void);
 
-//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/srp", iosSrpWaitDMA);
-s32 iosSrpWaitDMA(void)
-{
-    asm("sync");
-    return iosWaitDMA();
-}
+INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/srp", iosSrpWaitDMA);
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/srp", iosMemToSprDmaAdrCopy);
 void iosMemToSprDmaAdrCopy(u32 a0, u32 a1, u32 a2)

@@ -23,22 +23,9 @@ INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/matrix", iosPopVu0RegistersFro
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/matrix", iosTransCurrentMatrix);
 
-//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/matrix", iosSetTransCurrentMatrix);
-void iosSetTransCurrentMatrix(void *src)
-{
-    asm volatile(
-        "lqc2 $vf8, 0(%0);"
-        "vmove.xyzw $vf4, $vf8"
-        : : "r"(src) : "memory");
-}
+INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/matrix", iosSetTransCurrentMatrix);
 
-//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/matrix", iosClearTransCurrentMatrix);
-void iosClearTransCurrentMatrix(void)
-{
-    asm volatile(
-        "vmove.xyzw $vf4, $vf0"
-        : : : "memory");
-}
+INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/matrix", iosClearTransCurrentMatrix);
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/matrix", iosGetRotXVector);
 
@@ -57,13 +44,7 @@ INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/matrix", iosScaleCurrentMatrix
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/matrix", iosGetCurrentMatrix);
 
-//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/matrix", iosGetCurrentMatrixTrans);
-void iosGetCurrentMatrixTrans(void *dst)
-{
-    asm volatile(
-        "sqc2 $vf4, 0(%0)"
-        : : "r"(dst) : "memory");
-}
+INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/matrix", iosGetCurrentMatrixTrans);
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/matrix", iosSetCurrentMatrix);
 

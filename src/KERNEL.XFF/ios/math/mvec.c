@@ -12,70 +12,19 @@ typedef union
     u32 w[4];
 } MvecU;
 
-//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/mvec", iosMvecZero);
-void iosMvecZero(u_long128 *dst)
-{
-    u_long128 r;
-    asm("daddu %0, $0, $0" : "=r"(r));
-    *dst = r;
-}
+INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/mvec", iosMvecZero);
 
-//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/mvec", iosMvecAllOnes);
-void iosMvecAllOnes(u_long128 *dst)
-{
-    u_long128 r;
-    asm("pceqw %0, $0, $0" : "=r"(r));
-    *dst = r;
-}
+INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/mvec", iosMvecAllOnes);
 
-//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/mvec", iosMvecAllOne);
-void iosMvecAllOne(u_long128 *dst)
-{
-    u_long128 r;
-    asm("pceqw %0, $0, $0" : "=r"(r));
-    asm volatile("psrlw %0, %1, 31" : "=r"(r) : "r"(r));
-    *dst = r;
-}
+INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/mvec", iosMvecAllOne);
 
-//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/mvec", iosAddMvec);
-void iosAddMvec(u_long128 *dst, u_long128 *a, u_long128 *b)
-{
-    MvecRaw x = *(MvecRaw *)a;
-    MvecRaw y = *(MvecRaw *)b;
-    u_long128 r;
-    asm volatile("paddw %0, %1, %2" : "=r"(r) : "r"(*(u_long128 *)&x), "r"(*(u_long128 *)&y));
-    *dst = r;
-}
+INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/mvec", iosAddMvec);
 
-//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/mvec", iosClampSW_AddMvec);
-void iosClampSW_AddMvec(u_long128 *dst, u_long128 *a, u_long128 *b)
-{
-    MvecRaw x = *(MvecRaw *)a;
-    MvecRaw y = *(MvecRaw *)b;
-    u_long128 r;
-    asm volatile("paddsw %0, %1, %2" : "=r"(r) : "r"(*(u_long128 *)&x), "r"(*(u_long128 *)&y));
-    *dst = r;
-}
+INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/mvec", iosClampSW_AddMvec);
 
-//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/mvec", iosClampUW_AddMvec);
-void iosClampUW_AddMvec(u_long128 *dst, u_long128 *a, u_long128 *b)
-{
-    MvecRaw x = *(MvecRaw *)a;
-    MvecRaw y = *(MvecRaw *)b;
-    u_long128 r;
-    asm volatile("padduw %0, %1, %2" : "=r"(r) : "r"(*(u_long128 *)&x), "r"(*(u_long128 *)&y));
-    *dst = r;
-}
+INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/mvec", iosClampUW_AddMvec);
 
-//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/mvec", iosSubMvec);
-void iosSubMvec(u_long128 *dst, u_long128 *a, u_long128 *b)
-{
-    MvecRaw x = *(MvecRaw *)a;
-    MvecRaw y = *(MvecRaw *)b;
-    u_long128 r;
-    asm volatile("psubw %0, %1, %2" : "=r"(r) : "r"(*(u_long128 *)&x), "r"(*(u_long128 *)&y));
-    *dst = r;
-}
+INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/mvec", iosSubMvec);
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/mvec", iosMulMvec);
 
@@ -85,76 +34,21 @@ INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/mvec", iosCalcIcolorToBrightne
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/mvec", iosIColScale);
 
-//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/mvec", iosIColAddVec);
-void iosIColAddVec(u32 *dst, u32 a, u32 b)
-{
-    MvecU x;
-    MvecU y;
-    MvecU r;
-    x.w[0] = a;
-    y.w[0] = b;
-    asm volatile("paddub %0, %1, %2" : "=r"(r.q) : "r"(x.q), "r"(y.q));
-    *dst = r.w[0];
-}
+INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/mvec", iosIColAddVec);
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/mvec", iosSwClip255Mvec);
 
-//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/mvec", iosIColAddVecXYZ);
-void iosIColAddVecXYZ(u32 *dst, u32 a, u32 b, u32 c, u32 d, u32 e)
-{
-    MvecU x;
-    MvecU y;
-    MvecU r;
-    u32 t;
-    x.w[0] = a;
-    t = e & 0xFFFFFF00;
-    t |= b & 0xFF;
-    t &= 0xFFFF00FF;
-    t |= (c & 0xFF) << 8;
-    t &= 0xFF00FFFF;
-    t |= (d & 0xFF) << 16;
-    y.w[0] = t | 0xFF000000;
-    asm volatile("paddub %0, %1, %2" : "=r"(r.q) : "r"(x.q), "r"(y.q));
-    *dst = r.w[0];
-}
+INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/mvec", iosIColAddVecXYZ);
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/mvec", iosUcharColClampAdd);
 
-//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/mvec", iosSWToMmColMvec);
-void iosSWToMmColMvec(u_long128 *dst, u_long128 *src)
-{
-    MvecRaw x = *(MvecRaw *)src;
-    u_long128 r;
-    asm volatile("psllw %0, %1, 23" : "=r"(r) : "r"(*(u_long128 *)&x));
-    *dst = r;
-}
+INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/mvec", iosSWToMmColMvec);
 
-//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/mvec", iosMmColToSWMvec);
-void iosMmColToSWMvec(u_long128 *dst, u_long128 *src)
-{
-    MvecRaw x = *(MvecRaw *)src;
-    u_long128 r;
-    asm volatile("psrlw %0, %1, 23" : "=r"(r) : "r"(*(u_long128 *)&x));
-    *dst = r;
-}
+INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/mvec", iosMmColToSWMvec);
 
-//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/mvec", iosITOF15ToMmColMvec);
-void iosITOF15ToMmColMvec(u_long128 *dst, u_long128 *src)
-{
-    MvecRaw x = *(MvecRaw *)src;
-    u_long128 r;
-    asm volatile("psllw %0, %1, 8" : "=r"(r) : "r"(*(u_long128 *)&x));
-    *dst = r;
-}
+INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/mvec", iosITOF15ToMmColMvec);
 
-//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/mvec", iosMmColToITOF15Mvec);
-void iosMmColToITOF15Mvec(u_long128 *dst, u_long128 *src)
-{
-    MvecRaw x = *(MvecRaw *)src;
-    u_long128 r;
-    asm volatile("psrlw %0, %1, 8" : "=r"(r) : "r"(*(u_long128 *)&x));
-    *dst = r;
-}
+INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/mvec", iosMmColToITOF15Mvec);
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/mvec", iosFvecToMmColMvec);
 

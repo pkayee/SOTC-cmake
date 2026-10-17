@@ -158,29 +158,4 @@ void Sg2RemoteTickProc()
     }
 }
 
-//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/remote", Sg2RemoteInit);
-s32 Sg2RemoteInit()
-{
-    s32 i;
-
-    memset(D_4010C6C0, 0, 0x2000);
-    D_4010C680 = 0;
-    D_4010C684 = 0;
-    memset(D_401108C0, 0, 0x280);
-    D_401108A8 = D_401108AC = 0;
-    do
-    {
-        if (sceSifBindRpc(&D_40110880, 0x11223344, 0) < 0)
-        {
-            return -1;
-        }
-        i = 0x2710;
-        do
-        {
-            i -= 0x271;
-            asm("nop");
-        } while (i > 0);
-    } while (D_40110880.serve == 0);
-    Sg2CtrlEntryTickProcById(4, Sg2RemoteTickProc);
-    return 0;
-}
+INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/remote", Sg2RemoteInit);

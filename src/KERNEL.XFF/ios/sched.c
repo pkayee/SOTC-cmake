@@ -167,22 +167,7 @@ void bootSchedulerThread(void)
     iosStartThread(D_400F3B88, 0);
 }
 
-//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/sched", iosAddISchedulerTaskList);
-void iosAddISchedulerTaskList(s32 arg0, s32 arg1)
-{
-    s32 i;
-
-    for (i = 0; i < 3; i++)
-    {
-        if (D_400F3B70[i].unk0 == 0)
-        {
-            D_400F3B70[i].unk0 = arg0;
-            D_400F3B70[i].unk4 = arg1;
-            return;
-        }
-    }
-    asm("break");
-}
+INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/sched", iosAddISchedulerTaskList);
 
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/sched", iosGetISchedulerExecCnt);
