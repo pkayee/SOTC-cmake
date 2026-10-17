@@ -65,6 +65,132 @@ void isysInitGroup(void *group);
 void _isysDeleteGroup(void *obj, void *group, s32 flag);
 void isysRequestDeleteObj(void *obj);
 
+/* NEARMISS-STUB func_40024218 */
+#if 0 /* NEARMISS 59.8% cat=struct-layout sub=- | DCFull struct-layout suspected: attempt needs DCFull typedef with sceGifTag which live dc.c lacks; only a 59.8% attempt, never diffed | attempts=1 */
+typedef struct DCFull
+{
+    /* 0x00 */ u64 dmatag;
+    /* 0x08 */ u32 vif0;
+    /* 0x0C */ u32 vif1;
+    /* 0x10 */ sceGifTag giftag;
+    /* 0x20 */ u64 frame1;
+    /* 0x28 */ u64 frame1addr;
+    /* 0x30 */ u64 frame2;
+    /* 0x38 */ u64 frame2addr;
+    /* 0x40 */ u64 zbuf1;
+    /* 0x48 */ u64 zbuf1addr;
+    /* 0x50 */ u64 zbuf2;
+    /* 0x58 */ u64 zbuf2addr;
+    /* 0x60 */ u64 xyoffset1;
+    /* 0x68 */ u64 xyoffset1addr;
+    /* 0x70 */ u64 xyoffset2;
+    /* 0x78 */ u64 xyoffset2addr;
+    /* 0x80 */ u64 scissor1;
+    /* 0x88 */ u64 scissor1addr;
+    /* 0x90 */ u64 scissor2;
+    /* 0x98 */ u64 scissor2addr;
+    /* 0xA0 */ u64 dthe;
+    /* 0xA8 */ u64 dtheaddr;
+    /* 0xB0 */ u64 prmodecont;
+    /* 0xB8 */ u64 prmodecontaddr;
+    /* 0xC0 */ u32 endpad[3];
+    /* 0xCC */ u32 endvif;
+    /* 0xD0 */ u64 cdmatag;
+    /* 0xD8 */ u32 cvif0;
+    /* 0xDC */ u32 cvif1;
+    /* 0xE0 */ sceGifTag cgiftag;
+    /* 0xF0 */ u64 test1;
+    /* 0xF8 */ u64 test1addr;
+    /* 0x100 */ u64 prim;
+    /* 0x108 */ u64 primaddr;
+    /* 0x110 */ u64 rgbaq;
+    /* 0x118 */ u64 rgbaqaddr;
+    /* 0x120 */ u64 xyz2a;
+    /* 0x128 */ u64 xyz2aaddr;
+    /* 0x130 */ u64 xyz2b;
+    /* 0x138 */ u64 xyz2baddr;
+    /* 0x140 */ u64 test2;
+    /* 0x148 */ u64 test2addr;
+    /* 0x150 */ u32 cendpad[3];
+    /* 0x15C */ u32 cendvif;
+    /* 0x160 */ s32 fbp;
+    /* 0x164 */ s32 zbp;
+    /* 0x168 */ u16 w;
+    /* 0x16A */ u16 h;
+    /* 0x16C */ u8 r;
+    /* 0x16D */ u8 g;
+    /* 0x16E */ u8 b;
+    /* 0x16F */ u8 a;
+    /* 0x170 */ u64 flags;
+} DCFull;
+
+void func_40024218(DC *dc)
+{
+    DCFull *p = (DCFull *)dc;
+    s32 w = p->w;
+    s32 h = p->h;
+
+    SCE_GIF_CLEAR_TAG(&p->giftag);
+    p->giftag.NLOOP = 0xA;
+    p->giftag.EOP = 1;
+    p->giftag.NREG = 1;
+    p->giftag.REGS0 = 0xE;
+    p->dmatag = (u64)(p->giftag.NLOOP + 1) | 0x60000000;
+    p->vif0 = 0x11000000;
+    p->vif1 = 0x50000000 | (p->giftag.NLOOP + 1);
+    p->frame1 = (u64)p->fbp | ((u64)((w >> 6) & 0x3F) << 16);
+    p->frame1addr = 0x4C;
+    p->frame2 = p->frame1;
+    p->frame2addr = 0x4D;
+    p->zbuf1 = (u64)p->zbp | 0x31000000;
+    p->zbuf1addr = 0x4E;
+    p->zbuf2 = p->zbuf1;
+    p->zbuf2addr = 0x4F;
+    p->xyoffset1 = (u64)((0x800 - (w >> 1)) << 4) | ((u64)(0x800 - (h >> 1)) << 36);
+    p->xyoffset1addr = 0x18;
+    p->xyoffset2 = p->xyoffset1;
+    p->xyoffset2addr = 0x19;
+    p->scissor1 = (u64)((w - 1) << 16) | ((u64)(h - 1) << 48);
+    p->scissor1addr = 0x40;
+    p->scissor2 = p->scissor1;
+    p->scissor2addr = 0x41;
+    p->dthe = (p->flags >> 1) & 1;
+    p->dtheaddr = 0x45;
+    p->prmodecont = 1;
+    p->prmodecontaddr = 0x1A;
+    p->endpad[0] = 0;
+    p->endpad[1] = 0;
+    p->endpad[2] = 0;
+    p->endvif = 0x11000000;
+    if ((u32)p->flags & 1)
+    {
+        SCE_GIF_CLEAR_TAG(&p->cgiftag);
+        p->cgiftag.NLOOP = 6;
+        p->cgiftag.EOP = 1;
+        p->cgiftag.NREG = 1;
+        p->cgiftag.REGS0 = 0xE;
+        p->cdmatag = (u64)(p->cgiftag.NLOOP + 1) | 0x60000000;
+        p->cvif0 = 0;
+        p->cvif1 = 0x50000000 | (p->cgiftag.NLOOP + 1);
+        p->test1 = 0x30000;
+        p->test1addr = 0x47;
+        p->prim = 6;
+        p->primaddr = 0;
+        p->rgbaq = (u64)p->r | ((u64)p->g << 8) | ((u64)p->b << 16) | ((u64)p->a << 24);
+        p->rgbaqaddr = 1;
+        p->xyz2a = (u64)((-(w >> 1)) << 4) | ((u64)(-(h >> 1)) << 20);
+        p->xyz2aaddr = 4;
+        p->xyz2b = (u64)((w >> 1) << 4) | ((u64)(h >> 1) << 20);
+        p->xyz2baddr = 4;
+        p->test2 = 0x5000D;
+        p->test2addr = 0x47;
+        p->cendpad[0] = 0;
+        p->cendpad[1] = 0;
+        p->cendpad[2] = 0;
+        p->cendvif = 0x11000000;
+    }
+}
+#endif
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dc", func_40024218);
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dc", iosCreateDC);
@@ -139,6 +265,32 @@ void iosSetDCViewPort(DC *dc, s32 x, s32 y, s32 w, s32 h)
     dc->unk80 = scis;
 }
 
+/* NEARMISS-STUB iosSetDCViewPortCenter */
+#if 0 /* NEARMISS 99.09% cat=sched sub=addu-order | only diff: addu a7 (y+h) scheduled before addu v0 (x+w); operand swap and decl/stmt reorder tried (98.12-99.09) | attempts=4 */
+// kR22 iosSetDCViewPortCenter best 99.09%: only diff addu a7 (y+h) emitted before addu v0 (x+w). tried: decl order, stmt order, operand swap (98.12 / 99.09)
+void iosSetDCViewPortCenter(DC *dc, s32 x, s32 y, s32 w, s32 h, s32 cx, s32 cy)
+{
+    s32 sy = y + h - 1;
+    s32 oy = 0x800 + cy;
+    s32 ox = 0x800 + cx;
+    s32 sx = x + w - 1;
+    u64 xyoff = (u64)(ox << 4) | ((u64)(oy << 4) << 32);
+    u64 scis = (u64)x | ((u64)sx << 16) | ((u64)y << 32) | ((u64)sy << 48);
+
+    dc->unk70 = xyoff;
+    dc->unk68 = 0x18;
+    dc->unk78 = 0x19;
+    dc->unk90 = scis;
+    dc->unk60 = xyoff;
+    dc->unk88 = 0x40;
+    dc->unk98 = 0x41;
+    dc->unk174 = x;
+    dc->unk178 = y;
+    dc->unk17C = w;
+    dc->unk180 = h;
+    dc->unk80 = scis;
+}
+#endif
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dc", iosSetDCViewPortCenter);
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dc", iosSetDC);
