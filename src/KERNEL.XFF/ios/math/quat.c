@@ -109,12 +109,7 @@ void PopQuaternion(void)
     D_400458D0 = n;
 }
 
-//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/quat", InitQuaternionDrive);
-void InitQuaternionDrive(void)
-{
-    D_400458D0 = 0;
-    asm volatile("sqc2 $vf0, 0(%0)" : : "r"(D_40081E80) : "memory");
-}
+INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/quat", InitQuaternionDrive);
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/quat", SetQuaternionByAxisRotate);
 
