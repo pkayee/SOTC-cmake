@@ -2,7 +2,12 @@
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/initsys", supplement_crt0);
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/initsys", __sceKernlGetEhSemaId);
+extern s32 D_00132AA4[];
+
+s32 __sceKernlGetEhSemaId(void)
+{
+    return D_00132AA4[0];
+}
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/initsys", Copy2);
 
