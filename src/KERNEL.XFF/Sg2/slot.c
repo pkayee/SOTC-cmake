@@ -3,25 +3,47 @@
 typedef struct {
     u32 flags;     /* 0x00 */
     s32 unk4;      /* 0x04 busy/refcount */
-    u8 pad8[0x14];
+    u8 pad8[4];
+    s32 slotClass; /* 0x0C */
+    s32 vab;       /* 0x10 */
+    s32 ch;        /* 0x14 */
+    u8 pad18[4];
     s32 group;     /* 0x1C */
-    u8 pad20[0x14];
+    u8 pad20[4];
+    s32 note;      /* 0x24 */
+    u8 pad28[0xC];
     s32 masTune;   /* 0x34 */
-    u8 pad38[0x10];
+    s32 masVolL;   /* 0x38 */
+    s32 masVolR;   /* 0x3C */
+    s32 seMasVol;  /* 0x40 */
+    s32 baseVol;   /* 0x44 */
     s32 vol;       /* 0x48 */
-    u8 pad4C[8];
+    s32 masPan;    /* 0x4C */
+    s32 basePan;   /* 0x50 */
     s32 pan;       /* 0x54 */
     s32 bendRange; /* 0x58 */
     s32 bendValue; /* 0x5C */
-    u8 pad60[0x10];
+    u8 pad60[4];
+    u16 adsr1;       /* 0x64 */
+    u16 adsr2;       /* 0x66 */
+    s32 hwVoiceL;    /* 0x68 */
+    s32 hwVoiceR;    /* 0x6C */
     s32 directPitch; /* 0x70 */
     s16 volPhase0; /* 0x74 */
     s16 volPhase1; /* 0x76 */
     u8 pad78[8];
-    s32 lfoPitchPhase; /* 0x80 */
-    s32 lfoPitchTbl;   /* 0x84 */
-    s32 lfoPitchCur;   /* 0x88 */
-    s32 lfoPitchEnd;   /* 0x8C */
+    union {
+        struct {
+            s32 lfoPitchPhase;
+            s32 lfoPitchTbl;
+        } f;
+        struct {
+            s32 phase;
+            s32 tbl;
+            s32 cur;
+            s32 end;
+        } lp;
+    } u80; /* 0x80 */
     u8 pad90[0xC];
     s32 lfoVolTbl;   /* 0x9C */
     struct {
@@ -40,7 +62,12 @@ typedef struct {
         f32 b;   /* 0xC0 */
         f32 a;   /* 0xC4 */
     } tq;
-    u8 padC8[0x18];
+    u8 padC8[4];
+    s32 polStart;  /* 0xCC */
+    s32 polCur;    /* 0xD0 */
+    s32 polTarget; /* 0xD4 */
+    f32 polStep;   /* 0xD8 */
+    s32 polCnt;    /* 0xDC */
 } Sg2Slot; /* size 0xE0 */
 
 extern Sg2Slot D_401117B0[];
@@ -92,7 +119,25 @@ void Sg2SlotFree(s32 idx)
     }
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotCheckSlotClass);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotCheckSlotClass);
+s32 Sg2SlotCheckSlotClass(s32 slotClass)
+{
+    s32 found = 0;
+    s32 i;
+    Sg2Slot *slot = D_401117B0;
+    for (i = 0; i < 0x30; i++, slot++)
+    {
+        if (slot->flags & 1)
+        {
+            if (slot->slotClass == slotClass)
+            {
+                found = 1;
+                break;
+            }
+        }
+    }
+    return found;
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotFindLoop);
 s32 Sg2SlotFindLoop(s32 *out)
@@ -110,19 +155,105 @@ s32 Sg2SlotFindLoop(s32 *out)
     return n;
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotFindVab);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotFindVab);
+s32 Sg2SlotFindVab(s32 *out, s32 vab)
+{
+    s32 n = 0;
+    s32 i;
+    for (i = 0; i < 0x30; i++)
+    {
+        if (D_401117B0[i].flags & 1)
+        {
+            if (D_401117B0[i].vab == vab)
+            {
+                *out++ = i;
+                n++;
+            }
+        }
+    }
+    return n;
+}
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotFindVabCh);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotFindVabCh);
+s32 Sg2SlotFindVabCh(s32 *out, s32 vab, s32 ch)
+{
+    s32 n = 0;
+    s32 i;
+    for (i = 0; i < 0x30; i++)
+    {
+        if (D_401117B0[i].flags & 1)
+        {
+            if (D_401117B0[i].vab == vab && D_401117B0[i].ch == ch)
+            {
+                *out++ = i;
+                n++;
+            }
+        }
+    }
+    return n;
+}
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotFindVabChNote);
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotFindVabChSsaBaseNote);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotFindSlotClass);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotFindSlotClass);
+s32 Sg2SlotFindSlotClass(s32 *out, s32 slotClass)
+{
+    s32 n = 0;
+    s32 i;
+    for (i = 0; i < 0x30; i++)
+    {
+        if (D_401117B0[i].flags & 1)
+        {
+            if (D_401117B0[i].slotClass == slotClass)
+            {
+                *out++ = i;
+                n++;
+            }
+        }
+    }
+    return n;
+}
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotFindSlotClassCh);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotFindSlotClassCh);
+s32 Sg2SlotFindSlotClassCh(s32 *out, s32 slotClass, s32 ch)
+{
+    s32 n = 0;
+    s32 i;
+    for (i = 0; i < 0x30; i++)
+    {
+        if (D_401117B0[i].flags & 1)
+        {
+            if (D_401117B0[i].slotClass == slotClass && D_401117B0[i].ch == ch)
+            {
+                *out++ = i;
+                n++;
+            }
+        }
+    }
+    return n;
+}
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotFindSlotClassChNote);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotFindSlotClassChNote);
+s32 Sg2SlotFindSlotClassChNote(s32 *out, s32 slotClass, s32 ch, s32 note)
+{
+    s32 n = 0;
+    s32 i;
+    Sg2Slot *slot = D_401117B0;
+    for (i = 0; i < 0x30; i++, slot++)
+    {
+        if (slot->flags & 1)
+        {
+            if (slot->slotClass == slotClass && slot->ch == ch && slot->note == note)
+            {
+                *out++ = i;
+                n++;
+            }
+        }
+    }
+    return n;
+}
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotFindSlotClassChSsaBaseNote);
 
@@ -145,9 +276,25 @@ INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotSetMute);
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotSetMasVol);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotSetSeMasVol);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotSetSeMasVol);
+void Sg2SlotSetSeMasVol(s32 idx, s32 v)
+{
+    D_401117B0[idx].seMasVol = v;
+    if (D_401117B0[idx].hwVoiceL != -1 && D_401117B0[idx].hwVoiceR != -1)
+    {
+        D_401117B0[idx].flags |= 0x1000;
+    }
+}
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotSetBaseVol);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotSetBaseVol);
+void Sg2SlotSetBaseVol(s32 idx, s32 v)
+{
+    D_401117B0[idx].baseVol = v;
+    if (D_401117B0[idx].hwVoiceL != -1 && D_401117B0[idx].hwVoiceR != -1)
+    {
+        D_401117B0[idx].flags |= 0x1000;
+    }
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotSetVol);
 void Sg2SlotSetVol(s32 idx, s32 v)
@@ -156,9 +303,25 @@ void Sg2SlotSetVol(s32 idx, s32 v)
     D_401117B0[idx].flags |= 0x1000;
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotSetMasPan);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotSetMasPan);
+void Sg2SlotSetMasPan(s32 idx, s32 v)
+{
+    D_401117B0[idx].masPan = v;
+    if (D_401117B0[idx].hwVoiceL != -1 && D_401117B0[idx].hwVoiceR != -1)
+    {
+        D_401117B0[idx].flags |= 0x2000;
+    }
+}
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotSetBasePan);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotSetBasePan);
+void Sg2SlotSetBasePan(s32 idx, s32 v)
+{
+    D_401117B0[idx].basePan = v;
+    if (D_401117B0[idx].hwVoiceL != -1 && D_401117B0[idx].hwVoiceR != -1)
+    {
+        D_401117B0[idx].flags |= 0x2000;
+    }
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotSetPan);
 void Sg2SlotSetPan(s32 idx, s32 v)
@@ -198,7 +361,22 @@ void Sg2SlotSetMasTune(s32 idx, s32 v)
     D_401117B0[idx].flags |= 0x80;
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotSetAdsr);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotSetAdsr);
+typedef struct {
+    s32 hdr;
+    u16 adsr1; /* 0x04 */
+    u16 adsr2; /* 0x06 */
+} Sg2SlotAdsrView;
+
+void Sg2SlotSetAdsr(s32 idx, s32 adsr1, s32 adsr2)
+{
+    Sg2SlotAdsrView *slot = (Sg2SlotAdsrView *)&D_40111810[idx];
+    u16 a1 = adsr1;
+    u16 a2 = adsr2;
+    slot->adsr1 = a1;
+    slot->adsr2 = a2;
+    Sg2RemoteSend(2, idx, a1, a2);
+}
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotSetVolPhase);
 
@@ -214,7 +392,16 @@ void Sg2SlotSetDumperOn(s32 idx)
     D_401117B0[idx].flags |= 8;
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotSetLfoPitchTbl);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotSetLfoPitchTbl);
+void Sg2SlotSetLfoPitchTbl(s32 i, s32 tbl)
+{
+    if (tbl != 0)
+    {
+        (&D_401117B0[i])->u80.f.lfoPitchTbl = tbl;
+        D_401117B0[i].u80.lp.cur = tbl;
+        D_401117B0[i].u80.lp.end = tbl + 0x3C;
+    }
+}
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotSetLfoPitchSpeed);
 
@@ -259,7 +446,24 @@ void Sg2SlotSetTimePanParam(s32 idx, f32 a, f32 b)
     D_401117B0[idx].flags |= 0x40;
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotSetPoltamentParam);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotSetPoltamentParam);
+void Sg2SlotSetPoltamentParam(s32 idx, s32 target, f32 step)
+{
+    Sg2Slot *slot = &D_401117B0[idx];
+    if (!(slot->flags & 0x200))
+    {
+        slot->flags |= 0x200;
+        slot->polCnt = 0;
+        slot->polStart = slot->note;
+        slot->polCur = slot->note;
+    }
+    slot->polTarget = target;
+    if (target < slot->polCur)
+    {
+        step = -step;
+    }
+    slot->polStep = step;
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotGetVol);
 s32 Sg2SlotGetVol(s32 idx)
