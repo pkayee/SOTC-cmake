@@ -46,7 +46,10 @@ extern s32 D_401157B0;
 void Sg2ExPcmInputCtrl(u32 arg0, s32 arg1);
 void func_4003FF10(void *a0, s32 a1, void *a2, s32 a3);
 void func_4003FD60(s32 *a0, s32 a1, s32 a2, s32 a3, f32 f12, f32 f13);
-s32 func_4003FAD0(void *arg0, s32 arg1);
+void func_4003FAD0(s32 *arg0, s32 arg1);
+void func_4003F928(s32 *arg0, s32 arg1);
+void func_4003F7E8(s32 *arg0, s32 arg1);
+s32 Sg2StPcmInit(s32 arg0);
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", func_4003F3C8);
 void func_4003F3C8(s32 *arg0, s32 arg1)
@@ -208,9 +211,88 @@ void func_4003F8F0(s32 *arg0, s32 *arg1, s32 arg2)
     }
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", func_4003F928);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", func_4003F928);
+void func_4003F928(s32 *arg0, s32 arg1)
+{
+    s32 *p = arg0 + 1;
+    s32 n = arg1;
+    s32 len = p[2];
+    s32 pos = p[4];
+    s32 mode;
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", func_4003FAD0);
+    if (arg0[104] & 2)
+    {
+        if (!(pos + n < len))
+        {
+            n = len - pos;
+            arg0[0] = 2;
+        }
+    }
+    mode = arg0[105];
+    switch (mode)
+    {
+    case 0:
+        if (arg0[114] != 0 || arg0[115] != 0)
+        {
+            func_4003F528(p, n / 2, arg0[110], arg0[111], arg0[114], arg0[115]);
+        }
+        else
+        {
+            func_4003F468(p, n / 2, arg0[110], arg0[111]);
+        }
+        break;
+    case 1:
+        if (arg0[114] != 0 || arg0[115] != 0)
+        {
+            func_4003F6A0(p, n, arg0[110], arg0[111], arg0[114], arg0[115]);
+        }
+        else
+        {
+            func_4003F5D0(p, n, arg0[110], arg0[111]);
+        }
+        break;
+    }
+    if (arg0[105] == 1 && arg0[106] == 0)
+    {
+        func_4003F788(p, n);
+    }
+    func_4003F7E8(p, n);
+    if (arg0[113] != 0)
+    {
+        if (arg0[105] == 0)
+        {
+            n /= 2;
+        }
+        arg0[116] = arg0[116] + n;
+        arg0[116] = (u32)arg0[116] % ((u32)arg0[113] >> 1);
+    }
+}
+
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", func_4003FAD0);
+void func_4003FAD0(s32 *arg0, s32 arg1)
+{
+    s32 i;
+
+    if (arg0[1] & 4)
+    {
+        return;
+    }
+    func_4003F3C8(arg0 + 2, arg1);
+    for (i = 0; i < 4; i++)
+    {
+        if (D_40115958[i].f[0] & 1)
+        {
+            func_4003F928((s32 *)&D_40115958[i], arg1);
+            func_4003F8F0(arg0 + 2, D_40115958[i].f + 1, arg1);
+        }
+    }
+    func_4003F7E8(arg0 + 2, arg1);
+    if (arg0[0] == 0)
+    {
+        func_4003F788(arg0 + 2, arg1);
+    }
+    func_4003F3E8(arg0 + 2, arg1);
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", func_4003FBD8);
 void func_4003FBD8(PcmInSlot *arg0, s32 arg1)
@@ -251,7 +333,6 @@ void *func_400400F0(s32 *arg0, s32 arg1)
 }
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", func_40040118);
-
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", func_40040350);
 s32 func_40040350(void)
 {
@@ -579,4 +660,32 @@ void Sg2ExPcmSetSignal(s32 arg0)
 }
 
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", Sg2ExPcmInit);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", Sg2ExPcmInit);
+s32 Sg2ExPcmInit(void)
+{
+    s32 i;
+    PcmInSlot *p;
+
+    Sg2StPcmInit(0);
+    memset(&D_401157A0, 0, 0x1B4);
+    p = D_40115958;
+    for (i = 0; i < 4; i++)
+    {
+        p->f[0] = 2;
+        p->f[104] = 0;
+        p->f[6] = 0;
+        p->f[7] = 0;
+        p->f[13] = 0;
+        p->f[16] = 0;
+        p->f[55] = 0;
+        p->f[56] = 0;
+        p->f[62] = 0;
+        p->f[65] = 0;
+        p->f[1] = 0;
+        p->f[3] = 0;
+        p->f[5] = 0;
+        p++;
+    }
+    Sg2ExPcmOutputCtrl(2);
+    return 0;
+}
