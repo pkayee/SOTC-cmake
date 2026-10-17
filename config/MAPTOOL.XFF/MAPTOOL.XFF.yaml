@@ -61,7 +61,8 @@ segments:
       subalign: 8
       align: 8
       subsegments:
-        - [ 0x4f70, rodata, all_rodata ]
+        - [ 0x4f70, rodata, chunk/c0000_func_40010608 ]
+        - [ 0x5000, rodata, chunk/c0001_CreateMapWindow ]
     - name: xff_footer
       type: rodatabin
       start: 0x54c0
