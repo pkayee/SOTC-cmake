@@ -734,9 +734,4 @@ INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", isysSearchCalledModul
 void isysCreateExceptionThread(void)
 {}
 
-//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", func_4001D3A8);
-void func_4001D3A8(void)
-{
-    register void *ra asm("ra");
-    func_4001CFE0((s32)ra - 8);
-}
+INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", func_4001D3A8);

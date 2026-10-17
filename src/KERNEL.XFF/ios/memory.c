@@ -227,48 +227,9 @@ void iosMallocGarbageTickProc(s32 (*cb)(void *), void *cbArg)
     SignalSema(D_4007CC78);
 }
 
-//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/memory", iosMallocAlign);
-void *iosMallocAlign(void *ptn, s32 size, s32 align)
-{
-    void *p;
-    void *pc;
-    register void *ra asm("ra");
+INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/memory", iosMallocAlign);
 
-    pc = ra;
-    WaitSema(D_4007CC78);
-    p = func_400135C8(ptn, size, align, pc);
-    if (!p)
-    {
-        LoaderSysPrintf(D_400465B8, ptn, size, pc);
-        func_40015F18(ptn, 1);
-        LoaderSysPrintf(D_400465E8, &rootPtn, gbPtn);
-    }
-    SignalSema(D_4007CC78);
-    if (!p)
-    {
-        LoaderSysPrintf(D_40046618, D_40045568);
-        if (D_40045568)
-        {
-            ((void (*)(void))D_40045568)();
-        }
-        iosJumpRecoverPoint(D_40046628, ptn, size, pc);
-    }
-    return p;
-}
-
-//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/memory", iosMallocAlignNoCheck);
-void *iosMallocAlignNoCheck(void *ptn, s32 size, s32 align)
-{
-    void *r;
-    void *pc;
-    register void *ra asm("ra");
-
-    pc = ra;
-    WaitSema(D_4007CC78);
-    r = func_400135C8(ptn, size, align, pc);
-    SignalSema(D_4007CC78);
-    return r;
-}
+INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/memory", iosMallocAlignNoCheck);
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/memory", iosMallocSetExecGarbageCallback);
 void iosMallocSetExecGarbageCallback(void *user, s32 cb, s32 arg)
@@ -314,19 +275,7 @@ s32 iosFreeParts(void *ptn, u32 addr, s32 mode)
     return r;
 }
 
-//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/memory", iosCreatePartition);
-s32 iosCreatePartition(void *parent, s32 size)
-{
-    s32 r;
-    void *pc;
-    register void *ra asm("ra");
-
-    pc = ra;
-    WaitSema(D_4007CC78);
-    r = func_40014D48(parent, size, pc);
-    SignalSema(D_4007CC78);
-    return r;
-}
+INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/memory", iosCreatePartition);
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/memory", iosCreatePartitionWithPc);
 s32 iosCreatePartitionWithPc(void *parent, s32 size, void *pc)
