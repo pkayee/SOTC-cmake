@@ -364,8 +364,7 @@ int GetTimerUsedUnusedCounters(int *pnUsed, int *pnUnused)
     return ret;
 }
 
-/* NEARMISS-STUB iStartTimerCounter */
-#if 0 /* NEARMISS 97.5% cat=cse-hoist sub=- | D_00133A18+0x1c symbol-offset fold: target lui/lw vs ours lui+addiu+lw | attempts=1 */
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/timer", iStartTimerCounter);
 int iStartTimerCounter(int id)
 {
     TimerCounter *tc;
@@ -376,7 +375,7 @@ int iStartTimerCounter(int id)
     {
         return 0x80008002;
     }
-    if ((s32)D_00133A18[7] == id)
+    if (((volatile TimerTable *)D_00133A18)->activeId == id)
     {
         return 0x80000010;
     }
@@ -394,8 +393,6 @@ int iStartTimerCounter(int id)
     }
     return 0;
 }
-#endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/timer", iStartTimerCounter);
 
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/timer", StartTimerCounter);
 int StartTimerCounter(int id)
@@ -412,8 +409,7 @@ int StartTimerCounter(int id)
     return ret;
 }
 
-/* NEARMISS-STUB iStopTimerCounter */
-#if 0 /* NEARMISS 97.8% cat=cse-hoist sub=- | same D_00133A18+0x1c fold | attempts=1 */
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/timer", iStopTimerCounter);
 int iStopTimerCounter(int id)
 {
     TimerCounter *tc;
@@ -425,7 +421,7 @@ int iStopTimerCounter(int id)
     {
         return 0x80008002;
     }
-    if ((s32)D_00133A18[7] == id)
+    if (((volatile TimerTable *)D_00133A18)->activeId == id)
     {
         return 0x80000010;
     }
@@ -444,8 +440,6 @@ int iStopTimerCounter(int id)
     }
     return 1;
 }
-#endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/timer", iStopTimerCounter);
 
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/timer", StopTimerCounter);
 int StopTimerCounter(int id)
@@ -462,8 +456,7 @@ int StopTimerCounter(int id)
     return ret;
 }
 
-/* NEARMISS-STUB SetTimerCount */
-#if 0 /* NEARMISS 97.9% cat=cse-hoist sub=- | same D_00133A18+0x1c fold | attempts=1 */
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/timer", SetTimerCount);
 u64 SetTimerCount(int id, u64 ulNewCount)
 {
     int stat;
@@ -474,7 +467,7 @@ u64 SetTimerCount(int id, u64 ulNewCount)
 
     tc = (TimerCounter *)(((u32)id >> 10) << 6);
     stat = DIntr();
-    if (id < 0 || ((u32)id & 0x3FF) != tc->id || (s32)D_00133A18[7] == id)
+    if (id < 0 || ((u32)id & 0x3FF) != tc->id || ((volatile TimerTable *)D_00133A18)->activeId == id)
     {
         if (stat != 0)
         {
@@ -501,8 +494,6 @@ u64 SetTimerCount(int id, u64 ulNewCount)
     }
     return ret;
 }
-#endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/timer", SetTimerCount);
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/timer", iGetTimerBaseTime);
 
