@@ -245,9 +245,35 @@ void iosDmaSendPath1(s64 arg0, s64 arg1)
     *D1_CHCR = 0x101;
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosDmaSendPath2);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosDmaSendPath2);
+void iosDmaSendPath2(s64 arg0, s64 arg1)
+{
+    u32 stat;
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosDmaSendPath3);
+    do
+    {
+        asm volatile("cfc2.ni %0, $vi29" : "=r"(stat));
+    } while ((*D1_CHCR & 0x100) || (*D2_CHCR & 0x100) || (*VIF1_STAT & 0x1F000003) || (stat & 0x100) || (*GIF_STAT & 0xC00));
+    *D1_QWC = arg1;
+    *D1_MADR = arg0 & 0x0FFFFFFF;
+    FlushCache(0);
+    *D1_CHCR = 0x101;
+}
+
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosDmaSendPath3);
+void iosDmaSendPath3(s64 arg0, s64 arg1)
+{
+    u32 stat;
+
+    do
+    {
+        asm volatile("cfc2.ni %0, $vi29" : "=r"(stat));
+    } while ((*D1_CHCR & 0x100) || (*D2_CHCR & 0x100) || (*VIF1_STAT & 0x1F000003) || (stat & 0x100) || (*GIF_STAT & 0xC00));
+    *D2_QWC = arg1;
+    *D2_MADR = arg0 & 0x0FFFFFFF;
+    FlushCache(0);
+    *D2_CHCR = 0x141;
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosDmaSendSChainPath1);
 void iosDmaSendSChainPath1(u32 arg0)
@@ -329,7 +355,18 @@ void iosGsChangeMode(void)
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosSetBGColor);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosGsResetCRTC);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosGsResetCRTC);
+void func_40026BE0(s32 field);
+void iosGsResetCRTC(void)
+{
+    u32 stat;
+
+    do
+    {
+        asm volatile("cfc2.ni %0, $vi29" : "=r"(stat));
+    } while ((*D1_CHCR & 0x100) || (*D2_CHCR & 0x100) || (*VIF1_STAT & 0x1F000003) || (stat & 0x100) || (*GIF_STAT & 0xC00));
+    func_40026BE0((*(volatile u64 *)0x12001000 >> 13) & 1);
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosSetSyncNoReturnFunc);
 s32 iosSetSyncNoReturnFunc(s32 func)
