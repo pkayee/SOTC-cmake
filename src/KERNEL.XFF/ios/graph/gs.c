@@ -1,4 +1,5 @@
 #include "common.h"
+#include "sdk/ee/eeregs.h"
 
 extern s32 D_40092BD0;
 extern s32 D_40092BD4;
@@ -9,6 +10,8 @@ extern s32 D_40092C74;
 extern s32 D_40092C7C;
 extern s32 D_40092C80;
 extern s32 D_40045A90;
+extern s32 D_40045A50, D_40045A54, D_40045A58;
+extern u_long128 D_40045A70[2];
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosDumpDMAStatus);
 
@@ -24,7 +27,34 @@ INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", func_40026BE0);
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosGsResizeRootDC);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosGsSetMode);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosGsSetMode);
+void iosGsSetMode(void)
+{
+    s32 *p = (s32 *)&D_40092BD0;
+
+    if (p[0xA4 / 4] != 0)
+    {
+        p[0xA0 / 4] = 0;
+        p[2] = 0x200;
+        p[0] = 0x200;
+        p[3] = 0x1C0;
+        p[1] = 0x1C0;
+        D_40045A50 = 0;
+        D_40045A54 = 0x50;
+        D_40045A58 = 1;
+    }
+    else
+    {
+        p[0xA0 / 4] = 1;
+        p[2] = 0x200;
+        p[3] = 0x1C0;
+        p[0] = 0x200;
+        p[1] = 0x1C0;
+        D_40045A50 = 1;
+        D_40045A54 = 2;
+        D_40045A58 = 0;
+    }
+}
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosGsSetDrawContext);
 
@@ -180,7 +210,18 @@ INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosDmaSendSChainPath2);
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosDmaSendSChainPath3);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosResetPath);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosResetPath);
+void iosResetPath(void)
+{
+    register s32 tmp asm("v1") = 0;
+    *VIF1_FBRST = 1;
+    asm volatile("cfc2.ni %0, $vi28" : "+r"(tmp));
+    tmp |= 0x200;
+    asm volatile("ctc2.ni %0, $vi28; sync.p" : : "r"(tmp));
+    *VIF1_FIFO = D_40045A70[0];
+    *VIF1_FIFO = D_40045A70[1];
+    *GIF_CTRL = 1;
+}
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosSyncV);
 
