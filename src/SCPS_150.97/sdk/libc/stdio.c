@@ -41,4 +41,10 @@ int __swrite(void *cookie, char *buf, int n)
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libc/stdio", __sseek);
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libc/stdio", __sclose);
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libc/stdio", __sclose);
+int __sclose(void *cookie)
+{
+    FILE *fp = (FILE *)cookie;
+
+    return _close_r(fp->_data, fp->_file);
+}
