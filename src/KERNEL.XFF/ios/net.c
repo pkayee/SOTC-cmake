@@ -52,9 +52,75 @@ INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/net", iosNetRecvMsg);
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/net", InitNet);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/net", iosNetRecv);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/net", iosNetRecv);
+s32 iosNetRecv(s32 arg0, void* arg1, s32 arg2, s32 arg3)
+{
+    s32 ret;
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/net", iosNetSend);
+    if (D_40045710 != 0)
+    {
+        s32 off = arg0 * 68;
+        s8* slot = D_4007DF38 + off;
+        void** bufp = (void**)(D_4007DF38 - 4 + off);
+        s32* cidp = (s32*)(D_4007DF38 - 8 + off);
+        s32 flags;
+        s32 len = (arg2 < 0x701) ? arg2 : 0x700;
+
+        flags = 0;
+        ret = sceInetRecv(slot, *bufp, *cidp, arg1, len, &flags, arg3);
+    }
+    else
+    {
+        s32 len = (arg2 < 0xF01) ? arg2 : 0xF00;
+        s32* buf = D_4007CF00;
+        s32* pay = buf + 1;
+        s32 rlen = len + 4;
+        s32 res;
+
+        buf[0] = arg0;
+        pay[0] = len;
+        WaitSema(D_4007DF28);
+        sceSifCallRpc(D_4007DF00, 2, 0, buf, 8, buf, rlen, NULL, NULL);
+        SignalSema(D_4007DF28);
+        res = buf[0];
+        memcpy(arg1, pay, len);
+        ret = res;
+    }
+    return ret;
+}
+
+
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/net", iosNetSend);
+s32 iosNetSend(s32 arg0, void* arg1, s32 arg2, s32 arg3)
+{
+    s32 flags;
+    s32 ret;
+
+    if (D_40045710 != 0)
+    {
+        s32 off = arg0 * 68;
+        s8* slot = D_4007DF38 + off;
+        void** bufp = (void**)(D_4007DF38 - 4 + off);
+        s32* cidp = (s32*)(D_4007DF38 - 8 + off);
+
+        flags = 0;
+        ret = sceInetSend(slot, *bufp, *cidp, arg1, arg2, &flags, arg3);
+    }
+    else
+    {
+        s32 total = arg2 + 8;
+
+        D_4007CF00[0] = arg0;
+        D_4007CF00[1] = arg2;
+        memcpy((char*)D_4007CF00 + 8, arg1, arg2);
+        WaitSema(D_4007DF28);
+        sceSifCallRpc(D_4007DF00, 3, 0, D_4007CF00, total, D_4007CF00, 4, NULL, NULL);
+        SignalSema(D_4007DF28);
+        ret = D_4007CF00[0];
+    }
+    return ret;
+}
+
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/net", iosNetRecvMsgWithStateCallback);
 
@@ -98,3 +164,4 @@ s32 iosNetOpen(char* arg0)
     }
     return ret;
 }
+
