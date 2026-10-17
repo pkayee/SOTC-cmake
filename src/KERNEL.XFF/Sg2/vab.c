@@ -51,7 +51,21 @@ s32 func_4003ED58(VabSlot *arg0, s32 arg1)
     return (s32)base + p[1];
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/vab", vab_check_alive);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/vab", vab_check_alive);
+s32 vab_check_alive(s32 vab)
+{
+    s32 ret = 0;
+
+    if (vab < 0)
+    {
+        return ret;
+    }
+    if (vab >= 8)
+    {
+        return ret;
+    }
+    return D_40115640[vab].unk0 != 0;
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/vab", vab_get_info);
 s32 vab_get_info(s32 arg0, s32 *arg1, s32 *arg2)
