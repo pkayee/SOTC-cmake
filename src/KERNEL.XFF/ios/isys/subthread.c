@@ -33,6 +33,9 @@ static inline SubThreadEnv *subthread_env(SubThread *t)
 extern void *memcpy();
 extern void iosFree();
 extern void isysSleepSubThread();
+extern void *iosMallocAlign(s32, s32, s32);
+extern s32 rootPtn;
+extern void isysSearchModuleFuncNameByAddr(void *, void *, s32);
 extern void *D_40045E98;
 extern s32 D_40045E9C;
 
@@ -97,7 +100,17 @@ void isysDeleteSubThread(SubThread *t)
     }
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/subthread", isysDumpSubThreadStatus);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/subthread", isysDumpSubThreadStatus);
+void isysDumpSubThreadStatus(SubThread *t)
+{
+    SubThreadEnv *e = SUBTHREAD_ENV(t);
+    void *a = iosMallocAlign((s32)&rootPtn, 0x100, 4);
+    void *b = iosMallocAlign((s32)&rootPtn, 0x100, 4);
+
+    isysSearchModuleFuncNameByAddr(a, b, e->unk0);
+    iosFree(b);
+    iosFree(a);
+}
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/subthread", isysWakeupSubThread);
 
