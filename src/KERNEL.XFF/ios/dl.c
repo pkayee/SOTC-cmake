@@ -12,6 +12,11 @@ typedef struct DlState
     s32 lockCount[2]; // 0x28
 } DlState;
 
+typedef struct DmaTagBits { u64 qwc:16; u64 pad:10; u64 pce:2; u64 id:3; u64 irq:1; u64 addr:31; u64 spr:1; } DmaTagBits;
+typedef union DmaTag { u64 w; DmaTagBits b; } DmaTag;
+typedef struct DlPkt { u64 tag; u32 unk8; u32 unkC; DmaTag next; u32 unk18; u32 unk1C; } DlPkt;
+typedef struct DlRec { DmaTag tag; u8 pad8[0x18]; u32 head; u32 tail; u8 pad28[8]; } DlRec;
+
 extern DlState D_40092698;
 extern s32 D_40092690;
 extern s32 D_40045A1C;
@@ -99,13 +104,91 @@ s32 iosAllocPacketPtrPath1(s32 arg0)
     return ret;
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dl", iosDlChainHead);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dl", iosDlChainHead);
+void iosDlChainHead(s32 idx, s32 dc)
+{
+    volatile DlState *dl = &D_40092698;
+    DlRec *rec = (DlRec *)(dl->createAdrs[dl->workBufId] + idx * 0x30);
+    DlPkt *pkt = (DlPkt *)dl->packetPtrPath1;
+    DmaTag tag;
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dl", iosDlChainTail);
+    dl->packetPtrPath1 = dl->packetPtrPath1 + 0x20;
+    __asm__ volatile("pref 0x00, 0x40(%0)" : : "r"(pkt));
+    pkt->tag = ((u64)dc << 32) | 0x50000000;
+    pkt->unk1C = 0;
+    pkt->unk18 = 0;
+    pkt->unkC = 0;
+    pkt->unk8 = 0;
+    pkt->next.w = ((u64)rec->head << 32) | 0x20000000;
+    rec->head = (u32)pkt;
+    rec->tag.b.addr = (u32)pkt;
+    rec->tag.b.id = 5;
+}
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dl", iosDlChainHeadCurrent);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dl", iosDlChainTail);
+void iosDlChainTail(s32 idx, s32 dc)
+{
+    volatile DlState *dl = &D_40092698;
+    DlRec *rec = (DlRec *)(dl->createAdrs[dl->workBufId] + idx * 0x30);
+    DlPkt *pkt = (DlPkt *)dl->packetPtrPath1;
+    u32 link;
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dl", iosDlChainTailCurrent);
+    dl->packetPtrPath1 = dl->packetPtrPath1 + 0x20;
+    __asm__ volatile("pref 0x00, 0x40(%0)" : : "r"(pkt));
+    pkt->tag = ((u64)dc << 32) | 0x50000000;
+    pkt->unk1C = 0;
+    pkt->unk18 = 0;
+    pkt->unkC = 0;
+    pkt->unk8 = 0;
+    link = ((DlPkt *)rec->tail)->next.b.addr;
+    pkt->next.w = ((u64)link << 32) | 0x20000000;
+    ((DlPkt *)rec->tail)->next.b.addr = (u32)pkt;
+    rec->tail = (u32)pkt;
+}
+
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dl", iosDlChainHeadCurrent);
+void iosDlChainHeadCurrent(s32 dc)
+{
+    volatile DlState *dl = &D_40092698;
+    s32 idx = dl->layer;
+    DlRec *rec = (DlRec *)(dl->createAdrs[dl->workBufId] + idx * 0x30);
+    DlPkt *pkt = (DlPkt *)dl->packetPtrPath1;
+    DmaTag tag;
+
+    dl->packetPtrPath1 = dl->packetPtrPath1 + 0x20;
+    __asm__ volatile("pref 0x00, 0x40(%0)" : : "r"(pkt));
+    pkt->tag = ((u64)dc << 32) | 0x50000000;
+    pkt->unk1C = 0;
+    pkt->unk18 = 0;
+    pkt->unkC = 0;
+    pkt->unk8 = 0;
+    pkt->next.w = ((u64)rec->head << 32) | 0x20000000;
+    rec->head = (u32)pkt;
+    rec->tag.b.addr = (u32)pkt;
+    rec->tag.b.id = 5;
+}
+
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dl", iosDlChainTailCurrent);
+void iosDlChainTailCurrent(s32 dc)
+{
+    volatile DlState *dl = &D_40092698;
+    s32 idx = dl->layer;
+    DlRec *rec = (DlRec *)(dl->createAdrs[dl->workBufId] + idx * 0x30);
+    DlPkt *pkt = (DlPkt *)dl->packetPtrPath1;
+    u32 link;
+
+    dl->packetPtrPath1 = dl->packetPtrPath1 + 0x20;
+    __asm__ volatile("pref 0x00, 0x40(%0)" : : "r"(pkt));
+    pkt->tag = ((u64)dc << 32) | 0x50000000;
+    pkt->unk1C = 0;
+    pkt->unk18 = 0;
+    pkt->unkC = 0;
+    pkt->unk8 = 0;
+    link = ((DlPkt *)rec->tail)->next.b.addr;
+    pkt->next.w = ((u64)link << 32) | 0x20000000;
+    ((DlPkt *)rec->tail)->next.b.addr = (u32)pkt;
+    rec->tail = (u32)pkt;
+}
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dl", iosDlSwap);
 
