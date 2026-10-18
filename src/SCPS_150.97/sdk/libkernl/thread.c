@@ -129,12 +129,91 @@ INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/thread", iSuspendThread);
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/thread", DelayThread);
 
+/* NEARMISS-STUB StartThread */
+#if 0 /* NEARMISS 81.67% cat=no-c-form sub=- | sq zero stores need 128-bit zero store, load order differs | attempts=1 */
+/* best for StartThread: 81.67% (ee-gcc2.9-991111). Ours zeroes 0x2A0-based ctx with sq v1 after por v1,zero,zero; target uses sq $zero directly. Also ctx arithmetic order (stack load before stackSize load) differs. */
+s32 StartThread(s32 id, void *arg)
+{
+    struct ThreadParam info;
+    s32 ret;
+    u8 *ctx;
+
+    if (QueryIntrContext() != 0)
+    {
+        return -1;
+    }
+    if (DIntr() == 0)
+    {
+        return -1;
+    }
+    ret = ReferThreadStatus(id, &info);
+    if (ret < 0)
+    {
+        EIntr();
+        return ret;
+    }
+    if (info.status != 0x10)
+    {
+        EIntr();
+        return -1;
+    }
+    ctx = (u8 *)info.stack + info.stackSize - 0x2A0;
+    *(u_long128 *)(ctx + 0x0) = 0;
+    *(u_long128 *)(ctx + 0x10) = 0;
+    *(u_long128 *)(ctx + 0x20) = 0;
+    *(u_long128 *)(ctx + 0x30) = 0;
+    *(u_long128 *)(ctx + 0x40) = 0;
+    *(u_long128 *)(ctx + 0x50) = 0;
+    *(u_long128 *)(ctx + 0x60) = 0;
+    *(u_long128 *)(ctx + 0x70) = 0;
+    *(u_long128 *)(ctx + 0x80) = 0;
+    *(u_long128 *)(ctx + 0x90) = 0;
+    *(u_long128 *)(ctx + 0xA0) = 0;
+    *(u_long128 *)(ctx + 0xB0) = 0;
+    *(u_long128 *)(ctx + 0xC0) = 0;
+    *(u_long128 *)(ctx + 0xD0) = 0;
+    *(u_long128 *)(ctx + 0xE0) = 0;
+    *(u_long128 *)(ctx + 0xF0) = 0;
+    *(u_long128 *)(ctx + 0x100) = 0;
+    *(u_long128 *)(ctx + 0x110) = 0;
+    *(u_long128 *)(ctx + 0x120) = 0;
+    *(u_long128 *)(ctx + 0x130) = 0;
+    *(u_long128 *)(ctx + 0x140) = 0;
+    *(u_long128 *)(ctx + 0x150) = 0;
+    *(u_long128 *)(ctx + 0x160) = 0;
+    *(u_long128 *)(ctx + 0x170) = 0;
+    *(u_long128 *)(ctx + 0x180) = 0;
+    *(u_long128 *)(ctx + 0x190) = 0;
+    *(u_long128 *)(ctx + 0x1A0) = 0;
+    *(u_long128 *)(ctx + 0x1B0) = 0;
+    *(u_long128 *)(ctx + 0x200) = 0;
+    *(u_long128 *)(ctx + 0x210) = 0;
+    *(u_long128 *)(ctx + 0x220) = 0;
+    *(u_long128 *)(ctx + 0x230) = 0;
+    *(u_long128 *)(ctx + 0x240) = 0;
+    *(u_long128 *)(ctx + 0x250) = 0;
+    *(u_long128 *)(ctx + 0x260) = 0;
+    *(u_long128 *)(ctx + 0x270) = 0;
+    *(s64 *)(ctx + 0x40) = (s32)arg;
+    *(s64 *)(ctx + 0x1C0) = *(s32 *)(ctx + 0x1C0);
+    *(s64 *)(ctx + 0x1C8) = 0;
+    *(s64 *)(ctx + 0x1D0) = *(s32 *)(ctx + 0x1D0);
+    *(s64 *)(ctx + 0x1D8) = 0;
+    *(s64 *)(ctx + 0x1E0) = *(s32 *)(ctx + 0x1E0);
+    *(s64 *)(ctx + 0x1E8) = 0;
+    *(s64 *)(ctx + 0x1F0) = *(s32 *)(ctx + 0x1F0);
+    *(s64 *)(ctx + 0x1F8) = 0;
+    EIntr();
+    return _StartThread(id, arg);
+}
+#endif
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/thread", StartThread);
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/thread", _DelayThreadHandler);
 
 /* NEARMISS-STUB sioPutc */
-#if 0 /* NEARMISS 55.5% cat=sdk-compiler sub=ee-gcc2.9-991111 | ref loop: lw, andi, 3 nops, bnez; sb sits in jr delay slot after daddu return move; 55.5% attempt loop/store order differs under ee-gcc2.9 (static diff only) | attempts=1 */
+#if 0 /* NEARMISS 68.79% cat=cse-hoist sub=ee-gcc2.9-991111 | target materialises 0x1000F130 via lui+ori, ours folds into offsets | attempts=2 */
+/* best for sioPutc: 68.79% (ee-gcc2.9-991111). Target materialises 0x1000F130/F180 with lui+ori into v1 and loops with 3 nops after andi; ours folds the address into lw/sb offsets (lui 0x1001 + -0xed0). Variants with 0x..U and address-in-variable did not change it. */
 s32 sioPutc(s32 c)
 {
     volatile s32 *stat = (volatile s32 *)0x1000F130;
@@ -188,14 +267,16 @@ void sioPutcNL(s32 c)
 }
 
 /* NEARMISS-STUB func_00107E90 */
-#if 0 /* NEARMISS 9.7% cat=bitops sub=ee-gcc2.9-991111 | 64-bit IEEE double bit-pattern decode (exponent field, mantissa shift, round-half on variable shift); 9.7% attempt guessed the rounding; body has no FPU ops; not sdk-compiler | attempts=1 */
+#if 0 /* NEARMISS 74.86% cat=regalloc sub=ee-gcc2.9-991111 | x/m/e register assignment | attempts=2 */
+/* best for func_00107E90: 74.86% (ee-gcc2.9-991111). Target copies x to a1 (m) and keeps e in a2; ours coalesces x/m into a0 and e into a1. Remaining: reg assignment copy + bnel rounding shape. */
 s32 func_00107E90(u64 x)
 {
-    s32 e;
     u64 m;
-    s64 r;
+    s64 e;
+    u64 r;
 
-    e = (s32)((x << 1) >> 53) - 0x433;
+    m = x;
+    e = (s64)((m << 1) >> 53) - 0x433;
     if (e < -0x35)
     {
         return 0;
@@ -204,18 +285,22 @@ s32 func_00107E90(u64 x)
     {
         return 0x270F;
     }
-    m = ((x << 12) >> 12) | (1ULL << 52);
+    m = ((m << 12) >> 12) | (1ULL << 52);
     if (e < 0)
     {
         e = -e;
-        r = m >> (e - 2);
+        r = m >> (s32)(e - 2);
         if ((r & 3) == 3)
         {
-            return (s32)((r >> 2) + 1);
+            r = (r >> 2) + 1;
         }
-        return (s32)(r >> 2);
+        else
+        {
+            r = r >> 2;
+        }
+        return (s32)r;
     }
-    return (s32)(m << e);
+    return (s32)(m << (s32)e);
 }
 #endif
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/thread", func_00107E90);
@@ -272,4 +357,16 @@ s32 sioPutcSkipNull(s32 a0, s32 a1, s32 a2)
     return 1;
 }
 
+/* NEARMISS-STUB func_00108EB8 */
+#if 0 /* NEARMISS 94.47% cat=regalloc sub=- | target copies return into a0 before subu | attempts=1 */
+/* best for func_00108EB8: 94.47% (ee-gcc2.9-991111). Needs #include <stdarg.h> not used; __builtin_next_arg(a3)-0x20 gives ap=sp+0x60; missing daddu a0,v0 copy after call */
+s32 func_00108EB8(s32 a0, s32 a1, s32 *a2, s32 a3, ...)
+{
+    char *ap;
+
+    ap = (char *)__builtin_next_arg(a3) - 0x20;
+    a0 = func_001080F8(a0, a1, *a2, a3, ap);
+    *a2 -= a0;
+}
+#endif
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/thread", func_00108EB8);
