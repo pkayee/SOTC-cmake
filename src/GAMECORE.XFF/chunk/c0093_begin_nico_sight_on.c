@@ -2,33 +2,104 @@
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0093_begin_nico_sight_on", begin_nico_sight_on);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0093_begin_nico_sight_on", end_nico_sight_on);
+typedef struct {
+    s32 a;
+    s32 b;
+    s32 c;
+    u8 cntrl[4];
+} NicoSight;
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0093_begin_nico_sight_on", is_doing_nico_sight_on);
+void end_nico_yaw_pitch_cntrl(u8 *w);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0093_begin_nico_sight_on", get_ofst_yaw_nico_sight_on);
+void end_nico_sight_on(NicoSight *s)
+{
+    s->a = 0;
+    s->b = 0;
+    s->c = 0;
+    end_nico_yaw_pitch_cntrl(s->cntrl);
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0093_begin_nico_sight_on", get_ofst_pitch_nico_sight_on);
+s32 is_doing_nico_sight_on(s32 *arg0)
+{
+    return *arg0 != 0;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0093_begin_nico_sight_on", get_base_yaw_nico_sight_on);
+float get_ofst_yaw_nico_sight_on(void *arg0)
+{
+    return (*(float *)((char *)(arg0) + 0x248));
+}
+
+float get_ofst_pitch_nico_sight_on(void)
+{
+    return 0.0f;
+}
+
+float get_base_yaw_nico_sight_on(void *arg0)
+{
+    return (*(float *)((char *)(arg0) + 0x280));
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0093_begin_nico_sight_on", get_object_local_base_yaw_nico_sight_on);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0093_begin_nico_sight_on", get_base_pitch_nico_sight_on);
+float get_base_pitch_nico_sight_on(void *arg0)
+{
+    return (*(float *)((char *)(arg0) + 0x284));
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0093_begin_nico_sight_on", get_merge_yaw_nico_sight_on);
+float GAMEUTIL_increase_yaw(s32 kind, float value1, float value2);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0093_begin_nico_sight_on", get_merge_pitch_nico_sight_on);
+float get_merge_yaw_nico_sight_on(void *arg0)
+{
+    return GAMEUTIL_increase_yaw(0, (*(float *)((char *)(arg0) + 0x280)), (*(float *)((char *)(arg0) + 0x248)));
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0093_begin_nico_sight_on", get_hope_yaw_nico_sight_on);
+float GAMEUTIL_increase_pitch(s32 kind, s32 kind2, float value1, float value2, float value3, float value4);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0093_begin_nico_sight_on", get_hope_pitch_nico_sight_on);
+float get_merge_pitch_nico_sight_on(char *p)
+{
+    return GAMEUTIL_increase_pitch(0, 0, *(float *)(p + 0x284), 0.0f, 1.483529567718505859375f, -1.483529567718505859375f);
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0093_begin_nico_sight_on", get_snipe_position_nico_sight_on);
+float get_hope_yaw_nico_sight_on(void *arg0)
+{
+    return (*(float *)((char *)(arg0) + 0x208));
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0093_begin_nico_sight_on", get_predict_hit_position_nico_sight_on);
+float get_hope_pitch_nico_sight_on(void *arg0)
+{
+    return (*(float *)((char *)(arg0) + 0x204));
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0093_begin_nico_sight_on", get_hope_camera_direction_nico_sight_on);
+void get_snipe_position_nico_sight_on(char *dst, char *src)
+{
+    *(s128 *)(dst + 0x0) = *(s128 *)(src + 0x1C0);
+}
+
+typedef union {
+    s128 q;
+    float f[4];
+    s32 i[4];
+} Vec4;
+
+s32 get_predict_hit_position_nico_sight_on(Vec4 *out, char *p)
+{
+    out->q = ((Vec4 *)(p + 0x1D0))->q;
+    return ((Vec4 *)(p + 0x1D0))[1].i[0];
+}
+
+void GAMEUTIL_get_direction_by_yaw_pitch(s32 arg0, float arg1, float arg2);
+float get_base_pitch_nico_yaw_pitch_cntrl(u8 *p);
+float get_base_yaw_nico_yaw_pitch_cntrl(u8 *p);
+
+void get_hope_camera_direction_nico_sight_on(s32 arg0, u8 *arg1)
+{
+    float temp_f20;
+    u8 *temp_s0;
+
+    temp_s0 = arg1 + 0xC;
+    temp_f20 = get_base_yaw_nico_yaw_pitch_cntrl(temp_s0);
+    GAMEUTIL_get_direction_by_yaw_pitch(arg0, temp_f20, get_base_pitch_nico_yaw_pitch_cntrl(temp_s0));
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0093_begin_nico_sight_on", func_400801B0);
 
@@ -52,6 +123,21 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0093_begin_nico_sight_on", fun
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0093_begin_nico_sight_on", demo_op1);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0093_begin_nico_sight_on", demo_op1_resetHorseBridle);
+extern u8 gcGlobalVar[];
+s32 SCRGetFirstObj();
+s32 nico_resetHorseRidingStatusForHorse(s32 obj);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0093_begin_nico_sight_on", demo_op1_setHorseBridle);
+s32 demo_op1_resetHorseBridle(void)
+{
+    return nico_resetHorseRidingStatusForHorse(SCRGetFirstObj((s32)(gcGlobalVar + 0x2B4)));
+}
+
+extern int *SkelFocusDef_PLAYER_HAND_A_L, *SkelFocusDef_PLAYER_HAND_A_R;
+extern f32 D_40134220[], D_40134230[];
+void nico_setHorseRidingStatusForHorseIndep(void *, void *, s32, f32 *, s32, f32 *);
+
+void demo_op1_setHorseBridle(void)
+{
+    void *p = (void *)SCRGetFirstObj(gcGlobalVar + 0x2B4);
+    nico_setHorseRidingStatusForHorseIndep(p, (void *)SCRGetFirstObj(gcGlobalVar + 0x2B0),SkelFocusDef_PLAYER_HAND_A_L[2], D_40134220, SkelFocusDef_PLAYER_HAND_A_R[2], D_40134230);
+}
