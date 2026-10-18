@@ -17,7 +17,7 @@ int demoManChkStart(void *actor)
 }
 
 extern u8 rootPtn[];
-extern void func_400DCD30(void);
+extern void func_400DCD30(u64 a0);
 extern s32 createScriptObj(void *fn, s32 a1, void *a2, s32 a3, s32 a4, s32 a5, void *a6, s32 a7);
 extern void CancelCaptionSubThreadAll(void);
 
@@ -66,7 +66,14 @@ int IsForwardTime__DemoMan(void *context, float time)
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0167_demoManBootRequest", ForwardTime__DemoMan);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0167_demoManBootRequest", func_400DCD30);
+extern u8 SH_StageDataDEFAULT[];
+void sheetMgrUnloadSegmentIndex();
+
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0167_demoManBootRequest", func_400DCD30);
+void func_400DCD30(u64 a0)
+{
+    sheetMgrUnloadSegmentIndex(SH_StageDataDEFAULT, a0, 0);
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0167_demoManBootRequest", player_collision_check_direct_water_surface_plus);
 

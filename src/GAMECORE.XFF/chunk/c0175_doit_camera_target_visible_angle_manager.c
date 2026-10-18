@@ -15,7 +15,14 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0175_doit_camera_target_visibl
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0175_doit_camera_target_visible_angle_manager", func_400E4148);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0175_doit_camera_target_visible_angle_manager", func_400E4230);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0175_doit_camera_target_visible_angle_manager", func_400E4230);
+
+s32 func_400E4230(s32 **a, s32 **b) {
+    if (*(f32 *)((u8 *)*a + 0x4) > *(f32 *)((u8 *)*b + 0x4)) {
+        return 1;
+    }
+    return -1;
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0175_doit_camera_target_visible_angle_manager", CAM_get_base_space_posi_and_axisXYZ);
 

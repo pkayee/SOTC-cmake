@@ -123,4 +123,17 @@ void ReplayInScriptBegin(void)
     }
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0158_ReplayPauseScript", ReplayPauseScriptBegin);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0158_ReplayPauseScript", ReplayPauseScriptBegin);
+extern s32 D_40131E9C;
+extern s32 ScriptSpriteMenuObjDef_SPRITE_REPLAY_MODE_PAUSE;
+
+void ReplayPauseScriptBegin(void)
+{
+    g_Replay.c = 0;
+    g_Replay.b = 2;
+    g_Replay.flags &= ~4;
+    if (D_40131E9C != 0) {
+        D_40131E9C = 0;
+        _SCRStartSpriteMenuAnim(ScriptSpriteMenuObjDef_SPRITE_REPLAY_MODE_PAUSE, 0, 0, &D_40131E9C, 0, 0);
+    }
+}

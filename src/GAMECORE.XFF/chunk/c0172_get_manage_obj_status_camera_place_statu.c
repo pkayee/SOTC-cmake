@@ -125,7 +125,16 @@ int is_approach_rise_ok_camera_place_status(CamRegion *r)
     return 1;
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0172_get_manage_obj_status_camera_place_statu", is_cliff_rise_ok_camera_place_status);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0172_get_manage_obj_status_camera_place_statu", is_cliff_rise_ok_camera_place_status);
+int is_cliff_rise_ok_camera_place_status(CamRegion *r)
+{
+    long k;
+    if (get_attr_kind(r, &k) == 1 && (k == (0x8000L << 29) || k == (0xC000L << 29)))
+    {
+        return 0;
+    }
+    return 1;
+}
 
 int act_local_vs_ofst_camera_place_status(CamRegion *r, char **o)
 {

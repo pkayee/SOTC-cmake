@@ -28,7 +28,13 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0173_CAM_reset_slope_cntrl", f
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0173_CAM_reset_slope_cntrl", func_400E2868);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0173_CAM_reset_slope_cntrl", func_400E2940);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0173_CAM_reset_slope_cntrl", func_400E2940);
+f32 GetPlaneSlopeDegree(void);
+
+f32 func_400E2940(void)
+{
+    return (GetPlaneSlopeDegree() * 3.14159265f) / 180.0f;
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0173_CAM_reset_slope_cntrl", func_400E2980);
 

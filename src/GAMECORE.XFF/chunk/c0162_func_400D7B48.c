@@ -114,7 +114,13 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0162_func_400D7B48", func_400D
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0162_func_400D7B48", func_400D8218);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0162_func_400D7B48", func_400D8278);
+extern void isysRequestDeleteObj(s32 obj);
+
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0162_func_400D7B48", func_400D8278);
+void func_400D8278(void *actor)
+{
+    isysRequestDeleteObj(*(s32 *)((u8 *)GetSCRCharaAIWorkPtr(actor) + 0x41B0));
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0162_func_400D7B48", func_400D8298);
 

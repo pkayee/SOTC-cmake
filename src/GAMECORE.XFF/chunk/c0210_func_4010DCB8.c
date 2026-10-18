@@ -58,7 +58,12 @@ f32 getChkColWidth(void *arg0)
     return *(f32 *)((u8 *)arg0 + 0xCC);
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0210_func_4010DCB8", setRunStopTurnAngleFastLegCtrlWork);
+void setRunStopTurnAngleFastLegCtrlWork(u8 *a0, f32 f12)
+{
+    *(f32 *)(a0 + 0x4C) = f12 * 3.1415926f / 180.0f;
+}
+
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0210_func_4010DCB8", setRunStopTurnAngleFastLegCtrlWork);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0210_func_4010DCB8", func_4010E830);
 
