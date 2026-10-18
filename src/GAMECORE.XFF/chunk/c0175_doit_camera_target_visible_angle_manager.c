@@ -2,7 +2,12 @@
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0175_doit_camera_target_visible_angle_manager", doit_camera_target_visible_angle_manager);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0175_doit_camera_target_visible_angle_manager", end_get_yaw_pitch_camera_target_visible_angle_manager);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0175_doit_camera_target_visible_angle_manager", end_get_yaw_pitch_camera_target_visible_angle_manager);
+
+void end_get_yaw_pitch_camera_target_visible_angle_manager(void *arg0)
+{
+    (*(int *)((char *)(arg0) + 0x3D0)) = 0;
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0175_doit_camera_target_visible_angle_manager", func_400E3FD8);
 
