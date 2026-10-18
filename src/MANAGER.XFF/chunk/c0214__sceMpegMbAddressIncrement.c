@@ -14,6 +14,15 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0214__sceMpegMbAddressIncrement
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0214__sceMpegMbAddressIncrement", func_401074C8);
 
+/* NEARMISS-STUB func_40107500 */
+#if 0 /* NEARMISS 0.0% cat=stack-frame sub=- | 2.96 keeps addiu sp/sd ra/ld ra frame on bare tail j; void and s32 wrappers tried | attempts=2 */
+extern void _sceMpegFlushBuf();
+
+void func_40107500(void)
+{
+    return _sceMpegFlushBuf();
+}
+#endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0214__sceMpegMbAddressIncrement", func_40107500);
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0214__sceMpegMbAddressIncrement", func_40107508);

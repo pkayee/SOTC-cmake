@@ -122,7 +122,11 @@ void SetScriptObjFinishCallBackFunc(void *actor, int func, int arg)
     *(int *)(s + 0x50) = arg;
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0114_EntryObjectManagerCollisionGroup", GetScriptPriorityGroup);
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0114_EntryObjectManagerCollisionGroup", GetScriptPriorityGroup);
+s32 *GetScriptPriorityGroup(s32 idx)
+{
+    return &execScriptGroup[idx];
+}
 
 void setScriptObjArgument(void *actor, int arg)
 {

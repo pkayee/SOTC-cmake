@@ -166,7 +166,12 @@ unsigned char *CreateAmbientLightObj(void *heap, void *parent, int *col)
     return o;
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0106_GlobalLightCalcOutSideParam", func_4008E108);
+void FlushLayoutObj();
+
+void func_4008E108(void)
+{
+    FlushLayoutObj();
+}
 
 extern void InitLayoutObj(void *, void *);
 

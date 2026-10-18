@@ -4,7 +4,14 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0121_ExecObjectAnimation", Exec
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0121_ExecObjectAnimation", ExecMotionSyncAnimation);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0121_ExecObjectAnimation", SetScriptAnimationGlobalBaseInfo);
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0121_ExecObjectAnimation", SetScriptAnimationGlobalBaseInfo);
+extern u8 info[];
+
+typedef struct { u32 w[11]; } InfoBlk;
+void SetScriptAnimationGlobalBaseInfo(u8 *a0)
+{
+    *(InfoBlk *)info = *(InfoBlk *)a0;
+}
 
 extern u8 info[];
 

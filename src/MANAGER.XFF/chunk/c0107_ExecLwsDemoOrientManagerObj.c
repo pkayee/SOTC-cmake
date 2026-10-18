@@ -20,7 +20,14 @@ int FlushLwsDemoOrientManagerObj(int a, int b, int c, int d)
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0107_ExecLwsDemoOrientManagerObj", func_4008E7F0);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0107_ExecLwsDemoOrientManagerObj", func_4008E880);
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0107_ExecLwsDemoOrientManagerObj", func_4008E880);
+void isysFlushISYSLetterObj();
+
+void func_4008E880(s32 arg0)
+{
+    flushScriptObj(arg0);
+    isysFlushISYSLetterObj(arg0);
+}
 
 extern int GetScriptObjWorkSize();
 
