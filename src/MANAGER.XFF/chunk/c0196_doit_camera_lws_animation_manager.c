@@ -44,6 +44,26 @@ void doit_camera_lws_animation_manager(f32 dt, s32 a, s32 b) {
 void add_camera_lws_animation_segment(void) {
 }
 
+/* NEARMISS-STUB free_camera_lws_animation_segment */
+#if 0 /* NEARMISS 89.8% cat=regalloc sub=delay-slot-lw | target loads base into a0 then copies to s1; ours loads straight into s1 | attempts=2 */
+void free_camera_lws_animation_segment(u8 *seg) {
+    s32 n;
+    u8 *p;
+
+    if (seg != NULL) {
+        n = *(s32 *)(seg + 0xC);
+        p = *(u8 **)(seg + 0x10);
+        if (n > 0) {
+            do {
+                u8 *cur = p;
+                p += 0xC8;
+                n--;
+                end_camera_lws_animation_by_paramID(cur);
+            } while (n != 0);
+        }
+    }
+}
+#endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0196_doit_camera_lws_animation_manager", free_camera_lws_animation_segment);
 
 f32 func_400F3B50(u8 *a, s32 c1, s32 c2) {
