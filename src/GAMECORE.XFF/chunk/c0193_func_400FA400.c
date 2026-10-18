@@ -10,7 +10,10 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0193_func_400FA400", get_cur_b
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0193_func_400FA400", get_cur_base_mode_manager_game_camera_param_manager);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0193_func_400FA400", is_base_mode_manager_update_game_camera_param_manager);
+int is_base_mode_manager_update_game_camera_param_manager(int *arg0)
+{
+    return *arg0;
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0193_func_400FA400", get_interp_game_camera_param_game_camera_param_manager);
 
@@ -22,9 +25,16 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0193_func_400FA400", is_base_d
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0193_func_400FA400", act_camera_cutout_game_camera_param_manager);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0193_func_400FA400", drop_camera_cutout_flag_game_camera_param_manager);
+void drop_camera_cutout_flag_game_camera_param_manager(void *arg0)
+{
+    (*(int *)((char *)(arg0) + 8)) = 0;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0193_func_400FA400", constructor_game_camera_param_update_data_manager);
+void constructor_game_camera_param_update_data_manager(char *p)
+{
+    *(int *)(p + 0x0) = 0;
+    *(int *)(p + 0x4) = 0;
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0193_func_400FA400", reset_game_camera_param_update_data_manager);
 
