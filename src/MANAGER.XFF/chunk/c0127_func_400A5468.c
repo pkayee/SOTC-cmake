@@ -157,69 +157,66 @@ void SpriteMenuSetNumPartsFormat(u8 *spriteMenu, s32 format)
     spriteMenu[0xF] = format;
 }
 
-/* NEARMISS-STUB SpriteMenuSetDispFlag */
-#if 0 /* NEARMISS 76.0% cat=branch-layout sub=- | expected signed bltz/slti chain for [4,5] test, gcc sltiu range | attempts=1 */
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0127_func_400A5468", SpriteMenuSetDispFlag);
 void SpriteMenuSetDispFlag(u8 *spriteMenu, s32 layer, s32 flag)
 {
-    s32 state;
-    u8 *p = (spriteMenu[8] == 0x21) ? spriteMenu + 0x90 : NULL;
-    u8 *obj = *(u8 **)(p + 4) + layer * 0x68;
+    SmLayer *obj = smLayer(smClass(spriteMenu), layer);
 
     if (flag != 0)
     {
-        state = *(s32 *)(obj + 4);
-        if (state == 0)
+        switch (obj->status)
         {
-            *(s32 *)(obj + 4) = 1;
-        }
-        else if (!(state < 0 || state >= 6 || state < 4))
-        {
-            *(s32 *)(obj + 4) = 1;
+        case 0:
+        case 4:
+        case 5:
+            obj->status = 1;
+            break;
         }
     }
     else
     {
-        state = *(s32 *)(obj + 4);
-        if ((u32)(state - 1) < 3)
+        switch (obj->status)
         {
-            *(s32 *)(obj + 4) = 4;
+        case 1:
+        case 2:
+        case 3:
+            obj->status = 4;
+            break;
         }
     }
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0127_func_400A5468", SpriteMenuSetDispFlag);
 
-/* NEARMISS-STUB SpriteMenuSetDispFlagNoFade */
-#if 0 /* NEARMISS 52.0% cat=branch-layout sub=- | expected non-tail jal in flag==0 path; gcc tail-calls; sltiu vs bltz/slti | attempts=1 */
-void func_400A6A90(u8 *obj);
-
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0127_func_400A5468", SpriteMenuSetDispFlagNoFade);
+void func_400A6A90(SmLayer *obj);
 void SpriteMenuSetDispFlagNoFade(u8 *spriteMenu, s32 layer, s32 flag)
 {
-    u8 *p = (spriteMenu[8] == 0x21) ? spriteMenu + 0x90 : NULL;
-    u8 *obj = *(u8 **)(p + 4) + layer * 0x68;
-    s32 state;
+    SmLayer *obj = smLayer(smClass(spriteMenu), layer);
 
     if (flag != 0)
     {
-        state = *(s32 *)(obj + 4);
-        if (state == 0 || (state >= 4 && state < 6))
+        switch (obj->status)
         {
-            *(s32 *)(obj + 4) = 3;
+        case 0:
+        case 4:
+        case 5:
+            obj->status = 3;
             func_400A6A90(obj);
+            break;
         }
     }
     else
     {
-        state = *(s32 *)(obj + 4);
-        if (state > 0 && state < 4)
+        switch (obj->status)
         {
-            *(s32 *)(obj + 4) = 0;
+        case 1:
+        case 2:
+        case 3:
+            obj->status = 0;
             func_400A6A90(obj);
+            break;
         }
     }
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0127_func_400A5468", SpriteMenuSetDispFlagNoFade);
 
 /* NEARMISS-STUB SpriteMenuSetDispFlagByHash */
 #if 0 /* NEARMISS 62.18% cat=branch-layout sub=- | layer search peeled at element 0; state test branch order (==0 / 4..5 / 1..3) (62.18) | attempts=1 */
@@ -276,40 +273,41 @@ void SpriteMenuSetDispFlagByHash(u8 *spriteMenu, s32 hash, s32 flag)
 #endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0127_func_400A5468", SpriteMenuSetDispFlagByHash);
 
-/* NEARMISS-STUB SpriteMenuSetDispFlagAll */
-#if 0 /* NEARMISS 70.07% cat=branch-layout sub=- | pointer-walk loop with combined i++/obj+=0x68; state test branch layout (70.07) | attempts=1 */
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0127_func_400A5468", SpriteMenuSetDispFlagAll);
 void SpriteMenuSetDispFlagAll(u8 *spriteMenu, s32 flag)
 {
+    u8 *p = smClass(spriteMenu);
+    SmLayer *obj = *(SmLayer **)(p + 4);
     s32 i;
-    s32 state;
-    u8 *p;
-    u8 *obj;
 
-    p = smClass(spriteMenu);
-    obj = *(u8 **)(p + 4);
-    for (i = 0; i < *(s32 *)(p + 8); i++, obj += 0x68)
+    for (i = 0; i < *(s32 *)(p + 8); i++, obj++)
     {
-        state = *(s32 *)(obj + 4);
         if (flag != 0)
         {
-            if (state == 0 || (state >= 4 && state < 6))
+            switch (obj->status)
             {
-                *(s32 *)(obj + 4) = 1;
+            case 0:
+            case 4:
+            case 5:
+                obj->status = 1;
                 func_400A6A90(obj);
+                break;
             }
         }
         else
         {
-            if (state > 0 && state < 4)
+            switch (obj->status)
             {
-                *(s32 *)(obj + 4) = 4;
+            case 1:
+            case 2:
+            case 3:
+                obj->status = 4;
                 func_400A6A90(obj);
+                break;
             }
         }
     }
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0127_func_400A5468", SpriteMenuSetDispFlagAll);
 
 void func_400A2800(u8 *obj);
 
@@ -494,36 +492,24 @@ s32 SpriteMenuGetSpriteMenuClassParam(u8 *spriteMenu)
     return *(s32 *)(p + 0x20);
 }
 
-/* NEARMISS-STUB SpriteMenuGetLayerByHash */
-#if 0 /* NEARMISS 47.0% cat=branch-layout sub=- | loop shape differs from original (while/latch layout, 47%) | attempts=1 */
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0127_func_400A5468", SpriteMenuGetLayerByHash);
 void *SpriteMenuGetLayerByHash(u8 *spriteMenu, s32 hash)
 {
+    u8 *p = smClass(spriteMenu);
+    SmLayer *ret = NULL;
     s32 i;
-    s32 count;
-    u8 *layer;
-    u8 *p;
 
-    p = (spriteMenu[8] == 0x21) ? spriteMenu + 0x90 : NULL;
-    count = *(s32 *)(p + 8);
-    if (count <= 0)
+    for (i = 0; i < *(s32 *)(p + 8); i++)
     {
-        return NULL;
-    }
-    layer = *(u8 **)(p + 4);
-    i = 0;
-    while (*(s32 *)(*(u8 **)layer + 4) != hash)
-    {
-        i++;
-        if (i >= count)
+        ret = smLayer(p, i);
+        if (*(s32 *)(*(u8 **)ret + 4) == hash)
         {
             break;
         }
-        layer += 0x68;
     }
-    return layer;
+    return ret;
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0127_func_400A5468", SpriteMenuGetLayerByHash);
+
 
 /* NEARMISS-STUB SpriteMenuGetLayerNoByHash */
 #if 0 /* NEARMISS 38.0% cat=branch-layout sub=- | loop shape differs from original (38%) | attempts=1 */
@@ -686,37 +672,29 @@ s32 SpriteMenuGetMenuIdByHash(u8 *spriteMenu, s32 layerHash, s32 hash)
 #endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0127_func_400A5468", SpriteMenuGetMenuIdByHash);
 
-/* NEARMISS-STUB SpriteMenuSetMenuDispFlag */
-#if 0 /* NEARMISS 66.0% cat=branch-layout sub=- | loop pointer-walk +0x10 stride/i++ early; movz vs and/ori | attempts=1 */
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0127_func_400A5468", SpriteMenuSetMenuDispFlag);
 void SpriteMenuSetMenuDispFlag(u8 *spriteMenu, s32 layer, s32 id, s32 flag)
 {
+    SmLayer *obj = smLayer(smClass(spriteMenu), layer);
     s32 i;
-    u8 *p = (spriteMenu[8] == 0x21) ? spriteMenu + 0x90 : NULL;
-    u8 *obj = *(u8 **)(p + 4) + layer * 0x68;
-    u8 *base = *(u8 **)(obj + 0x14);
-    u8 *parts;
-    s32 flags;
 
-    for (i = 0; i < *(s32 *)(obj + 0x18); i++)
+    for (i = 0; i < obj->numParts; i++)
     {
-        parts = *(u8 **)(base + i * 0x10);
-        flags = *(s32 *)(parts + 0x10);
-        if ((flags & 2) && *(s32 *)(parts + 0x14) == id)
+        s32 *parts = *(s32 **)(*(s32 *)((u8 *)obj + 0x14) + i * 0x10);
+
+        if ((parts[4] & 2) && parts[5] == id)
         {
             if (flag)
             {
-                flags &= ~0x800;
+                parts[4] &= ~0x800;
             }
             else
             {
-                flags |= 0x800;
+                parts[4] |= 0x800;
             }
-            *(s32 *)(parts + 0x10) = flags;
         }
     }
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0127_func_400A5468", SpriteMenuSetMenuDispFlag);
 
 //INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0127_func_400A5468", SpriteMenuGetSelectMenuIdBySpriteMenuClass);
 s32 SpriteMenuGetSelectMenuIdBySpriteMenuClass(u8 *spriteMenu)
