@@ -1,10 +1,129 @@
 #include "common.h"
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0042_bgmScriptSetStatus", bgmScriptSetStatus);
+typedef struct BgmObj {
+    u8 pad0[0x34];
+    s32 mode34;
+    float f38;
+    u8 pad3C[4];
+    s32 x40;
+    u32 flags44;
+} BgmObj;
+typedef struct BgmSlot {
+    s32 state;
+    s32 prio;
+    u8 pad8[0x10];
+    s32 *h18;
+    s32 objp;
+    float f20;
+    float f24;
+    u8 pad28[8];
+    void (*cb)(struct BgmSlot *);
+    u8 pad34[0xC];
+} BgmSlot;
+extern BgmSlot D_402010F0[];
+extern void adpcmCloseFadeSetVol(s32, float);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0042_bgmScriptSetStatus", bgmPlayerDemoEndTypeAllClose);
+/* GAMECORE c0042 bgm status setter: closes every live slot. */
+extern s32 D_40131540;
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0042_bgmScriptSetStatus", bgmMinPriorityForceClose);
+extern void adpcmDeleteAdpcmSeq(s32);
+
+void bgmScriptSetStatus(s32 st)
+{
+    BgmSlot *s;
+    s32 i;
+    u32 fl;
+
+    D_40131540 = st;
+    if (st == 1) {
+        for (i = 0; i < 3; i++) {
+            s = &D_402010F0[i];
+            if (s->state != 0) {
+                if (s->state - 5U >= 2) {
+                    fl = ((BgmObj *)s->objp)->flags44;
+                    fl &= ~2;
+                    fl &= ~1;
+                    ((BgmObj *)s->objp)->flags44 = fl;
+                    s->state = 5;
+                    ((BgmObj *)s->objp)->x40 = 0;
+                }
+                if (s->cb != 0) {
+                    s->cb(s);
+                }
+            }
+        }
+    }
+}
+
+/* GAMECORE c0042 bgm slot close loop (slot table D_402010F0, 3 slots stride 0x40). */
+void bgmPlayerDemoEndTypeAllClose(void)
+{
+    BgmSlot *s;
+    s32 i;
+    u32 fl;
+
+    s = D_402010F0;
+    i = 2;
+    do {
+        if (s->state != 0) {
+            if (((BgmObj *)s->objp)->mode34 == 4) {
+                s->f24 = ((BgmObj *)s->objp)->f38;
+                if (s->state - 5U >= 2) {
+                    fl = ((BgmObj *)s->objp)->flags44;
+                    fl &= ~2;
+                    fl &= ~1;
+                    ((BgmObj *)s->objp)->flags44 = fl;
+                    s->state = 5;
+                    ((BgmObj *)s->objp)->x40 = 0;
+                }
+                if (s->cb != 0) {
+                    s->cb(s);
+                }
+            }
+        }
+        i--;
+        s++;
+    } while (i >= 0);
+}
+
+/* GAMECORE c0042: closes the lowest-priority live bgm slot under the given priority (state 6 slot is faded out instead). */
+void bgmMinPriorityForceClose(s32 prio)
+{
+    BgmSlot *s;
+    BgmSlot *best;
+    s32 i;
+    u32 fl;
+
+    best = 0;
+    for (i = 0; i < 3; i++) {
+        s = &D_402010F0[i];
+        if (s->state == 6) {
+            adpcmCloseFadeSetVol(*s->h18, 100.0f);
+            return;
+        }
+    }
+    for (i = 0; i < 3; i++) {
+        s = &D_402010F0[i];
+        if (s->state != 0 && s->prio < prio) {
+            prio = s->prio;
+            best = s;
+        }
+    }
+    if (best != 0) {
+        best->f24 = 0;
+        if (best->state - 5U >= 2) {
+            fl = ((BgmObj *)best->objp)->flags44;
+            fl &= ~2;
+            fl &= ~1;
+            ((BgmObj *)best->objp)->flags44 = fl;
+            best->state = 5;
+            ((BgmObj *)best->objp)->x40 = 0;
+        }
+        if (best->cb != 0) {
+            best->cb(best);
+        }
+    }
+}
 
 extern int D_40131574;
 extern int D_40131570;
@@ -153,7 +272,38 @@ void demoNormalHook(int a0, int a1, int a2, int *a3, int *t0)
 void initAdpcmOrient(void) {
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0042_bgmScriptSetStatus", deleteAdpcmOrient);
+/* GAMECORE c0042: orient table (count at +0xC, 0x50-byte rows at +0x10, row +0x40 = bgm slot): delete the adpcm seq and close each slot. */
+void deleteAdpcmOrient(u8 *o)
+{
+    u8 *row;
+    BgmSlot *s;
+    s32 n;
+    u32 fl;
+
+    row = *(u8 **)(o + 0x10);
+    if (*(s32 *)(o + 0xC) > 0) {
+        n = *(s32 *)(o + 0xC);
+        do {
+            if (*(BgmSlot **)(row + 0x40) != 0) {
+                adpcmDeleteAdpcmSeq(*(*(BgmSlot **)(row + 0x40))->h18);
+                s = *(BgmSlot **)(row + 0x40);
+                if (s->state - 5U >= 2) {
+                    fl = ((BgmObj *)s->objp)->flags44;
+                    fl &= ~2;
+                    fl &= ~1;
+                    ((BgmObj *)s->objp)->flags44 = fl;
+                    s->state = 5;
+                    ((BgmObj *)s->objp)->x40 = 0;
+                }
+                if (s->cb != 0) {
+                    s->cb(s);
+                }
+            }
+            n--;
+            row += 0x50;
+        } while (n != 0);
+    }
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0042_bgmScriptSetStatus", func_40044CE0);
 
