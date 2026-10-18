@@ -1,6 +1,35 @@
 #include "common.h"
 
 void CopyMultiMatrix();
+void *dynamic_cast_to_camera_obj();
+u8 *get_camera_obj_layout_class();
+u8 *GetScriptLayoutClass();
+u8 *GetLightClass();
+s32 CheckClothChainExist();
+
+#define LAYOUT_CLASS(c, obj)                                                 \
+    switch ((obj)[8]) {                                                      \
+    case 10:                                                                 \
+        c = (obj) + 0x20;                                                    \
+        break;                                                               \
+    case 11:                                                                 \
+        c = GetScriptLayoutClass(obj) + 0x70;                                \
+        break;                                                               \
+    case 17:                                                                 \
+        c = get_camera_obj_layout_class(dynamic_cast_to_camera_obj(obj));    \
+        break;                                                               \
+    case 19:                                                                 \
+        c = GetLightClass(obj);                                              \
+        break;                                                               \
+    case 9:                                                                  \
+    case 13:                                                                 \
+    case 22:                                                                 \
+        c = (obj) + 0x90;                                                    \
+        break;                                                               \
+    default:                                                                 \
+        c = NULL;                                                            \
+        break;                                                               \
+    }
 
 void UpdateLayoutClassPastGeometry(u8 *a0)
 {
@@ -11,7 +40,23 @@ void UpdateLayoutClassPastGeometry(u8 *a0)
     }
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0100_UpdateLayoutClassPastGeometry", SetLayoutObjAccessSwitchThisObjOnly);
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0100_UpdateLayoutClassPastGeometry", SetLayoutObjAccessSwitchThisObjOnly);
+void SetClothAccessSwitch();
+
+u8 *SetLayoutObjAccessSwitchThisObjOnly(u8 *obj, s32 v)
+{
+    u8 *c;
+
+    LAYOUT_CLASS(c, obj)
+    if (c != NULL && *(s8 *)(c + 0x1B8) != v) {
+        *(s8 *)(c + 0x1B8) = v;
+        if (*(s32 *)(c + 0x180) != 0) {
+            SetClothAccessSwitch(*(s32 *)(c + 0x178), v);
+        }
+        return c;
+    }
+    return NULL;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0100_UpdateLayoutClassPastGeometry", GetLayoutClassWindGeometry);
 
@@ -51,47 +96,38 @@ void SetLayoutClassScaleElem(u8 *a0, u128 *a1, s32 a2)
 #endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0100_UpdateLayoutClassPastGeometry", SetLayoutClassScaleElem);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0100_UpdateLayoutClassPastGeometry", CheckLayoutObjChainExist);
-
-/* NEARMISS-STUB SetLayoutObjDebugResetFunc */
-#if 0 /* NEARMISS 89.0% cat=rodata-const sub=- | see attempt (kX15 haiku best) | attempts=1 */
-s32 GetScriptLayoutClass();
-s64 dynamic_cast_to_camera_obj();
-s32 get_camera_obj_layout_class();
-s32 GetLightClass();
-
-void SetLayoutObjDebugResetFunc(u8 *a0, s32 a1)
+s32 CheckLayoutObjChainExist(u8 *obj)
 {
-    u8 *p;
+    u8 *c;
 
-    switch (a0[8]) {
-    case 9:
-    case 0xD:
-    case 0x16:
-        p = a0 + 0x90;
-        break;
-    case 10:
-        p = a0 + 0x20;
-        break;
-    case 0xB:
-        p = (u8 *)GetScriptLayoutClass() + 0x70;
-        break;
-    case 0x11:
-        *(s32 *)((u8 *)get_camera_obj_layout_class(dynamic_cast_to_camera_obj()) + 0x14C) = a1;
-        return;
-    case 0x13:
-        *(s32 *)((u8 *)GetLightClass() + 0x14C) = a1;
-        return;
-    default:
-        p = NULL;
-        break;
+    LAYOUT_CLASS(c, obj)
+    if (c != NULL) {
+        return CheckClothChainExist(*(s32 *)(c + 0x178));
     }
-    *(s32 *)(p + 0x14C) = a1;
+    return 0;
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0100_UpdateLayoutClassPastGeometry", SetLayoutObjDebugResetFunc);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0100_UpdateLayoutClassPastGeometry", CallLayoutObjDebugResetFunc);
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0100_UpdateLayoutClassPastGeometry", SetLayoutObjDebugResetFunc);
+void SetLayoutObjDebugResetFunc(u8 *obj, s32 fn)
+{
+    u8 *c;
+
+    LAYOUT_CLASS(c, obj)
+    *(s32 *)(c + 0x14C) = fn;
+}
+
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0100_UpdateLayoutClassPastGeometry", CallLayoutObjDebugResetFunc);
+void CallLayoutObjDebugResetFunc(u8 *obj)
+{
+    u8 *c;
+    void (*fn)(u8 *);
+
+    LAYOUT_CLASS(c, obj)
+    fn = *(void (**)(u8 *))(c + 0x14C);
+    if (fn != NULL) {
+        fn(obj);
+    }
+}
 
 /* NEARMISS-STUB GetLayoutClassCollisionBoundaryInfo */
 #if 0 /* NEARMISS 48.0% cat=regalloc sub=- | see attempt (kX15 haiku best) | attempts=1 */
@@ -113,99 +149,62 @@ s32 GetLayoutClassCollisionBoundaryInfo(u8 *out, u8 *obj)
 #endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0100_UpdateLayoutClassPastGeometry", GetLayoutClassCollisionBoundaryInfo);
 
-/* NEARMISS-STUB SetLayoutObjCollisionEnableFlag */
-#if 0 /* NEARMISS 79.0% cat=rodata-const sub=- | see attempt (kX15 haiku best) | attempts=1 */
-s32 GetScriptLayoutClass();
-s64 dynamic_cast_to_camera_obj();
-s32 get_camera_obj_layout_class();
-s32 GetLightClass();
-
-void SetLayoutObjCollisionEnableFlag(u8 *a0, s32 a1)
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0100_UpdateLayoutClassPastGeometry", SetLayoutObjCollisionEnableFlag);
+void SetLayoutObjCollisionEnableFlag(u8 *obj, s32 v)
 {
-    u8 *p;
+    u8 *c;
 
-    switch (a0[8]) {
-    case 9:
-    case 0xD:
-    case 0x16:
-        p = a0 + 0x90;
-        break;
-    case 10:
-        p = a0 + 0x20;
-        break;
-    case 0xB:
-        p = (u8 *)GetScriptLayoutClass() + 0x70;
-        break;
-    default:
-        p = NULL;
-        break;
-    case 0x11:
-        p = (u8 *)get_camera_obj_layout_class(dynamic_cast_to_camera_obj());
-        break;
-    case 0x13:
-        p = (u8 *)GetLightClass();
-        break;
-    }
-    if (*(s32 *)(p + 0x174) != 0) {
-        *(s8 *)(p + 0x1BB) = a1;
+    LAYOUT_CLASS(c, obj)
+    if (*(s32 *)(c + 0x174) != 0) {
+        *(s8 *)(c + 0x1BB) = v;
     }
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0100_UpdateLayoutClassPastGeometry", SetLayoutObjCollisionEnableFlag);
 
-/* NEARMISS-STUB GetLayoutObjCollisionEnableFlag */
-#if 0 /* NEARMISS 89.0% cat=rodata-const sub=- | see attempt (kX15 haiku best) | attempts=1 */
-s32 GetScriptLayoutClass();
-s64 dynamic_cast_to_camera_obj();
-s32 get_camera_obj_layout_class();
-s32 GetLightClass();
-
-s32 GetLayoutObjCollisionEnableFlag(u8 *a0)
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0100_UpdateLayoutClassPastGeometry", GetLayoutObjCollisionEnableFlag);
+s8 GetLayoutObjCollisionEnableFlag(u8 *obj)
 {
-    u8 *p;
+    u8 *c;
 
-    switch (a0[8]) {
-    case 9:
-    case 0xD:
-    case 0x16:
-        p = a0 + 0x90;
-        break;
-    case 10:
-        p = a0 + 0x20;
-        break;
-    case 0xB:
-        p = (u8 *)GetScriptLayoutClass() + 0x70;
-        break;
-    case 0xC:
-    case 0xE:
-    case 0xF:
-    case 0x10:
-    case 0x12:
-    case 0x14:
-    case 0x15:
-        p = NULL;
-        break;
-    case 0x11:
-        return *(s8 *)((u8 *)get_camera_obj_layout_class(dynamic_cast_to_camera_obj()) + 0x1BB);
-    case 0x13:
-        return *(s8 *)((u8 *)GetLightClass() + 0x1BB);
-    default:
-        p = NULL;
-        break;
-    }
-    return *(s8 *)(p + 0x1BB);
+    LAYOUT_CLASS(c, obj)
+    return *(s8 *)(c + 0x1BB);
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0100_UpdateLayoutClassPastGeometry", GetLayoutObjCollisionEnableFlag);
 
 void SetLayoutClassCollisionWorkAdr(u8 *layoutObj, void *work)
 {
     *(void **)(layoutObj + 0x174) = work;
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0100_UpdateLayoutClassPastGeometry", ChangeLayoutObjCollisionResourceAttribute);
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0100_UpdateLayoutClassPastGeometry", ChangeLayoutObjCollisionResourceAttribute);
+void ChangeCollisionResourceAttribute();
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0100_UpdateLayoutClassPastGeometry", SaveLayoutObjGeo);
+void ChangeLayoutObjCollisionResourceAttribute(u8 *obj, s32 a1, s32 a2, s32 a3, s32 a4, s32 a5, s32 a6)
+{
+    u8 *c;
+    u8 *p;
+
+    LAYOUT_CLASS(c, obj)
+    p = *(u8 **)(c + 0x184);
+    if (*(s32 *)(p + 0x20) != 0) {
+        ChangeCollisionResourceAttribute(*(s32 *)(p + 0x20), a1, a2, a3, a4, a5, a6);
+    }
+}
+
+s32 SaveLayoutObjGeo(u8 *obj)
+{
+    u8 *c;
+    s32 ok;
+
+    LAYOUT_CLASS(c, obj)
+    if (c == NULL) {
+        return -2;
+    }
+    ok = 0;
+    if (*(s32 *)(c + 0x190) != 0) {
+        (*(void (**)(s32))(c + 0x190))(*(s32 *)(c + 0x1A4));
+        ok = 1;
+    }
+    return ok ? 0 : -1;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0100_UpdateLayoutClassPastGeometry", GetLayoutRootMatrix);
 
@@ -262,6 +261,34 @@ s64 GetAliasLayoutObjWorkSize(u8 *a0)
     return size;
 }
 
+/* NEARMISS-STUB UpdateAliasLayoutObjClothGeometry */
+#if 0 /* NEARMISS 83.2% cat=regalloc sub=- | 2nd LAYOUT_CLASS(alias) result kept in v0 not a1; src->0x19C re-tested as pointer; expected beqz (not beqzl) default-case and a0 caching of src->0x19C; C with c | attempts=1 */
+extern u128 ZeroVector;
+
+void UpdateAliasLayoutObjClothGeometry(u8 *obj)
+{
+    u8 *c;
+    u8 *alias;
+    u8 *src;
+
+    LAYOUT_CLASS(c, obj)
+    if (*(s32 *)(c + 0x180) != 0) {
+        alias = *(u8 **)(c + 0x194);
+        LAYOUT_CLASS(src, alias)
+        if (*(s32 *)(src + 0x19C) != 0) {
+            *(f32 *)(*(u8 **)(c + 0x19C) + 0x80) = *(f32 *)(*(u8 **)(src + 0x19C) + 0x80);
+            *(f32 *)(*(u8 **)(c + 0x19C) + 0x84) = *(f32 *)(*(u8 **)(src + 0x19C) + 0x84);
+            *(u128 *)(*(u8 **)(c + 0x19C) + 0x60) = *(u128 *)(*(u8 **)(src + 0x19C) + 0x60);
+            *(u128 *)(*(u8 **)(c + 0x19C) + 0x70) = *(u128 *)(*(u8 **)(src + 0x19C) + 0x70);
+        } else {
+            *(s32 *)(*(u8 **)(c + 0x19C) + 0x80) = 0;
+            *(s32 *)(*(u8 **)(c + 0x19C) + 0x84) = 0;
+            *(u128 *)(*(u8 **)(c + 0x19C) + 0x60) = ZeroVector;
+            *(u128 *)(*(u8 **)(c + 0x19C) + 0x70) = ZeroVector;
+        }
+    }
+}
+#endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0100_UpdateLayoutClassPastGeometry", UpdateAliasLayoutObjClothGeometry);
 
 void func_400883B8(s32 *a0)
@@ -269,7 +296,37 @@ void func_400883B8(s32 *a0)
     *a0 = 0;
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0100_UpdateLayoutClassPastGeometry", func_400883C0);
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0100_UpdateLayoutClassPastGeometry", func_400883C0);
+extern f32 IdentityQuaternion[];
+extern u128 ZeroPoint;
+
+void SetGeometryPointerGlobalState();
+void DeleteTwoWayLink();
+u8 *GetLayoutClass();
+u8 *GetSubLinkClass();
+void isysRequestDeleteObj();
+
+void func_400883C0(u8 *obj)
+{
+    u8 *c;
+    u8 *o;
+
+    LAYOUT_CLASS(c, obj)
+    if (c != NULL) {
+        o = GetLayoutClass(obj);
+        if (*(s32 *)(o + 0x124) != 0) {
+            *(u128 *)(o + 0x60) = *(u128 *)*(u8 **)(o + 0x13C);
+            SetGeometryPointerGlobalState(o + 0xC0, IdentityQuaternion, &ZeroPoint);
+            DeleteTwoWayLink(o + 0x100);
+            *(s32 *)(o + 0x124) = 0;
+        }
+        return;
+    }
+    if (GetSubLinkClass(obj) == NULL) {
+        return;
+    }
+    isysRequestDeleteObj(obj);
+}
 
 void isysRequestDeleteObj();
 
