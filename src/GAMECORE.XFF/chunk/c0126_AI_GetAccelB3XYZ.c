@@ -15,6 +15,28 @@ float AI_GetAccelC3(float fparg0, float fparg1, float fparg2, float fparg3, floa
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0126_AI_GetAccelB3XYZ", AI_GetAccelC3XYZ);
 
+/* NEARMISS-STUB AI_GetTimeFromAccelC3 */
+#if 0 /* NEARMISS 39.56% cat=no-c-form sub=- | ee-gcc emits sqrt NaN check + jal sqrtf; target inline sqrt.s leaf, no frame | attempts=1 */
+float AI_GetTimeFromAccelC3(float fparg0, float fparg1, float fparg2, float fparg3)
+{
+    float fVar1;
+    float fVar2;
+
+    if (fparg3 < 0.1f) {
+        fparg3 = 0.1f;
+    }
+    fparg1 = fparg1 + fparg0;
+    fVar1 = 0.0f;
+    if (fparg2 < 0.0f) {
+        fparg2 = -fparg2;
+    }
+    fVar2 = fparg1 * 9.0f * fparg1 + fparg3 * 12.0f * fparg2;
+    if (0.0f <= fVar2) {
+        fVar1 = (fparg1 * -3.0f + __builtin_sqrtf(fVar2)) / fparg3;
+    }
+    return fVar1;
+}
+#endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0126_AI_GetAccelB3XYZ", AI_GetTimeFromAccelC3);
 
 float AI_GetVelocity2(float fparg0, float fparg1, float fparg2, float fparg3)
@@ -27,6 +49,32 @@ float AI_GetVelocity3(float fparg0, float fparg1, float fparg2, float fparg3, fl
     return fparg3 + ((fparg0 / 3.0f) * fparg4 * fparg4 * fparg4) + (fparg1 * 0.5f * fparg4 * fparg4) + (fparg2 * fparg4);
 }
 
+/* NEARMISS-STUB AI_GetVelocity3XYZ */
+#if 0 /* NEARMISS 6.125% cat=vu0-mmi sub=- | VU0 lqc2/qmtc2.ni/vmulx/vadd/sqc2 body; plain float C cannot emit VU0 | attempts=1 */
+
+void AI_GetVelocity3XYZ(float t, float *out, float *a1, float *a2, float *a3, float *a4)
+{
+    float v0;
+    float v1;
+    int i;
+
+    v0 = (t * t * t) / 3.0f;
+    for (i = 0; i < 4; i++) {
+        out[i] = a1[i] * v0;
+    }
+    v1 = (t * t) * 0.5f;
+    for (i = 0; i < 4; i++) {
+        out[i] = out[i] + a2[i] * v1;
+    }
+    for (i = 0; i < 4; i++) {
+        out[i] = out[i] + a3[i] * t;
+    }
+    for (i = 0; i < 4; i++) {
+        out[i] = out[i] + a4[i];
+    }
+    return;
+}
+#endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0126_AI_GetAccelB3XYZ", AI_GetVelocity3XYZ);
 
 float AI_GetPosition3(float fparg0, float fparg1, float fparg2, float fparg3, float fparg4, float fparg5)
