@@ -161,21 +161,15 @@ void glTexCoord2f(f32 s, f32 t)
     *(s32 *)(p + 0xAC) = 0;
 }
 
-/* NEARMISS-STUB glTexCoord2fv */
-#if 0 /* NEARMISS 79.0% cat=float-ops sub=- | gcc loads v[0] after v[1] / mtc1 of 1.0 ordering differs; sched of lwc1 pair | attempts=1 */
 void glTexCoord2fv(f32 *v)
 {
     u8 *p = D_401248C0;
-    f32 s = v[0];
-    f32 t = v[1];
 
-    *(f32 *)(p + 0xA0) = s;
-    *(f32 *)(p + 0xA4) = t;
+    *(f32 *)(p + 0xA0) = v[0];
+    *(f32 *)(p + 0xA4) = v[1];
     *(f32 *)(p + 0xA8) = 1.0f;
-    *(s32 *)(p + 0xAC) = 0;
+    *(f32 *)(p + 0xAC) = 0.0f;
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0016_glRotatef", glTexCoord2fv);
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0016_glRotatef", glVertex2f);
 

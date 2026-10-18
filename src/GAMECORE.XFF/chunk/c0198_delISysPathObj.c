@@ -69,33 +69,20 @@ s32 getPassageNum(u8* work)
     return *(s32*)(work + 0x380);
 }
 
-/* NEARMISS-STUB deletePassageWork */
-#if 0 /* NEARMISS 29.3% cat=branch-layout sub=- | branch-layout (loop beqzl) | attempts=1 */
-void deletePassageWork(u8* work, s32 idx)
+typedef struct { u64 q[3]; s16 f18; s16 f1A; s32 f1C; } PassageEnt;
+typedef struct { u8 pad[0x100]; PassageEnt ent[20]; s32 count; } PassageWork;
+void deletePassageWork(PassageWork *work, u32 idx)
 {
-    s32 count = *(s32*)(work + 0x380);
-    if (count != 0)
-    {
-        if ((u32)idx < (u32)(count - 1))
-        {
-            u64* src = (u64*)(work + (idx << 5) + 0x120);
-            do
-            {
-                u64* dst = src - 4;
-                dst[0] = src[0];
-                dst[1] = src[1];
-                dst[2] = src[2];
-                dst[3] = src[3];
-                *(s16*)((u8*)dst + 0x18) = 0;
-                idx++;
-                src += 4;
-            } while ((u32)idx < (u32)(*(s32*)(work + 0x380) - 1));
+    u32 i;
+
+    if (work->count != 0) {
+        for (i = idx; i < work->count - 1; i++) {
+            work->ent[i] = work->ent[i + 1];
+            work->ent[i].f18 = 0;
         }
-        *(s32*)(work + 0x380) = count - 1;
+        work->count--;
     }
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0198_delISysPathObj", deletePassageWork);
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0198_delISysPathObj", setDataHeaderFromAreaIdx);
 s32 setDataHeaderFromAreaIdx(u8* work, s32 areaIdx)

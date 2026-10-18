@@ -137,8 +137,6 @@ void SetGeometryPointerChainPos(char *pa0, int xa1, int xa2, float f12)
     *(float *)(pa0 + 0x8) = f12;
 }
 
-/* NEARMISS-STUB GetGeometryPointerCollisionDB */
-#if 0 /* NEARMISS 99.0% cat=rodata-const sub=- | in-TU: jump table address lui/lw only; jtbl normalisation refuses (extra non-padding rodata words after 9 entries) | attempts=1 */
 void *GetGeometryPointerCollisionDB(char *g)
 {
     switch (*(unsigned int *)(g + 0x30)) {
@@ -156,8 +154,6 @@ void *GetGeometryPointerCollisionDB(char *g)
     }
     return 0;
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0154_SetGeometryPointerGlobalStatePointer", GetGeometryPointerCollisionDB);
 
 extern float ZeroPoint[];
 extern void *GetLayoutObjCollisionDBWithTargetAttributeJudgeFunc(void *, void *, void *, void *);

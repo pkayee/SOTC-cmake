@@ -52,17 +52,14 @@ s32 getPathExFinish(u8* work, s32 mode)
     }
 }
 
-/* NEARMISS-STUB getPPointPasasgeNum */
-#if 0 /* NEARMISS 80.0% cat=regalloc sub=- | in-TU: spurious daddu a1,a0,zero at entry; 2-arg signature (s32,u8*) conflicts with caller proto | attempts=1 */
-s32 getPPointPasasgeNum(s32 unused, u8* work)
+s32 getPPointPasasgeNum(u8* work)
 {
-    if (*(s32*)(work + 0x3C40) != 9) {
-        return 0;
+    switch (*(s32*)(work + 0x3C40)) {
+    case 9:
+        return *(s32*)(work + 0x3C90);
     }
-    return *(s32*)(work + 0x3C90);
+    return 0;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0201_updateUserPathWorkEx", getPPointPasasgeNum);
 
 void setGPSelectMode(u8* work, s32 value)
 {
