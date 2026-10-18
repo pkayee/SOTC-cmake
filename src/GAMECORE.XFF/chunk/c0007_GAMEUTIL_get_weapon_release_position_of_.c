@@ -53,7 +53,29 @@ s32 GAMEUTIL_get_horse_obj(void)
     return obj;
 }
 #endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0007_GAMEUTIL_get_weapon_release_position_of_", GAMEUTIL_get_horse_obj);
+extern u8 gcGlobalVar[];
+int *isysGroupForFirst(void *group, int flag);
+int *isysGroupForNext(int *link, int flag);
+void isysGroupForExit(void *obj, int flag);
+
+void *GAMEUTIL_get_horse_obj(void)
+{
+    void *found = 0;
+    void *o = 0;
+    int *g;
+
+    for (g = isysGroupForFirst(gcGlobalVar + 0x2B4, 0); g != 0; g = isysGroupForNext(g, 0))
+    {
+        o = (void *)*g;
+        found = o;
+        break;
+    }
+    if (o != 0)
+    {
+        isysGroupForExit(o, 0);
+    }
+    return found;
+}
 
 void *GetCharacterClass(void *obj);
 
@@ -141,8 +163,6 @@ s32 GAMEUTIL_is_horse_obj_contact_ground(s32 *out, void *obj)
 #endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0007_GAMEUTIL_get_weapon_release_position_of_", GAMEUTIL_is_horse_obj_contact_ground);
 
-/* NEARMISS-STUB GAMEUTIL_get_horse_move_status */
-#if 0 /* NEARMISS 88.8% cat=regalloc sub=- | mode switch matches; class test merges sentinel in v0 with xori+bnez in target, gcc keeps the lh in v1 and emits addiu 3 + bne; the mode compare chain is identi | attempts=1 */
 extern s32 ControlMode_HORSE_WALK;
 extern s32 ControlMode_HORSE_TURN_WALK;
 extern s32 ControlMode_HORSE_RUN_N;
@@ -150,135 +170,114 @@ extern s32 ControlMode_HORSE_TURN_RUN_N;
 extern s32 ControlMode_HORSE_RUN;
 extern s32 ControlMode_HORSE_TURN_RUN;
 
+static inline s32 get_character_type(void *actor)
+{
+    u8 *c;
+    if (actor != NULL)
+    {
+        c = GetCharacterClass(actor);
+        if (c != NULL)
+        {
+            return *(s16 *)(c + 0x360);
+        }
+    }
+    return -1000000;
+}
+
+static inline s32 is_horse_obj(void *actor)
+{
+    return get_character_type(actor) == 3;
+}
+
 s32 GAMEUTIL_get_horse_move_status(s32 *out, void *obj)
 {
-    s32 state;
-    s32 ret;
-    s32 cls;
-    u8 *cc;
-    s32 mode;
+    s32 mode = 0;
+    s32 moving = 0;
 
-    state = 0;
-    ret = 0;
-    cc = NULL;
-    if (obj != NULL)
+    if (is_horse_obj(obj))
     {
-        cc = GetCharacterClass(obj);
-    }
-    if (cc != NULL)
-    {
-        cls = *(s16 *)(cc + 0x360);
-    }
-    else
-    {
-        cls = 0xFFF0BDC0;
-    }
-    if (cls != 3)
-    {
-        cls = 0;
-    }
-    if (cls == 3)
-    {
-        cc = GetCharacterClass(obj);
-        mode = *(s32 *)(cc + 0x740);
-        if (mode == ControlMode_HORSE_WALK || mode == ControlMode_HORSE_TURN_WALK)
+        s32 m = *(s32 *)((u8 *)GetCharacterClass(obj) + 0x740);
+
+        if (m == ControlMode_HORSE_WALK || m == ControlMode_HORSE_TURN_WALK)
         {
-            state = 2;
-            ret = 1;
+            mode = 2;
+            moving = 1;
         }
-        else if (mode == ControlMode_HORSE_RUN_N || mode == ControlMode_HORSE_TURN_RUN_N)
+        else if (m == ControlMode_HORSE_RUN_N || m == ControlMode_HORSE_TURN_RUN_N)
         {
-            state = 3;
-            ret = 1;
+            mode = 3;
+            moving = 1;
         }
-        else if (mode == ControlMode_HORSE_RUN || mode == ControlMode_HORSE_TURN_RUN)
+        else if (m == ControlMode_HORSE_RUN || m == ControlMode_HORSE_TURN_RUN)
         {
-            state = 4;
-            ret = 1;
+            mode = 4;
+            moving = 1;
         }
         else
         {
-            state = 1;
+            mode = 1;
         }
     }
     if (out != NULL)
     {
-        *out = state;
+        *out = mode;
     }
-    return ret;
+    return moving;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0007_GAMEUTIL_get_weapon_release_position_of_", GAMEUTIL_get_horse_move_status);
 
-/* NEARMISS-STUB GAMEUTIL_get_boss_obj */
-#if 0 /* NEARMISS 84.8% cat=sched sub=- | arg-setup order: gcc puts flag a1=0 for the first call before addiu a0 and hoists the exit-call flag a1=0 above beqz v0 (target sets it in the exit jal delay sl | attempts=1 */
-extern u8 gcGlobalVar[];
-void *isysGroupForFirst(s32 group, s32 flag);
-void isysGroupForExit(s32 obj, s32 flag);
-
-s32 GAMEUTIL_get_boss_obj(void)
+void *GAMEUTIL_get_boss_obj(void)
 {
-    s32 obj;
-    void *link;
+    void *found = 0;
+    void *o = 0;
+    int *g;
 
-    obj = 0;
-    link = isysGroupForFirst((s32)(gcGlobalVar + 0x2B8), 0);
-    if (link != NULL)
+    for (g = isysGroupForFirst(gcGlobalVar + 0x2B8, 0); g != 0; g = isysGroupForNext(g, 0))
     {
-        obj = *(s32 *)link;
+        o = (void *)*g;
+        found = o;
+        break;
     }
-    if (obj != 0)
+    if (o != 0)
     {
-        isysGroupForExit(obj, 0);
+        isysGroupForExit(o, 0);
     }
-    return obj;
+    return found;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0007_GAMEUTIL_get_weapon_release_position_of_", GAMEUTIL_get_boss_obj);
 
-/* NEARMISS-STUB GAMEUTIL_is_boss_obj */
-#if 0 /* NEARMISS 66.4% cat=branch-layout sub=- | two-path fn: flag==0 path needs obj in v0 and sentinel 0xFFF0BDC0 loaded after the calls; loop path keeps const 4 in s1 (hoisted) and uses do/while with obj in  | attempts=1 */
-void *GAMEUTIL_get_parent_object(void *obj);
+extern void *GAMEUTIL_get_parent_object(void *);
 
-s32 GAMEUTIL_is_boss_obj(void *obj, s32 flag)
+static inline int boss_get_character_type(void *actor)
 {
-    s32 cls;
-    void *cc;
-
-    if (flag == 0)
-    {
-        cls = 0xFFF0BDC0;
-        if (obj != NULL)
-        {
-            cc = GetCharacterClass(obj);
-            if (cc != NULL)
-            {
-                cls = *(s16 *)((u8 *)cc + 0x360);
-            }
-        }
-        return cls == 4;
+    char *c;
+    if (actor != 0) {
+        c = GetCharacterClass(actor);
+        if (c != 0)
+            return *(short *)(c + 0x360);
     }
-    while (obj != NULL)
-    {
-        cls = 0xFFF0BDC0;
-        if (obj != NULL)
-        {
-            cc = GetCharacterClass(obj);
-            if (cc != NULL)
-            {
-                cls = *(s16 *)((u8 *)cc + 0x360);
-            }
-        }
-        if (cls == 4)
-        {
+    return -1000000;
+}
+
+static inline int is_boss(void *actor)
+{
+    return boss_get_character_type(actor) == 4;
+}
+
+/* Reading p through a pointer (found by the permuter) keeps the inlined null
+   check inside the loop, as in the original. */
+int GAMEUTIL_is_boss_obj(void *actor, int parents)
+{
+    void *p;
+
+    if (parents == 0)
+        return is_boss(actor);
+    for (p = actor; p != 0; p = GAMEUTIL_get_parent_object(p)) {
+        void **pp = &p;
+
+        if (boss_get_character_type(*pp) == 4)
             return 1;
-        }
-        obj = GAMEUTIL_get_parent_object(obj);
     }
     return 0;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0007_GAMEUTIL_get_weapon_release_position_of_", GAMEUTIL_is_boss_obj);
 
 s32 GAMEUTIL_get_parent_collision_attribute(u64 *attr, void *obj);
 
@@ -579,15 +578,12 @@ void GAMEUTIL_constructor_position_filter(u128 *p)
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0007_GAMEUTIL_get_weapon_release_position_of_", GAMEUTIL_constructor_position_filter);
 
 /* NEARMISS-STUB GAMEUTIL_reset_position_filter */
-#if 0 /* NEARMISS 40.0% cat=sched sub=- | second lq of src hoisted above the flag store (gcc emits lq v1 first, sq v1 last); target keeps lq v0/sq/lq v1/sw/sq order | attempts=1 */
-void GAMEUTIL_reset_position_filter(u128 *p, u128 *src)
+#if 0 /* NEARMISS 54.9% cat=sched sub=- | in-TU: lq/sq/sw ordering; gcc hoists second lq above first sq | attempts=3 */
+void GAMEUTIL_reset_position_filter(u8 *p, u128 *pos)
 {
-    u128 b;
-
-    p[0] = *src;
-    b = *src;
-    ((s32 *)p)[8] = 1;
-    p[1] = b;
+    *(u128 *)p = *pos;
+    *(s32 *)(p + 0x20) = 1;
+    *(u128 *)(p + 0x10) = *pos;
 }
 #endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0007_GAMEUTIL_get_weapon_release_position_of_", GAMEUTIL_reset_position_filter);
