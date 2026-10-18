@@ -4,12 +4,22 @@ INCLUDE_ASM("asm/DBGMGR.XFF/nonmatchings/chunk/c0008_DebugDispQuaternion", Debug
 
 INCLUDE_ASM("asm/DBGMGR.XFF/nonmatchings/chunk/c0008_DebugDispQuaternion", GetGlDebugSw);
 
-INCLUDE_ASM("asm/DBGMGR.XFF/nonmatchings/chunk/c0008_DebugDispQuaternion", gluNewQuadric);
+//INCLUDE_ASM("asm/DBGMGR.XFF/nonmatchings/chunk/c0008_DebugDispQuaternion", gluNewQuadric);
+u64 gluNewQuadric()
+{
+    return 0;
+}
 
 void gluDeleteQuadric(void) {
 }
 
-INCLUDE_ASM("asm/DBGMGR.XFF/nonmatchings/chunk/c0008_DebugDispQuaternion", gluCylinder);
+//INCLUDE_ASM("asm/DBGMGR.XFF/nonmatchings/chunk/c0008_DebugDispQuaternion", gluCylinder);
+void _gluCylinder(u64 a, u64 b);
+
+void gluCylinder(u64 a, u64 b, u64 c)
+{
+    _gluCylinder(b, c);
+}
 
 INCLUDE_ASM("asm/DBGMGR.XFF/nonmatchings/chunk/c0008_DebugDispQuaternion", iosgluAddVertex4fv);
 

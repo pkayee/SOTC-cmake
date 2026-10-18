@@ -2068,4 +2068,12 @@ s32 isysSearchCalledModuleFuncNameByAddr(char *a0, char *a1, s32 a2)
 void isysCreateExceptionThread(void)
 {}
 
+/* NEARMISS-STUB func_4001D3A8 */
+#if 0 /* NEARMISS 100.0% cat=no-c-form sub=live-ra | reads live $ra (addiu a0,ra,-8) with sd/ld frame and j tail call; no C form, C gives 0 arg | attempts=3 */
+void func_4001D3A8(void)
+{
+    void *ra = __builtin_return_address(0);
+    func_4001CFE0((s32)ra - 8);
+}
+#endif
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", func_4001D3A8);

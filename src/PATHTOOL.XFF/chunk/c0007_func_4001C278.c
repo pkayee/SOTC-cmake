@@ -30,7 +30,13 @@ INCLUDE_ASM("asm/PATHTOOL.XFF/nonmatchings/chunk/c0007_func_4001C278", func_4001
 
 INCLUDE_ASM("asm/PATHTOOL.XFF/nonmatchings/chunk/c0007_func_4001C278", func_4001C898);
 
-INCLUDE_ASM("asm/PATHTOOL.XFF/nonmatchings/chunk/c0007_func_4001C278", func_4001C8F0);
+//INCLUDE_ASM("asm/PATHTOOL.XFF/nonmatchings/chunk/c0007_func_4001C278", func_4001C8F0);
+void DebugDispTriangularPyramidNotBlendVU1();
+
+void func_4001C8F0(void)
+{
+    DebugDispTriangularPyramidNotBlendVU1();
+}
 
 INCLUDE_ASM("asm/PATHTOOL.XFF/nonmatchings/chunk/c0007_func_4001C278", func_4001C908);
 

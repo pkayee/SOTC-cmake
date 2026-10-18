@@ -2,7 +2,13 @@
 
 INCLUDE_ASM("asm/GRPTOOLS.XFF/nonmatchings/chunk/c0001_create_fog_col_param_menu", create_fog_col_param_menu);
 
-INCLUDE_ASM("asm/GRPTOOLS.XFF/nonmatchings/chunk/c0001_create_fog_col_param_menu", GetToolNewNameNum);
+//INCLUDE_ASM("asm/GRPTOOLS.XFF/nonmatchings/chunk/c0001_create_fog_col_param_menu", GetToolNewNameNum);
+extern s32 D_40016098[];
+
+s32 GetToolNewNameNum(s32 idx)
+{
+    return D_40016098[idx];
+}
 
 INCLUDE_ASM("asm/GRPTOOLS.XFF/nonmatchings/chunk/c0001_create_fog_col_param_menu", getSizeofElemType);
 
