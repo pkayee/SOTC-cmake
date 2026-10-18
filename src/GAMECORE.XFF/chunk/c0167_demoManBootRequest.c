@@ -1,6 +1,11 @@
 #include "common.h"
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0167_demoManBootRequest", demoManBootRequest);
+void *GetScriptLayoutClass(void *);
+
+void demoManBootRequest(void)
+{
+    *(s32 *)(*(char **)((char *)((void *(*)(void))GetScriptLayoutClass)() + 0x2D8) + 4) = 1;
+}
 
 void *GetScriptLayoutClass(void *);
 
@@ -9,7 +14,15 @@ s32 demoManBootChk(void *actor)
     return (*(s32 *)((char *)((*(void **)((char *)(GetScriptLayoutClass(actor)) + 0x2D8))) + 8));
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0167_demoManBootRequest", demoManStart);
+void demoManStart(void *actor, s32 arg)
+{
+    char *w = *(char **)((char *)GetScriptLayoutClass(actor) + 0x2D8);
+
+    *(s32 *)(w + 0x40) = arg;
+    *(s32 *)(w + 0xC) = 1;
+    *(s32 *)(w + 0x3C) = 0;
+    *(s32 *)(w + 0x34) = 0;
+}
 
 int demoManChkStart(void *actor)
 {
@@ -64,7 +77,15 @@ int IsForwardTime__DemoMan(void *context, float time)
     return 0;
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0167_demoManBootRequest", ForwardTime__DemoMan);
+int ForwardTime__DemoMan(void *context, float time)
+{
+    char *w = *(char **)((char *)GetScriptLayoutClass(context) + 0x2D8);
+    float prev = *(float *)(w + 0x34);
+
+    *(float *)(w + 0x34) = time;
+    *(float *)(w + 0x24) = *(float *)(w + 0x24) + (time - prev);
+    return 1;
+}
 
 extern u8 SH_StageDataDEFAULT[];
 void sheetMgrUnloadSegmentIndex();

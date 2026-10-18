@@ -27,7 +27,16 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0084_func_40075120", motrootdyn
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0084_func_40075120", func_40075458);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0084_func_40075120", func_40075528);
+void func_40075528(s64 a0, s32 a1, char *a2)
+{
+    if (a2[4] != 0) {
+        a2[3] = 1;
+        return;
+    }
+    if (a1 == 1) {
+        a2[2] = a1;
+    }
+}
 
 extern int func_4006E0C0();
 
@@ -43,7 +52,13 @@ int motionfall(int a, int b, int c, int d, int e)
     return func_4006E0C0(a, b, c, d, e, 1);
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0084_func_40075120", func_40075680);
+s32 func_40075680(s32 a0, u8 *a1)
+{
+    if (a0 != *(s32 *)(a1 + 0x40) && a0 != *(s32 *)(a1 + 0x44)) {
+        return 1;
+    }
+    return 0;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0084_func_40075120", motrootdyn_startcharnodeparent);
 
