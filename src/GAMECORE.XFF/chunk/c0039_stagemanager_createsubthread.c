@@ -39,43 +39,58 @@ void stagemanager_unloadstage(s32 a0)
     return;
 }
 
-/* NEARMISS-STUB stagemanager_getStageNumberWithStageDataStrptr */
-#if 0 /* NEARMISS 90.2% cat=branch-layout sub=- | shared zero exit block | attempts=1 */
-s32 stagemanager_getStageNumberWithStageDataStrptr(u32 *a0)
+typedef struct
 {
-    u32 a2;
-    u32 off;
-    u8 *p;
-    u8 *q;
-    u8 *t;
-    s32 e;
-    s32 v;
+    s32 v[5];
+} StageData;
 
-    a2 = *a0;
-    off = a2 & 0x3FFFF;
-    p = (off != 0) ? *(u8 **)((u8 *)a0 - off) : NULL;
-    e = 0;
-    if ((s32)p != 0 && (s32)p != DldSysUndefSymbol)
+static inline u8 *dldResolve(u32 *h)
+{
+    u32 v = *h;
+    s32 off = v & 0x3FFFF;
+    s32 *t = off != 0 ? *(s32 **)((u8 *)h - off) : 0;
+
+    return (t != 0 && (s32)t != DldSysUndefSymbol) ? (u8 *)t[4] + ((v >> 18) & 0xFFF) * ((s32 *)t[2])[3] : 0;
+}
+
+s32 stagemanager_getStageNumberWithStageDataStrptr(u32 *h)
+{
+    StageData *p = (StageData *)dldResolve(h);
+
+    if (p != 0)
     {
-        q = *(u8 **)(p + 8);
-        e = *(s32 *)(p + 0x10) + ((a2 >> 18) & 0xFFF) * *(s32 *)(q + 0xC);
-    }
-    if (e != 0)
-    {
-        t = (DldSysUndefSymbol != (s32)SH_StageDataDEFAULT) ? SH_StageDataDEFAULT : NULL;
-        v = 0;
-        if (t != NULL)
-        {
-            v = *(s32 *)(t + 0x10);
-        }
-        return ((e - v) >> 2) * -0x33333333;
+        s32 *sh = DldSysUndefSymbol != (s32)SH_StageDataDEFAULT ? (s32 *)SH_StageDataDEFAULT : 0;
+        StageData *base = 0;
+
+        if (sh != 0)
+            base = (StageData *)sh[4];
+        return p - base;
     }
     return -1;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0039_stagemanager_createsubthread", stagemanager_getStageNumberWithStageDataStrptr);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0039_stagemanager_createsubthread", stagemanager_loadstagecore);
+void stagemanager_loadstagecore(void *a, s32 n, s32 c, s32 d)
+{
+    s32 *sh;
+    u8 *s;
+    s32 st;
+
+    sh = (DldSysUndefSymbol != (s32)SH_StageDataDEFAULT) ? (s32 *)SH_StageDataDEFAULT : 0;
+    s = (sh != 0) ? (u8 *)sh[4] + n * 20 : 0;
+    if (++*(u16 *)(s + 0x10) == 1)
+    {
+        sheetMgrLoadSegmentIndex(SH_StageDataDEFAULT, n, &st);
+        sheetMgrNopSegmentIndex(0);
+        while ((u32)(st - 0xDEAF) >= 2)
+        {
+            scrRun();
+        }
+        if (st != 0xDEB0)
+        {
+            initstage(a, n, c, -1, d, 0);
+        }
+    }
+}
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0039_stagemanager_createsubthread", stagemanager_unloadstagecore);
 void stagemanager_unloadstagecore(s32 a0)
@@ -157,26 +172,27 @@ void stagemanager_restartstagecore(s32 a0, s32 a1, s32 a2, s32 a3)
     initstage(a0, a1, a2, -1, a3, 1);
 }
 
-/* NEARMISS-STUB stagemanager_getCenterFromAreaId */
-#if 0 /* NEARMISS 74.7% cat=sched sub=- | gcc hoists float const loads above div check | attempts=1 */
-void stagemanager_getCenterFromAreaId(f32 *a0, s32 a1)
+typedef struct
 {
-    s32 w;
-    s32 h;
-    f32 cw;
-    f32 ch;
+    char pad[0x14];
+    float w;
+    float h;
+    char pad2[0x18];
+    int nx;
+    int nz;
+} StageInfo;
 
-    w = *(s32 *)(D_40131474 + 0x34);
-    cw = *(f32 *)(D_40131474 + 0x14);
-    a0[1] = 0.0f;
-    a0[0] = -((((f32)(a1 % w)) - ((f32)w * 0.5f)) * cw + cw * 0.5f);
-    h = *(s32 *)(D_40131474 + 0x38);
-    ch = *(f32 *)(D_40131474 + 0x18);
-    a0[3] = 1.0f;
-    a0[2] = (((f32)(a1 / w)) - ((f32)h * 0.5f)) * ch + ch * 0.5f;
+void stagemanager_getCenterFromAreaId(float *out, int id)
+{
+    StageInfo *s = (StageInfo *)D_40131474;
+    int x = id % s->nx;
+    int z = id / s->nx;
+
+    out[0] = -(((float)x - (float)s->nx * 0.5f) * s->w + s->w * 0.5f);
+    *(int *)&out[1] = 0;
+    out[2] = ((float)z - (float)((StageInfo *)D_40131474)->nz * 0.5f) * ((StageInfo *)D_40131474)->h + ((StageInfo *)D_40131474)->h * 0.5f;
+    out[3] = 1.0f;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0039_stagemanager_createsubthread", stagemanager_getCenterFromAreaId);
 
 extern s32 D_40131478;
 
@@ -373,49 +389,25 @@ void deleteWorldLayout(void)
     D_40131490 = 0;
 }
 
-/* NEARMISS-STUB initGameObject */
-#if 0 /* NEARMISS 86.7% cat=regalloc sub=- | DLD loop reg/lui hoist | attempts=1 */
-void gStatSetGObjAdrs(s32 a0, u8 *a1);
+void gStatSetGObjAdrs(u8 *a0, s32 a1);
 
 void initGameObject(s32 a0)
 {
-    s32 n;
-    u8 *e;
-    u8 *f;
-    u8 *p;
-    u32 a2;
-    u32 off;
-    u8 *q;
-    s32 v;
+    s32 n = *(s32 *)(a0 + 0xC);
+    u8 *e = *(u8 **)(a0 + 0x10);
+    s32 i;
 
-    n = *(s32 *)(a0 + 0xC);
-    e = *(u8 **)(a0 + 0x10);
-    if (n > 0)
+    for (i = 0; i < n; i++, e += 0x14)
     {
-        do
+        u8 *p = dldResolve((u32 *)(e + 0x10));
+
+        *(s32 *)(e + 8) = 0;
+        if (p != 0)
         {
-            f = e + 0x10;
-            a2 = *(u32 *)f;
-            off = a2 & 0x3FFFF;
-            p = (off != 0) ? *(u8 **)(f - off) : NULL;
-            v = 0;
-            if ((s32)p != 0 && (s32)p != DldSysUndefSymbol)
-            {
-                q = *(u8 **)(p + 8);
-                v = *(s32 *)(p + 0x10) + ((a2 >> 18) & 0xFFF) * *(s32 *)(q + 0xC);
-            }
-            *(s32 *)(e + 8) = 0;
-            if (v != 0)
-            {
-                gStatSetGObjAdrs(v, e);
-            }
-            n--;
-            e += 0x14;
-        } while (n != 0);
+            gStatSetGObjAdrs(p, (s32)e);
+        }
     }
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0039_stagemanager_createsubthread", initGameObject);
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0039_stagemanager_createsubthread", deleteGameObject);
 void unloadObj();
