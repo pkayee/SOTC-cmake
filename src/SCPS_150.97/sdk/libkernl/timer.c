@@ -61,7 +61,7 @@ void SetT2_COMP(unsigned int value)
 }
 
 /* NEARMISS-STUB InitTimer */
-#if 0 /* NEARMISS 79.5% cat=stack-frame sub=- | target frame 0x60 saves s0-s4; ours 0x40 | attempts=1 */
+#if 0 /* NEARMISS 79.5% cat=stack-frame sub=- | frame 0x60 (s0-s4 saved) vs ours smaller; D_00148A00 and func_00110AD0 need extern decls (added inside stub); store/regalloc of pool/tt same 79.5 | attempts=2 */
 int InitTimer(int arg)
 {
     TimerTable *tt;
@@ -241,7 +241,7 @@ u64 iGetTimerSystemTime(void)
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/timer", iGetTimerSystemTime);
 
 /* NEARMISS-STUB GetTimerSystemTime */
-#if 0 /* NEARMISS 59.4% cat=regalloc sub=- | DIntr result kept in v0 in target; ours copies | attempts=1 */
+#if 0 /* NEARMISS 59.5% cat=regalloc sub=- | lwu zero-extend load: target loads count with lwu straight into s0 (and reloads in the if), ours lw+dsll32/dsrl32; volatile/non-volatile mix tried (42-59%); DIn | attempts=2 */
 u64 GetTimerSystemTime(void)
 {
     int stat;
@@ -251,13 +251,13 @@ u64 GetTimerSystemTime(void)
     u64 shift;
 
     stat = DIntr();
-    count = *(volatile u32 *)0x10001000;
-    mode = *(volatile u32 *)0x10001010;
+    count = ((volatile u32 *)0x10001000)[0];
+    mode = ((volatile u32 *)0x10001000)[4];
     base = *(u64 *)D_00133A18;
     shift = 2;
     if (mode & 0x800)
     {
-        count = *(volatile u32 *)0x10001000;
+        count = ((volatile u32 *)0x10001000)[0];
         base++;
     }
     mode &= 3;
@@ -296,7 +296,7 @@ int AllocTimerCounter(void)
 }
 
 /* NEARMISS-STUB iFreeTimerCounter */
-#if 0 /* NEARMISS 97.0% cat=sched sub=- | beqzl with duplicated delay-slot store; ours beqz+nop | attempts=1 */
+#if 0 /* NEARMISS 97.0% cat=branch-layout sub=- | target beql (branch-likely, taken=continue) with delay slot lui D_00133A18 hoisted; error return laid out inline before it; ours bne to out-of-line error block. | attempts=2 */
 int iFreeTimerCounter(int id)
 {
     TimerCounter *tc;
@@ -544,6 +544,48 @@ unsigned long GetTimerCount(int id)
     return ret;
 }
 
+/* NEARMISS-STUB iSetTimerHandler */
+#if 0 /* NEARMISS 94.5% cat=no-c-form sub=- | target stores gp register (sw $gp,0x2C) = no C form; placeholder tc->unk2C=0 used here; also s2/s3 regalloc swapped (ulSchedule/arg); store-order variants no ch | attempts=1 */
+int iSetTimerHandler(int id, u64 ulSchedule, u64 (*cbHandler)(int, u64, u64, void *, void *), void *arg)
+{
+    TimerCounter *tc;
+    u32 flags;
+
+    tc = (TimerCounter *)(((u32)id >> 10) << 6);
+    if (id < 0 || ((u32)id & 0x3FF) != tc->id)
+    {
+        return 0x80008002;
+    }
+    if (((volatile TimerTable *)D_00133A18)->activeId == id)
+    {
+        return 0x80000010;
+    }
+    flags = tc->flags;
+    if (flags & 2)
+    {
+        func_00110A98(tc);
+        flags = tc->flags;
+    }
+    tc->unk28 = (u32)cbHandler;
+    if (cbHandler == 0)
+    {
+        tc->flags = flags & ~2;
+    }
+    else
+    {
+        tc->flags = flags | 2;
+        tc->unk20 = ulSchedule;
+        tc->unk2C = 0;
+        tc->unk30 = (u32)arg;
+        if (tc->flags & 1)
+        {
+            func_00110A10(tc);
+        }
+    }
+    func_00110880(iGetTimerSystemTime());
+    return 0;
+}
+#endif
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/timer", iSetTimerHandler);
 
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/timer", SetTimerHandler);
@@ -584,7 +626,7 @@ unsigned long TimerUSec2BusClock(unsigned int uiSec, unsigned int uiUsec)
 }
 
 /* NEARMISS-STUB TimerBusClock2Freq */
-#if 0 /* NEARMISS 90.0% cat=sched sub=- | mtc1/div.s nop scheduling | attempts=1 */
+#if 0 /* NEARMISS 90.0% cat=sched sub=- | unsigned long->float 2.9 expansion matches; target has 2 hazard nops after ld ra before div.s, ours none; k-local variant no change | attempts=1 */
 float TimerBusClock2Freq(unsigned long ulClock)
 {
     return 147456000.0f / (float)ulClock;
@@ -593,10 +635,12 @@ float TimerBusClock2Freq(unsigned long ulClock)
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/timer", TimerBusClock2Freq);
 
 /* NEARMISS-STUB TimerFreq2BusClock */
-#if 0 /* NEARMISS 72.0% cat=sched sub=- | mtc1/div.s nop hazard scheduling vs jal delay slot | attempts=1 */
+#if 0 /* NEARMISS 72.3% cat=sched sub=- | mtc1/div.s: target has 2 nops between sd ra and div.s, ours none; jal __fixunssfdi tail matches; local-temp/order variants no change | attempts=2 */
 unsigned long TimerFreq2BusClock(float fFreq)
 {
-    return (unsigned long)(147456000.0f / fFreq);
+    float c;
+    c = 147456000.0f;
+    return (unsigned long)(c / fFreq);
 }
 #endif
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/timer", TimerFreq2BusClock);
