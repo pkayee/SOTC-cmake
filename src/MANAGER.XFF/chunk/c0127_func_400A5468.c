@@ -93,29 +93,25 @@ s32 func_400A5468(u8 *obj)
 }
 #endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0127_func_400A5468", func_400A5468);
-/* NEARMISS-STUB GetSpriteMenuClass */
-#if 0 /* NEARMISS 77.1% cat=regalloc sub=- | gcc emits xori v1,v1,0x21 (immediate); expected keeps 0x21 in a0 (addiu a0,zero,0x21) and uses xor v1,v1,a0; no C form tried (ternary, s32 key, ==, ^) changed i | attempts=1 */
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0127_func_400A5468", GetSpriteMenuClass);
 void *GetSpriteMenuClass(void *spriteMenu)
 {
-    s32 type = ((u8 *)spriteMenu)[8];
-    s32 key = 0x21;
-
-    return (type == key) ? (u8 *)spriteMenu + 0x90 : NULL;
+    if (((u8 *)spriteMenu)[8] != 0x21)
+    {
+        return NULL;
+    }
+    return (u8 *)spriteMenu + 0x90;
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0127_func_400A5468", GetSpriteMenuClass);
 
-/* NEARMISS-STUB GetScriptSpriteMenuClass */
-#if 0 /* NEARMISS 77.1% cat=regalloc sub=- | same as GetSpriteMenuClass: gcc emits xori v1,v1,0x21; expected addiu a0,zero,0x21 + xor v1,v1,a0 | attempts=1 */
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0127_func_400A5468", GetScriptSpriteMenuClass);
 void *GetScriptSpriteMenuClass(void *spriteMenu)
 {
-    s32 type = ((u8 *)spriteMenu)[8];
-    s32 key = 0x21;
-
-    return (type == key) ? (u8 *)spriteMenu + 0x20 : NULL;
+    if (((u8 *)spriteMenu)[8] != 0x21)
+    {
+        return NULL;
+    }
+    return (u8 *)spriteMenu + 0x20;
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0127_func_400A5468", GetScriptSpriteMenuClass);
 
 //INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0127_func_400A5468", SpriteMenuEnableExtOkButton);
 
