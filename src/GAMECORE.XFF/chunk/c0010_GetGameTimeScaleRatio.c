@@ -29,29 +29,20 @@ void func_40022220(void);
 void func_400221B8(void);
 void func_40022270(void);
 
-/* NEARMISS-STUB GetGameTimeScaleRatio */
-#if 0 /* NEARMISS 98.33% cat=rodata-const sub=- | lui %hi(gcGlobalVar+off) folded by gcc vs expected lui %hi(gcGlobalVar)+lo addend | attempts=1 */
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0010_GetGameTimeScaleRatio", GetGameTimeScaleRatio);
 f32 GetGameTimeScaleRatio(void) {
     return *(f32*)(gcGlobalVar + 0x19C);
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0010_GetGameTimeScaleRatio", GetGameTimeScaleRatio);
 
-/* NEARMISS-STUB PauseAI */
-#if 0 /* NEARMISS 98.75% cat=rodata-const sub=- | lui %hi(gcGlobalVar+off) folded by gcc vs expected lui %hi(gcGlobalVar)+lo addend | attempts=1 */
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0010_GetGameTimeScaleRatio", PauseAI);
 void PauseAI(void) {
     *(s32*)(gcGlobalVar + 0x310) = 1;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0010_GetGameTimeScaleRatio", PauseAI);
 
-/* NEARMISS-STUB ReleaseAI */
-#if 0 /* NEARMISS 98.33% cat=rodata-const sub=- | lui %hi(gcGlobalVar+off) folded by gcc vs expected lui %hi(gcGlobalVar)+lo addend | attempts=1 */
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0010_GetGameTimeScaleRatio", ReleaseAI);
 void ReleaseAI(void) {
     *(s32*)(gcGlobalVar + 0x310) = 0;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0010_GetGameTimeScaleRatio", ReleaseAI);
 
 void SwitchPadAct(void) {
 }
