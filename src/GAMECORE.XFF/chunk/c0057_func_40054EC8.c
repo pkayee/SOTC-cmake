@@ -123,11 +123,22 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0057_func_40054EC8", func_4005
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0057_func_40054EC8", func_400557D0);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0057_func_40054EC8", getDebugDispType);
+s32 getDebugDispType(void)
+{
+    return 0;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0057_func_40054EC8", getDebugMotionStop);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0057_func_40054EC8", getDebugMotionStop);
+s32 getDebugMotionStop(void)
+{
+    return 0;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0057_func_40054EC8", getDebugScrDataPrintf);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0057_func_40054EC8", getDebugScrDataPrintf);
+s32 getDebugScrDataPrintf(void)
+{
+    return 0;
+}
 
 s32 getDebugHorseRoute(void)
 {
@@ -154,7 +165,11 @@ s32 getDebugHorseInsurance(void)
     return 0;
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0057_func_40054EC8", getDebugViewDisp);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0057_func_40054EC8", getDebugViewDisp);
+int getDebugViewDisp(void)
+{
+    return 0;
+}
 
 int GetDebugDispType(void)
 {
