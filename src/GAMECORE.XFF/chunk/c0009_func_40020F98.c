@@ -96,7 +96,12 @@ void nico_volatileDefaultAI(void)
     }
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0009_func_40020F98", nico_deleteMyself);
+void RequestCharacterMotionShiftFunc(void *chara, void (*func)(void *chara));
+void func_400212E8(void *a0);
+void nico_deleteMyself(void *character)
+{
+    RequestCharacterMotionShiftFunc(character, func_400212E8);
+}
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0009_func_40020F98", nico_ResetScriptCtrlAI);
 void *isysGetThisSubThread();
