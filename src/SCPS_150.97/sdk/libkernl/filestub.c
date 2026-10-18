@@ -35,6 +35,12 @@ extern s32 D_00137FF0[];
 extern s32 D_00138068[];
 extern s32 D_00147268[];
 extern struct IobEntry D_00147040[];
+extern s32 D_00138128[];
+extern s32 D_001380C8[];
+extern s32 D_00132390[];
+extern s32 D_001380B0[];
+extern s32 D_00138230[];
+extern s32 D_001380E0[];
 
 int CreateSema(struct SemaParam *);
 int DeleteSema(int);
@@ -42,14 +48,16 @@ int SignalSema(int);
 int WaitSema(int);
 void *memset();
 int memcmp(const void *, const void *, unsigned int);
-s32 func_0010BFA8(const char *, s32);
+s32 func_0010BFA8(const u8 *, s32);
 void _sceFsIobSemaMK(void);
 void _sceFsSemInit(void);
 void _sceFsSigSema(void);
 int _sceFsWaitS(s32 timeout);
+void sceFsInit(void);
 
 s32 sceSifCallRpc(void *, u32, u32, void *, s32, void *, s32, void *, void *);
 s32 DelayThread(u32);
+void sceSifWriteBackDCache(const void *, int);
 
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/filestub", _sceFsIobSemaMK);
 void _sceFsIobSemaMK(void)
@@ -277,29 +285,395 @@ s32 sceClose(s32 fd)
     return result;
 }
 
+/* NEARMISS-STUB sceLseek */
+#if 0 /* NEARMISS 88.1% cat=regalloc sub=- | s2/s3 swap (offset/sema vs flags/noRetry); D_00132390 first-slot bne operand order and lw/negu temp reg (v0/v1) in the -1 slot store; lui s6/s0 hoist in fallthr | attempts=1 */
+s32 sceLseek(s32 fd, s32 offset, s32 whence)
+{
+    struct SemaParam sp;
+    s32 result;
+    struct IobEntry *iob;
+    s32 *buf;
+    s32 sema;
+    s32 status;
+    s32 ret;
+    s32 i;
+    s32 retry;
+    s32 noRetry;
+    s32 val;
+
+    buf = D_00145B40;
+    iob = get_iob(fd);
+    _sceFsWaitS(4);
+    if (D_00132414[0] == 0 || iob == NULL || (noRetry = iob->unk04) == 0)
+    {
+        _sceFsSigSema();
+        return -9;
+    }
+    buf[3] = iob->unk00;
+    buf[4] = offset;
+    buf[5] = whence;
+    buf[6] = iob - D_00147040;
+    sp.maxCount = 1;
+    sp.option = (u32)D_001380B0;
+    retry = noRetry & 0x8000;
+    sp.initCount = 0;
+    sema = CreateSema(&sp);
+    buf[1] = (s32)&result;
+    buf[2] = 4;
+    buf[0] = sema;
+    if (retry)
+    {
+        WaitSema(D_00132424[0]);
+        noRetry = retry;
+        if (D_00132390[0] == -1)
+        {
+            val = buf[0];
+            D_00132390[0] = val;
+            buf[0] = -val;
+        }
+        else
+        {
+            for (i = 1; i < 0x20; i++)
+            {
+                if (D_00132390[i] == -1)
+                {
+                    val = buf[0];
+                    D_00132390[i] = val;
+                    buf[0] = -val;
+                    break;
+                }
+            }
+        }
+        SignalSema(D_00132424[0]);
+    }
+    else
+    {
+        noRetry = 0;
+    }
+    ret = func_0010A328(D_00147240, 4, 0, buf, 0x1C, D_00146780, 4, NULL, NULL, noRetry);
+    if (ret < 0)
+    {
+        DeleteSema(sema);
+        _sceFsSigSema();
+        return -11;
+    }
+    status = *(s32 *)((u32)D_00146780 | 0x20000000);
+    _sceFsSigSema();
+    if (status == 0)
+    {
+        DeleteSema(sema);
+        return -11;
+    }
+    if (noRetry != 0)
+    {
+        DeleteSema(sema);
+        return 0;
+    }
+    WaitSema(sema);
+    DeleteSema(sema);
+    return result;
+}
+#endif
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/filestub", sceLseek);
 
+/* NEARMISS-STUB sceRead */
+#if 0 /* NEARMISS 89.8% cat=regalloc sub=- | s2/s3/s4/s5 register mapping of sema/offset/flags/noRetry; D_00132390 slot operand order and lw/negu temp reg (v0/v1); lui s0 hoist; status/noRetry layout match | attempts=1 */
+s32 sceRead(s32 fd, void *buffer, s32 count)
+{
+    struct SemaParam sp;
+    s32 result;
+    struct IobEntry *iob;
+    s32 *buf;
+    s32 sema;
+    s32 status;
+    s32 ret;
+    s32 i;
+    s32 flags;
+    s32 retry;
+    s32 noRetry;
+    s32 val;
+
+    buf = D_00145B40;
+    iob = get_iob(fd);
+    _sceFsWaitS(2);
+    if (D_00132414[0] == 0 || iob == NULL || (flags = iob->unk04) == 0)
+    {
+        _sceFsSigSema();
+        return -9;
+    }
+    buf[3] = iob->unk00;
+    buf[7] = iob - D_00147040;
+    sp.maxCount = 1;
+    sp.option = (u32)D_001380C8;
+    retry = flags & 0x8000;
+    buf[4] = (s32)buffer;
+    buf[5] = count;
+    sp.initCount = 0;
+    sema = CreateSema(&sp);
+    buf[1] = (s32)&result;
+    buf[2] = 4;
+    buf[0] = sema;
+    if (retry)
+    {
+        WaitSema(D_00132424[0]);
+        noRetry = retry;
+        if (D_00132390[0] == -1)
+        {
+            val = buf[0];
+            D_00132390[0] = val;
+            buf[0] = -val;
+        }
+        else
+        {
+            for (i = 1; i < 0x20; i++)
+            {
+                if (D_00132390[i] == -1)
+                {
+                    val = buf[0];
+                    D_00132390[i] = val;
+                    buf[0] = -val;
+                    break;
+                }
+            }
+        }
+        SignalSema(D_00132424[0]);
+    }
+    else
+    {
+        noRetry = 0;
+    }
+    if (!(flags & 0x20000000))
+    {
+        sceSifWriteBackDCache(buffer, count);
+    }
+    sceSifWriteBackDCache(buf, 0x20);
+    ret = func_0010A328(D_00147240, 2, 0, buf, 0x20, D_00146780, 4, NULL, NULL, noRetry);
+    if (ret < 0)
+    {
+        DeleteSema(sema);
+        _sceFsSigSema();
+        return -11;
+    }
+    status = *(s32 *)((u32)D_00146780 | 0x20000000);
+    _sceFsSigSema();
+    if (status == 0)
+    {
+        DeleteSema(sema);
+        return -11;
+    }
+    if (noRetry != 0)
+    {
+        DeleteSema(sema);
+        return 0;
+    }
+    WaitSema(sema);
+    DeleteSema(sema);
+    return result;
+}
+#endif
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/filestub", sceRead);
 
+/* NEARMISS-STUB sceWrite */
+#if 0 /* NEARMISS 86.68% cat=regalloc sub=- | hi(D_00145B40) in s3 not s8 and count/flags/sema/noRetry permuted s4-s7; first-branch -1 store and i-loop index form now match; local declaration order changes  | attempts=1 */
+s32 sceWrite(s32 fd, void *buffer, s32 count)
+{
+    struct SemaParam sp;
+    s32 result;
+    struct IobEntry *iob;
+    s32 *buf;
+    s32 sema;
+    s32 status;
+    s32 ret;
+    s32 i;
+    s32 flags;
+    s32 retry;
+    s32 noRetry;
+    s32 val;
+    s32 head;
+
+    buf = D_00145B40;
+    iob = get_iob(fd);
+    _sceFsWaitS(3);
+    if (D_00132414[0] == 0 || iob == NULL || (flags = iob->unk04) == 0)
+    {
+        _sceFsSigSema();
+        return -9;
+    }
+    buf[3] = iob->unk00;
+    buf[11] = iob - D_00147040;
+    sp.maxCount = 1;
+    sp.option = (u32)D_001380E0;
+    retry = flags & 0x8000;
+    buf[5] = count;
+    buf[4] = (s32)buffer;
+    sp.initCount = 0;
+    sema = CreateSema(&sp);
+    buf[1] = (s32)&result;
+    buf[2] = 4;
+    D_00145B40[0] = sema;
+    if (retry)
+    {
+        WaitSema(D_00132424[0]);
+        noRetry = retry;
+        if (D_00132390[0] == -1)
+        {
+            val = D_00145B40[0];
+            D_00132390[0] = val;
+            D_00145B40[0] = -val;
+        }
+        else
+        {
+            for (i = 1; i < 0x20; i++)
+            {
+                if (D_00132390[i] == -1)
+                {
+                    val = buf[0];
+                    D_00132390[i] = val;
+                    buf[0] = -val;
+                    break;
+                }
+            }
+        }
+        SignalSema(D_00132424[0]);
+    }
+    else
+    {
+        noRetry = 0;
+    }
+    head = (u32)buffer & 0xF;
+    if (head != 0)
+    {
+        head = 16 - head;
+    }
+    if (count < head)
+    {
+        head = count;
+    }
+    if (!(flags & 0x20000000))
+    {
+        sceSifWriteBackDCache(buffer, count);
+    }
+    buffer = (void *)((u32)buffer | 0x20000000);
+    buf[6] = head;
+    for (i = 0; i < head; i++)
+    {
+        ((u8 *)buf)[0x1C + i] = ((u8 *)buffer)[i];
+    }
+    ret = func_0010A328(D_00147240, 3, 0, buf, 0x30, D_00146780, 4, NULL, NULL, noRetry);
+    if (ret < 0)
+    {
+        DeleteSema(sema);
+        _sceFsSigSema();
+        return -11;
+    }
+    status = *(s32 *)((u32)D_00146780 | 0x20000000);
+    _sceFsSigSema();
+    if (status == 0)
+    {
+        DeleteSema(sema);
+        return -11;
+    }
+    if (noRetry != 0)
+    {
+        DeleteSema(sema);
+        return 0;
+    }
+    WaitSema(sema);
+    DeleteSema(sema);
+    return result;
+}
+#endif
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/filestub", sceWrite);
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/filestub", sceIoctl);
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/filestub", sceIoctl2);
 
+/* NEARMISS-STUB func_0010BFA8 */
+#if 0 /* NEARMISS 93.38% cat=regalloc sub=- | frame 0xC0 vs 0xD0 (target keeps s7=hi(D_00145B40) live and saves s0-s7); copy-loop test/load reg choice (lbu v0/sll) and D_00138128 lui hoisted to a1; u8 path  | attempts=1 */
+s32 func_0010BFA8(const u8 *path, s32 rpc)
+{
+    struct SemaParam sp;
+    s32 result;
+    s32 *buf;
+    s32 i;
+    s32 sema;
+    s32 status;
+    s32 ret;
+
+    buf = D_00145B40;
+    _sceFsWaitS(rpc);
+    if (D_00132414[0] == 0)
+    {
+        sceFsInit();
+    }
+    for (i = 0; i < 0x400; i++)
+    {
+        ((char *)buf)[0xC + i] = path[i];
+        if (path[i] == 0)
+        {
+            break;
+        }
+    }
+    if (i == 0x400)
+    {
+        ((char *)buf)[0x40B] = 0;
+        i = 0x3FF;
+    }
+    sp.maxCount = 1;
+    sp.option = (u32)D_00138128;
+    sp.initCount = 0;
+    sema = CreateSema(&sp);
+    buf[0] = sema;
+    buf[1] = (s32)&result;
+    buf[2] = 4;
+    ret = func_0010A328(D_00147240, rpc, 0, D_00145B40, i + 0xD, D_00146780, 4, NULL, NULL, 0);
+    if (ret < 0)
+    {
+        DeleteSema(sema);
+        _sceFsSigSema();
+        return -11;
+    }
+    status = *(s32 *)((u32)D_00146780 | 0x20000000);
+    _sceFsSigSema();
+    if (status != 0)
+    {
+        WaitSema(sema);
+        DeleteSema(sema);
+    }
+    else
+    {
+        DeleteSema(sema);
+        return -11;
+    }
+    return result;
+}
+#endif
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/filestub", func_0010BFA8);
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/filestub", sceRemove);
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/filestub", sceRemove);
+s32 sceRemove(const u8 *path)
+{
+    return func_0010BFA8(path, 0x6);
+}
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/filestub", sceMkdir);
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/filestub", sceRmdir);
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/filestub", sceRmdir);
+s32 sceRmdir(const u8 *path)
+{
+    return func_0010BFA8(path, 0x8);
+}
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/filestub", sceFormat);
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/filestub", sceAddDrv);
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/filestub", sceDelDrv);
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/filestub", sceDelDrv);
+s32 sceDelDrv(const u8 *path)
+{
+    return func_0010BFA8(path, 0x10);
+}
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/filestub", sceDopen);
 
@@ -412,14 +786,111 @@ INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/filestub", sceChstat);
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/filestub", sceRename);
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/filestub", sceChdir);
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/filestub", sceChdir);
+s32 sceChdir(const u8 *path)
+{
+    return func_0010BFA8(path, 0x12);
+}
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/filestub", sceSync);
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/filestub", sceMount);
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/filestub", sceUmount);
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/filestub", sceUmount);
+s32 sceUmount(const u8 *path)
+{
+    return func_0010BFA8(path, 0x15);
+}
 
+/* NEARMISS-STUB sceLseek64 */
+#if 0 /* NEARMISS 88.11% cat=regalloc sub=- | offset/whence and noRetry swapped across s2/s3 (target: whence s5, offset s3, noRetry s2); target hoists lui %hi(D_00147240)/D_00146780 into the -1 and loop pat | attempts=1 */
+s64 sceLseek64(s32 fd, s64 offset, s32 whence)
+{
+    struct SemaParam sp;
+    s64 result;
+    struct IobEntry *iob;
+    s32 *buf;
+    s32 sema;
+    s32 status;
+    s32 ret;
+    s32 i;
+    s32 retry;
+    s32 noRetry;
+    s32 val;
+
+    buf = D_00145B40;
+    iob = get_iob(fd);
+    _sceFsWaitS(0x16);
+    if (D_00132414[0] == 0 || iob == NULL || (noRetry = iob->unk04) == 0)
+    {
+        _sceFsSigSema();
+        return -9;
+    }
+    buf[3] = iob->unk00;
+    *(s64 *)&buf[4] = offset;
+    buf[6] = whence;
+    buf[7] = iob - D_00147040;
+    sp.maxCount = 1;
+    sp.option = (u32)D_00138230;
+    retry = noRetry & 0x8000;
+    sp.initCount = 0;
+    sema = CreateSema(&sp);
+    buf[1] = (s32)&result;
+    buf[2] = 8;
+    D_00145B40[0] = sema;
+    if (retry)
+    {
+        WaitSema(D_00132424[0]);
+        noRetry = retry;
+        if (D_00132390[0] == -1)
+        {
+            val = D_00145B40[0];
+            D_00132390[0] = val;
+            D_00145B40[0] = -val;
+        }
+        else
+        {
+            for (i = 1; i < 0x20; i++)
+            {
+                if (D_00132390[i] == -1)
+                {
+                    val = buf[0];
+                    D_00132390[i] = val;
+                    buf[0] = -val;
+                    break;
+                }
+            }
+        }
+        SignalSema(D_00132424[0]);
+    }
+    else
+    {
+        noRetry = 0;
+    }
+    ret = func_0010A328(D_00147240, 0x16, 0, buf, 0x20, D_00146780, 4, NULL, NULL, noRetry);
+    if (ret < 0)
+    {
+        DeleteSema(sema);
+        _sceFsSigSema();
+        return -11;
+    }
+    status = *(s32 *)((u32)D_00146780 | 0x20000000);
+    _sceFsSigSema();
+    if (status == 0)
+    {
+        DeleteSema(sema);
+        return -11;
+    }
+    if (noRetry != 0)
+    {
+        DeleteSema(sema);
+        return 0;
+    }
+    WaitSema(sema);
+    DeleteSema(sema);
+    return result;
+}
+#endif
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/filestub", sceLseek64);
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/filestub", sceDevctl);

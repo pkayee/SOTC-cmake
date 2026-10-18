@@ -55,4 +55,10 @@ int sceVibSetActParam(int port, int n1, u8 *p1, int n2, u8 *p2)
 #endif
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libvib", sceVibSetActParam);
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libvib", func_00115B30); /* C form scores 100% but TU end is 4 mod 8: SHA1 fails (needs 4 byte pad), kept asm */
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libvib", func_00115B30);
+
+s32 func_00115B30(void)
+{
+    sceSifCallRpc(D_0014EA80, 0x80001363, 0, D_0014EB80, 0x90, D_0014EB80, 0x90, NULL, NULL);
+    return *(s32 *)D_0014EB80;
+}

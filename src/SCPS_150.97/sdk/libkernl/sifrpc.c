@@ -6,11 +6,22 @@
 extern s32 D_00145AC0[];
 
 /* NEARMISS-STUB sceSifInitRpc */
-#if 0 /* NEARMISS 79.9% cat=call-abi sub=- | tail j sceSifSetReg; address const sched | attempts=1 */
+#if 0 /* NEARMISS 86.9% cat=regalloc sub=- | tail j sceSifSetReg fixed (early return + void proto); rest: lui/addiu base-reg order and a2v/a3v/q store scheduling differ; volatile q 82.7, volatile q[0] also | attempts=2 */
+extern s32 D_00132388[];
+extern s32 D_001442C0[];
+extern s32 D_00144AC0[];
+extern s32 D_001452C0[];
+void func_001093F8(void *a0, void *a1);
+void func_001099F0(void *a0, void *a1);
+void func_001097D0(s32 *a0, void *a1);
+void func_00109508(s32 *a0, s32 *a1);
+void sceSifSetReg(u32 a0, s32 a1);
+
 void sceSifInitRpc(unsigned int mode)
 {
     s32 *q;
     s32 *tbl;
+    s32 *r;
     s32 a2v;
     s32 a3v;
     s32 s2v;
@@ -31,7 +42,7 @@ void sceSifInitRpc(unsigned int mode)
     a3v = (s32)D_001452C0 | 0x20000000;
     q[8] = 0x20;
     s2v = (s32)tbl | 0x20000000;
-    q[0] = 1;
+    D_00145AC0[0] = 1;
     q[5] = a2v;
     q[1] = s2v;
     q[7] = a3v;
@@ -45,16 +56,17 @@ void sceSifInitRpc(unsigned int mode)
     sceSifAddCmdHandler(0x8000000A, func_001099F0, q);
     sceSifAddCmdHandler(0x8000000C, func_00109508, q);
     EIntr();
-    if (sceSifGetReg(0x80000002) == 0)
+    if (sceSifGetReg(0x80000002) != 0)
     {
-        q = tbl + 16;
-        q[3] = 1;
-        sceSifSendCmd(0x80000002, q, 0x10, 0, 0, 0);
-        while (sceSifGetSreg(0) == 0)
-        {
-        }
-        sceSifSetReg(0x80000002, 1);
+        return;
     }
+    r = tbl + 16;
+    r[3] = 1;
+    sceSifSendCmd(0x80000002, r, 0x10, 0, 0, 0);
+    while (sceSifGetSreg(0) == 0)
+    {
+    }
+    sceSifSetReg(0x80000002, 1);
 }
 #endif
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/sifrpc", sceSifInitRpc);
@@ -130,9 +142,13 @@ void *func_001093B8(s32 *a0, s32 a1)
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/sifrpc", func_001093F8);
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/sifrpc", func_001094C8);
+u_long func_001094C8(int a0, u_long a1, u_long a2, void *a3, void *a4)
+{
+    s32 *s;
 
-u_long func_001094C8(int a0, u_long a1, u_long a2, void *a3, void *a4);
+    s = (s32 *)a3;
+    return isceSifSendCmd(0x80000008, s, 0x40, (void *)s[9], (void *)s[10], s[11]) ? 0 : 0x800;
+}
 
 void func_00109508(s32 *a0, s32 *a1)
 {
@@ -405,36 +421,39 @@ INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/sifrpc", sceSifCallRpc);
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/sifrpc", sceSifCheckStatRpc);
 
-/* NEARMISS-STUB sceSifSetRpcQueue */
-#if 0 /* NEARMISS 99.6% cat=sched sub=- | head load scheduled before key/8/c stores | attempts=2 */
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/sifrpc", sceSifSetRpcQueue);
+typedef struct
+{
+    s32 pad[10];
+    sceSifQueueData *head;
+} RpcState;
+
 void sceSifSetRpcQueue(sceSifQueueData *queue, int key)
 {
     sceSifQueueData *cur;
-    sceSifQueueData *p;
+    sceSifQueueData *head;
 
     DIntr();
-    cur = (sceSifQueueData *)D_00145AC0[10];
     queue->key = key;
     queue->active = 0;
     queue->link = NULL;
     queue->start = NULL;
     queue->end = NULL;
     queue->next = NULL;
-    if (cur == NULL)
+    head = ((RpcState *)D_00145AC0)->head;
+    if (head == NULL)
     {
-        D_00145AC0[10] = (s32)queue;
+        ((RpcState *)D_00145AC0)->head = queue;
     }
     else
     {
-        for (p = cur; p->next != NULL; p = p->next)
+        for (cur = head; cur->next != NULL; cur = cur->next)
         {
         }
-        p->next = queue;
+        cur->next = queue;
     }
     EIntr();
 }
-#endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/sifrpc", sceSifSetRpcQueue);
 
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/sifrpc", sceSifRegisterRpc);
 

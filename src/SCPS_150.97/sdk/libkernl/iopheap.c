@@ -5,9 +5,8 @@ extern s32 D_0013242C[];
 extern sceSifClientData D_00147340[];
 extern s32 D_00147380[];
 extern s32 D_001473C0[];
+extern u8 D_00147400[];
 
-/* NEARMISS-STUB sceSifInitIopHeap */
-#if 0 /* NEARMISS 93.8% cat=sched sub=- | bind loop, delay loop (4 nops) and serve test match; compiler schedules return-0 before the D_0013242C store (ours lui v1 + return-0 hoisted, target lui v0 stor | attempts=1 */
 s32 sceSifInitIopHeap(void)
 {
     s32 ret;
@@ -22,17 +21,15 @@ s32 sceSifInitIopHeap(void)
         }
         if (D_00147340[0].serve != NULL)
         {
+            D_0013242C[0] = 0;
             break;
         }
         for (i = 0x100000; i != -1; i--)
         {
         }
     }
-    D_0013242C[0] = 0;
     return 0;
 }
-#endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/iopheap", sceSifInitIopHeap);
 
 s32 sceSifAllocIopHeap(s32 size)
 {
@@ -93,7 +90,7 @@ int sceSifFreeIopHeap(void *addr)
 }
 
 /* NEARMISS-STUB sceSifLoadIopHeap */
-#if 0 /* NEARMISS 83.3% cat=struct-layout sub=- | target loop reads fname[i] once (lbu, sll 24, beqz) and keeps a1 unclobbered; ours re-reads fname[i] after the store (aliasing) and peels the first iteration; a | attempts=1 */
+#if 0 /* NEARMISS 83.3% cat=struct-layout sub=- | target loop reads fname[i] once (lbu, sll 24, bnel); ours re-reads fname[i] after the sb (aliasing) and peels first byte; from-zero for-loop form 81.2 (lbu + bn | attempts=1 */
 s32 sceSifLoadIopHeap(u8 *fname, s32 arg)
 {
     s32 i;

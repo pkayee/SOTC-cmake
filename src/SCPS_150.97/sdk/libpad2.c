@@ -144,18 +144,16 @@ int scePad2DeleteSocket(int socket)
 }
 
 /* NEARMISS-STUB scePad2Read */
-#if 0 /* NEARMISS 75.28% cat=regalloc sub=- | slot address op order (target lui D, mult socket, addu D later); tail return target uses bnezl with lbu in delay slot; memcpy/func_001158D8 arg order | attempts=1 */
+#if 0 /* NEARMISS 93.3% cat=branch-layout sub=- | branch-layout: target loads ptr[2] straight into a2 for memcpy (ours copies via v0); ptr+0x1C!=0 check is beql with lw in delay slot; ternary return kept (if/el | attempts=2 */
 int scePad2Read(int socket, u8 *buf)
 {
-    u8 *slot;
     u8 *ptr;
 
-    slot = (u8 *)D_0014B718 + socket * 0x334;
-    if (*(s32 *)slot == 0)
+    if (D_0014B718[socket].w[0] == 0)
     {
         return -1;
     }
-    if (*(s32 *)(slot + 4) == 0)
+    if (D_0014B718[socket].w[1] == 0)
     {
         if (func_00115750(socket) < 0)
         {
@@ -201,12 +199,12 @@ int scePad2GetButtonProfile(int socket, u8 *buf)
 
 
 /* NEARMISS-STUB scePad2GetState */
-#if 0 /* NEARMISS 64.16% cat=uncategorized sub=- | mask chain: target ands/ors an uninitialised callee-saved word (no folding), ours folds to constant 0x0101800C; frame 0x60 vs 0x50; st/rbuf stack order differs | attempts=1 */
+#if 0 /* NEARMISS 81.04% cat=uncategorized sub=- | mask chain/frame differ (salvage kK43/kR48 live-C revert) | attempts=3 */
 int scePad2GetState(int socket)
 {
-    u8 st;
-    u8 rbuf[12];
     u8 *p;
+    u8 st;
+    u32 rbuf[3];
     s32 flags;
     s32 ret;
 
@@ -229,12 +227,11 @@ int scePad2GetState(int socket)
     }
     else
     {
-        flags = ret;
-        flags = (flags & ret) | 0xC;
+        flags = (flags & -0x4000) | 0xC;
         flags = (flags & 0xFFFF3FFF) | 0x8000;
         flags = (flags & 0xFF00FFFF) | 0x10000;
         flags = (flags & 0xFFFFFFFF00FFFFFF) | 0x1000000;
-        ret = sceDbcReceiveData(socket, flags, rbuf, &st);
+        ret = sceDbcReceiveData(socket, flags, (u8 *)rbuf, &st);
         if (ret >= 0)
         {
             return st;
