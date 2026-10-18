@@ -313,7 +313,14 @@ void PauseCamFinalizer(s32 a0)
     D_40130C30 = a0;
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0015_bossStatLayoutChk", SetCamFinalizerGeometry);
+extern u8 gcGlobalVar[];
+
+void SetCamFinalizerGeometry(s128 *a, s128 *b)
+{
+    s128 *dst = (s128 *)(gcGlobalVar + 0x340);
+    dst[0] = *a;
+    dst[2] = *b;
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0015_bossStatLayoutChk", st_camfinalizer);
 

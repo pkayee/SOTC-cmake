@@ -177,23 +177,30 @@ void setFadeParam(f32 *p, s32 a1, f32 a2, f32 a3)
 #endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0018_endingflowStartAdpcmSeq", setFadeParam);
 
-/* NEARMISS-STUB calcFadeParam */
-#if 0 /* NEARMISS 95.75% cat=regalloc sub=- | same instruction order as target; FP register assignment differs: target G in f5, p[0] in f1, p[2] in f4 (ours G in f1, p[0] in f4, p[2] in f5); 3 variants (loc | attempts=1 */
-void calcFadeParam(f32 *p)
-{
-    f32 g = *(f32 *)(gcGlobalVar + 0x168);
+typedef struct {
+    f32 startTime;
+    f32 endTime;
+    f32 startValue;
+    f32 endValue;
+    f32 value;
+} FadeParam;
 
-    if (g <= p[1])
-    {
-        p[4] = p[2] + (p[3] - p[2]) * ((g - p[0]) / (p[1] - p[0]));
-    }
-    else
-    {
-        p[4] = p[3];
+void calcFadeParam(FadeParam *f)
+{
+    f32 time = *(f32 *)(gcGlobalVar + 0x168);
+    f32 endTime = f->endTime;
+
+    if (time <= endTime) {
+        f32 startTime = f->startTime;
+        f32 value = f->startValue;
+
+        time = (time - startTime) / (endTime - startTime);
+        value += (f->endValue - value) * time;
+        f->value = value;
+    } else {
+        f->value = f->endValue;
     }
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0018_endingflowStartAdpcmSeq", calcFadeParam);
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0018_endingflowStartAdpcmSeq", checkFadeParam);
 
