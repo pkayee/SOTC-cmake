@@ -188,21 +188,93 @@ void *getColiGroupByUserPathWork(char *w)
     return 0;
 }
 
+/* NEARMISS-STUB func_40101AD8 */
+#if 0 /* NEARMISS 55.5% cat=sched sub=- | lq/store order reshuffled; ret in a7 not v0; flag in v0 not v1 | attempts=1 */
+s32 func_40101AD8(char *p, s32 a1, u32 a2, u128 *a3, s32 a4)
+{
+    s32 ret = 0;
+    u32 n = *(u32 *)(p + 0x380);
+
+    if (n < 0x13) {
+        char *e;
+        u128 q;
+        if ((s32)n < 0x14) {
+            e = p + n * 0x20 + 0x100;
+        } else {
+            e = 0;
+        }
+        q = *a3;
+        *(u16 *)(e + 0x1A) = 1;
+        ret = 1;
+        *(u128 *)e = q;
+        *(u16 *)(e + 0x14) = a1;
+        *(u32 *)(e + 0x1C) = a2;
+        *(u16 *)(e + 0x16) = a4;
+        *(u32 *)(e + 0x10) = 0;
+        *(u16 *)(e + 0x18) = 0;
+        *(u32 *)(p + 0x380) = *(u32 *)(p + 0x380) + 1;
+    }
+    return ret;
+}
+#endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0200_pathJudgeFunc", func_40101AD8);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0200_pathJudgeFunc", func_40101B40);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0200_pathJudgeFunc", func_40101C30);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0200_pathJudgeFunc", func_40101C30);
+void func_40101C30(char *p)
+{
+    s128 v = *(s128 *)p;
+
+    *(s32 *)(p + 0x40) = -1;
+    *(s128 *)(p + 0x30) = v;
+    *(s128 *)(p + 0x50) = v;
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0200_pathJudgeFunc", func_40101C48);
 
+/* NEARMISS-STUB func_40101E70 */
+#if 0 /* NEARMISS 55.5% cat=sched sub=- | store order: ee-gcc reorders sh/sw/sq stores vs target; ret addiu placement | attempts=1 */
+s32 func_40101E70(s8 *w, s32 a1, s32 a2, u128 *a3, s32 a4, s32 idx)
+{
+    s8 *e;
+    u128 q;
+
+    if (idx < 0x14) {
+        e = w + idx * 0x20 + 0x100;
+        q = *a3;
+        *(s16 *)(e + 0x14) = a1;
+        *(s32 *)(e + 0x1C) = a2;
+        *(s16 *)(e + 0x16) = a4;
+        *(s16 *)(e + 0x18) = 0;
+        *(s16 *)(e + 0x1A) = 1;
+        *(u128 *)e = q;
+        *(s32 *)(e + 0x10) = 0;
+        return 1;
+    }
+    return 0;
+}
+#endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0200_pathJudgeFunc", func_40101E70);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0200_pathJudgeFunc", func_40101EB8);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0200_pathJudgeFunc", func_40101F40);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0200_pathJudgeFunc", func_40101FC8);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0200_pathJudgeFunc", func_40101FC8);
+
+extern f32 CalcDistancePointAnd2Point();
+
+s32 func_40101FC8(f32 a0)
+{
+    f32 r = CalcDistancePointAnd2Point();
+
+    if (0.0f <= r && r <= a0)
+    {
+        return 1;
+    }
+    return 0;
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0200_pathJudgeFunc", func_40102010);
 
@@ -212,6 +284,23 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0200_pathJudgeFunc", func_4010
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0200_pathJudgeFunc", func_40102228);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0200_pathJudgeFunc", func_401026D0);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0200_pathJudgeFunc", func_401026D0);
+s32 ClipCollisionDirectCallBack();
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0200_pathJudgeFunc", func_40102708);
+s32 func_401026D0(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4)
+{
+    s32 r = 0;
+
+    if (a3 != 0) {
+        r = ClipCollisionDirectCallBack(a0, a1, a2, a3, 0, 0, 0, a4, 0);
+    }
+    return r;
+}
+
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0200_pathJudgeFunc", func_40102708);
+extern s32 widePathCollisionDirect(f32, s32, s32, s32, s32, s32, s32);
+
+s32 func_40102708(s8 *w, s32 a1, s32 a2)
+{
+    return widePathCollisionDirect(*(f32 *)(w + 0x3C1C), (s32)w, a1, a2, *(s32 *)(w + 0x3C20), *(s32 *)(w + 0xF0), 0);
+}
