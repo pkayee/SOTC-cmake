@@ -41,21 +41,82 @@ SheetDataObj *sheetMgrSheetHeaderSearchSheetDataObj(char *mgr, int id)
     return obj;
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0192_sheetMgrInit", sheetMgrSearchSheetDataObj);
+extern void iosJumpRecoverPoint(const char *, int);
+extern const char D_401351C8[];
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0192_sheetMgrInit", sheetMgrAddSegLoadList);
+char *sheetMgrSearchSheetDataObj(int idx, int hash)
+{
+    char *s = D_4012E330[idx];
+    char *o;
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0192_sheetMgrInit", sheetMgrGetSegLoadHeader);
+    if (s == 0)
+        iosJumpRecoverPoint(D_401351C8, **(int **)(s + 0x38));
+    for (o = *(char **)(s + 0x40); o != 0; o = *(char **)(o + 0x54)) {
+        if (hash == (*(int **)(o + 0x38))[1])
+            break;
+    }
+    return o;
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0192_sheetMgrInit", sheetMgrAddSegInitList);
+extern void *D_401B53DC;
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0192_sheetMgrInit", sheetMgrCheckSegInitList);
+void sheetMgrAddSegLoadList(void *arg0)
+{
+    (*(void **)((char *)(arg0) + 0x4C)) = (void *) D_401B53DC;
+    D_401B53DC = arg0;
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0192_sheetMgrInit", sheetMgrGetSegInitHeader);
+int sheetMgrGetSegLoadHeader(void)
+{
+    return (int)D_401B53DC;
+}
+
+extern char *D_401B53E4;
+extern char *D_401B53E8;
+
+void sheetMgrAddSegInitList(char *p)
+{
+    *(char **)(p + 0x50) = 0;
+    if (D_401B53E4 != 0)
+        *(char **)(D_401B53E8 + 0x50) = p;
+    else
+        D_401B53E4 = p;
+    D_401B53E8 = p;
+}
+
+typedef struct SheetInitEntry {
+    char pad[0x50];
+    struct SheetInitEntry *next;
+} SheetInitEntry;
+
+int sheetMgrCheckSegInitList(SheetInitEntry *entry)
+{
+    SheetInitEntry *node = (SheetInitEntry *)D_401B53E4;
+    int found = 0;
+
+    while (node != 0) {
+        if (node == entry) {
+            found = 1;
+            break;
+        }
+        node = node->next;
+    }
+    return found;
+}
+
+int sheetMgrGetSegInitHeader(void)
+{
+    return (int)D_401B53E4;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0192_sheetMgrInit", sheetMgrCreateStageIndexSkipInfo);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0192_sheetMgrInit", sheetMgrChkStageIndexResolve);
+extern u8 *D_401C1038;
+
+int sheetMgrChkStageIndexResolve(int i)
+{
+    return (D_401C1038[i / 8] >> (i & 7)) & 1;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0192_sheetMgrInit", sheetMgrLoadSegmentIndex);
 
@@ -81,4 +142,9 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0192_sheetMgrInit", sheetMgrSpe
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0192_sheetMgrInit", sheetMgrSpecialFsEnd);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0192_sheetMgrInit", sheetMgrSetNoWaitMode);
+extern int D_4012E338;
+
+void sheetMgrSetNoWaitMode(int arg0)
+{
+    D_4012E338 = arg0;
+}
