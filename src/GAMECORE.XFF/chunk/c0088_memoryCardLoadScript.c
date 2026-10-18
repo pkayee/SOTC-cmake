@@ -5,9 +5,27 @@ extern int ScriptSpriteMenuObjDef_SPRITE_SAVE;
 extern void _SCRStartSpriteMenuAnim(int, int, int, int *, int, int);
 extern void scrRun(void);
 
+u64 *GetCollisionDBAttributeAdr(void *surface);
+
+extern u8 gcGlobalVar[];
+extern void *SCRGetFirstObj(void *table);
+extern u8 *GetSCRCharaAIWorkPtr(void *obj);
+
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0088_memoryCardLoadScript", memoryCardLoadScript);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0088_memoryCardLoadScript", bootMemoryCardLoadScriptNoBlock);
+/* store order matters: D_40203F40 = b BEFORE *p = 2 (other order 84%). a = 3rd arg of the anim start, b = global value */
+void bootMemoryCardLoadScriptNoBlock(int a, int b)
+{
+    extern int D_40203F40;
+    extern int ScriptSpriteMenuObjDef_SPRITE_LOAD;
+    int *p = &D_40131828;
+    if (*p == 0) {
+        D_40203F40 = b;
+        *p = 2;
+        _SCRStartSpriteMenuAnim(ScriptSpriteMenuObjDef_SPRITE_LOAD, 0, a, 0, 0, 0);
+        *p = 0;
+    }
+}
 
 void bootMemoryCardSaveScript(int param)
 {
@@ -109,9 +127,24 @@ void SCRCanossaWallBreakEnd(void *character)
     RequestCharacterMotionShiftFunc(character, &func_4007B050);
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0088_memoryCardLoadScript", func_4007B010);
+s32 func_4007B010(void *surface, u64 *m)
+{
+    u64 *attr = GetCollisionDBAttributeAdr(surface);
+    return m[1] == (*attr & m[0]);
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0088_memoryCardLoadScript", func_4007B050);
+void func_4007B050(void *character)
+{
+    void *o = SCRGetFirstObj(gcGlobalVar + 0x2B8);
+    u8 *ai;
+
+    if (o != 0) {
+        ai = GetSCRCharaAIWorkPtr(o);
+        if (*(s32 *)(ai + 0x41C0) > 0) {
+            *(s32 *)(ai + 0x41C0) = *(s32 *)(ai + 0x41C0) - 1;
+        }
+    }
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0088_memoryCardLoadScript", SCRSetupWeaponMinotaur);
 
