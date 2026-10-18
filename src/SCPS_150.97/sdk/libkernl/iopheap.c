@@ -89,9 +89,14 @@ int sceSifFreeIopHeap(void *addr)
     return sceSifFreeSysMemory(addr);
 }
 
-/* NEARMISS-STUB sceSifLoadIopHeap */
-#if 0 /* NEARMISS 83.3% cat=struct-layout sub=- | target loop reads fname[i] once (lbu, sll 24, bnel); ours re-reads fname[i] after the sb (aliasing) and peels first byte; from-zero for-loop form 81.2 (lbu + bn | attempts=1 */
-s32 sceSifLoadIopHeap(u8 *fname, s32 arg)
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/iopheap", sceSifLoadIopHeap);
+typedef struct
+{
+    s32 arg;
+    char name[0xFC];
+} IopHeapLoadPkt;
+
+s32 sceSifLoadIopHeap(char *fname, s32 arg)
 {
     s32 i;
     s32 ret;
@@ -100,26 +105,20 @@ s32 sceSifLoadIopHeap(u8 *fname, s32 arg)
     {
         return 0;
     }
-    D_00147400[4] = fname[0];
-    i = 0;
-    if (fname[0] != 0)
+    for (i = 0; i < 0xFC; i++)
     {
-        for (i = 1; i < 0xFC; i++)
+        if ((((IopHeapLoadPkt *)D_00147400)->name[i] = fname[i]) == 0)
         {
-            D_00147400[4 + i] = fname[i];
-            if (fname[i] == 0)
-            {
-                break;
-            }
+            break;
         }
     }
     if (i == 0xFC)
     {
         i = 0xFB;
-        D_00147400[0xFF] = 0;
+        ((IopHeapLoadPkt *)D_00147400)->name[0xFB] = 0;
     }
-    *(s32 *)D_00147400 = arg;
-    D_00147400[0xFF] = 0;
+    ((IopHeapLoadPkt *)D_00147400)->arg = arg;
+    ((IopHeapLoadPkt *)D_00147400)->name[0xFB] = 0;
     ret = sceSifCallRpc(D_00147340, 3, 0, D_00147400, i + 5, D_00147380, 4, NULL, NULL);
     if (ret < 0)
     {
@@ -127,8 +126,6 @@ s32 sceSifLoadIopHeap(u8 *fname, s32 arg)
     }
     return D_00147380[0];
 }
-#endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/iopheap", sceSifLoadIopHeap);
 
 u32 sceSifQueryMemSize(void)
 {
