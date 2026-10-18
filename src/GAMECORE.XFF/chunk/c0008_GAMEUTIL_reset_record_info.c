@@ -356,38 +356,34 @@ void func_40020E30(void)
     }
 }
 
-/* NEARMISS-STUB nico_clothdrive */
-#if 0 /* NEARMISS 98.6% cat=regalloc sub=- | only regalloc differs: target th=s2, gcGlobalVar base=s1, layout+0x30=s3; ours th=s3,base=s2,p=s1; beqz join placed one insn earlier. Same 40 insns otherwise. V | attempts=1 */
-void UpdateLayoutClassPastSimpleGeometry();
-void UpdateLayoutClassParentGeometry();
-void UpdateLayoutClassSimpleGeometry(u8 *layout, f32 f);
-void GetLayoutClassWindGeometry();
-void GetClothDynamics(void *obj, s32 flag, s32 zero, f32 a, f32 b);
+typedef struct {
+    char pad0[0x180];
+    float wind;
+    float scale;
+} GlobalVar;
+
+void UpdateLayoutClassPastSimpleGeometry(char *c);
+void UpdateLayoutClassParentGeometry(char *c, s32 a, s32 b);
+void UpdateLayoutClassSimpleGeometry(char *c, f32 f);
+void GetLayoutClassWindGeometry(char *c, void *p);
+void GetClothDynamics(void *th, s32 a, s32 b, f32 wind, f32 scale);
 void nico_clothdrive(void)
 {
-    u8 *p;
-    u8 *g;
-    u8 *layout;
-    void *th;
-
-    th = isysGetThisSubThread();
-    layout = GetLayoutClass(th);
-    g = (u8 *)&gcGlobalVar;
-    p = layout + 0x30;
+    void *th = isysGetThisSubThread();
+    char *c = GetLayoutClass(th);
+    GlobalVar *g = (GlobalVar *)&gcGlobalVar;
 
     for (;;) {
-        if (*(s32 *)(layout + 0x124) != 0) {
-            UpdateLayoutClassPastSimpleGeometry(layout, p);
-            UpdateLayoutClassParentGeometry(layout, 0, 0);
-            UpdateLayoutClassSimpleGeometry(layout, *(f32 *)(g + 0x184));
+        if (*(s32 *)(c + 0x124) != 0) {
+            UpdateLayoutClassPastSimpleGeometry(c);
+            UpdateLayoutClassParentGeometry(c, 0, 0);
+            UpdateLayoutClassSimpleGeometry(c, g->scale);
         }
-        GetLayoutClassWindGeometry(layout, p);
-        GetClothDynamics(th, 1, 0, *(f32 *)(g + 0x180), *(f32 *)(g + 0x184));
+        GetLayoutClassWindGeometry(c, c + 0x30);
+        GetClothDynamics(th, 1, 0, g->wind, g->scale);
         scrRun();
     }
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0008_GAMEUTIL_reset_record_info", nico_clothdrive);
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0008_GAMEUTIL_reset_record_info", nico_individualClothOverSurfDetectFunc);
 s32 CheckUnderVariableXZSurface();

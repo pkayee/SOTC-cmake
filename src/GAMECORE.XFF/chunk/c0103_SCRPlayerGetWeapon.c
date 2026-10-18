@@ -76,7 +76,30 @@ s32 nico_playerIsActingSightOn(s32 obj)
     return 0;
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0103_SCRPlayerGetWeapon", nico_playerSightOnDirection);
+s32 GAMEUTIL_is_player_obj(s32 chr);
+void get_hope_camera_direction_nico_sight_on(void *arg0, void *arg1);
+void SCRGetLocalDirZ(void *arg0, void *arg1);
+
+void nico_playerSightOnDirection(void *out, void *obj)
+{
+    s32 p;
+    u8 *w;
+
+    u8 *GetSCRCharaAIWorkPtr();
+    p = GAMEUTIL_is_player_obj(obj);
+    if (p == 1)
+    {
+        w = GetSCRCharaAIWorkPtr(obj) + 0x290;
+        if (is_doing_nico_sight_on(w) == 1)
+        {
+            get_hope_camera_direction_nico_sight_on(out, w);
+            return;
+        }
+        SCRGetLocalDirZ(out, obj);
+        return;
+    }
+    SCRGetLocalDirZ(out, obj);
+}
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0103_SCRPlayerGetWeapon", nico_playerSetAttentionHeadActFlag);
 void nico_playerSetAttentionHeadActFlag(s32 obj, s32 flag)
