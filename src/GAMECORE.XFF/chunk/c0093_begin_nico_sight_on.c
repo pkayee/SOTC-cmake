@@ -39,6 +39,25 @@ float get_base_yaw_nico_sight_on(void *arg0)
     return (*(float *)((char *)(arg0) + 0x280));
 }
 
+/* NEARMISS-STUB get_object_local_base_yaw_nico_sight_on */
+#if 0 /* NEARMISS 90.48% cat=cse-hoist sub=- | zero-stores of yaw/pitch emitted before lw of p+4; target loads a1 first, stores pitch after it | attempts=1 */
+extern void GAMEUTIL_get_local_directionZ(float *, s32);
+extern void GAMEUTIL_get_yaw_pitch_by_direction(float *, float *, float *);
+extern float GAMEUTIL_get_move_radi_from_yaw1_to_yaw2(float, float);
+
+void get_object_local_base_yaw_nico_sight_on(char *p)
+{
+    float dir[4];
+    float yaw = 0.0f;
+    float pitch = 0.0f;
+    s32 arg = *(s32 *)(p + 4);
+
+    GAMEUTIL_get_local_directionZ(dir, arg);
+    GAMEUTIL_get_yaw_pitch_by_direction(&yaw, &pitch, dir);
+    GAMEUTIL_get_move_radi_from_yaw1_to_yaw2(yaw, *(float *)(p + 0x280));
+    return;
+}
+#endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0093_begin_nico_sight_on", get_object_local_base_yaw_nico_sight_on);
 
 float get_base_pitch_nico_sight_on(void *arg0)
@@ -101,13 +120,60 @@ void get_hope_camera_direction_nico_sight_on(s32 arg0, u8 *arg1)
     GAMEUTIL_get_direction_by_yaw_pitch(arg0, temp_f20, get_base_pitch_nico_yaw_pitch_cntrl(temp_s0));
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0093_begin_nico_sight_on", func_400801B0);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0093_begin_nico_sight_on", func_400801B0);
+extern void GAMEUTIL_get_local_directionZ(float *, s32);
+extern void GAMEUTIL_get_yaw_pitch_by_direction(float *, float *, float *);
 
+float func_400801B0(s32 arg)
+{
+    float dir[4];
+    float yaw = 0.0f;
+    float pitch = 0.0f;
+
+    GAMEUTIL_get_local_directionZ(dir, arg);
+    GAMEUTIL_get_yaw_pitch_by_direction(&yaw, &pitch, dir);
+    return yaw;
+}
+
+/* NEARMISS-STUB func_400801F0 */
+#if 0 /* NEARMISS 93.68% cat=sched sub=- | lui/addiu of YUnitVector before bnez; target has mov.s f12 before lui-addiu, addiu in delay slot | attempts=1 */
+extern void *GAMEUTIL_get_riding_horse_object(void *chara);
+extern void GAMEUTIL_act_axis_rot_root_quaternion_abs(void *q, f32 *axis, f32 ang);
+extern f32 YUnitVector[];
+
+void func_400801F0(u8 *arg0, f32 arg1)
+{
+    void *obj;
+
+    obj = GAMEUTIL_get_riding_horse_object(*(void **)(arg0 + 4));
+    if (obj == 0)
+    {
+        obj = *(void **)(arg0 + 4);
+    }
+    GAMEUTIL_act_axis_rot_root_quaternion_abs(obj, YUnitVector, arg1);
+}
+#endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0093_begin_nico_sight_on", func_400801F0);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0093_begin_nico_sight_on", func_40080240);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0093_begin_nico_sight_on", func_40080240);
+extern s32 ScriptCtrlDef_SCRPlayerSightOnTurnLeft;
+extern s32 ScriptCtrlDef_SCRHorseSightOnTurnLeft;
+s32 func_400803C0(s32 a, s32 b, s32 c);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0093_begin_nico_sight_on", func_40080268);
+s32 func_40080240(s32 a)
+{
+    return func_400803C0(a, ScriptCtrlDef_SCRPlayerSightOnTurnLeft, ScriptCtrlDef_SCRHorseSightOnTurnLeft);
+}
+
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0093_begin_nico_sight_on", func_40080268);
+extern s32 ScriptCtrlDef_SCRPlayerSightOnTurnRight;
+extern s32 ScriptCtrlDef_SCRHorseSightOnTurnRight;
+s32 func_400803C0(s32 a, s32 b, s32 c);
+
+s32 func_40080268(s32 a)
+{
+    return func_400803C0(a, ScriptCtrlDef_SCRPlayerSightOnTurnRight, ScriptCtrlDef_SCRHorseSightOnTurnRight);
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0093_begin_nico_sight_on", func_40080290);
 
@@ -120,7 +186,27 @@ s32 func_400803A0(s32 a)
     return func_400803C0(a, 0, ScriptCtrlDef_SCRHorseSightOnTurnNone);
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0093_begin_nico_sight_on", func_400803C0);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0093_begin_nico_sight_on", func_400803C0);
+extern s32 GAMEUTIL_is_player_obj(s32 chr);
+extern void *GAMEUTIL_get_riding_horse_object(void *chara);
+extern s32 setHorseForceScriptKey(void *actor, s32 key);
+extern s32 SCRRequestMotionDirect(s32 obj, s32 motion);
+
+s32 func_400803C0(s32 a, s32 b, s32 c)
+{
+    s32 r;
+    void *horse;
+
+    r = GAMEUTIL_is_player_obj(*(s32 *)(a + 4));
+    if (r != 1) {
+        return r;
+    }
+    horse = GAMEUTIL_get_riding_horse_object(*(void **)(a + 4));
+    if (horse != NULL) {
+        return setHorseForceScriptKey(horse, c);
+    }
+    return SCRRequestMotionDirect(*(s32 *)(a + 4), b);
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0093_begin_nico_sight_on", nico_getOmakeItem);
 
