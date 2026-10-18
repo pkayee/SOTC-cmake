@@ -40,8 +40,8 @@ extern s32 D_00133B54[];
 extern s32 D_00133B60[];
 extern s32 D_00133B68[];
 extern s32 D_00133B74[];
-extern volatile s32 D_00133BA0[];
-extern volatile s32 D_00133BA4[];
+extern s32 D_00133BA0[];
+extern s32 D_00133BA4[];
 extern s32 D_00150F80[];
 
 void _sceCd_cd_callback(s32 *arg)
@@ -197,7 +197,7 @@ void func_001170B0(void)
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libcdvd/cdvd000", func_001170B0);
 
 /* NEARMISS-STUB func_00117198 */
-#if 0 /* NEARMISS 90.75% cat=cse-hoist sub=- | store before SignalSema needs volatile; target has lui s0 B60 after the sw, ours hoists lui s0 above lui v1 BA0 (scheduling) | attempts=2 */
+#if 0 /* NEARMISS 90.75% cat=cse-hoist sub=- | store before SignalSema needs a qualified load; target has lui s0 B60 after the sw, ours hoists lui s0 above lui v1 BA0 (scheduling) | attempts=2 */
 extern s32 D_00133B54[];
 extern s32 D_00133B60[];
 extern s32 D_00133B68[];
@@ -210,7 +210,7 @@ void func_00117198(void)
 
     if (D_00133B54[0] != 0)
     {
-        ((volatile s32 *)D_00133BA0)[0] = -1;
+        ((s32 *)D_00133BA0)[0] = -1;
         SignalSema(D_00133B60[0]);
     }
     DeleteSema(D_00133B68[0]);
@@ -432,24 +432,16 @@ s32 sceCdSearchFile(sceCdlFILE *fp, const char *name)
     return sceCdLayerSearchFile(fp, name, 0);
 }
 
-//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libcdvd/cdvd000", _sceCd_ncmd_prechk);
-extern s32 D_00133B50[];
-extern s32 D_00133B5C[];
-extern s32 D_00133B68[];
-extern s32 D_00133B7C[];
-extern s32 D_00134D10[];
-extern char D_00138A60[];
-extern char D_00138A88[];
-void func_001170B0(void);
-
+/* NEARMISS-STUB _sceCd_ncmd_prechk */
+#if 0 /* NEARMISS 94.59% cat=volatile-alias sub=- | needs the banned qualifier: jal delay slot takes arg lw | attempts=4 */
 s32 _sceCd_ncmd_prechk(s32 arg)
 {
     s32 i;
 
     func_001170B0();
-    if (*(volatile s32 *)D_00133B68 != PollSema(*(volatile s32 *)D_00133B68))
+    if (*(s32 *)D_00133B68 != PollSema(*(s32 *)D_00133B68))
     {
-        if (*(volatile s32 *)D_00133B50 > 0)
+        if (*(s32 *)D_00133B50 > 0)
         {
             scePrintf(D_00138A60, arg, D_00133B5C[0]);
         }
@@ -458,7 +450,7 @@ s32 _sceCd_ncmd_prechk(s32 arg)
     D_00133B5C[0] = arg;
     if (sceCdSync(1) != 0)
     {
-        SignalSema(*(volatile s32 *)D_00133B68);
+        SignalSema(*(s32 *)D_00133B68);
         return 0;
     }
     sceSifInitRpc(0);
@@ -468,7 +460,7 @@ s32 _sceCd_ncmd_prechk(s32 arg)
         {
             if (sceSifBindRpc((sceSifClientData *)D_00134D10, 0x80000595, 0) < 0)
             {
-                if (*(volatile s32 *)D_00133B50 > 0)
+                if (*(s32 *)D_00133B50 > 0)
                 {
                     scePrintf(D_00138A88);
                 }
@@ -489,6 +481,8 @@ s32 _sceCd_ncmd_prechk(s32 arg)
     }
     return 1;
 }
+#endif
+INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libcdvd/cdvd000", _sceCd_ncmd_prechk);
 
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libcdvd/cdvd000", sceCdNcmdDiskReady);
 extern s32 D_00133BC0[];
@@ -566,24 +560,16 @@ s32 sceCdSyncS(s32 mode)
     return sceSifCheckStatRpc((sceSifRpcData *)D_001356C0);
 }
 
-//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libcdvd/cdvd000", _sceCd_scmd_prechk);
-extern s32 D_00133B50[];
-extern s32 D_00133B58[];
-extern s32 D_00133B6C[];
-extern s32 D_00133B94[];
-extern s32 D_001356C0[];
-extern char D_00138AC0[];
-extern char D_00138AE8[];
-void func_001170B0(void);
-
+/* NEARMISS-STUB _sceCd_scmd_prechk */
+#if 0 /* NEARMISS 94.59% cat=no-c-form sub=- | needs the banned qualifier: target orders the sema lw into a0 for PollSema and the jal delay slot differently; plain form 94.59 (lw takes jal delay slot), swap- | attempts=2 */
 s32 _sceCd_scmd_prechk(s32 arg)
 {
     s32 i;
 
     func_001170B0();
-    if (*(volatile s32 *)D_00133B6C != PollSema(*(volatile s32 *)D_00133B6C))
+    if (D_00133B6C[0] != PollSema(D_00133B6C[0]))
     {
-        if (*(volatile s32 *)D_00133B50 > 0)
+        if (D_00133B50[0] > 0)
         {
             scePrintf(D_00138AC0, arg, D_00133B58[0]);
         }
@@ -592,7 +578,7 @@ s32 _sceCd_scmd_prechk(s32 arg)
     D_00133B58[0] = arg;
     if (sceCdSyncS(1) != 0)
     {
-        SignalSema(*(volatile s32 *)D_00133B6C);
+        SignalSema(D_00133B6C[0]);
         return 0;
     }
     sceSifInitRpc(0);
@@ -602,7 +588,7 @@ s32 _sceCd_scmd_prechk(s32 arg)
         {
             if (sceSifBindRpc((sceSifClientData *)D_001356C0, 0x80000593, 0) < 0)
             {
-                if (*(volatile s32 *)D_00133B50 > 0)
+                if (D_00133B50[0] > 0)
                 {
                     scePrintf(D_00138AE8);
                 }
@@ -623,6 +609,8 @@ s32 _sceCd_scmd_prechk(s32 arg)
     }
     return 1;
 }
+#endif
+INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libcdvd/cdvd000", _sceCd_scmd_prechk);
 
 /* NEARMISS-STUB _sceCdSC */
 #if 0 /* NEARMISS 0.0% cat=branch-layout sub=- | beq chain: target bodies out of line (beq to shared store), our compile inverts to bnel and uses a0 for the 0x8011 base; no mechanical fix found | attempts=2 */
