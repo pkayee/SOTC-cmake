@@ -1,12 +1,29 @@
 #include "common.h"
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0065_getDynamicsTestType", getDynamicsTestType);
+extern unsigned char D_401315B8[];
+extern unsigned char D_401315BC[];
+extern unsigned char D_401315C0[];
+extern unsigned char D_401315C4[];
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0065_getDynamicsTestType", getPendulumGravityRatio);
+void *getDynamicsTestType(void)
+{
+    return D_401315B8;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0065_getDynamicsTestType", getPendulumAirResistRatio);
+void *getPendulumGravityRatio(void)
+{
+    return D_401315BC;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0065_getDynamicsTestType", getPendulumSideFriction);
+void *getPendulumAirResistRatio(void)
+{
+    return D_401315C0;
+}
+
+void *getPendulumSideFriction(void)
+{
+    return D_401315C4;
+}
 
 void dynamicstest(void) {
 }
