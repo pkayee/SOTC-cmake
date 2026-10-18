@@ -253,7 +253,7 @@ void __register_frame_info_table(void *begin, struct object *ob);
 /* Called from crtbegin.o to register the unwind info for an object.  */
 
 /* NEARMISS-STUB __register_frame_info */
-#if 0 /* NEARMISS 89.6% cat=volatile-alias sub=mutex-load-order | lock load must follow the 5 ob-> stores while the unlock load is hoisted above the objects stores (global mutex/objects alias the ob-> stores) | attempts=3 */
+#if 0 /* NEARMISS 89.6% cat=-alias sub=mutex-load-order | lock load must follow the 5 ob-> stores while the unlock load is hoisted above the objects stores (global mutex/objects alias the ob-> stores) | attempts=3 */
 /* gcc 2.96 frame.c; needs the frame.c TU header (gthread inlines, objects/object_mutex as -G0 extern arrays). 89.6: lock load must follow all 5 ob-> stores while the unlock load is hoisted above the objects stores. */
 void __register_frame_info(void *begin, struct object *ob)
 {
@@ -286,7 +286,7 @@ void __register_frame(void *begin)
    collect2.  */
 
 /* NEARMISS-STUB __register_frame_info_table */
-#if 0 /* NEARMISS 89.6% cat=volatile-alias sub=mutex-load-order | same as __register_frame_info: lock load ordering vs ob-> stores (global mutex/objects alias) | attempts=2 */
+#if 0 /* NEARMISS 89.6% cat=-alias sub=mutex-load-order | same as __register_frame_info: lock load ordering vs ob-> stores (global mutex/objects alias) | attempts=2 */
 /* gcc 2.96 frame.c; needs the frame.c TU header (gthread inlines, objects/object_mutex as -G0 extern arrays). 89.6: lock load must follow all 5 ob-> stores while the unlock load is hoisted above the objects stores. */
 void __register_frame_info_table(void *begin, struct object *ob)
 {

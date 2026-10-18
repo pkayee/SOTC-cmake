@@ -255,7 +255,7 @@ void func_40027ED8(void);
 static inline u8 *dldRef(u32 *lp, s32 fld)
 {
     u8 *slot;
-    u32 off = *(volatile u32 *)lp & 0x3FFFF;
+    u32 off = *(u32 *)lp & 0x3FFFF;
 
     slot = off ? *(u8 **)((u8 *)lp - off) : NULL;
     return (slot != NULL && slot != (u8 *)DldSysUndefSymbol) ? *(u8 **)(slot + fld) : NULL;

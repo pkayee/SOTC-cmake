@@ -10,7 +10,7 @@ int sceGsPutDrawEnv(sceGifTag *giftag)
 {
     u_int i;
 
-    if (*(volatile u_int *)0x1000A000 & 0x100)
+    if (*(u_int *)0x1000A000 & 0x100)
     {
         i = 0;
         do
@@ -21,18 +21,18 @@ int sceGsPutDrawEnv(sceGifTag *giftag)
                 return -1;
             }
             i++;
-        } while (*(volatile u_int *)0x1000A000 & 0x100);
+        } while (*(u_int *)0x1000A000 & 0x100);
     }
-    *(volatile u_int *)0x1000A020 = (*(u_long *)giftag & 0x7FFF) + 1;
+    *(u_int *)0x1000A020 = (*(u_long *)giftag & 0x7FFF) + 1;
     if (((u_int)giftag & 0x70000000) == 0x70000000)
     {
-        *(volatile u_int *)0x1000A010 = ((u_int)giftag & 0xFFFFFFF) | 0x80000000;
+        *(u_int *)0x1000A010 = ((u_int)giftag & 0xFFFFFFF) | 0x80000000;
     }
     else
     {
-        *(volatile u_int *)0x1000A010 = (u_int)giftag & 0xFFFFFFF;
+        *(u_int *)0x1000A010 = (u_int)giftag & 0xFFFFFFF;
     }
-    *(volatile u_int *)0x1000A000 = 0x101;
+    *(u_int *)0x1000A000 = 0x101;
     return 0;
 }
 #endif
