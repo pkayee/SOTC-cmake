@@ -532,7 +532,7 @@ void func_40022668(f32 f, u8 *obj, f32 *vec)
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0010_GetGameTimeScaleRatio", func_40022668);
 
 /* NEARMISS-STUB func_40022820 */
-#if 0 /* NEARMISS 82.0% cat=regalloc sub=- | 0.0 held in callee-saved f22 across calls, F in f23; needs rule-13-forbidden local zero | attempts=1 */
+#if 0 /* NEARMISS 82.0% cat=regalloc sub=- | 0.0 zero local (3 placements: decl first/second/last, zero also in t1/t2 assigns) still 81.84: arg-setup for func_40024008 (lwc1 via v0=obj+0x60 CSE, obj+0x60 a | attempts=2 */
 f32 func_40023F88(f32 pitch);
 f32 GAMEUTIL_get_move_radi_from_pitch1_to_pitch2(f32 pitch1, f32 pitch2);
 f32 func_40023FC8(u8 *obj, f32 pitch);
