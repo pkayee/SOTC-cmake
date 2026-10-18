@@ -46,7 +46,11 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0147_SetColDebug", GetCollision
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0147_SetColDebug", func_400BC778);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0147_SetColDebug", func_400BC798);
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0147_SetColDebug", func_400BC798);
+void func_400BC798(u8* work)
+{
+    *(s32*)work = 0;
+}
 
 int objfilter(int arg0, int arg1)
 {

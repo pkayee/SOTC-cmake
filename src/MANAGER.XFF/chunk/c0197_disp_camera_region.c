@@ -38,6 +38,17 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0197_disp_camera_region", get_r
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0197_disp_camera_region", is_have_region_camera_region);
 
+/* NEARMISS-STUB func_400F4F00 */
+#if 0 /* NEARMISS 32.3% cat=sched sub=- | compiler schedules p[4] store before sd; target has sd before jr and p[4] in delay slot | attempts=2 */
+void func_400F4F00(s32 *p, s32 a1, s32 a2, s64 a3, s32 a4, s32 a5)
+{
+    p[0] = a1;
+    p[1] = a2;
+    p[5] = a5;
+    *(s64 *)(p + 2) = a3;
+    p[4] = a4;
+}
+#endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0197_disp_camera_region", func_400F4F00);
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0197_disp_camera_region", init_col_attr_table_segment);

@@ -79,7 +79,7 @@ u8 *GetDamageDefByName(u32 *lp, const char *name) {
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0201__SetMultiCastLetterReceiverInfo", GetAttributeRelationEffectDefByName);
 
 /* NEARMISS-STUB GetAnimationEffectDefByName */
-#if 0 /* NEARMISS 93.33% cat=regalloc sub=- | extra cnt copy to s1 and nop; loop guard order differs | attempts=1 */
+#if 0 /* NEARMISS 93.33% cat=regalloc sub=- | extra a1->s1 copy and nop; loop guard order differs | attempts=1 */
 u8 *GetAnimationEffectDefByName(u32 *lp, const char *name) {
     u8 *p;
     s32 cnt = (s32)dldRef(lp, 0xC);

@@ -45,7 +45,19 @@ int auto_end_check_and_check_free_particle_geodisp(int *arg0)
     return 0;
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0164_func_400D05C0", doit_particle_geodisp);
+extern void func_400CC510(int);
+
+void doit_particle_geodisp(int arg0)
+{
+    int temp_v0;
+
+    if (arg0 != 0) {
+        temp_v0 = GetGeoDispClass() + 0xE8;
+    } else {
+        temp_v0 = 0;
+    }
+    func_400CC510(temp_v0);
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0164_func_400D05C0", clip_particle_geodisp);
 

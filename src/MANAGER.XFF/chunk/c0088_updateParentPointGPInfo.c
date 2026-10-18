@@ -17,7 +17,13 @@ void motrootdyn_startparentpointxzfit_from_pendulum(void *a, char *c, int e)
     charrootdyn_parentpointxzfitstab(c, *(int *)(c + 0x1C0), e);
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0088_updateParentPointGPInfo", motrootdyn_startparentpointxzfit);
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0088_updateParentPointGPInfo", motrootdyn_startparentpointxzfit);
+extern void func_400799E8(void *, void *);
+
+void motrootdyn_startparentpointxzfit(void *a, void *b, void *c)
+{
+    func_400799E8(a, c);
+}
 
 extern void motrootdyn_changehcol_from_xz(void *);
 extern void func_400799E8(void *, void *);

@@ -111,7 +111,14 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0095_InitFogColMan", CreateGeoD
 void func_40082B70(void) {
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0095_InitFogColMan", func_40082B78);
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0095_InitFogColMan", func_40082B78);
+s32 GetLayoutDispObjGroup(void);
+void _isysDeleteGroup(s32 a, s32 b, s32 c);
+
+void func_40082B78(s32 arg0)
+{
+    _isysDeleteGroup(arg0, GetLayoutDispObjGroup(), 0);
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0095_InitFogColMan", CheckPositionInsideOfJudgeVolumeInfo);
 
