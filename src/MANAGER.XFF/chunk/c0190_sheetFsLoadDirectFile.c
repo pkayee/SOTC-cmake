@@ -1,10 +1,27 @@
 #include "common.h"
 
+extern int iosCdStRead();
+extern int iosCdStSkip();
+extern int iosCdStSectorAlignSkip();
+extern int IosGetMergeDataFileName();
+extern void iosCdStInit(int);
+extern void func_400EC808();
+
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0190_sheetFsLoadDirectFile", sheetFsLoadDirectFile);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0190_sheetFsLoadDirectFile", sheetFsInit);
+void sheetFsInit(void)
+{
+    iosCdStInit(IosGetMergeDataFileName());
+    func_400EC808();
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0190_sheetFsLoadDirectFile", sheetFsGetStageTexSegIndex);
+typedef struct { int a, b, seg; } Seg;
+extern char *D_401B5350;
+
+int sheetFsGetStageTexSegIndex(int x, int y)
+{
+    return (*(Seg **)(D_401B5350 + 8))[(4 - y) * 10 + (x + 5) % 10].seg;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0190_sheetFsLoadDirectFile", sheetFsAddStageTexSegIndex);
 
@@ -16,11 +33,20 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0190_sheetFsLoadDirectFile", sh
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0190_sheetFsLoadDirectFile", sheetFsGetStageTexSegTexSegDef);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0190_sheetFsLoadDirectFile", sheetFsDataRead);
+int sheetFsDataRead(int a, int b, int c, int d)
+{
+    return iosCdStRead(b, c, c, d);
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0190_sheetFsLoadDirectFile", sheetFsSkipRead);
+int sheetFsSkipRead(int a, int b, int c, int d)
+{
+    return iosCdStSkip(b, b, c, d);
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0190_sheetFsLoadDirectFile", sheetFsSectorAlignSkip);
+int sheetFsSectorAlignSkip(int a, int b, int c, int d)
+{
+    return iosCdStSectorAlignSkip(a, b, c, d);
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0190_sheetFsLoadDirectFile", sheetFsLoadBootData);
 
