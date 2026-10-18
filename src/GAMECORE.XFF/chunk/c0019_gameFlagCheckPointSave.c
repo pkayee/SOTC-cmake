@@ -13,12 +13,30 @@ extern f32 D_401FD0C8[];
 extern s32 D_401FD0BC;
 extern s64 D_401FD0C0;
 extern s8 D_401FD098;
+extern u8 D_401FC8C8[];
+extern u8 D_401FCA58[];
+extern u8 D_401FCD78[];
+extern void *memset(void *, int, unsigned int);
 
 void SetDamageClassDamageTableType(s32 type);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0019_gameFlagCheckPointSave", gameFlagCheckPointSave);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0019_gameFlagCheckPointSave", gameFlagInit);
+static inline void gameSetF(f32 f)
+{
+    *(f32 *)((u8 *)D_40130C78 + 0x2C) = f;
+    *(f32 *)((u8 *)D_40130C78 + 0x30) = f;
+}
+
+void gameFlagInit(void)
+{
+    memset(D_401FC810, 0, 0x50);
+    memset(D_401FC860, 0, 0x68);
+    gameSetF(100.0f);
+    memset(D_401FC8C8, 0, 0x190);
+    memset(D_401FCA58, 0, 0x320);
+    memset(D_401FCD78, 0, 0x320);
+}
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0019_gameFlagCheckPointSave", _optionWorkSet);
 void _optionWorkSet(s32 idx, s32 val)
@@ -44,7 +62,10 @@ s32 *_optionWorkPtr(s32 idx)
     return &D_401FC788[idx];
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0019_gameFlagCheckPointSave", _gameFlagSet);
+void _gameFlagSet(s32 i)
+{
+    D_401FC810[i / 8] |= 1 << (i & 7);
+}
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0019_gameFlagCheckPointSave", _gameFlagCls);
 s32 _gameFlagCls(s32 idx)
@@ -61,7 +82,12 @@ s32 _gameFlagChk(s32 idx)
     return (D_401FC810[idx / 8] >> (idx & 7)) & 1;
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0019_gameFlagCheckPointSave", _gameFlagXor);
+s32 _gameFlagXor(s32 i)
+{
+    u8 *p = &D_401FC810[i / 8];
+    *p ^= 1 << (i & 7);
+    return (*p >> (i & 7)) & 1;
+}
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0019_gameFlagCheckPointSave", _gameWorkSet);
 void _gameWorkSet(s32 idx, s32 val)
@@ -105,9 +131,42 @@ s32 _gameIWorkChk(s32 idx)
     return D_40130C7C[idx];
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0019_gameFlagCheckPointSave", fruitsFlagSet);
+void fruitsFlagSet(unsigned int a, int b)
+{
+    unsigned char *base = D_401FC8C8;
+    unsigned char *p;
+    int bit;
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0019_gameFlagCheckPointSave", fruitsFlagChk);
+    if (a >= 100 || b >= 32 || b < 0) {
+        p = 0;
+    } else {
+        int n = a * 32 + b;
+
+        bit = n & 7;
+        p = base + (n >> 3);
+    }
+    if (p != 0)
+        *p |= 1 << bit;
+}
+
+int fruitsFlagChk(unsigned int a, int b)
+{
+    unsigned char *base = D_401FC8C8;
+    unsigned char *p;
+    int bit;
+
+    if (a >= 100 || b >= 32 || b < 0) {
+        p = 0;
+    } else {
+        int n = a * 32 + b;
+
+        bit = n & 7;
+        p = base + (n >> 3);
+    }
+    if (p != 0 && ((*p >> bit) & 1))
+        return 1;
+    return 0;
+}
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0019_gameFlagCheckPointSave", getGameDataExistIcoData);
 s32 getGameDataExistIcoData(void)
