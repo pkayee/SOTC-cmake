@@ -10,13 +10,13 @@ typedef struct
     s32 unk4;
 } t_ischedTask;
 
-extern volatile s32 D_40045C64;
+extern s32 D_40045C64;
 extern s32 D_40045C68;
 extern s32 D_40045C6C;
 extern s32 D_40045C74;
 extern s32 D_40045C7C;
 extern s64 D_400F2B18;
-extern volatile s32 D_400F2B20;
+extern s32 D_400F2B20;
 extern t_iosMessageQueue D_400F2B28;
 extern iosThread* D_400F2B44;
 extern t_iosMessageQueue D_400F3B50;
@@ -60,14 +60,16 @@ extern void ischedRestart(void);
 extern void func_4002CD88(void);
 extern s32 func_4002CEA0(s32 arg0);
 
-//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/sched", func_4002C8F0);
+/* NEARMISS-STUB func_4002C8F0 */
+#if 0 /* NEARMISS 92.3% cat=volatile-alias sub=- | needs volatile (banned): poll loop and top lock store; local-ptr lock form reached 92.3, delay slot fill and vint reread still differ | attempts=1 */
 s32 func_4002C8F0(void)
 {
     s32 garbageFlag;
     s32 vintSnap;
     s32 i;
+    s32 *lockp = &D_400F2B20;
 
-    D_400F2B20 = 0;
+    *lockp = 0;
     iosCdSetErrorCallback((void *)ischedStop, (void *)ischedRestart);
     iosCreateMsgQueue(&D_400F2B28, 0, 0);
     bootGPThread((void *)func_4002CD88);
@@ -94,7 +96,7 @@ s32 func_4002C8F0(void)
             }
         }
         D_40045C74++;
-        while (D_400F2B20 != 0)
+        while (*lockp != 0)
         {
         }
         doit_letter_manager();
@@ -139,12 +141,17 @@ s32 func_4002C8F0(void)
         iosGPFrameInit();
     }
 }
+#endif
+INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/sched", func_4002C8F0);
 
-//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/sched", getVIntrCnt);
+/* NEARMISS-STUB getVIntrCnt */
+#if 0 /* NEARMISS 47.8% cat=volatile-alias sub=- | needs volatile (banned): expected lui+addiu+lw 0(v1) (volatile-global address form); plain/local-pointer/int-cast/register/array-index forms all fold to lw %lo | attempts=1 */
 s32 getVIntrCnt(void)
 {
-    return D_40045C64;
+    return (&D_40045C64)[0];
 }
+#endif
+INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/sched", getVIntrCnt);
 
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/sched", waitVscheduler);
@@ -154,7 +161,8 @@ void waitVscheduler(void)
 }
 
 
-//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/sched", bootSchedulerThread);
+/* NEARMISS-STUB bootSchedulerThread */
+#if 0 /* NEARMISS 99.87% cat=volatile-alias sub=- | needs volatile (banned): target lui %hi(D_400F2B50+0x4a0) addend differs from plain-form 0x4c0; local-ptr, s32-retype, folded-offset forms change the lui shape | attempts=1 */
 void bootSchedulerThread(void)
 {
     iosPadInit();
@@ -166,6 +174,8 @@ void bootSchedulerThread(void)
     D_400F3B88 = iosCreateThread(func_4002C8F0, D_400F3B90, 0x2000, 0x2D, 0);
     iosStartThread(D_400F3B88, 0);
 }
+#endif
+INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/sched", bootSchedulerThread);
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/sched", iosAddISchedulerTaskList);
 
@@ -177,7 +187,8 @@ s32 iosGetISchedulerExecCnt(void)
 }
 
 
-//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/sched", ischedStop);
+/* NEARMISS-STUB ischedStop */
+#if 0 /* NEARMISS 67.6% cat=volatile-alias sub=- | needs volatile (banned): target reloads D_400F2B20 after T0_MODE store | attempts=1 */
 void ischedStop(void)
 {
     if (D_400F2B20 == 0)
@@ -186,16 +197,24 @@ void ischedStop(void)
     }
     D_400F2B20 += 1;
 }
+#endif
+INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/sched", ischedStop);
 
-//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/sched", ischedRestart);
+/* NEARMISS-STUB ischedRestart */
+#if 0 /* NEARMISS 75.7% cat=volatile-alias sub=- | needs volatile (banned): target store then reloads D_400F2B20 via lw 0(v0) before bnez; plain/alias/label/goto forms forward the value and fold to lw %lo | attempts=1 */
 void ischedRestart(void)
 {
-    D_400F2B20 -= 1;
-    if (D_400F2B20 == 0)
+    s32 *p;
+
+    p = &D_400F2B20;
+    *p = *p - 1;
+    if (*p == 0)
     {
         *T0_MODE |= 0x80;
     }
 }
+#endif
+INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/sched", ischedRestart);
 
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/sched", iosSetISchedulerSubthreadTask);
@@ -240,10 +259,14 @@ void func_4002CD88(void)
 }
 
 
-//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/sched", func_4002CDB0);
+/* NEARMISS-STUB func_4002CDB0 */
+#if 0 /* NEARMISS 92.23404% cat=volatile-alias sub=- | needs volatile (banned): ours folds sw D_40045C64 into delay slot of beqz, target keeps it before; prologue hi-reg order differs | attempts=1 */
 s32 func_4002CDB0(void)
 {
+    s32 *p;
+
     iosCreateMsgQueue(&D_400F3B50, 0, 0);
+    p = &D_400F2B20;
     while (1)
     {
         iosSleepThread();
@@ -253,11 +276,13 @@ s32 func_4002CDB0(void)
         {
             vschedGameTime++;
         }
-        tickProcSound(D_400F2B20);
+        tickProcSound(*p);
         iosPadTickProc();
         iosRecvMsg(&D_400F3B50, 0, 0);
     }
 }
+#endif
+INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/sched", func_4002CDB0);
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/sched", func_4002CE70);
 s32 func_4002CE70(void)
@@ -268,7 +293,8 @@ s32 func_4002CE70(void)
 }
 
 
-//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/sched", func_4002CEA0);
+/* NEARMISS-STUB func_4002CEA0 */
+#if 0 /* NEARMISS 93.02439% cat=volatile-alias sub=- | needs volatile (banned): target loads D_40045C64 via lui+addiu v0,0 then lw 0(v1) (volatile-only form); plain, local s32* ptr, array-index, cast forms all fold  | attempts=1 */
 s32 func_4002CEA0(s32 arg0)
 {
     s32 r;
@@ -287,3 +313,5 @@ s32 func_4002CEA0(s32 arg0)
     }
     return r;
 }
+#endif
+INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/sched", func_4002CEA0);
