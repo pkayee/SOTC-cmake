@@ -1,6 +1,64 @@
 #include "common.h"
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0125_CreateScriptLwsOri", CreateScriptLwsOri);
+/* c0125 CreateScriptLwsOri: obj kind 0x16 (rest of the layout is in c0125 matched siblings); ctor = isys create + Init chain inlined as in InitScriptLwsOrientObj. arg order: (grp, extra, def) */
+s32 GetLwsOrientWorkSize();
+s32 GetScriptObjWorkSize();
+void *_isysCreateObj(void *, s32, s32, s32, void (*)(void), s32);
+void isysSetObjImmediateDeleteFunc();
+void isysInitISYSLetterObj();
+void InitLwsOrientObj();
+void initScriptObj();
+void InitChildGroupManagerObj();
+void isysAddGroupWithLinkParam();
+void func_400A1C08(void);
+void func_400A2338(u8 *);
+
+/* c0125 CreateSortList: list header words {items@0, count@4, scale f32@8, mode@0xC, cur@0x10}, 0x14 bytes from rootPtn. Arg order: bits in a0, mode in a1, scale in f12 */
+extern s32 rootPtn;
+void *iosMallocAlign(void *, s32, s32);
+
+void isysFlushISYSLetterObj();
+
+/* c0125 func_400A2BD8: per-frame step of a lws-orient track. o: +4 state, +8 target f32, +0xC rate f32, +0x10 timer f32, +0x34 flag f32; *o = class (kind at +0xC). Arg order: dt in f12, o in a0 */
+float rintf(float);
+static inline int TimerStep(u8 *o, float dt)
+{
+    *(float *)(o + 0x10) = *(float *)(o + 0x10) - dt;
+    if (*(float *)(o + 0x10) < 0.0f) {
+        *(float *)(o + 0x10) = 0.0f;
+        return 0;
+    }
+    return 1;
+}
+
+u8 *CreateScriptLwsOri(void *grp, s32 extra, u8 *def)
+{
+    s32 s = (s32)def + 0x134;
+    s32 a = GetLwsOrientWorkSize(def);
+    s32 b = GetScriptObjWorkSize(s);
+    u8 *o = _isysCreateObj(grp, 0x16, 0x11a0, extra + (a + b), (void (*)(void))func_400A2338, 0x10);
+    s32 *f;
+    s32 *g;
+    u8 *c;
+
+    if (o != 0) {
+        isysSetObjImmediateDeleteFunc(o, func_400A1C08);
+        isysInitISYSLetterObj(o);
+        InitLwsOrientObj(o, def);
+        initScriptObj(o, s, *(s32 *)o);
+        InitChildGroupManagerObj(o);
+        c = o[8] != 0x16 ? 0 : o + 0x20;
+        f = (s32 *)c + 0x455;
+        f[1] = 0;
+        f[0] = 0;
+        *(s32 *)(c + 0x1164) = 0;
+        g = (s32 *)c + 0x457;
+        g[0] = 0;
+        g[1] = 0;
+        isysAddGroupWithLinkParam(o, *(s32 *)(def + 0x120), 0, 0);
+    }
+    return o;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0125_CreateScriptLwsOri", func_400A1EA0);
 
@@ -109,7 +167,23 @@ char *GetScriptLwsOrientDefinfo(unsigned char *p)
     return (char *)p + 0x20;
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0125_CreateScriptLwsOri", func_400A2338);
+/* c0125 func_400A2338: FlushScriptLwsOri body (c0125 sibling) plus a trailing isysFlushISYSLetterObj */
+void func_400A2338(u8 *o)
+{
+    u8 *c = o[8] != 0x16 ? 0 : o + 0x20;
+    LwsCb *cb = (LwsCb *)(c + 0x115C);
+
+    if (cb->fn != 0) {
+        cb->fn(cb->arg);
+    }
+    flushScriptObj(o);
+    FlushCharacterObj(o);
+    FlushChildGroupManagerObj(o);
+    if (*(void **)(c + 0x1154) != 0) {
+        iosFree(*(void **)(c + 0x1154));
+    }
+    isysFlushISYSLetterObj(o);
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0125_CreateScriptLwsOri", DeleteScriptLwsOrientObjSubObjects);
 
@@ -162,7 +236,22 @@ void ClearSortList(void *list)
     words[4] = 0;
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0125_CreateScriptLwsOri", CreateSortList);
+int *CreateSortList(u32 bits, int mode, float scale)
+{
+    int *w = iosMallocAlign(&rootPtn, 0x14, 4);
+    int n = 1 << bits;
+    int i;
+
+    w[3] = mode;
+    w[1] = n;
+    *(float *)&w[2] = (float)n / scale;
+    w[0] = (int)iosMallocAlign(&rootPtn, n << 2, 4);
+    for (i = 0; i < w[1]; i++) {
+        ((int *)w[0])[i] = 0;
+    }
+    w[4] = 0;
+    return w;
+}
 
 void DeleteSortList(void **list)
 {
@@ -176,7 +265,53 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0125_CreateScriptLwsOri", func_
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0125_CreateScriptLwsOri", func_400A2A10);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0125_CreateScriptLwsOri", func_400A2BD8);
+void func_400A2BD8(float dt, u8 *o)
+{
+    float *p;
+    float d;
+    float step;
+    float v;
+
+    if (TimerStep(o, dt)) return;
+    p = 0;
+    switch (*(s32 *)(*(u8 **)o + 0xC)) {
+    case 0:
+        p = (float *)(o + 0x34);
+        break;
+    case 2:
+    case 3:
+        p = (float *)(o + 0x1C);
+        break;
+    case 1:
+    case 4:
+        p = (float *)(o + 0x20);
+        break;
+    }
+    d = *(float *)(o + 8) - *p;
+    step = *(float *)(o + 0xC) * dt;
+    if (*(s32 *)(*(u8 **)o + 0xC) != 0) {
+        *(float *)(o + 0x34) = 1.0f;
+        step = rintf(step);
+        if (step < 0.0f) {
+            if (!(-1.0f < step)) goto done;
+        } else if (!(step < 1.0f)) {
+            goto done;
+        }
+        if (0.0f < step) step = 1.0f;
+        if (step < 0.0f) step = -1.0f;
+    }
+done:
+    *p = *p + step;
+    v = *(float *)(o + 8);
+    if (d * (v - *p) <= 0.0f) {
+        *p = v;
+        if (v == 0.0f) {
+            *(s32 *)(o + 4) = 0;
+        } else {
+            *(s32 *)(o + 4) = 3;
+        }
+    }
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0125_CreateScriptLwsOri", func_400A2D58);
 
