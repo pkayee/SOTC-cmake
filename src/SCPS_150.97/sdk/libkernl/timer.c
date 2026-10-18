@@ -150,7 +150,17 @@ int EndTimer(void)
 }
 
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/timer", GetTimerPreScaleFactor);
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/timer", GetTimerPreScaleFactor);
+extern s32 D_00133A20;
+
+u32 GetTimerPreScaleFactor(void)
+{
+    if (D_00133A20 < 0)
+    {
+        return 0x80008001;
+    }
+    return *(volatile u32 *)0x10001010 & 3;
+}
 
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/timer", StartTimerSystemTime);
 int StartTimerSystemTime(void)
@@ -390,7 +400,26 @@ int FreeTimerCounter(int id)
     return ret;
 }
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/timer", iGetTimerUsedUnusedCounters);
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/timer", iGetTimerUsedUnusedCounters);
+int iGetTimerUsedUnusedCounters(u32 *used, u32 *unused)
+{
+    volatile TimerTable *tt;
+
+    tt = (volatile TimerTable *)D_00133A18;
+    if (tt->intcId < 0)
+    {
+        return 0x80008001;
+    }
+    if (used != 0)
+    {
+        *used = tt->numUsed;
+    }
+    if (unused != 0)
+    {
+        *unused = 0x80 - tt->numUsed;
+    }
+    return 0;
+}
 
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/timer", GetTimerUsedUnusedCounters);
 int GetTimerUsedUnusedCounters(int *pnUsed, int *pnUnused)
@@ -538,7 +567,22 @@ u64 SetTimerCount(int id, u64 ulNewCount)
     return ret;
 }
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/timer", iGetTimerBaseTime);
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/timer", iGetTimerBaseTime);
+u64 iGetTimerBaseTime(int id)
+{
+    TimerCounter *tc;
+
+    tc = (TimerCounter *)(((u32)id >> 10) << 6);
+    if (id < 0 || ((u32)id & 0x3FF) != tc->id)
+    {
+        return -1;
+    }
+    if (tc->flags & 1)
+    {
+        return tc->startTime - tc->accum;
+    }
+    return 0;
+}
 
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/timer", GetTimerBaseTime);
 unsigned long GetTimerBaseTime(int id)

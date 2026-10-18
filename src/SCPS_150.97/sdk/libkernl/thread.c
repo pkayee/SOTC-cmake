@@ -309,33 +309,26 @@ INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/thread", func_00107F20);
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/thread", func_001080F8);
 
-/* NEARMISS-STUB func_00108E10 */
-#if 0 /* NEARMISS 27.0% cat=sdk-compiler sub=ee-gcc2.9-991111 | 27% best (kK23) has the right shape; movz select for if(*a1==1) a2=0 and beql early-out do not match ee-gcc2.9 codegen; db cause "exact or 1 insn off" contradicts 27%, recheck under SDK compiler | attempts=1 */
-s32 func_00108E10(u8 **a0, s32 *a1, s32 a2)
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/thread", func_00108E10);
+s32 func_00108E10(u8 **wr, s32 *cnt, s32 c)
 {
-    u8 *p;
-
-    if (*a1 == 0)
+    if (*cnt == 0)
     {
         return 1;
     }
-    if (a2 >= 0x100)
+    if (c < 0x100)
     {
-        **a0 = 0;
-        return 0;
+        if (*cnt == 1)
+        {
+            c = 0;
+        }
+        *(*wr)++ = c;
+        (*cnt)--;
+        return 1;
     }
-    p = *a0;
-    if (*a1 == 1)
-    {
-        a2 = 0;
-    }
-    *p = a2;
-    *a0 = p + 1;
-    *a1 -= 1;
-    return 1;
+    **wr = 0;
+    return 0;
 }
-#endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/thread", func_00108E10);
 
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/thread", func_00108E68);
 s32 func_00108E68(s32 a0, s32 a1, s32 a2)
