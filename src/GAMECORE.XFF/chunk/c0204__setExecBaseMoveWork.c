@@ -1,5 +1,9 @@
 #include "common.h"
 
+s64 chkCurveCollision(float arg);
+
+extern const f32 D_40137590;
+
 void _setExecBaseMoveWork(void *arg0, s32 arg1)
 {
     *(s32 *)((u8 *)arg0 + 4) = arg1;
@@ -110,22 +114,39 @@ float calcMoveTurnAngle2(char *p, float a)
     return calcMoveAngle(0, a, *(float *)(p + 0xA8), *(float *)(**(char ***)(p + 0x1C) + 0x78), D_40137588);
 }
 
-/* NEARMISS-STUB calcProgRotRatioForMove2 */
-#if 0 /* NEARMISS 83.33% cat=call-abi sub=- | float param slot/a0 copy to v0 (daddu) and load order differ from target | attempts=1 */
-extern u8 gcGlobalVar[];
-float calcProgRotRatio(f32 unused, void *obj, f32 a, f32 b, f32 c, f32 d);
-
-void calcProgRotRatioForMove2(char *obj, f32 unused)
+/* decls are inside the body on purpose: apply_ready skips top-level decls whose name appears in the parked NEARMISS stub above
+   (gcGlobalVar, calcProgRotRatio) and then deletes the stub, leaving the TU without them */
+void calcProgRotRatioForMove2(char *obj, f32 f)
 {
-    char *p = **(char ***)(obj + 0x1C);
+    extern u8 gcGlobalVar[];
+    void calcProgRotRatio(f32 a, f32 b, f32 c, f32 d, f32 e);
 
-    calcProgRotRatio(unused, obj, *(f32 *)(obj + 0xA4), *(f32 *)(gcGlobalVar + 0x190), *(f32 *)(obj + 0xA8),
-                     *(f32 *)(p + 0x78));
+    calcProgRotRatio(f, *(f32 *)(obj + 0xA4), *(f32 *)(gcGlobalVar + 0x190), *(f32 *)(obj + 0xA8),
+                     *(f32 *)(**(char ***)(obj + 0x1C) + 0x78));
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0204__setExecBaseMoveWork", calcProgRotRatioForMove2);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0204__setExecBaseMoveWork", adjustCurveAngleForCollision);
+float adjustCurveAngleForCollision(float ang, float lim, float x)
+{
+    if (lim < __builtin_fabsf(ang))
+    {
+        switch (chkCurveCollision(x))
+        {
+        case 3:
+            if (ang < 0.0f)
+            {
+                ang = ang + 6.2831851f;
+            }
+            break;
+        case 2:
+            if (0.0f < ang)
+            {
+                ang = ang + -6.2831851f;
+            }
+            break;
+        }
+    }
+    return ang;
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0204__setExecBaseMoveWork", calcDownSpeedRatio);
 
@@ -151,6 +172,12 @@ s32 moveCtrlWallJudgeFunc(void *col, void *w)
     return 1;
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0204__setExecBaseMoveWork", func_40105C78);
+s32 func_40105C78(void *arg0)
+{
+    *(f32 *)((u8 *)arg0 + 0x1C) = 1.0f;
+    *(f32 *)((u8 *)arg0 + 0x10) = D_40137590;
+    *(f32 *)((u8 *)arg0 + 0x14) = D_40137590;
+    *(f32 *)((u8 *)arg0 + 0x18) = D_40137590;
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0204__setExecBaseMoveWork", createBirdCtrlWork);

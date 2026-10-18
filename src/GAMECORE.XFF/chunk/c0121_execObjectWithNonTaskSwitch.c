@@ -1,5 +1,21 @@
 #include "common.h"
 
+/* GAMECORE c0121 SCRSetDispFlag: 100 in scratch. Needs the 2-arg (obj, flag) pass-through to both callees (a2 temp for slti),
+ * `!= 0xd` outer test with the else holding the jal call, and NESTED ifs (&& chain merges into sltiu range = 63%). */
+extern void SetScriptAnimationObjAccessSwitch(u8 *, int);
+extern void SetLayoutObjAccessSwitch(u8 *, int);
+
+/* GAMECORE c0121 _initstage: 100 in scratch; relocatable-handle decode as in c0060 SCRSetMyOwnGameFlag; initlayout needs the real 6-arg decl for the tail-call j */
+extern int DldSysUndefSymbol;
+extern int D_40131BB8;
+extern int D_40131BBC;
+extern int D_40131BC0;
+extern int D_40131BC4;
+extern int D_40131BC8;
+extern int D_40131BCC;
+extern char *gcGetStageData(int);
+extern void initlayout(int, char *, int, int, int, int);
+
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0121_execObjectWithNonTaskSwitch", execObjectWithNonTaskSwitch);
 
 extern int isysGetThisSubThread();
@@ -18,7 +34,22 @@ void scrRunM(int n)
         func_400A4778(t);
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0121_execObjectWithNonTaskSwitch", SCRSetDispFlag);
+void SCRSetDispFlag(u8 *p, int q)
+{
+    s32 t = p[8];
+    if (t != 0xd) {
+        if (t < 0xe) {
+            if (t < 0xc) {
+                if (8 < t) {
+                    SetLayoutObjAccessSwitch(p, q);
+                    return;
+                }
+            }
+        }
+    } else {
+        SetScriptAnimationObjAccessSwitch(p, q);
+    }
+}
 
 extern void *GetScriptCharacterClass(void *);
 
@@ -120,7 +151,17 @@ s32 initdefaultaitask(void)
     return gcCreateScriptObj(func_400A58C0, 0, rootPtn, 0x1000, 0, 4, D_40135D48);
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0121_execObjectWithNonTaskSwitch", _initstage);
+void _initstage(void)
+{
+    unsigned int *h = (unsigned int *)(gcGetStageData(D_40131BBC) + 4);
+    unsigned int v = *h;
+    int off = v & 0x3FFFF;
+    char *t = off != 0 ? *(char **)((char *)h - off) : 0;
+    char *p = 0;
+    if (t != 0 && t != (char *)DldSysUndefSymbol)
+        p = *(char **)(t + 0x10) + ((v >> 18) & 0xFFF) * *(int *)(*(char **)(t + 8) + 0xC);
+    initlayout(D_40131BB8, p, D_40131BC0, D_40131BC4, D_40131BC8, D_40131BCC);
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0121_execObjectWithNonTaskSwitch", initstage);
 
