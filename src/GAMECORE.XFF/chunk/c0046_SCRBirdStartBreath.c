@@ -46,9 +46,19 @@ int SCRConditionBirdBeginningApproaching(void *actor)
     return r;
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0046_SCRBirdStartBreath", func_40049790);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0046_SCRBirdStartBreath", func_40049790);
+extern void _SCRStartLWS(s32, s32, s32, s32);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0046_SCRBirdStartBreath", func_400497C0);
+void func_40049790(void *character)
+{
+    _SCRStartLWS(*(s32 *)((u8 *)GetSCRCharaAIWorkPtr(character) + 0x4190), -1, 4, 0);
+}
+
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0046_SCRBirdStartBreath", func_400497C0);
+void func_400497C0(void *character)
+{
+    _SCRStartLWS(*(s32 *)((u8 *)GetSCRCharaAIWorkPtr(character) + 0x4190), -1, 1, 0);
+}
 
 void func_400497F0(void) {
 }

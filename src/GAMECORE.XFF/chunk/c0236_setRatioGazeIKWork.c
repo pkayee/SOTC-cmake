@@ -87,7 +87,29 @@ void updateGazeIKWork(char *w, s128 *target)
     }
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0236_setRatioGazeIKWork", func_4012CC60);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0236_setRatioGazeIKWork", func_4012CC60);
+u32 func_4012CC60(s32 n, u8 *p)
+{
+    s32 i;
+    u32 v = *(u32 *)(p + 0x14);
+
+    for (i = 0; i != n; i++)
+    {
+        if ((s32)v < 0)
+        {
+            return 0xFFFFFFFE;
+        }
+        if ((s32)v > 0 && (v & 0x10000))
+        {
+            v = *(u32 *)((v & 0xFFFEFFFF) * 0x40 + *(u32 *)(*(u32 *)(p + 0x10) + 0x24) + 0x30);
+        }
+        else
+        {
+            v = *(u32 *)(v * 0x40 + *(u32 *)(*(u32 *)(p + 0x10) + 8) + 0x38);
+        }
+    }
+    return v;
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0236_setRatioGazeIKWork", func_4012CCE0);
 
@@ -109,8 +131,22 @@ void initTailIKWork(int a, int b, char *p)
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0236_setRatioGazeIKWork", nico_calcTailGenealogicalNodeTail);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0236_setRatioGazeIKWork", ReflectIK_initWormDynamics);
+/* NEARMISS-STUB ReflectIK_initWormDynamics */
+#if 0 /* NEARMISS 83.0% cat=branch-layout sub=- | float store hoisted to first; target has swc1 after lq a3, before jr | attempts=1 */
+extern u128 ZeroVector;
 
+void ReflectIK_initWormDynamics(void *dst, u128 *a, u128 *b, u128 *c, float f)
+{
+    u128 *d = (u128 *)dst;
+
+    *(float *)((u8 *)dst + 0x40) = f;
+    d[1] = *a;
+    d[2] = ZeroVector;
+    d[0] = *b;
+    d[3] = *c;
+}
+#endif
+INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0236_setRatioGazeIKWork", ReflectIK_initWormDynamics);
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0236_setRatioGazeIKWork", func_4012D738);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0236_setRatioGazeIKWork", func_4012DA20);

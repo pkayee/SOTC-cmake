@@ -78,7 +78,17 @@ int GetCollisionFinderWorkSize(int count)
     return a + b + 0x66;
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0148_ReconstructCollisionEdgeLinkDBVWallFinde", CopyCollisionFinder);
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0148_ReconstructCollisionEdgeLinkDBVWallFinde", CopyCollisionFinder);
+
+typedef struct
+{
+    s32 unk[4];
+} CollisionFinderCopy16;
+
+void CopyCollisionFinder(CollisionFinderCopy16 *dst, CollisionFinderCopy16 *src)
+{
+    *dst = *src;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0148_ReconstructCollisionEdgeLinkDBVWallFinde", ReleaseCollisionFinder);
 
@@ -88,6 +98,33 @@ int CheckCollisionFinderAlive(char *p)
     return 0;
 }
 
+/* NEARMISS-STUB CheckCollisionFinderExistData */
+#if 0 /* NEARMISS 79.35% cat=regalloc sub=- | ours keeps elem ptr in a1 and mask in a0; target ptr a0 mask a1, f[1] loaded first | attempts=1 */
+int CheckCollisionFinderExistData(int *f, int i, u32 key)
+{
+    int n = f[0];
+    int j = i;
+    int *e;
+    u32 v;
+
+    if (f[1] < n)
+        n = f[1];
+    e = (int *)(f[2] + i * 8);
+    if (j < n) {
+        v = e[1];
+        while (1) {
+            if ((v & 0xFFFFFF) == key)
+                return 1;
+            j++;
+            if (j >= n)
+                break;
+            e += 2;
+            v = e[1];
+        }
+    }
+    return 0;
+}
+#endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0148_ReconstructCollisionEdgeLinkDBVWallFinde", CheckCollisionFinderExistData);
 
 extern int D_4012B3A0;

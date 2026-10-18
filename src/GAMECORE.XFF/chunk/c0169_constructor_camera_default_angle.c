@@ -31,7 +31,13 @@ int is_must_reach_normal_default_angle(char *c)
     return 0;
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0169_constructor_camera_default_angle", func_400DF220);
+void GAMEUTIL_reset_status_manager(void *, s32);
+
+void func_400DF220(u8 *p)
+{
+    *(s32 *)(p + 0x378) = 1;
+    GAMEUTIL_reset_status_manager(p + 0x37c, 1);
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0169_constructor_camera_default_angle", func_400DF248);
 
@@ -43,6 +49,18 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0169_constructor_camera_defaul
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0169_constructor_camera_default_angle", func_400DF5E0);
 
+/* NEARMISS-STUB func_400DF6A8 */
+#if 0 /* NEARMISS 62.87% cat=regalloc sub=- | float regs: callee-saved f20-f22 assigned C,B,zero; target B,zero,C; 0x354 store placement | attempts=1 */
+f32 doit_aim_angle_interp_cntrl(f32 p1, f32 p2, f32 p3, u32 *c, s32 flag);
+
+void func_400DF6A8(u8 *p, s32 a1, s32 flag, f32 a, f32 b, f32 c)
+{
+    *(f32 *)(p + 0x350) = a;
+    *(f32 *)(p + 0x354) = b;
+    doit_aim_angle_interp_cntrl(a, 0.0f, c, (u32 *)(p + 0x358), flag);
+    doit_aim_angle_interp_cntrl(b, 0.0f, c, (u32 *)(p + 0x368), flag);
+}
+#endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0169_constructor_camera_default_angle", func_400DF6A8);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0169_constructor_camera_default_angle", func_400DF728);

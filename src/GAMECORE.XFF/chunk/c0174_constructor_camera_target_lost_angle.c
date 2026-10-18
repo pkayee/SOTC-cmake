@@ -63,7 +63,15 @@ int is_exist_camera_target_lost_angle(int *arg0)
     return *arg0 != 0;
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0174_constructor_camera_target_lost_angle", func_400E33F0);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0174_constructor_camera_target_lost_angle", func_400E33F0);
+int func_400E33F0(s32 *param)
+{
+    if (param[0] == 2 && *(f32*)((u8*)param + 0x24) <= -1.0471975f)
+    {
+        return 1;
+    }
+    return 0;
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0174_constructor_camera_target_lost_angle", func_400E3428);
 
