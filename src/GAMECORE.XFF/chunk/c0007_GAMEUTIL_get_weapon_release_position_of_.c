@@ -316,41 +316,33 @@ void GAMEUTIL_set_custom_boss_interest_position(u128 *p)
     D_401306B0 = *p;
 }
 
-/* NEARMISS-STUB GAMEUTIL_constructor_move_angle */
-#if 0 /* NEARMISS 98.7% cat=sched sub=- | float-constant stores: constants and load order match, but gcc puts the 0x4 store first and swaps the fv0/fv1 register for the 0x8 and 0x18 constants; target st | attempts=1 */
 void GAMEUTIL_reset_move_angle(s32 *p);
 
 void GAMEUTIL_constructor_move_angle(u8 *p)
 {
     GAMEUTIL_reset_move_angle((s32 *)p);
-    *(f32 *)(p + 0x08) = 1.0471974611282349f;
-    *(f32 *)(p + 0x18) = 0.0174532907f;
-    *(f32 *)(p + 0x0C) = 0.8726645112037659f;
-    *(f32 *)(p + 0x10) = 0.7999999523162842f;
-    *(f32 *)(p + 0x14) = 1.74532903f;
-    *(f32 *)(p + 0x04) = 0.8726645112037659f;
+    *(f32 *)(p + 0x04) = (50.0f * 3.1415926f) / 180.0f;
+    *(f32 *)(p + 0x08) = (60.0f * 3.1415926f) / 180.0f;
+    *(f32 *)(p + 0x0C) = (50.0f * 3.1415926f) / 180.0f;
+    *(f32 *)(p + 0x10) = 0.8f;
+    *(f32 *)(p + 0x14) = (100.0f * 3.1415926f) / 180.0f;
+    *(f32 *)(p + 0x18) = (1.0f * 3.1415926f) / 180.0f;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0007_GAMEUTIL_get_weapon_release_position_of_", GAMEUTIL_constructor_move_angle);
 
 void GAMEUTIL_reset_move_angle(s32 *p)
 {
     *p = 0;
 }
 
-/* NEARMISS-STUB GAMEUTIL_set_parameter_move_angle */
-#if 0 /* NEARMISS 95.9% cat=sched sub=- | float arg f12-f17 math (x*pi)/180 stores match; gcc schedules the 0x14 field mul (f16) first, target schedules it last (mul order g,a,b,c,e); store reorders do  | attempts=1 */
-void GAMEUTIL_set_parameter_move_angle(f32 a, f32 b, f32 c, f32 d, f32 e, f32 g, u8 *p)
+void GAMEUTIL_set_parameter_move_angle(u8 *p, f32 a, f32 b, f32 c, f32 d, f32 e, f32 g)
 {
+    *(f32 *)(p + 0x4) = (a * 3.1415926f) / 180.0f;
+    *(f32 *)(p + 0x8) = (b * 3.1415926f) / 180.0f;
+    *(f32 *)(p + 0xc) = (c * 3.1415926f) / 180.0f;
     *(f32 *)(p + 0x10) = d;
-    *(f32 *)(p + 0x18) = (g * 3.1415926f) / 180.0f;
-    *(f32 *)(p + 0x04) = (a * 3.1415926f) / 180.0f;
-    *(f32 *)(p + 0x08) = (b * 3.1415926f) / 180.0f;
-    *(f32 *)(p + 0x0C) = (c * 3.1415926f) / 180.0f;
     *(f32 *)(p + 0x14) = (e * 3.1415926f) / 180.0f;
+    *(f32 *)(p + 0x18) = (g * 3.1415926f) / 180.0f;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0007_GAMEUTIL_get_weapon_release_position_of_", GAMEUTIL_set_parameter_move_angle);
 
 void GAMEUTIL_begin_move_angle(s32 *p)
 {
@@ -488,40 +480,34 @@ void GAMEUTIL_constructor_col_plane_info(u8 *p)
     *(s32 *)(p + 0x50) = 0;
 }
 
-void GAMEUTIL_init_col_plane_info_filter(f32 a, f32 b);
+void GAMEUTIL_init_col_plane_info_filter(u8 *p, f32 a, f32 b);
 
-void GAMEUTIL_constructor_col_plane_info_filter(void)
+void GAMEUTIL_constructor_col_plane_info_filter(u8 *p)
 {
-    GAMEUTIL_init_col_plane_info_filter(0.0f, 0.0f);
+    GAMEUTIL_init_col_plane_info_filter(p, 0.0f, 0.0f);
 }
 
-/* NEARMISS-STUB GAMEUTIL_init_col_plane_info_filter */
-#if 0 /* NEARMISS 99.6% cat=sched sub=- | int store order: gcc schedules sw 0x68 before sq 0x40 and sw 0x6c after it; target has sw 0x6c between the 2nd ZeroPoint lq and sq 0x40, then 0x50,0x60,0x64,0x6 | attempts=1 */
-void GAMEUTIL_set_parameter_col_plane_info_filter(f32 a, f32 b, u8 *p);
 
-void GAMEUTIL_init_col_plane_info_filter(f32 a, f32 b, u8 *p)
+void GAMEUTIL_set_parameter_col_plane_info_filter(u8 *p, f32 a, f32 b);
+
+void GAMEUTIL_init_col_plane_info_filter(u8 *p, f32 a, f32 b)
 {
-    u128 z;
-
     *(s32 *)(p + 0x00) = 0;
     *(s32 *)(p + 0x04) = 0;
     *(s32 *)(p + 0x08) = 0;
     *(u64 *)(p + 0x10) = 0;
     *(u128 *)(p + 0x20) = YUnitVector;
     *(u128 *)(p + 0x30) = ZeroPoint;
-    z = ZeroPoint;
-    *(s32 *)(p + 0x6C) = 0;
-    *(u128 *)(p + 0x40) = z;
+    *(u128 *)(p + 0x40) = ZeroPoint;
     *(s32 *)(p + 0x50) = 0;
     *(s32 *)(p + 0x60) = 0;
     *(s32 *)(p + 0x64) = 0;
     *(s32 *)(p + 0x68) = 0;
-    GAMEUTIL_set_parameter_col_plane_info_filter(a, b, p);
+    *(s32 *)(p + 0x6C) = 0;
+    GAMEUTIL_set_parameter_col_plane_info_filter(p, a, b);
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0007_GAMEUTIL_get_weapon_release_position_of_", GAMEUTIL_init_col_plane_info_filter);
 
-void GAMEUTIL_set_parameter_col_plane_info_filter(f32 a, f32 b, u8 *p)
+void GAMEUTIL_set_parameter_col_plane_info_filter(u8 *p, f32 a, f32 b)
 {
     *(f32 *)(p + 0x70) = a;
     *(f32 *)(p + 0x74) = b;
@@ -563,35 +549,37 @@ f32 GAMEUTIL_disp_col_plane_info_filter_debug(u8 *p, f32 a, f32 c, f32 b)
 #endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0007_GAMEUTIL_get_weapon_release_position_of_", GAMEUTIL_disp_col_plane_info_filter_debug);
 
-/* NEARMISS-STUB GAMEUTIL_constructor_position_filter */
-#if 0 /* NEARMISS 84.6% cat=sched sub=- | delay-slot/scheduling: target loads a0=s0 (daddu) before mtc1 zero->f12 for the tail call; gcc emits mtc1 first | attempts=1 */
-extern u128 ZeroPoint;
+typedef union {
+    u128 q;
+    f32 f[4];
+} QVec;
 
-void GAMEUTIL_reset_position_filter(u128 *p, u128 *src);
-void GAMEUTIL_set_parameter_position_filter(f32 value, u8 *p);
+typedef struct {
+    QVec first;
+    QVec second;
+    s32 count;
+    f32 ratio;
+} PositionFilter;
 
-void GAMEUTIL_constructor_position_filter(u128 *p)
+void GAMEUTIL_reset_position_filter(PositionFilter *filter, QVec *position);
+void GAMEUTIL_set_parameter_position_filter(PositionFilter *filter, f32 value);
+
+void GAMEUTIL_constructor_position_filter(PositionFilter *filter)
 {
-    GAMEUTIL_reset_position_filter(p, &ZeroPoint);
-    GAMEUTIL_set_parameter_position_filter(0.0f, (u8 *)p);
+    GAMEUTIL_reset_position_filter(filter, (QVec *)&ZeroPoint);
+    GAMEUTIL_set_parameter_position_filter(filter, 0.0f);
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0007_GAMEUTIL_get_weapon_release_position_of_", GAMEUTIL_constructor_position_filter);
 
-/* NEARMISS-STUB GAMEUTIL_reset_position_filter */
-#if 0 /* NEARMISS 54.9% cat=sched sub=- | in-TU: lq/sq/sw ordering; gcc hoists second lq above first sq | attempts=3 */
-void GAMEUTIL_reset_position_filter(u8 *p, u128 *pos)
+void GAMEUTIL_reset_position_filter(PositionFilter *filter, QVec *position)
 {
-    *(u128 *)p = *pos;
-    *(s32 *)(p + 0x20) = 1;
-    *(u128 *)(p + 0x10) = *pos;
+    filter->first.q = position->q;
+    filter->second.q = position->q;
+    filter->count = 1;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0007_GAMEUTIL_get_weapon_release_position_of_", GAMEUTIL_reset_position_filter);
 
-void GAMEUTIL_set_parameter_position_filter(f32 value, u8 *p)
+void GAMEUTIL_set_parameter_position_filter(PositionFilter *filter, f32 value)
 {
-    *(f32 *)(p + 0x24) = value;
+    filter->ratio = value;
 }
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0007_GAMEUTIL_get_weapon_release_position_of_", GAMEUTIL_doit_position_filter);

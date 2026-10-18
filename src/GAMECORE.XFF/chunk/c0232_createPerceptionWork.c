@@ -9,8 +9,6 @@ void setPerceptionParam(void *arg0, int arg1)
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0232_createPerceptionWork", perceptionExec2);
 
-/* NEARMISS-STUB forceSetPerceptionWork */
-#if 0 /* NEARMISS 76.0% cat=sched sub=- | in-TU: zero stores interleave with lq/sq copies; external 100 needs volatile on every access (REVIEW volatile) | attempts=1 */
 union PerceptionVector {
     s128 q;
     float f[4];
@@ -29,13 +27,11 @@ void forceSetPerceptionWork(void *arg0, void *work)
         ((union PerceptionVector *)work)->q = (*(union PerceptionVector **)((char *)actor + 0x134))->q;
         ((union PerceptionVector *)((char *)work + 0x10))->q = (*(union PerceptionVector **)((char *)actor + 0x134))->q;
         negative = -*(float *)((char *)context + 0x18);
-        *(int *)((char *)work + 0x20) = 0;
-        *(int *)((char *)work + 0x24) = 0;
+        *(float *)((char *)work + 0x20) = 0.0f;
+        *(float *)((char *)work + 0x24) = 0.0f;
         *(float *)((char *)work + 0x28) = negative;
     }
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0232_createPerceptionWork", forceSetPerceptionWork);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0232_createPerceptionWork", forceRenewLastPosPerceptionWork);
 
