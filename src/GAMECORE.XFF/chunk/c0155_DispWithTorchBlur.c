@@ -176,8 +176,55 @@ f32 *getSwordLineChangeSpeed(void)
     return &D_40131D34;
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0155_DispWithTorchBlur", getSwordLlineChangeThreshold);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0155_DispWithTorchBlur", getSwordLlineChangeThreshold);
+extern f32 D_40131D38;
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0155_DispWithTorchBlur", getBossHPRatioBase);
+f32 *getSwordLlineChangeThreshold(void)
+{
+    return &D_40131D38;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0155_DispWithTorchBlur", func_400D2958);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0155_DispWithTorchBlur", getBossHPRatioBase);
+extern f32 D_40131D40;
+
+f32 *getBossHPRatioBase(void)
+{
+    return &D_40131D40;
+}
+
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0155_DispWithTorchBlur", func_400D2958);
+extern void seStop(s32);
+
+extern s32 D_40131E00;
+extern s32 D_40131D58[];
+extern f32 D_40131D48;
+extern s32 D_40131DA0;
+extern s32 D_40131DA4;
+extern s32 D_40131CD0;
+
+void func_400D2958(s32 *a0)
+{
+    *a0 = 0;
+    if (--D_40131E00 <= 0)
+    {
+        if (D_40131D58[1] != 0)
+        {
+            seStop(D_40131D58[1]);
+            D_40131D58[1] = 0;
+        }
+        if (D_40131D58[2] != 0)
+        {
+            seStop(D_40131D58[2]);
+            D_40131D58[2] = 0;
+        }
+        if (D_40131D58[3] != 0)
+        {
+            seStop(D_40131D58[3]);
+            D_40131D58[3] = 0;
+        }
+        D_40131DA0 = 0;
+        D_40131DA4 = 0;
+        D_40131D48 = 1.0f;
+        D_40131CD0 = 0;
+    }
+}
