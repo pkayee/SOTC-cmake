@@ -142,9 +142,13 @@ void *func_001093B8(s32 *a0, s32 a1)
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/sifrpc", func_001093F8);
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/sifrpc", func_001094C8);
+u_long func_001094C8(int a0, u_long a1, u_long a2, void *a3, void *a4)
+{
+    s32 *s;
 
-u_long func_001094C8(int a0, u_long a1, u_long a2, void *a3, void *a4);
+    s = (s32 *)a3;
+    return isceSifSendCmd(0x80000008, s, 0x40, (void *)s[9], (void *)s[10], s[11]) ? 0 : 0x800;
+}
 
 void func_00109508(s32 *a0, s32 *a1)
 {
