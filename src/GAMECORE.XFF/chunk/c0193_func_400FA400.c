@@ -1,5 +1,13 @@
 #include "common.h"
 
+/* GAMECORE c0193 PROVEN 100. Param-sheet table walk. KEY: output/source cells typed through union {float f; s32 a;} (float stores then alias tbl[] loads => the target reloads); plain float and s32 pointers give 30-55%. 8 args (a0-a3,t0-t2 + f12). */
+typedef union { float f; s32 a; } UW410;
+
+/* GAMECORE c0193 PROVEN 100. Entry = m->ents + idx*0x67C (m+4 = ents). KEY: access the float/int entry fields through a union {float f; s32 a;} ptr so the stores alias the reloaded m->ents (target reloads lw 4(m) per statement; plain float and s32 pointer stores get CSE'd = 70-82%); operand order 'off + ents' for the two stores, 'ents + off' for the call arg. */
+extern void *get_best_mode_manager();
+extern void func_400F6438();
+typedef union { float f; s32 a; } UW;
+
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0193_func_400FA400", func_400FA400);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0193_func_400FA400", get_game_camera_mode_local_parameter);
@@ -115,7 +123,14 @@ void reset_game_camera_param_update_data_manager(UpdManager *m, int n)
     }
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0193_func_400FA400", set_update_data_game_camera_param_update_data_manager);
+void set_update_data_game_camera_param_update_data_manager(void *m, int idx, float f, s32 a, s32 b, s32 c)
+{
+    int off = idx * 0x67C;
+
+    ((UW *)(off + *(s32 *)((u8 *)m + 4)))->f = f;
+    ((UW *)(off + *(s32 *)((u8 *)m + 4) + 4))->a = a;
+    func_400F6438(*(s32 *)((u8 *)m + 4) + off + 8, get_best_mode_manager(a, b, c));
+}
 
 int is_already_set_game_camera_param_update_data_manager(void *arg0, int arg1)
 {
@@ -174,11 +189,59 @@ float get_mode_common_data_filter_base_dist_to_look_at(CameraModeCommonData **mo
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0193_func_400FA400", func_400FAFA0);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0193_func_400FA400", func_400FB090);
+/* GAMECORE c0193 PROVEN 100. Compare two camera-mode param blocks at +0x4C: nested ifs with direct 'return 1' and one trailing 'return 0' (early-return chain = 63%, result var r = 71%, the Ghidra literal r= chain = 81%). NOTE Ghidra misreads k==1: it returns 1. */
+s32 func_400FB090(u8 *a, u8 *b)
+{
+    s32 k;
+
+    if (b != 0)
+    {
+        a += 0x4C;
+        b += 0x4C;
+        k = *(s32 *)(a + 0xA0);
+        if (k == *(s32 *)(b + 0xA0) && *(s32 *)(a + 0xBC) == *(s32 *)(b + 0xBC))
+        {
+            if (k == 1)
+                return 1;
+            if (*(s32 *)(a + 0xA4) == *(s32 *)(b + 0xA4) && (u32)(*(s32 *)(a + 0xA4) - 100) < 3)
+            {
+                if (k == 0 || k == 4 || k == 5 || k == 6)
+                    return 1;
+            }
+        }
+    }
+    return 0;
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0193_func_400FA400", func_400FB130);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0193_func_400FA400", func_400FB300);
+/* GAMECORE c0193 PROVEN 100. Picks the list entry (stride 0x67C) with the largest float at +0; outputs its +4 / +8 words. list[0]=count, list[1]=base ptr. */
+void func_400FB300(s32 *o0, s32 *o1, s32 *list)
+{
+    s32 n = list[0];
+    s32 a = 0;
+    s32 b = 0;
+    float best = -1.0f;
+
+    if (n > 0)
+    {
+        float *p = (float *)list[1];
+
+        do
+        {
+            n--;
+            if (best < *p)
+            {
+                a = ((s32 *)p)[1];
+                best = *p;
+                b = ((s32 *)p)[2];
+            }
+            p = (float *)((u8 *)p + 0x67C);
+        } while (n != 0);
+    }
+    *o0 = a;
+    *o1 = b;
+}
 
 extern s32 DldSysUndefSymbol;
 extern void fsEffectSetParamSheetSeg(void *);
@@ -204,4 +267,20 @@ void func_400FB3D0(s32 *p)
     }
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0193_func_400FA400", func_400FB410);
+void func_400FB410(float scale, UW410 *o0, s32 *o1, UW410 *o2, s32 *o3, s32 k, s32 dflt, s32 *tbl)
+{
+    if (k == 0)
+    {
+        o0->f = ((UW410 *)tbl[0])->f * scale;
+        *o1 = tbl[0] + 8;
+        o2->f = ((UW410 *)tbl[1])->f * scale;
+        *o3 = tbl[1] + 8;
+    }
+    else
+    {
+        o0->f = 1.0f;
+        *o1 = dflt;
+        o2->f = ((UW410 *)tbl[k + 1])->f * scale;
+        *o3 = tbl[k + 1] + 8;
+    }
+}
