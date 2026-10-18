@@ -1,5 +1,12 @@
 #include "common.h"
 
+/* MANAGER c0083: this+0xD14 = linked flag, this+0xD60 = TwoWayLink node, this+0xD20 = geometry slot. No local for the node: write self+0xD60 twice (a named `link` local swaps s1/s2, 88.4). */
+extern void *GetGeometryPointerObject(void *);
+extern void *GetLayoutClass(void *);
+extern void DeleteTwoWayLink(void *);
+extern int AddTwoWayLinkNext(void *, void *);
+extern void CopyGeometryPointer(void *, void *);
+
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0083_GetRootRotStatus", GetRootRotStatus);
 
 extern void *GetCharacterClass(void *);
@@ -119,23 +126,14 @@ s32 func_40074EA8(void)
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0083_GetRootRotStatus", charrootdyn_memoryposition);
 
-/* NEARMISS-STUB charrootdyn_setChainFindStatus */
-#if 0 /* NEARMISS 31.85% cat=branch-layout sub=- | target ends in b into func_40075120 (80B, tail outside fn); C cannot emit that branch | attempts=1 */
-extern void DeleteTwoWayLink(void *);
-extern u8 *GetGeometryPointerObject();
-extern u8 *GetLayoutClass();
-
-void charrootdyn_setChainFindStatus(u8 *this, u8 *arg1)
+void charrootdyn_setChainFindStatus(char *self, void *geometry)
 {
-    u8 *geo;
-    u8 *layout;
-
-    geo = GetGeometryPointerObject(arg1);
-    layout = GetLayoutClass(geo);
-    if (*(s32 *)(this + 0xD14) != 0) {
-        DeleteTwoWayLink(this + 0xD60);
-        *(s32 *)(this + 0xD14) = 0;
+    char *layout = GetLayoutClass(GetGeometryPointerObject(geometry));
+    if (*(int *)(self + 0xD14) != 0) {
+        *(int *)(self + 0xD14) = 0;
+        DeleteTwoWayLink(self + 0xD60);
     }
+    AddTwoWayLinkNext(layout + 0x118, self + 0xD60);
+    *(int *)(self + 0xD14) = 1;
+    CopyGeometryPointer(self + 0xD20, geometry);
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0083_GetRootRotStatus", charrootdyn_setChainFindStatus);
