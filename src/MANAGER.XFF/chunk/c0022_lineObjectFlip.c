@@ -2,9 +2,25 @@
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0022_lineObjectFlip", lineObjectFlip);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0022_lineObjectFlip", debugLineObjectSetup);
+extern s32 D_4012A098;
+extern s32 transMicroCode();
+extern void iosDlChainTailCurrent();
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0022_lineObjectFlip", debugLineObjectSetAttribute);
+s32 debugLineObjectSetup(void)
+{
+    D_4012A098 = -1;
+    return transMicroCode(11);
+}
+
+void debugLineObjectSetAttribute(int arg0)
+{
+    if ((D_4012A098 == -1) || (arg0 != D_4012A098)) {
+        if (arg0 != -1) {
+            iosDlChainTailCurrent();
+        }
+        D_4012A098 = arg0;
+    }
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0022_lineObjectFlip", debugLineObjectCreateAttributre);
 
@@ -12,7 +28,16 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0022_lineObjectFlip", debugLine
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0022_lineObjectFlip", debugLineObjectSetBillboardMatrix);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0022_lineObjectFlip", debugLineObjectDisp);
+extern int *D_401ABD50[];
+extern s32 iosDlGetWorkBufId(void);
+
+void debugLineObjectDisp(int i)
+{
+    int *t = D_401ABD50[i];
+
+    t += iosDlGetWorkBufId();
+    iosDlChainTailCurrent(t[2]);
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0022_lineObjectFlip", lineObjectDispImmediatef);
 

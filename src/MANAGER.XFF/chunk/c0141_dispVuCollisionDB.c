@@ -6,11 +6,56 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0141_dispVuCollisionDB", DebugD
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0141_dispVuCollisionDB", _CalcCollisionMultiDepSurfBoundary);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0141_dispVuCollisionDB", FlushCollisionWorkByWorkStruct);
+extern void FlushModifiedManager(void *);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0141_dispVuCollisionDB", ReleaseCollisionWork);
+int FlushCollisionWorkByWorkStruct(void *arg0, int arg1, int arg2, int arg3)
+{
+    int var_s1;
+    void *var_s0;
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0141_dispVuCollisionDB", FlushCollisionWorkImmediate);
+    var_s0 = (*(void **)((char *)(arg0) + 0x24));
+    if (arg1 > 0)
+    {
+        var_s1 = arg1;
+        do
+        {
+            var_s1 -= 1;
+            FlushModifiedManager(var_s0);
+            FlushModifiedManager(var_s0 + 0x30);
+            FlushModifiedManager(var_s0 + 0x48);
+            FlushModifiedManager(var_s0 + 0x18);
+            var_s0 += 0x60;
+        } while (var_s1 != 0);
+    }
+    if (arg3 != 0)
+    {
+        FlushModifiedManager(arg0 + 0x28);
+        FlushModifiedManager(arg0 + 0x40);
+    }
+    if (arg2 != 0)
+    {
+        FlushModifiedManager(arg0 + 0x58);
+        FlushModifiedManager(arg0 + 0x70);
+    }
+    (*(int *)((char *)(arg0) + 0x1C)) = 0;
+    return 1;
+}
+
+void ReleaseCollisionWork(void **work)
+{
+    iosFree(work[0]);
+    work[0] = 0;
+}
+
+extern void func_400BC798();
+extern void DeleteAllTwoWayLink(void *, void *);
+extern void iosMallocSetExecGarbageCallback(void *, int, int);
+
+void FlushCollisionWorkImmediate(char *w)
+{
+    DeleteAllTwoWayLink(w + 0x10, func_400BC798);
+    iosMallocSetExecGarbageCallback(w, -1, 0);
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0141_dispVuCollisionDB", Check_InVariableXZSurfJudgeFunc_LowerSurface);
 

@@ -6,7 +6,12 @@ extern u8 D_4012B50C[];
 extern s32 D_4012B560;
 extern s32 D_4012B564;
 extern s32 D_4012B570[];
+extern u8 D_40134130[];
+extern u8 D_40134140[];
 
+void iosFree(void *p);
+
+void *malloc_from_root_partition(s32 size, const char *name);
 void *get_particle_emitter_from_emitter_id(s32 id);
 void *get_main_particle_effect_lod_from_sheet(void *sheet);
 void init_particle_effect_lod(void *lod);
@@ -15,6 +20,7 @@ void *iosgluGetCameraContext(void);
 float GetScreenRadiusParticle(void *cam, float radius, float scale);
 void texTransRequest(void *tex, s32 a1, s32 a2);
 void func_400D37D0(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4);
+s32 func_400CCC28(void);
 
 s32 end_particle_emitter(s32 unused, s32 emitter_id, s32 flag)
 {
@@ -137,17 +143,48 @@ s32 is_proper_particle_texture_id(u32 id)
     return 0;
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0165_end_particle_emitter", create_particle_effect_lod);
+void *create_particle_effect_lod(void)
+{
+    u8 *p = malloc_from_root_partition(0x140, D_40134140);
+
+    *(s32 *)(p + 0xD0) = 0;
+    *(s32 *)(p + 0xD4) = 0;
+    *(s32 *)(p + 0xD8) = 0;
+    *(s32 *)(p + 0xDC) = 0;
+    iosUnitMatrix(p + 0xE0);
+    return p;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0165_end_particle_emitter", set_except_npe_file_data_to_particle_effect_lod);
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0165_end_particle_emitter", init_particle_effect_lod);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0165_end_particle_emitter", is_emitter_need_disp);
+s32 is_emitter_need_disp(void *e)
+{
+    if (e != NULL && *(s32 *)((u8 *)e + 0x124) > 0 && func_400CCC28() == 0 && *(float *)((u8 *)e + 0x140) > 0.0f)
+    {
+        return 1;
+    }
+    return 0;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0165_end_particle_emitter", check_free_particle_effect_lod);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0165_end_particle_emitter", recreate_particle_effects);
+s32 recreate_particle_effects(void *arg0, s32 arg1)
+{
+    void *temp_v0;
+    void *temp_v0_2;
+
+    temp_v0_2 = *(void **)((u8 *)arg0 + 0xD4);
+    if (temp_v0_2 != NULL)
+    {
+        iosFree(temp_v0_2);
+    }
+    *(s32 *)((u8 *)arg0 + 0xD0) = arg1;
+    temp_v0 = malloc_from_root_partition(arg1 * 0x1BC, D_40134130);
+    *(void **)((u8 *)arg0 + 0xD4) = temp_v0;
+    return temp_v0 != NULL;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0165_end_particle_emitter", particleGWorkPut);
 
