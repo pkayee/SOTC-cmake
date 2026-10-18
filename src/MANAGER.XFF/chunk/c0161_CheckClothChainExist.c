@@ -1,12 +1,26 @@
 #include "common.h"
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0161_CheckClothChainExist", CheckClothChainExist);
+signed char CheckClothChainExist(void *arg0)
+{
+    return (*(signed char *)((char *)(arg0) + 6));
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0161_CheckClothChainExist", ResetClothDynamics);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0161_CheckClothChainExist", SetClothSingleFixedChainLeafFixGeometryPointer);
+extern void CopyGeometryPointer(char *, int, int, int);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0161_CheckClothChainExist", SetClothSingleFixedChainLeafFixNodeOffset);
+void SetClothSingleFixedChainLeafFixGeometryPointer(char *p, int a, int b, int c)
+{
+    char *g = p + 0x30;
+    g[0x40] = 1;
+    CopyGeometryPointer(g, a, b, c);
+    g[0x41] = 0;
+}
+
+void SetClothSingleFixedChainLeafFixNodeOffset(void *arg0, signed char arg1)
+{
+    (*(signed char *)((char *)(arg0) + 0x71)) = arg1;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0161_CheckClothChainExist", getClothDynamics);
 
