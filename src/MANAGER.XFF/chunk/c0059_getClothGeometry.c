@@ -203,21 +203,17 @@ s32 GetCharacterClassInitParamNbNodes(u8 *obj)
 #endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0059_getClothGeometry", GetCharacterClassInitParamNbNodes);
 
-/* NEARMISS-STUB GetCharacterClassInitParamNbOptionNodes */
-#if 0 /* NEARMISS 98.57% cat=regalloc sub=- | intermediate pointer in v1 vs v0 | attempts=1 */
-
 s32 GetCharacterClassInitParamNbOptionNodes(u8 *obj)
 {
+    s32 n = -1;
     u8 *p = *(u8 **)(obj + 0x84);
 
-    if (p == NULL)
+    if (p != NULL)
     {
-        return -1;
+        n = *(s32 *)(*(u8 **)(p + 0x20) + 0x20);
     }
-    return *(s32 *)(*(u8 **)(p + 0x20) + 0x20);
+    return n;
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0059_getClothGeometry", GetCharacterClassInitParamNbOptionNodes);
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0059_getClothGeometry", GetCharacterClassBaseQ);
 
@@ -278,28 +274,45 @@ s32 GetCharacterClassIKNodeBooleanInfo(u8 *obj, u8 *cc, s32 a2)
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0059_getClothGeometry", GetCharacterClassIKNodeBooleanInfo);
 
 /* NEARMISS-STUB GetCharacterClassOptionNodeLocalQuaternionPos */
-#if 0 /* NEARMISS 68.07% cat=sched sub=- | two u128 lq/sq copies: 0x2E8 pointer load and idx*16 scheduling | attempts=1 */
-
-u32 GetCharacterClassOptionNodeLocalQuaternionPos(u128 *a0, u128 *a1, u8 *cc, s32 idx)
+#if 0 /* NEARMISS 85.53% cat=sched sub=- | in-TU: edits applied; target loads options ptr 0x354 first and quaternion ptr 0x2E8 after position store | attempts=2 */
+typedef union
 {
-    u8 *mot;
-    u8 *base;
-    u128 *p1;
-    u128 *p2;
-    u128 q1;
-    u128 q2;
-    u32 ret;
+    u128 q;
+    f32 f[4];
+    s32 i[4];
+} Vec4;
 
-    p1 = (u128 *)(*(u8 **)(cc + 0x2EC) + idx * 0x10);
-    mot = *(u8 **)(cc + 0x354);
-    p2 = (u128 *)(*(u8 **)(cc + 0x2E8) + idx * 0x10);
-    q1 = *p1;
-    base = *(u8 **)(mot + 0x24) + idx * 0x40;
-    *a1 = q1;
-    q2 = *p2;
-    ret = *(u32 *)(base + 0x30);
-    *a0 = q2;
-    return ret;
+typedef struct
+{
+    char pad[0x30];
+    s32 value30;
+    char pad34[0xC];
+} OptionNode;
+
+typedef struct
+{
+    char pad[0x24];
+    OptionNode *nodes;
+} OptionContext;
+
+typedef struct
+{
+    char pad[0x2E8];
+    Vec4 *quaternions;
+    Vec4 *positions;
+    char pad2F0[0x64];
+    OptionContext *options;
+} CharacterClass;
+
+s32 GetCharacterClassOptionNodeLocalQuaternionPos(Vec4 *quaternion, Vec4 *position, CharacterClass *character, s32 index)
+{
+    u128 positionValue = character->positions[index].q;
+    OptionNode *node = &character->options->nodes[index];
+    s32 value = node->value30;
+
+    position->q = positionValue;
+    quaternion->q = character->quaternions[index].q;
+    return value;
 }
 #endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0059_getClothGeometry", GetCharacterClassOptionNodeLocalQuaternionPos);

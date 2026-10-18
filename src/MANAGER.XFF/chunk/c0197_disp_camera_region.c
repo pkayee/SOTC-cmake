@@ -6,7 +6,19 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0197_disp_camera_region", const
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0197_disp_camera_region", create_and_init_camera_region);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0197_disp_camera_region", check_free_camera_region);
+extern void iosFree(void *);
+
+void check_free_camera_region(void **arg0)
+{
+    void *temp_v0;
+
+    temp_v0 = *arg0;
+    if (temp_v0 != 0)
+    {
+        iosFree(temp_v0);
+        *arg0 = 0;
+    }
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0197_disp_camera_region", doit_camera_region);
 
@@ -32,8 +44,34 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0197_disp_camera_region", init_
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0197_disp_camera_region", is_this_camera_region_alive);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0197_disp_camera_region", init_camera_region_manager);
+extern char D_401C1E60[];
+extern void *memset(void *, int, unsigned int);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0197_disp_camera_region", doit_camera_region_manager);
+void init_camera_region_manager(void)
+{
+    memset(D_401C1E60, 0, 0xC8);
+}
+
+extern void doit_camera_region(void *, void *, float);
+
+void doit_camera_region_manager(void *actor, float interval)
+{
+    void **entry;
+    void *region;
+    int remaining;
+
+    remaining = 0x31;
+    entry = (void **)D_401C1E60;
+    do
+    {
+        region = *entry;
+        entry++;
+        if (region != 0)
+        {
+            doit_camera_region(region, actor, interval);
+        }
+        remaining--;
+    } while (remaining >= 0);
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0197_disp_camera_region", get_camera_region_resource_id_by_name);
