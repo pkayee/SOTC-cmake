@@ -78,22 +78,24 @@ u8 *GetDamageDefByName(u32 *lp, const char *name) {
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0201__SetMultiCastLetterReceiverInfo", GetAttributeRelationEffectDefByName);
 
-/* NEARMISS-STUB GetAnimationEffectDefByName */
-#if 0 /* NEARMISS 93.33% cat=regalloc sub=- | extra a1->s1 copy and nop; loop guard order differs | attempts=1 */
-u8 *GetAnimationEffectDefByName(u32 *lp, const char *name) {
+u8 *GetAnimationEffectDefByName(u32 *lp, const char *name)
+{
     u8 *p;
     s32 cnt = (s32)dldRef(lp, 0xC);
 
-    p = dldRef(lp, 0x10);
-    for (; cnt != 0; cnt--, p += 0x8) {
-        if (strcmp(*(const char **)(p + 0x4), name) == 0) {
-            return p;
+    if (cnt != 0)
+    {
+        p = dldRef(lp, 0x10);
+        for (; cnt != 0; cnt--, p += 8)
+        {
+            if (strcmp(*(const char **)(p + 4), name) == 0)
+            {
+                return p;
+            }
         }
     }
     return NULL;
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0201__SetMultiCastLetterReceiverInfo", GetAnimationEffectDefByName);
 
 //INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0201__SetMultiCastLetterReceiverInfo", GetCollisionDetectEffectWaterOnlyDefByName);
 u8 *GetCollisionDetectEffectWaterOnlyDefByName(u32 *lp, const char *name) {

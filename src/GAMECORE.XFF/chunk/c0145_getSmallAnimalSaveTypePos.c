@@ -139,18 +139,156 @@ void func_400C4A98(void *arg0)
     } while (i >= 0);
 }
 
+/* NEARMISS-STUB func_400C4AE0 */
+#if 0 /* NEARMISS 86.5% cat=branch-layout sub=- | store order: target sh 0x50 in jr delay slot; ours hoists it after first store (scheduler); one -1 reg matches | attempts=1 */
+void func_400C4AE0(void *arg0)
+{
+    int m = -1;
+    int *p = (int *)arg0;
+    short *h = (short *)arg0;
+    p[0] = 0;
+    h[0x52 / 2] = m;
+    p[1] = 0;
+    p[2] = 0;
+    p[3] = m;
+    p[4] = 0;
+    p[0x15] = 0;
+    h[0x50 / 2] = m;
+}
+#endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0145_getSmallAnimalSaveTypePos", func_400C4AE0);
-
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0145_getSmallAnimalSaveTypePos", func_400C4B08);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0145_getSmallAnimalSaveTypePos", func_400C4BC0);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0145_getSmallAnimalSaveTypePos", func_400C4BC0);
+extern char SH_SmallAnimalTypeDEFAULT[];
 
+int func_400C4BC0(void *arg0)
+{
+    int base = *(int *)(SH_SmallAnimalTypeDEFAULT + 0x10);
+    if (*(int *)((char *)arg0 + 0x10) != 0) {
+        return base + (*(short *)((char *)arg0 + 0x34) * 13) * 4 + 8;
+    }
+    return base + (*(short *)((char *)arg0 + 0x34) * 13) * 4 + 4;
+}
+
+/* NEARMISS-STUB func_400C4C20 */
+#if 0 /* NEARMISS 92.19% cat=regalloc sub=- | same CFG; ours uses v1 ptr and a0 ret, target a0 ptr and v0 ret; no extra moves | attempts=1 */
+int func_400C4C20(void *arg0, int arg1)
+{
+    int ret = 0;
+    char *p = *(char **)((char *)arg0 + 0x14);
+    if (p != 0) {
+        do {
+            ret = 1;
+            if (arg1 == *(int *)(p + 0xc)) {
+                break;
+            }
+            p = *(char **)(p + 0x58);
+            if (p == 0) {
+                ret = 0;
+                break;
+            }
+        } while (1);
+    }
+    return ret;
+}
+#endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0145_getSmallAnimalSaveTypePos", func_400C4C20);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0145_getSmallAnimalSaveTypePos", func_400C4C60);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0145_getSmallAnimalSaveTypePos", func_400C4C60);
+int func_400C4C60(void *arg0)
+{
+    int count = 0;
+    int n = *(int *)((char *)arg0 + 0x10);
+    int i;
+    char *p = *(char **)((char *)arg0 + 0x14);
+    if (n > 0) {
+        i = n;
+        do {
+            int v = *(int *)(p + 0x54);
+            int c1 = count + 1;
+            i--;
+            p = *(char **)(p + 0x58);
+            if (v != 0) {
+                count = c1;
+            }
+        } while (i != 0);
+    }
+    return count;
+}
 
+/* NEARMISS-STUB func_400C4CA0 */
+#if 0 /* NEARMISS 64.96% cat=regalloc sub=- | induction vars swapped: target countdown n in a3, offset a2; ours a4; count reload CSE'd; reg order off | attempts=1 */
+typedef struct {
+    int id;
+    int cnt;
+    char *head;
+    char pad[0x14];
+} SmallEnt;
+
+typedef struct {
+    int n;
+    char pad[0xc];
+    SmallEnt ent[1];
+} SmallTable;
+
+int func_400C4CA0(SmallTable *arg0)
+{
+    int count = 0;
+    int n = arg0->n;
+    int i;
+    int k;
+    int j;
+    char *node;
+    SmallEnt *e;
+    if (n > 0) {
+        i = n;
+        k = 0;
+        e = arg0->ent;
+        do {
+            if (arg0->ent[k].cnt > 0) {
+                node = arg0->ent[k].head;
+                j = e->cnt;
+                do {
+                    int c1 = count + 1;
+                    int v = *(int *)(node + 0x54);
+                    j--;
+                    node = *(char **)(node + 0x58);
+                    if (v != 0) {
+                        count = c1;
+                    }
+                } while (j != 0);
+            }
+            i--;
+            k++;
+            e++;
+        } while (i != 0);
+    }
+    return count;
+}
+#endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0145_getSmallAnimalSaveTypePos", func_400C4CA0);
 
+/* NEARMISS-STUB func_400C4D10 */
+#if 0 /* NEARMISS 68.0% cat=regalloc sub=- | loop shape differs: target walks ptr with id load in bnel delay slot, ours reorders ret/ptr regs; first insn mismatch | attempts=1 */
+char *func_400C4D10(char *arg0, int arg1)
+{
+    char *ret = 0;
+    if (arg1 != -1) {
+        char *p = *(char **)(arg0 + 0x23C);
+        if (p != 0) {
+            do {
+                if (arg1 == *(int *)(p + 0xC)) {
+                    ret = p;
+                    break;
+                }
+                p = *(char **)(p + 0x58);
+            } while (p != 0);
+        }
+    }
+    return ret;
+}
+#endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0145_getSmallAnimalSaveTypePos", func_400C4D10);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0145_getSmallAnimalSaveTypePos", func_400C4D60);
