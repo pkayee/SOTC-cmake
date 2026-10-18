@@ -70,9 +70,39 @@ void *modelGetDlLayerIndex(char *model, int index)
     return modelGetDlLayer(model, *(char **)(model + 0x50) + index * 0x120);
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0026_modelNameByObj", modelSetEnviroment);
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0026_modelNameByObj", modelSetEnviroment);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0026_modelNameByObj", modelInit);
+extern s32 D_4012A4FC;
+extern s32 D_4012A4F8;
+extern void func_40031988(void);
+extern void *getSpecularity(void);
+extern void func_40031AE8(float);
+
+void modelSetEnviroment(void)
+{
+    s32 i;
+
+    if (D_4012A4F8 != 0)
+    {
+        for (i = 0; i < D_4012A4FC; i++)
+        {
+            *(s32 *)(D_4012A4F8 + i * 4) = 0;
+        }
+    }
+    func_40031988();
+    func_40031AE8(*(float *)getSpecularity());
+}
+
+extern s32 rootPtn;
+extern s32 D_4012A4FC;
+extern s32 D_4012A4F8;
+void *iosMallocAlign(void *, s32, s32);
+
+void modelInit(s32 arg0)
+{
+    D_4012A4FC = arg0;
+    D_4012A4F8 = (s32)iosMallocAlign(&rootPtn, arg0 << 2, 0x10);
+}
 
 int ModelDispGetWorkSize(void)
 {

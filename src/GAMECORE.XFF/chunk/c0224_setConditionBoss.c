@@ -27,8 +27,16 @@ void SCRFuncSetAttainRange(void *a, int b, int c, int d, int e, int f, int g, un
     setSCRAttainRange(getSCRDataCtrlWork(a), h);
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0224_setConditionBoss", func_4011EB70);
+extern void *GetCollisionDBAttributeAdr();
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0224_setConditionBoss", func_4011EBB0);
+int func_4011EB70(int a, long *b)
+{
+    return b[1] == (*(long *)GetCollisionDBAttributeAdr() & b[0]);
+}
+
+int func_4011EBB0(int a, u64 *b)
+{
+    return !((*(u64 *)GetCollisionDBAttributeAdr() & b[0]) < b[1]);
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0224_setConditionBoss", initScriptDataSystem);

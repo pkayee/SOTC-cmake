@@ -12,6 +12,8 @@ extern float D_40206DA0;
 extern int D_40206DA4;
 extern int func_400A21E0(s128 *, void *, char *);
 extern float func_400A1830(void *, s128 *, char *, char *, char *, int);
+extern s32 GetLayoutClass(s32);
+extern void GetGeometryPointerPosition(void *, int);
 
 void nico_player_colfit_GetLower(int arg0)
 {
@@ -39,7 +41,19 @@ void nico_player_colfit_Shoulder(void *o)
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0118_nico_player_colfit_GetLower", nico_player_pendulum_HandEffector);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0118_nico_player_colfit_GetLower", nico_player_pendulum_Shoulder);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0118_nico_player_colfit_GetLower", nico_player_pendulum_Shoulder);
+void nico_player_pendulum_Shoulder(void *o)
+{
+    s128 pos;
+    s128 v;
+    int cls = *(int *) o;
+    if (D_40206DA4 != 0)
+    {
+        GetGeometryPointerPosition(&pos, GetLayoutClass(cls) + 0xC0);
+        v = pos;
+        D_40206DA0 = func_400A1830(o, &v, D_40206D50, (char *) &D_40206D90, (char *) &D_40206D80, 0);
+    }
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0118_nico_player_colfit_GetLower", nico_player_pendulum_FootEffector);
 
@@ -51,6 +65,32 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0118_nico_player_colfit_GetLow
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0118_nico_player_colfit_GetLower", player_updateSlipEffect);
 
+/* NEARMISS-STUB player_initSlipEffect */
+#if 0 /* NEARMISS 89.818184% cat=sched sub=- | gcc schedules sw 0x30 and sw 0x0(a1)/sd out of source order; target keeps REA order | attempts=1 */
+extern s32 D_40206DA8[];
+
+void player_initSlipEffect(void *actor, u64 *effect)
+{
+    s32 *slip = D_40206DA8;
+    effect[1] = 0;
+    *(s32 *)effect = 0;
+    slip[7] = 1;
+    slip[13] = 2;
+    slip[14] = 0;
+    slip[0] = 0;
+    slip[1] = 0;
+    slip[2] = 0;
+    slip[3] = 0;
+    slip[8] = 0;
+    slip[4] = 0;
+    slip[5] = 0;
+    slip[6] = 0;
+    slip[9] = 0;
+    slip[10] = 0;
+    slip[11] = 0;
+    slip[12] = 0;
+}
+#endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0118_nico_player_colfit_GetLower", player_initSlipEffect);
 
 void player_resetSlipEffect(void *actor, void **effect)

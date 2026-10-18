@@ -2,9 +2,36 @@
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0170_get_particle_parameter_blend_disp", get_particle_parameter_blend_disp);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0170_get_particle_parameter_blend_disp", func_400D7598);
+//INCLUDE_ASM(...);
+void *func_400D7598(s32 p0, u8 *p1, s32 p2, s32 p3)
+{
+    s32 n = *(s32 *)(p1 + 0xD0);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0170_get_particle_parameter_blend_disp", func_400D75F8);
+    if (n - 1 < p3)
+    {
+        return (void *)(*(s32 *)(p1 + 0xD4) + n * 0x1BC - 0x1BC);
+    }
+    return (void *)(*(s32 *)(p1 + 0xD4) + p3 * 0x1BC);
+}
+
+//INCLUDE_ASM(...);
+void func_400D75F8(float p0, float *p1, float *p2)
+{
+    if (p0 < 0.0f)
+    {
+        *p1 = p0 + 1.0f;
+        *p2 = 0.0f;
+        return;
+    }
+    if (p0 < 1.0f)
+    {
+        *p1 = 1.0f - p0;
+        *p2 = p0;
+        return;
+    }
+    *p1 = 0.0f;
+    *p2 = p0;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0170_get_particle_parameter_blend_disp", func_400D7650);
 

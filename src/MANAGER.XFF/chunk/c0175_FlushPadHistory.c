@@ -79,9 +79,38 @@ void usbdevFrameInit(void)
     kbGetStatus(D_401B17A4 + 0x5C, D_401B17A4 + 0x58);
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0175_FlushPadHistory", func_400DD140);
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0175_FlushPadHistory", func_400DD140);
+typedef void (*FlushCb)(void *);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0175_FlushPadHistory", func_400DD198);
+int func_400DD140(void *status)
+{
+    s32 *node;
+
+    node = *(s32 **)D_401B17A0;
+    if (node != NULL) {
+        do {
+            ((FlushCb)node[0])(status);
+            node = (s32 *)node[1];
+        } while (node != NULL);
+    }
+    return 1;
+}
+
+extern s32 *D_401B17F8;
+
+int func_400DD198(void *status)
+{
+    s32 *node;
+
+    node = D_401B17F8;
+    if (node != NULL) {
+        do {
+            ((FlushCb)node[0])(status);
+            node = (s32 *)node[1];
+        } while (node != NULL);
+    }
+    return 1;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0175_FlushPadHistory", func_400DD1F0);
 
