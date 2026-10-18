@@ -8,7 +8,7 @@ typedef struct TimerCounter
 {
     struct TimerCounter *next;
     u32 unk04;
-    u32 id;
+    volatile u32 id;
     u32 flags;
     u64 startTime;
     u64 accum;
@@ -100,7 +100,7 @@ int InitTimer(int arg)
     }
     tt->intcId = id;
     stat = DIntr();
-    mode = *(u32 *)0x10001010;
+    mode = *(volatile u32 *)0x10001010;
     mode = (mode & 0xFFFFFFFC) | arg;
     mode |= 0x300;
     if (!(mode & 0x80))
@@ -120,43 +120,37 @@ int InitTimer(int arg)
 #endif
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/timer", InitTimer);
 
-/* NEARMISS-STUB EndTimer */
-#if 0 /* NEARMISS 95.2% cat=branch-layout sub=- | 95.2: only bgezl delay-slot fill of numUsed load (target bgezl, we emit bgez+nop); plain/local-ptr/const/nested/array forms all 95.2 or worse; needs qualified r | attempts=2 */
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/timer", EndTimer);
 int EndTimer(void)
 {
-    TimerTable *tt;
     int stat;
 
-    tt = (TimerTable *)D_00133A18;
-    if (tt->intcId < 0)
+    if (((volatile TimerTable *)D_00133A18)->intcId < 0)
     {
         return 0x80008001;
     }
-    if (tt->numUsed != 0)
+    if (((volatile TimerTable *)D_00133A18)->numUsed != 0)
     {
         return 0x80000010;
     }
     stat = DIntr();
-    if (RemoveIntcHandler(0xB, tt->intcId) == 0)
+    if (RemoveIntcHandler(0xB, ((volatile TimerTable *)D_00133A18)->intcId) == 0)
     {
         DisableIntc(0xB);
         SetT2_MODE(0xC00);
         SetT2_COUNT(0);
     }
     *(u64 *)D_00133A18 = 0;
-    tt->intcId = -1;
+    ((TimerTable *)D_00133A18)->intcId = -1;
     if (stat != 0)
     {
         EIntr();
     }
     return 0;
 }
-#endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/timer", EndTimer);
 
 
-/* NEARMISS-STUB GetTimerPreScaleFactor */
-#if 0 /* NEARMISS 74.8% cat=volatile-alias sub=- | needs the banned qualifier: target does lui 0x1000 in bgez delay slot, ori 0x1010 then lw 0(v1); plain and local-pointer forms fold to lw 0x1010(v0) | attempts=1 */
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/timer", GetTimerPreScaleFactor);
 extern s32 D_00133A20;
 
 u32 GetTimerPreScaleFactor(void)
@@ -165,20 +159,17 @@ u32 GetTimerPreScaleFactor(void)
     {
         return 0x80008001;
     }
-    return *(u32 *)0x10001010 & 3;
+    return *(volatile u32 *)0x10001010 & 3;
 }
-#endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/timer", GetTimerPreScaleFactor);
 
-/* NEARMISS-STUB StartTimerSystemTime */
-#if 0 /* NEARMISS 90.67% cat=volatile-alias sub=- | needs the banned qualifier: target does lui 0x1000 / ori 0x1010 / lw 0(v0) after DIntr with load scheduled after move s0; plain, local-pointer and (u32) cast fo | attempts=1 */
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/timer", StartTimerSystemTime);
 int StartTimerSystemTime(void)
 {
     int stat;
     u32 mode;
 
     stat = DIntr();
-    mode = *(u32 *)0x10001010;
+    mode = *(volatile u32 *)0x10001010;
     if (mode & 0x80)
     {
         if (stat != 0)
@@ -195,18 +186,15 @@ int StartTimerSystemTime(void)
     }
     return 0;
 }
-#endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/timer", StartTimerSystemTime);
 
-/* NEARMISS-STUB StopTimerSystemTime */
-#if 0 /* NEARMISS 89.16% cat=volatile-alias sub=- | needs the banned qualifier: target lui 0x1000 then ori 0x1010 then lw 0(reg); plain, local-pointer and local-addr forms fold to lw 0x1010(v1) | attempts=1 */
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/timer", StopTimerSystemTime);
 int StopTimerSystemTime(void)
 {
     int stat;
     u32 mode;
 
     stat = DIntr();
-    mode = *(u32 *)0x10001010;
+    mode = *(volatile u32 *)0x10001010;
     if (!(mode & 0x80))
     {
         if (stat != 0)
@@ -222,8 +210,6 @@ int StopTimerSystemTime(void)
     }
     return 1;
 }
-#endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/timer", StopTimerSystemTime);
 
 /* NEARMISS-STUB func_00110880 */
 #if 0 /* NEARMISS 93.55% cat=branch-layout sub=- | loop shape: target tests exit with beqzl and back-edge b; ours bnezl; cursor/now copy scheduling differs (now in a3 early in target); single-cursor loop gets 93 | attempts=1 */
@@ -242,7 +228,7 @@ void func_00110880(u64 now)
     {
         return;
     }
-    mode = *(u32 *)0x10001010;
+    mode = *(volatile u32 *)0x10001010;
     if (p == NULL)
     {
         SetT2_COMP(0);
@@ -267,7 +253,7 @@ void func_00110880(u64 now)
     shift = mode & 3;
     if ((s64)(cmp - now) < 0x7333)
     {
-        SetT2_COMP(*(u32 *)0x10001000 + (u32)((u64)0x7333 >> (shift * 4)));
+        SetT2_COMP(*(volatile u32 *)0x10001000 + (u32)((u64)0x7333 >> (shift * 4)));
         SetT2_MODE(mode & 0xFFFFF7FF);
         return;
     }
@@ -291,13 +277,13 @@ u64 iGetTimerSystemTime(void)
     s32 t1;
     u64 t2;
 
-    v0 = *(u32 *)0x10001000;
-    t0 = *(u32 *)0x10001010;
+    v0 = *(volatile u32 *)0x10001000;
+    t0 = *(volatile u32 *)0x10001010;
     t2 = *(u64 *)0x00133A18;
     t1 = 2;
     if (t0 & 0x800)
     {
-        v0 = *(u32 *)0x10001000;
+        v0 = *(volatile u32 *)0x10001000;
         t2++;
     }
     t0 &= 3;
@@ -315,7 +301,7 @@ u64 iGetTimerSystemTime(void)
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/timer", iGetTimerSystemTime);
 
 /* NEARMISS-STUB GetTimerSystemTime */
-#if 0 /* NEARMISS 59.5% cat=regalloc sub=- | lwu zero-extend load: target loads count with lwu straight into s0 (and reloads in the if), ours lw+dsll32/dsrl32; qualifier mix tried (42-59%); DIn | attempts=2 */
+#if 0 /* NEARMISS 59.5% cat=regalloc sub=- | lwu zero-extend load: target loads count with lwu straight into s0 (and reloads in the if), ours lw+dsll32/dsrl32; volatile/non-volatile mix tried (42-59%); DIn | attempts=2 */
 u64 GetTimerSystemTime(void)
 {
     int stat;
@@ -325,13 +311,13 @@ u64 GetTimerSystemTime(void)
     u64 shift;
 
     stat = DIntr();
-    count = ((u32 *)0x10001000)[0];
-    mode = ((u32 *)0x10001000)[4];
+    count = ((volatile u32 *)0x10001000)[0];
+    mode = ((volatile u32 *)0x10001000)[4];
     base = *(u64 *)D_00133A18;
     shift = 2;
     if (mode & 0x800)
     {
-        count = ((u32 *)0x10001000)[0];
+        count = ((volatile u32 *)0x10001000)[0];
         base++;
     }
     mode &= 3;
@@ -369,8 +355,7 @@ int AllocTimerCounter(void)
     return ret;
 }
 
-/* NEARMISS-STUB iFreeTimerCounter */
-#if 0 /* NEARMISS 97.0% cat=volatile-alias sub=- | needs the banned qualifier: without volatile gcc moves tc->id=0 store into beqzl delay slot; plain form keeps nop delay slot | attempts=2 */
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/timer", iFreeTimerCounter);
 int iFreeTimerCounter(int id)
 {
     TimerCounter *tc;
@@ -399,8 +384,6 @@ int iFreeTimerCounter(int id)
     tt->numUsed--;
     return ret;
 }
-#endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/timer", iFreeTimerCounter);
 
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/timer", FreeTimerCounter);
 int FreeTimerCounter(int id)
@@ -417,13 +400,12 @@ int FreeTimerCounter(int id)
     return ret;
 }
 
-/* NEARMISS-STUB iGetTimerUsedUnusedCounters */
-#if 0 /* NEARMISS 85.0% cat=volatile-alias sub=- | needs the banned qualifier: target reloads tt->numUsed in unused branch with nop delay slot; plain form fills delay slot with addiu | attempts=1 */
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/timer", iGetTimerUsedUnusedCounters);
 int iGetTimerUsedUnusedCounters(u32 *used, u32 *unused)
 {
-    TimerTable *tt;
+    volatile TimerTable *tt;
 
-    tt = (TimerTable *)D_00133A18;
+    tt = (volatile TimerTable *)D_00133A18;
     if (tt->intcId < 0)
     {
         return 0x80008001;
@@ -438,8 +420,6 @@ int iGetTimerUsedUnusedCounters(u32 *used, u32 *unused)
     }
     return 0;
 }
-#endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/timer", iGetTimerUsedUnusedCounters);
 
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/timer", GetTimerUsedUnusedCounters);
 int GetTimerUsedUnusedCounters(int *pnUsed, int *pnUnused)
@@ -456,8 +436,7 @@ int GetTimerUsedUnusedCounters(int *pnUsed, int *pnUnused)
     return ret;
 }
 
-/* NEARMISS-STUB iStartTimerCounter */
-#if 0 /* NEARMISS 97.53% cat=volatile-alias sub=- | needs the banned qualifier: without volatile gcc emits lui/addiu(D+0x1c)/lw 0x1c(v0) instead of lui/lw %lo(D+0x1c); D[7], struct-cast and byte-ptr forms all sam | attempts=2 */
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/timer", iStartTimerCounter);
 int iStartTimerCounter(int id)
 {
     TimerCounter *tc;
@@ -468,7 +447,7 @@ int iStartTimerCounter(int id)
     {
         return 0x80008002;
     }
-    if (*(u32 *)((u8 *)D_00133A18 + 0x1c) == id)
+    if (((volatile TimerTable *)D_00133A18)->activeId == id)
     {
         return 0x80000010;
     }
@@ -486,8 +465,6 @@ int iStartTimerCounter(int id)
     }
     return 0;
 }
-#endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/timer", iStartTimerCounter);
 
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/timer", StartTimerCounter);
 int StartTimerCounter(int id)
@@ -504,8 +481,7 @@ int StartTimerCounter(int id)
     return ret;
 }
 
-/* NEARMISS-STUB iStopTimerCounter */
-#if 0 /* NEARMISS 97.84% cat=volatile-alias sub=- | needs the banned qualifier: target folds the 0x1c field offset into the symbol relocation; plain, array-index and struct-cast forms do not | attempts=2 */
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/timer", iStopTimerCounter);
 int iStopTimerCounter(int id)
 {
     TimerCounter *tc;
@@ -517,7 +493,7 @@ int iStopTimerCounter(int id)
     {
         return 0x80008002;
     }
-    if (((TimerTable *)D_00133A18)->activeId == id)
+    if (((volatile TimerTable *)D_00133A18)->activeId == id)
     {
         return 0x80000010;
     }
@@ -536,8 +512,6 @@ int iStopTimerCounter(int id)
     }
     return 1;
 }
-#endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/timer", iStopTimerCounter);
 
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/timer", StopTimerCounter);
 int StopTimerCounter(int id)
@@ -554,8 +528,7 @@ int StopTimerCounter(int id)
     return ret;
 }
 
-/* NEARMISS-STUB SetTimerCount */
-#if 0 /* NEARMISS 97.92% cat=volatile-alias sub=- | needs the banned qualifier: without volatile gcc emits lui/addiu(D+0x1c)/lw 0x1c(v0) instead of lui/lw %lo(D+0x1c); plain cast and TimerTable-object extern form | attempts=2 */
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/timer", SetTimerCount);
 u64 SetTimerCount(int id, u64 ulNewCount)
 {
     int stat;
@@ -566,7 +539,7 @@ u64 SetTimerCount(int id, u64 ulNewCount)
 
     tc = (TimerCounter *)(((u32)id >> 10) << 6);
     stat = DIntr();
-    if (id < 0 || ((u32)id & 0x3FF) != tc->id || ((TimerTable *)D_00133A18)->activeId == id)
+    if (id < 0 || ((u32)id & 0x3FF) != tc->id || ((volatile TimerTable *)D_00133A18)->activeId == id)
     {
         if (stat != 0)
         {
@@ -593,8 +566,6 @@ u64 SetTimerCount(int id, u64 ulNewCount)
     }
     return ret;
 }
-#endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/timer", SetTimerCount);
 
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/timer", iGetTimerBaseTime);
 u64 iGetTimerBaseTime(int id)
@@ -676,7 +647,7 @@ int iSetTimerHandler(int id, u64 ulSchedule, u64 (*cbHandler)(int, u64, u64, voi
     {
         return 0x80008002;
     }
-    if (((TimerTable *)D_00133A18)->activeId == id)
+    if (((volatile TimerTable *)D_00133A18)->activeId == id)
     {
         return 0x80000010;
     }

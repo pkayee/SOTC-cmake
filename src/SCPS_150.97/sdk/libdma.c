@@ -17,7 +17,7 @@ void WaitDma(sceDmaChan *d)
     int count;
 
     count = 0x1000000;
-    while (*(u_int *)d & 0x100) {
+    while (*(volatile u_int *)d & 0x100) {
         count--;
         if (count < 0) {
             scePrintf("libdma: sync timeout\n");
@@ -87,12 +87,12 @@ int sceDmaReset(int mode)
     int i;
     int dmae;
 
-    dmae = *(u_int *)0x1000E000 & 1;
+    dmae = *(volatile u_int *)0x1000E000 & 1;
     for (i = 0; i < 10; i++) {
         if (D_00138608[i]) {
             sceDmaChan *ch = D_00133AB0[i];
-            u_int *w;
-            w = (u_int *)ch;
+            volatile u_int *w;
+            w = (volatile u_int *)ch;
             w[0x80 / 4] = 0;
             w[0x00 / 4] = 0;
             w[0x30 / 4] = 0;
@@ -101,12 +101,12 @@ int sceDmaReset(int mode)
             w[0x40 / 4] = 0;
         }
     }
-    *(u_int *)0x1000E010 = 0xFF1F;
-    *(u_int *)0x1000E010 &= 0xFF1F0000;
+    *(volatile u_int *)0x1000E010 = 0xFF1F;
+    *(volatile u_int *)0x1000E010 &= 0xFF1F0000;
     memclr(&env, 0x14);
     sceDmaPutEnv(&env);
     if (mode == 1) {
-        *(u_int *)0x1000E000 |= 1;
+        *(volatile u_int *)0x1000E000 |= 1;
     }
     return dmae;
 }
@@ -126,7 +126,7 @@ sceDmaEnv *sceDmaGetEnv(sceDmaEnv *env)
 void *sceDmaPutStallAddr(void *addr)
 {
     void *ret;
-    void **stall = (void **)0x1000E060;
+    volatile void **stall = (volatile void **)0x1000E060;
 
     ret = *stall;
     *stall = addr;
@@ -227,7 +227,7 @@ void sceDmaRecvI(sceDmaChan *d, void *addr, int size)
 int sceDmaSync(sceDmaChan *d, int mode, int timeout)
 {
     if (mode == 1) {
-        return (*(u_int *)d >> 8) & 1;
+        return (*(volatile u_int *)d >> 8) & 1;
     }
     WaitDma(d);
     return 0;
@@ -243,37 +243,33 @@ int sceDmaWatch(sceDmaChan *d, void *addr, int mode, int timeout)
     return 0;
 }
 
-/* NEARMISS-STUB sceDmaPause */
-#if 0 /* NEARMISS 85.97% cat=volatile-alias sub=- | needs the banned qualifier: register accesses differ | attempts=2 */
 u_int sceDmaPause(sceDmaChan *d)
 {
-    u_int old;
-    u_int enabler;
     int intr;
+    u_int enabler;
+    u_int old;
 
     intr = DIntr();
-    enabler = *(u_int *)0x1000F520;
+    enabler = *(volatile u_int *)0x1000F520;
     if (!(enabler & 0x10000)) {
-        *(u_int *)0x1000F590 = enabler | 0x10000;
+        *(volatile u_int *)0x1000F590 = enabler | 0x10000;
     }
-    *(u_int *)0x1000E000;
-    old = *(u_int *)d;
-    *(u_int *)d = old & 0xFFFFFEFF;
-    *(u_int *)0x1000F590 = enabler;
+    *(volatile u_int *)0x1000E000;
+    old = *(volatile u_int *)d;
+    *(volatile u_int *)d = old & 0xFFFFFEFF;
+    *(volatile u_int *)0x1000F590 = enabler;
     if (intr) {
         EIntr();
     }
     return old;
 }
-#endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libdma", sceDmaPause);
 
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libdma", sceDmaRestart);
 int sceDmaRestart(sceDmaChan *d, u_int chcr)
 {
     u_int old;
 
-    old = *(u_int *)d;
-    *(u_int *)d = chcr;
+    old = *(volatile u_int *)d;
+    *(volatile u_int *)d = chcr;
     return (old >> 8) & 1;
 }

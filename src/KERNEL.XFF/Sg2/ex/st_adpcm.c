@@ -5,7 +5,7 @@ extern s32 (*D_400F9040)(void*, s32, s32, s32);
 extern s32 Sg2StAdpcmQuit(void);
 extern s32 Sg2StAdpcmSetPitch(u64, u32);
 extern s32 Sg2ExStAdpcmSlotFree(void);
-extern s32 D_400F8F78;
+extern volatile s32 D_400F8F78;
 extern s32 D_400F8F80[48];
 extern s32 Sg2StAdpcmInit(s32);
 extern s32 Sg2StAdpcmPlay(u64);
@@ -39,8 +39,7 @@ typedef struct
     } u;
 } StAdpcmVolCtx;
 
-/* NEARMISS-STUB Sg2ExStAdpcmInit */
-#if 0 /* NEARMISS 95.17% cat=volatile-alias sub=- | needs volatile (banned): D_400F8F78 store folds %lo into sw in matched build; volatile-free forms (ptr local, array extern, reorder, cast-addr) keep addiu v1,%l | attempts=1 */
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/st_adpcm", Sg2ExStAdpcmInit);
 void Sg2ExStAdpcmInit(void)
 {
     s32 i;
@@ -53,8 +52,6 @@ void Sg2ExStAdpcmInit(void)
     D_400F8F78 = 1;
     D_400F8F7C = 0;
 }
-#endif
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/st_adpcm", Sg2ExStAdpcmInit);
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/st_adpcm", Sg2ExStAdpcmStopMode);
 void Sg2ExStAdpcmStopMode(s32 arg0)
@@ -217,19 +214,19 @@ s32 Sg2ExStAdpcmGetUserParam(void* p)
 }
 
 /* decomper FIX (scratch MATCH via cmp.sh; only diffs are the j-label name and TU padding).
-   Needs `extern s32 D_400F8F78;` (see Sg2ExStAdpcmInit fix).
+   Needs `extern volatile s32 D_400F8F78;` (see Sg2ExStAdpcmInit fix).
    Two embedded views of the ctx: track vol bank pairs at ctx+0xC+0x240 = ctx+0x24C (stride 8, [16][2]),
    per-track send L/R arrays at ctx+0x10+0x30 = ctx+0x40 / ctx+0x60 ([8] each).
    The pointer locals MUST be declared d first, then c (that gives addiu p+0x10 before addiu p+0xC). */
 
-/* NEARMISS-STUB func_40031C08 */
-#if 0 /* NEARMISS 78.2% cat=volatile-alias sub=- | needs volatile (banned): target re-reads D_400F8F78 between the two || compares and keeps lui+addiu address; volatile-free forms (ptr local, u32 cast reread, u3 | attempts=1 */
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/st_adpcm", func_40031C08);
 s32 func_40031C08(StAdpcmVolCtx* p, s32 voice, s32 idx)
 {
     s32 l;
     s32 r;
     StAdpcmSendSub *d = &p->u.d.d;
     StAdpcmVolSub *c = &p->u.c;
+
     l = d->l[idx] * c->lr[idx][0] / 100;
     r = d->r[idx] * c->lr[idx][1] / 100;
     if (l >= 0x4000)
@@ -258,8 +255,6 @@ s32 func_40031C08(StAdpcmVolCtx* p, s32 voice, s32 idx)
     }
     return Sg2StAdpcmSetVolume(1LL << voice, l, r);
 }
-#endif
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/st_adpcm", func_40031C08);
 
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/st_adpcm", Sg2ExStAdpcmVolumePercent);
@@ -536,19 +531,16 @@ s32 Sg2ExStAdpcmIopReadAdr(void* p, s32 n)
     return 0;
 }
 
-/* NEARMISS-STUB Sg2ExStAdpcmSetOutputMode */
-#if 0 /* NEARMISS 53.25% cat=volatile-alias sub=- | needs volatile (banned): store to D_400F8F78 differs | attempts=1 */
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/st_adpcm", Sg2ExStAdpcmSetOutputMode);
 void Sg2ExStAdpcmSetOutputMode(void* p, s32 mode)
 {
 
-    D_400F8F78 = mode;
+    *(volatile s32*)&D_400F8F78 = mode;
     if (p)
     {
         ____VolReflection(p);
     }
 }
-#endif
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/st_adpcm", Sg2ExStAdpcmSetOutputMode);
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/st_adpcm", Sg2ExStAdpcmLoopSecNum);
 s32 Sg2ExStAdpcmLoopSecNum(void* p, s32* a, s32* b)

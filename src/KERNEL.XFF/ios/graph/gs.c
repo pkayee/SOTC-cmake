@@ -65,17 +65,17 @@ void iosDumpVIF1Status(void)
     fqc = (stat >> 24) & 0x1F;
     LoaderSysPrintf("DataCount(QW)  : %d(0x%x)\n", fqc, fqc);
     LoaderSysPrintf("-------------------------\n");
-    LoaderSysPrintf(" MARK:\x1b[32m0x%08x\x1b[0m\n", *(u32 *)0x10003C30);
+    LoaderSysPrintf(" MARK:\x1b[32m0x%08x\x1b[0m\n", *(volatile u32 *)0x10003C30);
     LoaderSysPrintf(" Row0:\x1b[32m0x%08x\x1b[0m   Row1:\x1b[32m0x%08x\x1b[0m   Row2:\x1b[32m0x%08x\x1b[0m   Row3:\x1b[32m0x%08x\x1b[0m\n",
-        *(u32 *)0x10003D00, *(u32 *)0x10003D10, *(u32 *)0x10003D20, *(u32 *)0x10003D30);
+        *(volatile u32 *)0x10003D00, *(volatile u32 *)0x10003D10, *(volatile u32 *)0x10003D20, *(volatile u32 *)0x10003D30);
     LoaderSysPrintf(" Col0:\x1b[32m0x%08x\x1b[0m   Col1:\x1b[32m0x%08x\x1b[0m   Col2:\x1b[32m0x%08x\x1b[0m   Col3:\x1b[32m0x%08x\x1b[0m\n",
-        *(u32 *)0x10003D40, *(u32 *)0x10003D50, *(u32 *)0x10003D60, *(u32 *)0x10003D70);
+        *(volatile u32 *)0x10003D40, *(volatile u32 *)0x10003D50, *(volatile u32 *)0x10003D60, *(volatile u32 *)0x10003D70);
     LoaderSysPrintf("CYCLE:\x1b[32m0x%08x\x1b[0m   MASK:\x1b[32m0x%08x\x1b[0m   MODE:\x1b[32m0x%08x\x1b[0m\n",
-        *(u32 *)0x10003C40, *(u32 *)0x10003C70, *(u32 *)0x10003C50);
+        *(volatile u32 *)0x10003C40, *(volatile u32 *)0x10003C70, *(volatile u32 *)0x10003C50);
     LoaderSysPrintf(" ITOP:\x1b[32m0x%08x\x1b[0m  ITOPS:\x1b[32m0x%08x\x1b[0m   BASE:\x1b[32m0x%08x\x1b[0m   OFST:\x1b[32m0x%08x\x1b[0m\n",
-        *(u32 *)0x10003CD0, *(u32 *)0x10003C90, *(u32 *)0x10003CA0, *(u32 *)0x10003CB0);
+        *(volatile u32 *)0x10003CD0, *(volatile u32 *)0x10003C90, *(volatile u32 *)0x10003CA0, *(volatile u32 *)0x10003CB0);
     LoaderSysPrintf("  TOP:\x1b[32m0x%08x\x1b[0m   TOPS:\x1b[32m0x%08x\x1b[0m    NUM:\x1b[32m0x%08x\x1b[0m   CODE:\x1b[32m0x%08x\x1b[0m\n",
-        *(u32 *)0x10003CE0, *(u32 *)0x10003CC0, *(u32 *)0x10003C60, *(u32 *)0x10003C80);
+        *(volatile u32 *)0x10003CE0, *(volatile u32 *)0x10003CC0, *(volatile u32 *)0x10003C60, *(volatile u32 *)0x10003C80);
 }
 #endif
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosDumpVIF1Status);
@@ -84,7 +84,7 @@ INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosDumpGIFStatus);
 
 /* NEARMISS-STUB iosSyncPath */
 #if 0 /* NEARMISS 89.0% cat=vu0-mmi sub=- | cfc2.ni vi29 (VU0 COP2 control read) has no C form; asm-free probe read version | attempts=1 */
-/* kR39 asm-free probe: 89.01% (cfc2.ni $vi29 read replaced by probe; no C form for COP2 cfc2) cause=no-c-form */
+/* kR39 asm-free probe: 89.01% (cfc2.ni $vi29 read replaced by volatile probe; no C form for COP2 cfc2) cause=no-c-form */
 s32 iosSyncPath(s32 mode, s32 timeout)
 {
     u32 stat;
@@ -99,7 +99,7 @@ s32 iosSyncPath(s32 mode, s32 timeout)
     count = 0;
     if (mode != 0)
     {
-        stat = *(u32 *)0x1000F000;
+        stat = *(volatile u32 *)0x1000F000;
         r = ((s32)*D1_CHCR >> 8) & 1;
         r2 = (*D2_CHCR & 0x100) ? (r | 2) : r;
         r3 = (*VIF1_STAT & 0x1F000003) ? (r2 | 4) : r2;
@@ -143,7 +143,7 @@ s32 iosSyncPath(s32 mode, s32 timeout)
             return -1;
         }
     }
-    stat = *(u32 *)0x1000F000;
+    stat = *(volatile u32 *)0x1000F000;
     while (stat & 0x100)
     {
         count++;
@@ -155,7 +155,7 @@ s32 iosSyncPath(s32 mode, s32 timeout)
             ((void (*)(u32))D_40045A90)(*VIF1_MARK);
             return -1;
         }
-        stat = *(u32 *)0x1000F000;
+        stat = *(volatile u32 *)0x1000F000;
     }
     while (*GIF_STAT & 0xC00)
     {
@@ -203,12 +203,12 @@ void func_40026BE0(s32 field)
     lo = (s32 *)((u8 *)env + off);
     lo[2] = (lo[2] & ~0x20) | ((env[0xA0 / 4] & 1) << 5);
     x = (u8 *)env + (env[0x8C / 4] & 1) * 0x38;
-    *(u64 *)0x12000000 = *(u64 *)(x + 0x18);
-    *(u64 *)0x12000020 = *(u64 *)(x + 0x20);
-    *(u64 *)0x12000070 = *(u64 *)(x + 0x28);
-    *(u64 *)0x12000090 = *(u64 *)(x + 0x38);
-    *(u64 *)0x12000080 = *(u64 *)(x + 0x30);
-    *(u64 *)0x120000A0 = *(u64 *)(x + 0x40);
+    *(volatile u64 *)0x12000000 = *(u64 *)(x + 0x18);
+    *(volatile u64 *)0x12000020 = *(u64 *)(x + 0x20);
+    *(volatile u64 *)0x12000070 = *(u64 *)(x + 0x28);
+    *(volatile u64 *)0x12000090 = *(u64 *)(x + 0x38);
+    *(volatile u64 *)0x12000080 = *(u64 *)(x + 0x30);
+    *(volatile u64 *)0x120000A0 = *(u64 *)(x + 0x40);
 }
 #endif
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", func_40026BE0);
@@ -259,7 +259,7 @@ void iosGsSetMode(void)
 
 /* NEARMISS-STUB iosGsSetDrawContext */
 #if 0 /* NEARMISS 89.0% cat=vu0-mmi sub=- | cfc2.ni vi29 (VU0 COP2 control read) has no C form; asm-free probe read version | attempts=1 */
-/* kR39 asm-free probe: 88.74% (cfc2.ni $vi29 read replaced by probe; no C form for COP2 cfc2) cause=no-c-form */
+/* kR39 asm-free probe: 88.74% (cfc2.ni $vi29 read replaced by volatile probe; no C form for COP2 cfc2) cause=no-c-form */
 void iosGsSetDrawContext(void)
 {
     u32 stat;
@@ -269,9 +269,9 @@ void iosGsSetDrawContext(void)
 
     do
     {
-        stat = *(u32 *)0x1000F000;
+        stat = *(volatile u32 *)0x1000F000;
     } while ((*D1_CHCR & 0x100) || (*D2_CHCR & 0x100) || (*VIF1_STAT & 0x1F000003) || (stat & 0x100) || (*GIF_STAT & 0xC00));
-    func_40026BE0((*(u64 *)0x12001000 >> 13) & 1);
+    func_40026BE0((*(volatile u64 *)0x12001000 >> 13) & 1);
     dc = D_40092C58;
     if (iosDlGetWorkBufId() == 0)
         dc += 0x190;
@@ -280,7 +280,7 @@ void iosGsSetDrawContext(void)
     addr = (u32)dc;
     do
     {
-        stat = *(u32 *)0x1000F000;
+        stat = *(volatile u32 *)0x1000F000;
     } while ((*D1_CHCR & 0x100) || (*D2_CHCR & 0x100) || (*VIF1_STAT & 0x1F000003) || (stat & 0x100) || (*GIF_STAT & 0xC00));
     *D2_QWC = qwc;
     *D2_MADR = addr & 0x0FFFFFFF;
@@ -442,14 +442,14 @@ void iosResetGraph(s16 arg0, s16 arg1, s16 arg2, s16 arg3)
 
 /* NEARMISS-STUB iosDmaSendPath1 */
 #if 0 /* NEARMISS 91.0% cat=vu0-mmi sub=- | cfc2.ni vi29 (VU0 COP2 control read) has no C form; asm-free probe read version | attempts=1 */
-/* kR39 asm-free probe: 90.84% (cfc2.ni $vi29 read replaced by probe; no C form for COP2 cfc2) cause=no-c-form */
+/* kR39 asm-free probe: 90.84% (cfc2.ni $vi29 read replaced by volatile probe; no C form for COP2 cfc2) cause=no-c-form */
 void iosDmaSendPath1(s64 arg0, s64 arg1)
 {
     u32 stat;
 
     do
     {
-        stat = *(u32 *)0x1000F000;
+        stat = *(volatile u32 *)0x1000F000;
     } while ((*D1_CHCR & 0x100) || (*D2_CHCR & 0x100) || (*VIF1_STAT & 0x1F000003) || (stat & 0x100) || (*GIF_STAT & 0xC00));
     *D1_QWC = arg1;
     *D1_MADR = arg0 & 0x0FFFFFFF;
@@ -461,14 +461,14 @@ INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosDmaSendPath1);
 
 /* NEARMISS-STUB iosDmaSendPath2 */
 #if 0 /* NEARMISS 91.0% cat=vu0-mmi sub=- | cfc2.ni vi29 (VU0 COP2 control read) has no C form; asm-free probe read version | attempts=1 */
-/* kR39 asm-free probe: 90.84% (cfc2.ni $vi29 read replaced by probe; no C form for COP2 cfc2) cause=no-c-form */
+/* kR39 asm-free probe: 90.84% (cfc2.ni $vi29 read replaced by volatile probe; no C form for COP2 cfc2) cause=no-c-form */
 void iosDmaSendPath2(s64 arg0, s64 arg1)
 {
     u32 stat;
 
     do
     {
-        stat = *(u32 *)0x1000F000;
+        stat = *(volatile u32 *)0x1000F000;
     } while ((*D1_CHCR & 0x100) || (*D2_CHCR & 0x100) || (*VIF1_STAT & 0x1F000003) || (stat & 0x100) || (*GIF_STAT & 0xC00));
     *D1_QWC = arg1;
     *D1_MADR = arg0 & 0x0FFFFFFF;
@@ -480,14 +480,14 @@ INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosDmaSendPath2);
 
 /* NEARMISS-STUB iosDmaSendPath3 */
 #if 0 /* NEARMISS 91.0% cat=vu0-mmi sub=- | cfc2.ni vi29 (VU0 COP2 control read) has no C form; asm-free probe read version | attempts=1 */
-/* kR39 asm-free probe: 90.84% (cfc2.ni $vi29 read replaced by probe; no C form for COP2 cfc2) cause=no-c-form */
+/* kR39 asm-free probe: 90.84% (cfc2.ni $vi29 read replaced by volatile probe; no C form for COP2 cfc2) cause=no-c-form */
 void iosDmaSendPath3(s64 arg0, s64 arg1)
 {
     u32 stat;
 
     do
     {
-        stat = *(u32 *)0x1000F000;
+        stat = *(volatile u32 *)0x1000F000;
     } while ((*D1_CHCR & 0x100) || (*D2_CHCR & 0x100) || (*VIF1_STAT & 0x1F000003) || (stat & 0x100) || (*GIF_STAT & 0xC00));
     *D2_QWC = arg1;
     *D2_MADR = arg0 & 0x0FFFFFFF;
@@ -499,14 +499,14 @@ INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosDmaSendPath3);
 
 /* NEARMISS-STUB iosDmaSendSChainPath1 */
 #if 0 /* NEARMISS 90.0% cat=vu0-mmi sub=- | cfc2.ni vi29 (VU0 COP2 control read) has no C form; asm-free probe read version | attempts=1 */
-/* kR39 asm-free probe: 90.15% (cfc2.ni $vi29 read replaced by probe; no C form for COP2 cfc2) cause=no-c-form */
+/* kR39 asm-free probe: 90.15% (cfc2.ni $vi29 read replaced by volatile probe; no C form for COP2 cfc2) cause=no-c-form */
 void iosDmaSendSChainPath1(u32 arg0)
 {
     u32 stat;
 
     do
     {
-        stat = *(u32 *)0x1000F000;
+        stat = *(volatile u32 *)0x1000F000;
     } while ((*D1_CHCR & 0x100) || (*D2_CHCR & 0x100) || (*VIF1_STAT & 0x1F000003) || (stat & 0x100) || (*GIF_STAT & 0xC00));
     *D1_QWC = 0;
     *D1_TADR = arg0 & 0x7FFFFFFF;
@@ -518,14 +518,14 @@ INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosDmaSendSChainPath1);
 
 /* NEARMISS-STUB iosDmaSendSChainPath2 */
 #if 0 /* NEARMISS 90.0% cat=vu0-mmi sub=- | cfc2.ni vi29 (VU0 COP2 control read) has no C form; asm-free probe read version | attempts=1 */
-/* kR39 asm-free probe: 90.15% (cfc2.ni $vi29 read replaced by probe; no C form for COP2 cfc2) cause=no-c-form */
+/* kR39 asm-free probe: 90.15% (cfc2.ni $vi29 read replaced by volatile probe; no C form for COP2 cfc2) cause=no-c-form */
 void iosDmaSendSChainPath2(u32 arg0)
 {
     u32 stat;
 
     do
     {
-        stat = *(u32 *)0x1000F000;
+        stat = *(volatile u32 *)0x1000F000;
     } while ((*D1_CHCR & 0x100) || (*D2_CHCR & 0x100) || (*VIF1_STAT & 0x1F000003) || (stat & 0x100) || (*GIF_STAT & 0xC00));
     *D1_QWC = 0;
     *D1_TADR = arg0 & 0x7FFFFFFF;
@@ -537,14 +537,14 @@ INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosDmaSendSChainPath2);
 
 /* NEARMISS-STUB iosDmaSendSChainPath3 */
 #if 0 /* NEARMISS 90.0% cat=vu0-mmi sub=- | cfc2.ni vi29 (VU0 COP2 control read) has no C form; asm-free probe read version | attempts=1 */
-/* kR39 asm-free probe: 90.15% (cfc2.ni $vi29 read replaced by probe; no C form for COP2 cfc2) cause=no-c-form */
+/* kR39 asm-free probe: 90.15% (cfc2.ni $vi29 read replaced by volatile probe; no C form for COP2 cfc2) cause=no-c-form */
 void iosDmaSendSChainPath3(u32 arg0)
 {
     u32 stat;
 
     do
     {
-        stat = *(u32 *)0x1000F000;
+        stat = *(volatile u32 *)0x1000F000;
     } while ((*D1_CHCR & 0x100) || (*D2_CHCR & 0x100) || (*VIF1_STAT & 0x1F000003) || (stat & 0x100) || (*GIF_STAT & 0xC00));
     *D2_QWC = 0;
     *D2_TADR = arg0 & 0x7FFFFFFF;
@@ -568,14 +568,11 @@ s32 iosSyncV(s32 arg0)
     return (*GS_CSR >> 13) & 1;
 }
 
-/* NEARMISS-STUB iosGetField */
-#if 0 /* NEARMISS 87.67% cat=no-c-form sub=- | target folds nothing: lui v1,0x1200 / ori v1,0x1000 / ld 0(v1); every plain-C form folds to ld 4096(v0) | attempts=1 */
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosGetField);
 s32 iosGetField(void)
 {
-    return (*(u64 *)0x12001000 >> 13) & 1;
+    return (*(volatile u64 *)0x12001000 >> 13) & 1;
 }
-#endif
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosGetField);
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosGsChangeMode);
 void iosGsChangeMode(void)
@@ -593,16 +590,16 @@ INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosSetBGColor);
 
 /* NEARMISS-STUB iosGsResetCRTC */
 #if 0 /* NEARMISS 91.0% cat=vu0-mmi sub=- | cfc2.ni vi29 (VU0 COP2 control read) has no C form; asm-free probe read version | attempts=1 */
-/* kR39 asm-free probe: 91.38% (cfc2.ni $vi29 read replaced by probe; no C form for COP2 cfc2) cause=no-c-form */
+/* kR39 asm-free probe: 91.38% (cfc2.ni $vi29 read replaced by volatile probe; no C form for COP2 cfc2) cause=no-c-form */
 void iosGsResetCRTC(void)
 {
     u32 stat;
 
     do
     {
-        stat = *(u32 *)0x1000F000;
+        stat = *(volatile u32 *)0x1000F000;
     } while ((*D1_CHCR & 0x100) || (*D2_CHCR & 0x100) || (*VIF1_STAT & 0x1F000003) || (stat & 0x100) || (*GIF_STAT & 0xC00));
-    func_40026BE0((*(u64 *)0x12001000 >> 13) & 1);
+    func_40026BE0((*(volatile u64 *)0x12001000 >> 13) & 1);
 }
 #endif
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosGsResetCRTC);
@@ -616,7 +613,7 @@ s32 iosSetSyncNoReturnFunc(s32 func)
 
 /* NEARMISS-STUB iosSetScreenEnv */
 #if 0 /* NEARMISS 93.0% cat=vu0-mmi sub=- | cfc2.ni vi29 (VU0 COP2 control read) has no C form; asm-free probe read version | attempts=1 */
-/* kR39 asm-free probe: 93.19% (cfc2.ni $vi29 read replaced by probe; no C form for COP2 cfc2) cause=no-c-form */
+/* kR39 asm-free probe: 93.19% (cfc2.ni $vi29 read replaced by volatile probe; no C form for COP2 cfc2) cause=no-c-form */
 void iosSetScreenEnv(s32 w, s32 h, s32 dw, s32 dh)
 {
     s16 a = D_40045A50;
@@ -638,22 +635,22 @@ void iosSetScreenEnv(s32 w, s32 h, s32 dw, s32 dh)
     *GS_CSR;
     do
     {
-        stat = *(u32 *)0x1000F000;
+        stat = *(volatile u32 *)0x1000F000;
     } while ((*D1_CHCR & 0x100) || (*D2_CHCR & 0x100) || (*VIF1_STAT & 0x1F000003) || (stat & 0x100) || (*GIF_STAT & 0xC00));
-    func_40026BE0((*(u64 *)0x12001000 >> 13) & 1);
+    func_40026BE0((*(volatile u64 *)0x12001000 >> 13) & 1);
 }
 #endif
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gs", iosSetScreenEnv);
 
 /* NEARMISS-STUB iosCheckDrawFinish */
 #if 0 /* NEARMISS 68.0% cat=vu0-mmi sub=- | cfc2.ni vi29 (VU0 COP2 control read) has no C form; asm-free probe read version | attempts=1 */
-/* kR39 asm-free probe: 67.5% (cfc2.ni $vi29 read replaced by probe; no C form for COP2 cfc2) cause=no-c-form */
+/* kR39 asm-free probe: 67.5% (cfc2.ni $vi29 read replaced by volatile probe; no C form for COP2 cfc2) cause=no-c-form */
 s32 iosCheckDrawFinish(void)
 {
     u32 stat;
 
     D_40045A5C++;
-    stat = *(u32 *)0x1000F000;
+    stat = *(volatile u32 *)0x1000F000;
     if ((*D1_CHCR & 0x100) || (*D2_CHCR & 0x100) || (*VIF1_STAT & 0x1F000003) || (stat & 0x100) || (*GIF_STAT & 0xC00))
         return 0;
     return 1;
