@@ -54,15 +54,18 @@ s32 GAMEUTIL_is_nearly_equal_pitch(f32 a, f32 b, f32 c)
     return d <= c;
 }
 
-/* NEARMISS-STUB GAMEUTIL_set_inside_check_method */
-#if 0 /* NEARMISS 50.0% cat=sched sub=- | lq hoisted above sw (target stores first) | attempts=1 */
-void GAMEUTIL_set_inside_check_method(s32 *obj, s32 method, u128 *src)
+typedef union
 {
-    obj[0] = method;
-    *(u128 *)&obj[4] = *src;
+    s128 q;
+    f32 f[4];
+    s32 i[4];
+} Vec4;
+
+void GAMEUTIL_set_inside_check_method(Vec4 *p, s32 m, Vec4 *v)
+{
+    p[0].i[0] = m;
+    p[1].q = v->q;
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0006_GAMEUTIL_is_yaw_dir_inside_of_region", GAMEUTIL_set_inside_check_method);
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0006_GAMEUTIL_is_yaw_dir_inside_of_region", GAMEUTIL_is_inside);
 

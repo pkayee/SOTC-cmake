@@ -2,21 +2,94 @@
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0146_GetCollisionDBGroupCallBack", GetCollisionDBGroupCallBack);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0146_GetCollisionDBGroupCallBack", GetCollisionDBLastPointOnCurrentPlane);
+extern int func_400AB528();
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0146_GetCollisionDBGroupCallBack", ChangeCollisionResourceAttribute);
+int GetCollisionDBLastPointOnCurrentPlane(int a, int b, int c)
+{
+    return func_400AB528(a, b, c, 1);
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0146_GetCollisionDBGroupCallBack", GetCollisionResource);
+typedef struct
+{
+    u64 attr;
+    s64 pad;
+} CollAttr;
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0146_GetCollisionDBGroupCallBack", GetRayVolumeUncollisionPointForCamera);
+typedef struct
+{
+    u8 pad[0x30];
+    s32 n;
+    CollAttr *a;
+} CollRes;
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0146_GetCollisionDBGroupCallBack", CollisionObjectJudgeCallbackExceptOneObj);
+void ChangeCollisionResourceAttribute(CollRes *r, u64 m1, u64 v1, u64 m2, u64 v2, u64 clr, u64 set)
+{
+    s32 i = r->n;
+    CollAttr *p = r->a;
+
+    while (--i != -1)
+    {
+        u64 v = p->attr;
+
+        if ((v & m1) == v1 && (v & m2) == v2)
+        {
+            p->attr = (v & ~clr) | set;
+        }
+        p++;
+    }
+}
+
+s32 GetCollisionResource(void *arg0)
+{
+    return *(s32 *)((u8 *)(*(void **)((u8 *)(arg0) + 8)) + 0x20);
+}
+
+extern int objfilter(int a, int b);
+extern int func_400B5E28();
+extern int GetRayVolumeUncollisionPoint(int, int, int, int, int, void *, int, int, void *, int);
+
+int GetRayVolumeUncollisionPointForCamera(int a, int b, int c, int d, int e, int f)
+{
+    return GetRayVolumeUncollisionPoint(a, b, c, d, e, objfilter, 0, 0, func_400B5E28, f);
+}
+
+s32 CollisionObjectJudgeCallbackExceptOneObj(s32 arg0, s32 arg1)
+{
+    return arg0 != arg1;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0146_GetCollisionDBGroupCallBack", CollisionObjectJudgeCallbackExceptDescendOneObj);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0146_GetCollisionDBGroupCallBack", ConstructorCollisionObjectJudgeCallbackData);
+typedef struct
+{
+    s32 a;
+    s32 b[5];
+} CollJudgeCallbackData;
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0146_GetCollisionDBGroupCallBack", CollisionObjectJudgeCallbackExceptPluralObj);
+void ConstructorCollisionObjectJudgeCallbackData(CollJudgeCallbackData *p)
+{
+    s32 i;
+
+    p->a = 0;
+    for (i = 4; i >= 0; i--)
+    {
+        p->b[i] = 0;
+    }
+}
+
+s32 CollisionObjectJudgeCallbackExceptPluralObj(s32 obj, s32 *list)
+{
+    s32 i;
+
+    for (i = 0; i < list[0]; i++)
+    {
+        if (obj == list[i + 1])
+        {
+            return 0;
+        }
+    }
+    return 1;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0146_GetCollisionDBGroupCallBack", CollisionObjectJudgeCallbackExceptDescendPluralObj);
 
@@ -26,11 +99,26 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0146_GetCollisionDBGroupCallBac
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0146_GetCollisionDBGroupCallBack", getBossDBInfo);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0146_GetCollisionDBGroupCallBack", getVolumeCollisionDebugMode);
+extern unsigned char D_4012B32C[];
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0146_GetCollisionDBGroupCallBack", getCollisionDebugGraphMode);
+void *getVolumeCollisionDebugMode(void)
+{
+    return D_4012B32C;
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0146_GetCollisionDBGroupCallBack", getCollisionVirtualWallDispFlag);
+extern unsigned char D_4012B330[];
+
+void *getCollisionDebugGraphMode(void)
+{
+    return D_4012B330;
+}
+
+extern unsigned char D_4012B334[];
+
+void *getCollisionVirtualWallDispFlag(void)
+{
+    return D_4012B334;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0146_GetCollisionDBGroupCallBack", func_400BB870);
 
@@ -38,9 +126,31 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0146_GetCollisionDBGroupCallBac
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0146_GetCollisionDBGroupCallBack", func_400BBAC8);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0146_GetCollisionDBGroupCallBack", GetColMultiDepVtxInfoVertexNormal);
+s32 GetColMultiDepVtxInfoVertexNormal(void *arg0, void *arg1)
+{
+    s32 temp_a1;
+    s32 temp_v1;
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0146_GetCollisionDBGroupCallBack", GetColMultiDepVtxInfoVertexNormalWork);
+    temp_v1 = (*(s32 *)((char *)(arg1) + 0));
+    temp_a1 = (*(s32 *)((char *)(arg1) + 4));
+    if (temp_v1 != -1) {
+        return (*(s32 *)((char *)(((temp_v1 * 0x60) + (*(s32 *)((char *)((*(void **)((char *)(arg0) + 0x174))) + 0x24)))) + 0x2C)) + (temp_a1 * 0x10);
+    }
+    return (*(s32 *)((char *)((*(void **)((char *)(arg0) + 0x174))) + 0x54)) + (temp_a1 * 0x10);
+}
+
+void GetColMultiDepVtxInfoVertexNormalWork(void *arg0, void *arg1, void *arg2)
+{
+    int temp_a2;
+
+    temp_a2 = (*(int *)((char *)(arg2) + 0));
+    (*(int *)((char *)(arg0) + 0)) = (int) (*(int *)((char *)(arg2) + 4));
+    if (temp_a2 != -1) {
+        (*(void **)((char *)(arg0) + 4)) = (void *) ((*(int *)((char *)((*(void **)((char *)(arg1) + 0x174))) + 0x24)) + (temp_a2 * 0x60) + 0x18);
+        return;
+    }
+    (*(void **)((char *)(arg0) + 4)) = (void *) ((*(void **)((char *)(arg1) + 0x174)) + 0x40);
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0146_GetCollisionDBGroupCallBack", iasmCalcCollisionMultiDepSurfBoundarySub);
 
