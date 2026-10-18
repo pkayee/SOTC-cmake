@@ -20,7 +20,7 @@ extern void waitVscheduler(void);
 extern void iosPushVu0Registers(void);
 extern void iosPopVu0Registers(void);
 extern s32 iosCheckDrawFinish(void);
-extern volatile s64* iosGetPacketPtrPath1();
+extern s64* iosGetPacketPtrPath1();
 extern void iosSetPacketPtrPath1();
 extern void iosDlChainTailCurrent();
 
@@ -48,7 +48,7 @@ extern void (*D_40045AE4)(); // v scheduler function
 extern void (*D_40045AE8)();
 extern s32 D_40045AEC;
 extern struct unkstrc {
-    volatile s64 *unk0;
+    s64 *unk0;
     s64 *unk4, *unk8;
     volatile s64* unkC;
     s32 unk10, unk14, unk18, unk1C;
@@ -71,7 +71,7 @@ static inline void gsRegI(s64 addr, s64 data)
 
 
 // .bss
-extern volatile struct { char pad[0xA0]; s32 unkA0; s32 unkA4; } D_40092BD0;
+extern struct { char pad[0xA0]; s32 unkA0; s32 unkA4; } D_40092BD0;
 extern s16 D_40045A50, D_40045A54, D_40045A58;
 extern void iosInitDC();
 extern void isysSleepSubThread();
@@ -340,7 +340,7 @@ void func_400286E8(void)
     }
 }
 
-volatile s64* gsRegBegin(void)
+s64* gsRegBegin(void)
 {
     D_40045AF4->unk1C = 0;
     D_40045AF4->unkC = iosGetPacketPtrPath1();
@@ -409,7 +409,7 @@ void gsRegEnd(void)
 }
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gp", gsRegEndWithPtr);
-volatile s64 *gsRegEndWithPtr(void)
+s64 *gsRegEndWithPtr(void)
 {
     if (D_40045AF4->unk1C == 0)
     {
