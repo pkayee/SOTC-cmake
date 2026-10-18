@@ -1,44 +1,31 @@
 #include "common.h"
 
-/* NEARMISS-STUB GAMEUTIL_get_weapon_release_position_of_player_obj */
-#if 0 /* NEARMISS 78.8% cat=regalloc sub=- | sentinel/class test: target keeps the merged class in v0 and tests it with xori+bnez; gcc loads the sentinel into v1 before the lh and emits addiu 2 + bne; both | attempts=1 */
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0007_GAMEUTIL_get_weapon_release_position_of_", GAMEUTIL_get_weapon_release_position_of_player_obj);
+u8 *GetLayoutClass(s32 o);
+void GetMotionNodePos(void *out, s32 obj, s32 node, s32 a);
 void *GetCharacterClass(void *obj);
-u8 *GetLayoutClass(void *chara);
-void GetMotionNodePos(void *out, void *obj, s32 a2, s32 a3);
 
-s32 GAMEUTIL_get_weapon_release_position_of_player_obj(u8 *out, void *obj)
+static inline s32 GetObjKind(s32 obj)
 {
-    s32 cls;
-    u8 *cc;
-    u8 *layout;
+    if (obj != 0) {
+        u8 *cc = GetCharacterClass((void *)obj);
+        if (cc != 0) {
+            return *(s16 *)(cc + 0x360);
+        }
+    }
+    return -1000000;
+}
 
-    if (obj == NULL)
-    {
-        cls = 0xFFF0BDC0;
-    }
-    else
-    {
-        cc = GetCharacterClass(obj);
-        if (cc == NULL)
-        {
-            cls = 0xFFF0BDC0;
-        }
-        else
-        {
-            cls = *(s16 *)(cc + 0x360);
-        }
-    }
-    if (cls == 2)
-    {
+s32 GAMEUTIL_get_weapon_release_position_of_player_obj(u128 *out, s32 obj)
+{
+    s32 k = GetObjKind(obj) ^ 2;
+    if (k == 0) {
         GetMotionNodePos(out, obj, 0x10000, 0);
         return 1;
     }
-    layout = GetLayoutClass(obj);
-    *(u128 *)out = *(u128 *)(*(u8 **)(layout + 0x134));
+    *out = **(u128 **)(GetLayoutClass(obj) + 0x134);
     return 0;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0007_GAMEUTIL_get_weapon_release_position_of_", GAMEUTIL_get_weapon_release_position_of_player_obj);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0007_GAMEUTIL_get_weapon_release_position_of_", GAMEUTIL_get_player_look_around_direction);
 
@@ -70,25 +57,11 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0007_GAMEUTIL_get_weapon_relea
 
 void *GetCharacterClass(void *obj);
 
-/* NEARMISS-STUB GAMEUTIL_is_horse_obj */
-#if 0 /* NEARMISS 48.2% cat=branch-layout sub=- | branch layout: target keeps beqz a0 / jal / beqz v0 / lh+b / const-sentinel join with xori+sltiu; gcc emits a different early-return layout (daddu v0,zero,zero  | attempts=1 */
-s32 GAMEUTIL_is_horse_obj(void *obj)
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0007_GAMEUTIL_get_weapon_release_position_of_", GAMEUTIL_is_horse_obj);
+s32 GAMEUTIL_is_horse_obj(s32 obj)
 {
-    u8 *cc;
-
-    if (obj == NULL)
-    {
-        return 0;
-    }
-    cc = GetCharacterClass(obj);
-    if (cc == NULL)
-    {
-        return 0;
-    }
-    return *(s16 *)(cc + 0x360) == 3;
+    return GetObjKind(obj) == 3;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0007_GAMEUTIL_get_weapon_release_position_of_", GAMEUTIL_is_horse_obj);
 
 void *GetCharacterClass(void *obj);
 
@@ -474,34 +447,32 @@ void GAMEUTIL_set_enable_side_change_angle_look_at_vs_offset(f32 value, u8 *p)
     *(f32 *)(p + 0x50) = value;
 }
 
-/* NEARMISS-STUB GAMEUTIL_reset_look_at_vs_offset */
-#if 0 /* NEARMISS 89.5% cat=branch-layout sub=- | flag bool (x!=0 && x*0<=0) -> store 1/0 then field stores: target v0=1 in the bc1t delay slot and a likely-branch-free layout; gcc emits bc1tl with v0=0 fallthr | attempts=1 */
-void GAMEUTIL_reset_interp_ratio_cntrl(void *cntrl);
-void GAMEUTIL_set_param_interp_ratio_cntrl(f32 a, f32 b, void *cntrl);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0007_GAMEUTIL_get_weapon_release_position_of_", GAMEUTIL_reset_look_at_vs_offset);
+void GAMEUTIL_reset_interp_ratio_cntrl(void *p);
+void GAMEUTIL_set_param_interp_ratio_cntrl(void *p, f32 a, f32 b);
 
 void GAMEUTIL_reset_look_at_vs_offset(u8 *p)
 {
-    s32 flag;
-
-    flag = (*(f32 *)(p + 0x00) != 0.0f) && (*(f32 *)(p + 0x00) * 0.0f <= 0.0f);
-    if (flag)
-    {
-        *(s32 *)(p + 0x10) = 1;
+    f32 v = *(f32 *)p;
+    s32 r;
+    if (v == 0.0f || !(v * 0.0f <= 0.0f)) {
+        r = 0;
+    } else {
+        r = 1;
     }
-    else
-    {
+    if (r != 0) {
+        *(s32 *)(p + 0x10) = 1;
+    } else {
         *(s32 *)(p + 0x10) = 0;
     }
-    *(s32 *)(p + 0x00) = 0;
-    *(f32 *)(p + 0x0C) = 1.0f;
-    *(s32 *)(p + 0x04) = 0;
-    *(s32 *)(p + 0x08) = 0;
+    *(s32 *)(p + 0) = 0;
+    *(f32 *)(p + 0xC) = 1.0f;
+    *(s32 *)(p + 4) = 0;
+    *(s32 *)(p + 8) = 0;
     *(s32 *)(p + 0x14) = 0;
     GAMEUTIL_reset_interp_ratio_cntrl(p + 0x1C);
-    GAMEUTIL_set_param_interp_ratio_cntrl(0.0f, 1.0f, p + 0x1C);
+    GAMEUTIL_set_param_interp_ratio_cntrl(p + 0x1C, 0.0f, 1.0f);
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0007_GAMEUTIL_get_weapon_release_position_of_", GAMEUTIL_reset_look_at_vs_offset);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0007_GAMEUTIL_get_weapon_release_position_of_", GAMEUTIL_doit_look_at_vs_offset);
 
