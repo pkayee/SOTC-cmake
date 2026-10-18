@@ -95,22 +95,19 @@ void DebugControl(s32 obj, s32 p1, s32 p2, s32 p3, f32 unused, f32 f1, f32 f2)
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0004_DebugControl", DebugGlobalMoveWith2ndController);
 
-void iosSetKPrintfColorContext(f32 r, f32 g, f32 b, f32 a, s32 ctx, s32 flag);
+void iosSetKPrintfColorContext(s32 ctx, s32 a, f32 r, f32 g, f32 b, f32 al);
 void kprintfContext(s32 ctx, const char *fmt, s32 arg);
 extern const char D_401324F0[];
 extern const char D_401324F8[];
 
-/* NEARMISS-STUB DebugDispItem */
-#if 0 /* NEARMISS 90.2% cat=sched sub=- | second iosSetKPrintfColorContext arg setup scheduled differently: target reloads ctx into a0 right after the first kprintfContext returns and places the 1.0f mo | attempts=1 */
-void DebugDispItem(s32 ctx, s32 p2, s32 p3)
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0004_DebugControl", DebugDispItem);
+void DebugDispItem(s32 ctx, s32 v1, s32 v2)
 {
-    iosSetKPrintfColorContext(1.0f, 1.0f, 1.0f, 1.0f, ctx, 0);
-    kprintfContext(ctx, D_401324F0, p2);
-    iosSetKPrintfColorContext(0.25f, 0.75f, 1.0f, 1.0f, ctx, 0);
-    kprintfContext(ctx, D_401324F8, p3);
+    iosSetKPrintfColorContext(ctx, 0, 1.0f, 1.0f, 1.0f, 1.0f);
+    kprintfContext(ctx, D_401324F0, v1);
+    iosSetKPrintfColorContext(ctx, 0, 0.25f, 0.75f, 1.0f, 1.0f);
+    kprintfContext(ctx, D_401324F8, v2);
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0004_DebugControl", DebugDispItem);
 
 void DebugDispPosition(s32 a0, f32 radius)
 {
