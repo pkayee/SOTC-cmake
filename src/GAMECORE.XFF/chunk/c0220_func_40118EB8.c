@@ -21,7 +21,11 @@ void setAttackParamWormCtrlWork(void *arg0, float fparg0)
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0220_func_40118EB8", setOffsetParamWormCtrlWork);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0220_func_40118EB8", setLimitTurnWormCtrlWork);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0220_func_40118EB8", setLimitTurnWormCtrlWork);
+void setLimitTurnWormCtrlWork(void *arg0, int arg1)
+{
+    (*(int *)((char *)(arg0) + 0xD8)) = arg1;
+}
 
 void setRotColCheckWormCtrlWork(void *arg0, int arg1)
 {
@@ -48,7 +52,11 @@ void setUnderFrictionCoffWormCtrlWork(void *arg0, float fparg0)
     (*(float *)((char *)(arg0) + 0x9C)) = fparg0;
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0220_func_40118EB8", setWorldPitchLimitWormCtrlWork);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0220_func_40118EB8", setWorldPitchLimitWormCtrlWork);
+void setWorldPitchLimitWormCtrlWork(void *arg0, float fparg0)
+{
+    (*(float *)((char *)(arg0) + 0x80)) = fparg0 * 3.1415926f / 180.0f;
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0220_func_40118EB8", resetVelocityWormCtrlWork);
 

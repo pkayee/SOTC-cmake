@@ -271,4 +271,12 @@ void setSavedPlaceId(s8 val)
     D_401FD098 = val;
 }
 
+/* NEARMISS-STUB gameFlagCheckPointLoad */
+#if 0 /* NEARMISS 12.7% cat=struct-layout sub=- | target copies 6 regions in unrolled u64 loops (1008 B); sibling is one struct copy | attempts=1 */
+typedef struct { s32 b[0x10]; } GFCpBlk;
+void gameFlagCheckPointLoad(GFCpBlk *a0)
+{
+    *(GFCpBlk *)D_401FC810 = *a0;
+}
+#endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0019_gameFlagCheckPointSave", gameFlagCheckPointLoad);

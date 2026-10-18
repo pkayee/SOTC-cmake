@@ -6,9 +6,45 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0161_nico_kameBodyExpression",
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0161_nico_kameBodyExpression", SCRConditionKameBattleAreaEscape);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0161_nico_kameBodyExpression", nico_bossTortoiseAIMain);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0161_nico_kameBodyExpression", nico_bossTortoiseAIMain);
+void nico_bossTortoiseAIMain(s32 *a0)
+{
+    void *thread;
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0161_nico_kameBodyExpression", func_400D78E8);
+    isysGetThisSubThread();
+    for (;;)
+    {
+        thread = isysGetThisSubThread();
+        SCRExecBossPreProcess(*a0);
+        CharaCtrlResetAllScriptCtrlStatus(thread);
+        updateScriptDataSystem(thread);
+        *(u64 *)((u8 *)a0 + 0x4198) = 0;
+        isysGetThisSubThread();
+        SCRExecBossPostProcess(*a0);
+        scrRunM(1);
+    }
+}
+
+extern char gcGlobalVar[];
+extern int *isysGroupForFirst(void *, int);
+extern int *isysGroupForNext(int *, int);
+extern void isysGroupForExit(int, int);
+extern void unloadObj(int);
+
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0161_nico_kameBodyExpression", func_400D78E8);
+void func_400D78E8(void)
+{
+    int m = 0;
+    int *g;
+
+    for (g = isysGroupForFirst(gcGlobalVar + 0x304, 0); g != 0; g = isysGroupForNext(g, 0))
+    {
+        m = *g;
+        unloadObj(m);
+    }
+    if (m != 0)
+        isysGroupForExit(m, 0);
+}
 
 extern void RequestCharacterMotionShiftFunc(void *character, void (*func)(void *character));
 

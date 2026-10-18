@@ -100,6 +100,53 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0045_arrowFilter", func_40048D
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0045_arrowFilter", func_40048D48);
 
+/* NEARMISS-STUB nico_birdBossStart */
+#if 0 /* NEARMISS 87.0% cat=vu0-mmi sub=- | sqc2 vf0 zero store vs sd pair; callee func_400490F8 is asm | attempts=1 */
+extern s32 rootPtn;
+void func_400490F8(s32 *a0);
+s32 SCRGetSizeOfBossWork(void *thread);
+void *iosCreatePartition(void *parent, s32 size);
+u8 *GetScriptCharacterClass(void *thread);
+void CharaCtrlResetCtrlStatus(void *chara);
+void CharaCtrlResetAllScriptCtrlStatus(void *chara);
+void *_SCRMallocAlign(void *ptn, s32 size, s32 align);
+void *SCRCharaInitBossWork(void *ptn, void *thread);
+void SCRReleaseBossWork(void);
+void SetScriptCharacterObjReleaseCallBackFunc(void *chara, void *func, void *arg);
+void *GetScriptClass(void *chara);
+void initScriptDataSystem(void *chara, void *data);
+void isysJumpSubThread(void *func, void *arg);
+
+void nico_birdBossStart(void)
+{
+    void *thread = isysGetThisSubThread();
+    s32 size = SCRGetSizeOfBossWork(thread);
+    void *part = iosCreatePartition(&rootPtn, size + 0x41F3);
+    u8 *cls = GetScriptCharacterClass(thread);
+    void *mem;
+    void *boss;
+
+    *(void **)(cls + 0x114C) = part;
+    CharaCtrlResetCtrlStatus(thread);
+    CharaCtrlResetAllScriptCtrlStatus(thread);
+    cls = GetScriptCharacterClass(thread);
+    mem = _SCRMallocAlign(part, 0x41C0, 0x10);
+    *(void **)(cls + 0x1150) = mem;
+    boss = SCRCharaInitBossWork(part, thread);
+    *(void **)mem = boss;
+    SetScriptCharacterObjReleaseCallBackFunc(thread, SCRReleaseBossWork, boss);
+    CharaCtrlResetCtrlStatus(thread);
+    cls = GetScriptClass(thread);
+    initScriptDataSystem(thread, *(void **)(cls + 0x48));
+    *(s32 *)((u8 *)mem + 0x4194) = 0;
+    *(s32 *)((u8 *)mem + 0x4198) = 0;
+    *(u64 *)((u8 *)mem + 0x41A0) = 0;
+    *(u64 *)((u8 *)mem + 0x41A8) = 0;
+    *(s32 *)((u8 *)mem + 0x41B4) = 0;
+    *(s32 *)((u8 *)mem + 0x41B8) = 0;
+    isysJumpSubThread(func_400490F8, mem);
+}
+#endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0045_arrowFilter", nico_birdBossStart);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0045_arrowFilter", SCRFuncBirdSetAttainPosForPathData);

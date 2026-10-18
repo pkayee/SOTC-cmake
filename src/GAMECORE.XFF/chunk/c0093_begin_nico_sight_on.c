@@ -111,13 +111,26 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0093_begin_nico_sight_on", fun
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0093_begin_nico_sight_on", func_40080290);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0093_begin_nico_sight_on", func_400803A0);
+extern s32 ScriptCtrlDef_SCRHorseSightOnTurnNone;
+s32 func_400803C0(s32 a, s32 b, s32 c);
+
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0093_begin_nico_sight_on", func_400803A0);
+s32 func_400803A0(s32 a)
+{
+    return func_400803C0(a, 0, ScriptCtrlDef_SCRHorseSightOnTurnNone);
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0093_begin_nico_sight_on", func_400803C0);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0093_begin_nico_sight_on", nico_getOmakeItem);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0093_begin_nico_sight_on", nico_delOmakeItem);
+extern s32 D_40131968;
+void isysRequestDeleteObj(s32);
+
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0093_begin_nico_sight_on", nico_delOmakeItem);
+void nico_delOmakeItem(void) {
+    isysRequestDeleteObj(D_40131968);
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0093_begin_nico_sight_on", func_400806E8);
 

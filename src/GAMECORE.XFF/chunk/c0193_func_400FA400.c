@@ -180,8 +180,28 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0193_func_400FA400", func_400F
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0193_func_400FA400", func_400FB300);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0193_func_400FA400", func_400FB350);
+extern s32 DldSysUndefSymbol;
+extern void fsEffectSetParamSheetSeg(void *);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0193_func_400FA400", func_400FB3D0);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0193_func_400FA400", func_400FB350);
+void func_400FB350(void *arg0)
+{
+    u32 *h = *(u32 **)(*(char **)((char *)arg0 + 0x684) + 0x14);
+    u32 v = *h;
+    s32 off = v & 0x3FFFF;
+    char *t = off != 0 ? *(char **)((char *)h - off) : 0;
+    char *p = (t != 0 && t != (char *)DldSysUndefSymbol) ? *(char **)(t + 0x10) + ((v >> 18) & 0xFFF) * *(s32 *)(*(char **)(t + 8) + 0xC) : 0;
+    fsEffectSetParamSheetSeg(p + 0x1B0);
+}
+
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0193_func_400FA400", func_400FB3D0);
+void func_400FB3D0(s32 *p)
+{
+    *p = 0;
+    if (p[1] != 0) {
+        iosFree((void *)p[1]);
+        p[1] = 0;
+    }
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0193_func_400FA400", func_400FB410);

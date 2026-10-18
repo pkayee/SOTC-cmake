@@ -41,11 +41,22 @@ void deleteSlowLegCtrlWork(void) {
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0219_setDashSlowLegCtrlWork", func_40116E60);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0219_setDashSlowLegCtrlWork", func_40116ED0);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0219_setDashSlowLegCtrlWork", func_40116ED0);
+void func_40116ED0(u8* w)
+{
+    *(s32*)(w + 0x94) = 0;
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0219_setDashSlowLegCtrlWork", func_40116ED8);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0219_setDashSlowLegCtrlWork", func_40116FB8);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0219_setDashSlowLegCtrlWork", func_40116FB8);
+float calcAngleTime(float angle, float a, float b, float c);
+
+float func_40116FB8(char *obj, float angle)
+{
+    return calcAngleTime(angle, *(float *)(obj + 0xA8), *(float *)(obj + 0xA4),
+                         *(float *)(**(char ***)(obj + 0x1C) + 0x78));
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0219_setDashSlowLegCtrlWork", func_40116FE0);
 
