@@ -52,7 +52,17 @@ INCLUDE_ASM("asm/PATHTOOL.XFF/nonmatchings/chunk/c0006_func_4001A9C0", func_4001
 
 INCLUDE_ASM("asm/PATHTOOL.XFF/nonmatchings/chunk/c0006_func_4001A9C0", func_4001BA18);
 
-INCLUDE_ASM("asm/PATHTOOL.XFF/nonmatchings/chunk/c0006_func_4001A9C0", func_4001BA98);
+extern u8 padManagerData[];
+void func_40017728();
+
+void func_4001BA98(void)
+{
+    if (*(s32 *)(padManagerData + 8) & 0x20)
+    {
+        func_40017728();
+    }
+    return;
+}
 
 INCLUDE_ASM("asm/PATHTOOL.XFF/nonmatchings/chunk/c0006_func_4001A9C0", func_4001BAC8);
 
@@ -66,7 +76,17 @@ INCLUDE_ASM("asm/PATHTOOL.XFF/nonmatchings/chunk/c0006_func_4001A9C0", func_4001
 
 INCLUDE_ASM("asm/PATHTOOL.XFF/nonmatchings/chunk/c0006_func_4001A9C0", func_4001BDE0);
 
-INCLUDE_ASM("asm/PATHTOOL.XFF/nonmatchings/chunk/c0006_func_4001A9C0", func_4001BE20);
+extern u8 padManagerData[];
+void func_400180D0();
+
+void func_4001BE20(void)
+{
+    if (*(s32 *)(padManagerData + 8) & 0x20)
+    {
+        func_400180D0();
+    }
+    return;
+}
 
 INCLUDE_ASM("asm/PATHTOOL.XFF/nonmatchings/chunk/c0006_func_4001A9C0", func_4001BE50);
 

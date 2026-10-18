@@ -24,7 +24,15 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0082_SetCharacterClassWindDynam
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0082_SetCharacterClassWindDynamics", charrootdyn_getRegularColFinderPosition);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0082_SetCharacterClassWindDynamics", charrootdyn_getCollisionAttribute);
+void GetGeometryPointerSurfaceAttribute();
+
+u64 charrootdyn_getCollisionAttribute(s32 a0)
+{
+    u64 attr[2];
+
+    GetGeometryPointerSurfaceAttribute(attr, a0);
+    return attr[0];
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0082_SetCharacterClassWindDynamics", charrootdyn_getOffsetGlobalPos);
 

@@ -63,6 +63,28 @@ void func_400FAB90() {
     isysRequestDeleteObj();
 }
 
+/* NEARMISS-STUB getBootParent */
+#if 0 /* NEARMISS 86.0% cat=branch-layout sub=loop-exit-likely | param geo walk: GetGeometryPointerObject(geo), geo=layout+0xC0 (arg was missing in the old attempt); structure exact; left: obj==NULL exit is beql (predicted ta | attempts=2 */
+u8 *getBootParent(u8 *geo)
+{
+    u8 *parent = NULL;
+    u8 *obj;
+    u8 *layout;
+
+    while ((obj = GetGeometryPointerObject(geo)) != NULL) {
+        layout = GetLayoutClass(obj);
+        if (layout == NULL) {
+            break;
+        }
+        geo = layout + 0xC0;
+        parent = obj;
+        if (*(s32 *)(layout + 0x124) == 0) {
+            break;
+        }
+    }
+    return parent;
+}
+#endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0203_getSETriggerTestMode", getBootParent);
 
 u8 *SequenceKickParticle(s32 owner, s32 g) {
@@ -205,7 +227,10 @@ void *initLoadObjEditWork(s32 sheet, s32 unused, s32 size) {
     return p;
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0203_getSETriggerTestMode", delLoadObjEditWork);
+void delLoadObjEditWork(s32 a, s32 b, void *p) {
+    iosFree(p);
+    return;
+}
 
 s32 getEditWorkSize(s32 *a) {
     if (a != NULL) {

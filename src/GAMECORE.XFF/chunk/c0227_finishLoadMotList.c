@@ -78,23 +78,16 @@ s32 SCRConditionAttacked(s32 a0)
     return nico_GetCharacterAttackedFlag(a0);
 }
 
-/* NEARMISS-STUB SCRConditionDamagedType */
-#if 0 /* NEARMISS 74.47% cat=branch-layout sub=- | target bnel likely w/ return 0 in delay slot; we if-convert last compare | attempts=1 */
 s32 SCRConditionDamagedType(s32 a0, s32 a1, s32 a2, s32 a3, s32 sheetType)
 {
-    u8* damage = GetDamageClass(a0);
-    if (*(s32*)damage != 1)
+    u8 *damage = GetDamageClass(a0);
+
+    if (*(s32 *)damage == 1 && sheetType == GetDamagerClassDamageSheetType(damage))
     {
-        return 0;
+        return 1;
     }
-    if (GetDamagerClassDamageSheetType(damage) != sheetType)
-    {
-        return 0;
-    }
-    return 1;
+    return 0;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0227_finishLoadMotList", SCRConditionDamagedType);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0227_finishLoadMotList", SCRConditionDamagedWeaponType);
 

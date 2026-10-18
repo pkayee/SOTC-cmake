@@ -2,7 +2,17 @@
 
 INCLUDE_ASM("asm/PATHTOOL.XFF/nonmatchings/chunk/c0007_func_4001C278", func_4001C278);
 
-INCLUDE_ASM("asm/PATHTOOL.XFF/nonmatchings/chunk/c0007_func_4001C278", func_4001C2B8);
+extern u8 padManagerData[];
+void func_40018E78();
+
+void func_4001C2B8(void)
+{
+    if (*(s32 *)(padManagerData + 8) & 0x20)
+    {
+        func_40018E78();
+    }
+    return;
+}
 
 INCLUDE_ASM("asm/PATHTOOL.XFF/nonmatchings/chunk/c0007_func_4001C278", func_4001C2E8);
 

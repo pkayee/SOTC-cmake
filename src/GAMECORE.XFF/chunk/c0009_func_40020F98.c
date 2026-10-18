@@ -195,7 +195,7 @@ void func_40021300(void)
 }
 
 /* NEARMISS-STUB func_40021440 */
-#if 0 /* NEARMISS 94.27% cat=regalloc sub=- | bnezl delay slot holds dead li v0,1 in target (ours lui v0); s2 hi-part kept live across calls in target; f-reg order target f1=0x178 f2=0x188 f0=0x168 vs ours  | attempts=1 */
+#if 0 /* NEARMISS 95.96% cat=regalloc sub=dead-li-case | DEAD-LI-CASE fixed (switch D_40130A68 case0/case1/default like func_40021638): 94.27->95.96; left: s2 hi-part live across calls and f-reg order (f1/f2/f0) | attempts=2 */
 s64 iosGetTCount();
 f32 iosGetSecondFromTCount(u64 arg0);
 u64 __muldi3(u64 a, s64 b);
@@ -207,10 +207,16 @@ void func_40021440(void)
     f32 f;
 
     func_40021300();
-    if (D_40130A68 == 0) {
+    switch (D_40130A68) {
+    case 0:
         t = iosGetTCount();
-    } else {
+        break;
+    case 1:
         t = D_40130A70;
+        break;
+    default:
+        t = D_40130A70;
+        break;
     }
     g = (u8 *)&gcGlobalVar;
     *(s64 *)(g + 0x110) = *(s64 *)(g + 0x108);
@@ -247,25 +253,27 @@ void func_40021440(void)
 #endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0009_func_40020F98", func_40021440);
 
-/* NEARMISS-STUB func_40021638 */
-#if 0 /* NEARMISS 94.0% cat=branch-layout sub=- | orig lw v0+bnez with dead addiu v1 in delay slot; ours lw v1+bnezl | attempts=1 */
-/* GAMECORE.XFF c0009 func_40021638 best C 94.77%, not live */
-extern s32 D_40130A68;
-extern s64 D_40130A70;
 s64 iosGetTCount();
 f32 iosGetSecondFromTCount(u64 arg0);
-void func_40021300();
 void func_40021440();
+
 void func_40021638(void)
 {
     u8 *g;
     s64 t;
 
     func_40021300();
-    if (D_40130A68 == 0) {
+    switch (D_40130A68)
+    {
+    case 0:
         t = iosGetTCount();
-    } else {
+        break;
+    case 1:
         t = D_40130A70;
+        break;
+    default:
+        t = D_40130A70;
+        break;
     }
     g = (u8 *)&gcGlobalVar;
     *(s64 *)(g + 0x140) = t;
@@ -281,8 +289,6 @@ void func_40021638(void)
     *(f32 *)(g + 0x168) = iosGetSecondFromTCount(*(s64 *)(g + 0x108) + *(s64 *)(g + 0x120));
     func_40021440();
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0009_func_40020F98", func_40021638);
 
 /* NEARMISS-STUB func_400216E8 */
 #if 0 /* NEARMISS 77.3% cat=regalloc sub=f-reg order a8/a0/zero; delay-slot sd ra | fpu regs f3/f5/f4 in target vs f4/f1/f8 ours; sd ra in bc1f delay slot (target: prologue); target mtc1 zero before lui; branch shape d>0 path matches | attempts=1 */

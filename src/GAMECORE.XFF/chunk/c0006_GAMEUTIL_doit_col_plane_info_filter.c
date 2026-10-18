@@ -476,31 +476,31 @@ s32 GAMEUTIL_is_swimming_now(s32 arg0)
     return 0;
 }
 
-/* NEARMISS-STUB GAMEUTIL_is_floating_now */
-#if 0 /* NEARMISS 89.3% cat=branch-layout sub=- | mode-compare reg choice, shared return-0 tail | attempts=1 */
 s32 GAMEUTIL_check_parent_flag(s32 chr);
-s32 GAMEUTIL_is_floating_now(s32 arg0)
+
+static inline s32 is_swimming_inl(s32 chr)
 {
-    u8 *chara;
     s32 mode;
 
-    if (GAMEUTIL_check_parent_flag(arg0) == 0)
+    if (GAMEUTIL_is_player_obj(chr) == 1)
     {
-        if (GAMEUTIL_is_player_obj(arg0) == 1)
+        mode = *(s32 *)(GetCharacterClass(chr) + 0x740);
+        if (mode == ControlMode_PLAYER_SWIM || mode == ControlMode_PLAYER_SWIM_MOVE || mode == ControlMode_PLAYER_SWIM_DASH)
         {
-            chara = GetCharacterClass(arg0);
-            mode = *(s32*)(chara + 0x740);
-            if (mode == ControlMode_PLAYER_SWIM || mode == ControlMode_PLAYER_SWIM_MOVE || mode == ControlMode_PLAYER_SWIM_DASH)
-            {
-                return 0;
-            }
+            return 1;
         }
+    }
+    return 0;
+}
+
+s32 GAMEUTIL_is_floating_now(s32 arg0)
+{
+    if (GAMEUTIL_check_parent_flag(arg0) == 0 && !is_swimming_inl(arg0))
+    {
         return 1;
     }
     return 0;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0006_GAMEUTIL_doit_col_plane_info_filter", GAMEUTIL_is_floating_now);
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0006_GAMEUTIL_doit_col_plane_info_filter", GAMEUTIL_is_sign_change);
 s32 GAMEUTIL_is_sign_change(f32 a, f32 b)
@@ -552,33 +552,25 @@ s32 GAMEUTIL_get_player_obj(void)
 #endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0006_GAMEUTIL_doit_col_plane_info_filter", GAMEUTIL_get_player_obj);
 
-/* NEARMISS-STUB GAMEUTIL_is_player_obj */
-#if 0 /* NEARMISS 83.8% cat=branch-layout sub=- | null-check ladder and 0xFFF0BDC0 fallback not matching | attempts=1 */
-s32 GAMEUTIL_is_player_obj(s32 chr)
+static inline s32 get_character_type_inl(s32 chr)
 {
-    u8* chara;
-    s32 type;
+    u8 *chara;
 
     if (chr != 0)
     {
         chara = GetCharacterClass(chr);
         if (chara != 0)
         {
-            type = *(s16*)(chara + 0x360);
-        }
-        else
-        {
-            type = 0xFFF0BDC0;
+            return *(s16 *)(chara + 0x360);
         }
     }
-    else
-    {
-        type = 0xFFF0BDC0;
-    }
-    return type == 2;
+    return 0xFFF0BDC0;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0006_GAMEUTIL_doit_col_plane_info_filter", GAMEUTIL_is_player_obj);
+
+s32 GAMEUTIL_is_player_obj(s32 chr)
+{
+    return get_character_type_inl(chr) == 2;
+}
 
 /* NEARMISS-STUB GAMEUTIL_is_player_obj_standing_on_horse */
 #if 0 /* NEARMISS 54.5% cat=regalloc sub=- | frame 0x20 vs 0x10, mode ladder layout | attempts=1 */

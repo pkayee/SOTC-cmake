@@ -74,13 +74,10 @@ void *malloc_from_src_partition(s32 part, s32 size, s32 unused, s32 fallback) {
     return p;
 }
 
-/* NEARMISS-STUB malloc_from_root_partition */
-#if 0 /* NEARMISS 38.0% cat=call-abi sub=sibcall | target: jal iosMallocAlign + frame (non-tail, move a1,a0 before sp adjust); ours emits j iosMallocAlign. voids32/cast/local variants all sibcall | attempts=1 */
-void *malloc_from_root_partition(s32 size) {
-    return iosMallocAlign(&rootPtn, size, 0x10);
+s64 malloc_from_root_partition(s32 size)
+{
+    return (s64)iosMallocAlign(&rootPtn, size, 0x10);
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0007_initmanager", malloc_from_root_partition);
 
 void *malloc_from_fast_get_partition(s32 size, s32 unused, s32 fallback) {
     s32 part = D_40124790;

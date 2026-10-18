@@ -23,31 +23,21 @@ s32 stagemanager_createsubthread(s32 a0, s32 a1, s32 a2)
     return r;
 }
 
-/* NEARMISS-STUB stagemanager_loadstage */
-#if 0 /* NEARMISS 0.0% cat=call-abi sub=- | same as unloadstage: gcc emits j createScriptObj (sibcall, frame kept, ld ra early); expected jal + ld ra/jr ra and prologue scheduled after arg loads | attempts=1 */
-extern u8 gcGlobalVar[];
-s32 createScriptObj(void *fn, s32 a1, void *a2, s32 a3, s32 a4, s32 a5, void *a6, s32 a7);
 void func_40041CC8(void);
 
 void stagemanager_loadstage(s32 a0, s32 a1)
 {
     createScriptObj((void *)func_40041CC8, (a0 << 16) | a1, *(void **)(gcGlobalVar + 0x308), 0x1000, 0, 1, 0, 0);
+    return;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0039_stagemanager_createsubthread", stagemanager_loadstage);
 
-/* NEARMISS-STUB stagemanager_unloadstage */
-#if 0 /* NEARMISS 0.0% cat=call-abi sub=- | gcc sibcalls the final createScriptObj as j (frame kept, ld ra early); expected is jal + ld ra/jr ra with prologue scheduled after arg loads; s32/void/K&R calle | attempts=1 */
-extern u8 gcGlobalVar[];
-s32 createScriptObj();
-void func_40041DD8(void);
+void func_40041DD8(s32 a0);
 
 void stagemanager_unloadstage(s32 a0)
 {
     createScriptObj((void *)func_40041DD8, a0, *(void **)(gcGlobalVar + 0x308), 0x1000, 0, 1, 0, 0);
+    return;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0039_stagemanager_createsubthread", stagemanager_unloadstage);
 
 /* NEARMISS-STUB stagemanager_getStageNumberWithStageDataStrptr */
 #if 0 /* NEARMISS 90.2% cat=branch-layout sub=- | shared zero exit block | attempts=1 */
@@ -255,8 +245,6 @@ void stagemanager_checkstageAlreadyLoadedByStrptr(u32 *a0)
 #endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0039_stagemanager_createsubthread", stagemanager_checkstageAlreadyLoadedByStrptr);
 
-/* NEARMISS-STUB stagemanager_checkstageAlreadyLoadedByStageData */
-#if 0 /* NEARMISS 92.0% cat=call-abi sub=- | gcc emits j sheetMgrChkStageIndexResolve (sibcall, frame kept); expected jal with mult in delay slot then ld ra/jr ra; register assignment already matches | attempts=1 */
 extern s32 DldSysUndefSymbol;
 extern u8 SH_StageDataDEFAULT[];
 
@@ -265,7 +253,7 @@ void stagemanager_checkstageAlreadyLoadedByStageData(s32 a0)
     u8 *p;
     s32 v = 0;
 
-    if ((s32)DldSysUndefSymbol == (s32)SH_StageDataDEFAULT)
+    if ((s32)SH_StageDataDEFAULT == DldSysUndefSymbol)
     {
         p = NULL;
     }
@@ -278,9 +266,8 @@ void stagemanager_checkstageAlreadyLoadedByStageData(s32 a0)
         v = *(s32 *)(p + 0x10);
     }
     sheetMgrChkStageIndexResolve(((a0 - v) >> 2) * -0x33333333);
+    return;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0039_stagemanager_createsubthread", stagemanager_checkstageAlreadyLoadedByStageData);
 
 /* NEARMISS-STUB stagemanager_unloadstageByStrptr */
 #if 0 /* NEARMISS 76.59% cat=call-abi sub=- | sibcall j createScriptObj vs jal | attempts=1 */

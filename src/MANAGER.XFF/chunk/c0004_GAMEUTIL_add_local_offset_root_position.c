@@ -358,24 +358,13 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0004_GAMEUTIL_add_local_offset_
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0004_GAMEUTIL_add_local_offset_root_position", GAMEUTIL_is_between_yaw_and_yaw_extend_abs);
 
-/* NEARMISS-STUB GAMEUTIL_is_between_pitch_and_pitch */
-#if 0 /* NEARMISS 56.875% cat=branch-layout sub=- | target has two separate return blocks (shared ret1 reached from both && tests, ret0 separate jr ra); gcc 2.96 merges to one exit with v0 set, 3 C shapes tried ( | attempts=1 */
 s32 GAMEUTIL_is_between_pitch_and_pitch(f32 value, f32 min, f32 max)
 {
-    if (min <= value && value <= max)
+    if ((min <= value && value <= max) || (max <= value && value <= min))
     {
         return 1;
     }
-    else if (max <= value && value <= min)
-    {
-        return 1;
-    }
-    else
-    {
-        return 0;
-    }
+    return 0;
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0004_GAMEUTIL_add_local_offset_root_position", GAMEUTIL_is_between_pitch_and_pitch);
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0004_GAMEUTIL_add_local_offset_root_position", GAMEUTIL_is_inside_of_region_yaw);

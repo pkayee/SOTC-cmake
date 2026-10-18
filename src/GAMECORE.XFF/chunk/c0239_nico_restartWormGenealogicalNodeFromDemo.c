@@ -18,7 +18,14 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0239_nico_restartWormGenealogi
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0239_nico_restartWormGenealogicalNodeFromDemo", initEventScriptObj);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0239_nico_restartWormGenealogicalNodeFromDemo", getEventScriptObjWorkSize);
+extern s32 D_40132460[];
+s32 GetScriptObjWorkSize();
+
+s64 getEventScriptObjWorkSize(s32 *a0)
+{
+    D_40132460[4] = *a0;
+    return GetScriptObjWorkSize(D_40132460);
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0239_nico_restartWormGenealogicalNodeFromDemo", createEventScriptObj);
 

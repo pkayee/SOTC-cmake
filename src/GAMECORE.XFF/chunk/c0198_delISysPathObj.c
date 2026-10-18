@@ -386,49 +386,36 @@ s32 getWayFinish(u8* work)
     return ret;
 }
 
-/* NEARMISS-STUB getPathStatus */
-#if 0 /* NEARMISS 33.9% cat=branch-layout sub=- | branch-layout | attempts=1 */
-s32 getPathStatus(u8* work)
+s32 getPathStatus(u8 *work)
 {
-    s32 mode = *(s32*)(work + 0x39C);
-    if (mode == 0)
+    switch (*(s32 *)(work + 0x39C))
     {
-        if (*(s32*)(work + 0x380) != 0 || *(s32*)(work + 0x3E8) != 0)
+    case 0:
+        if (*(s32 *)(work + 0x380) != 0 || *(s32 *)(work + 0x3E8) != 0)
         {
             return 1;
         }
-        return 0;
-    }
-    if (mode > 0)
-    {
-        if (mode == 1)
+        break;
+    case 1:
+        if (*(s32 *)(work + 0x380) != 0)
         {
-            return *(s32*)(work + 0x380) != 0;
+            return 1;
         }
-        return 0;
+        break;
+    case -1:
+        return 1;
     }
-    if (mode == -1)
+    return 0;
+}
+
+s32 useTempAttain(u8 *work)
+{
+    if (*(s32 *)(work + 0x39C) == 0 && *(s32 *)(work + 0x3F0) != 0)
     {
         return 1;
     }
     return 0;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0198_delISysPathObj", getPathStatus);
-
-/* NEARMISS-STUB useTempAttain */
-#if 0 /* NEARMISS 63.3% cat=regalloc sub=- | regalloc | attempts=1 */
-s32 useTempAttain(u8* work)
-{
-    s32 ret = 0;
-    if (*(s32*)(work + 0x39C) == 0)
-    {
-        ret = *(s32*)(work + 0x3F0) != 0;
-    }
-    return ret;
-}
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0198_delISysPathObj", useTempAttain);
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0198_delISysPathObj", getWayForRoute);
 s32 getWayForRoute(u8* work)
