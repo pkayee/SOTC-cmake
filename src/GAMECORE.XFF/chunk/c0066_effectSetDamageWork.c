@@ -93,7 +93,21 @@ void fadeout_weakpoint_effect(void)
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0066_effectSetDamageWork", end_weakpoint_effect);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0066_effectSetDamageWork", effect_death);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0066_effectSetDamageWork", effect_death);
+extern u8 *GetLayoutClass();
+extern void func_40060A68(u8 *, s32, float *, s32, s16);
+
+void effect_death(void)
+{
+    float pos[4] __attribute__((aligned(16)));
+    u8 *c = GetLayoutClass();
+    int **m;
+
+    GetGeometryPointerPosition(pos, D_40203290);
+    m = *(int ***)(c + 0x144);
+    func_40060A68(c, *(int *)((char *)m[0] + 0x20), pos, *(int *)((char *)m[3] + 0x104), *(short *)(c + 0x1B4));
+    return;
+}
 
 extern int D_40203288;
 
@@ -117,17 +131,50 @@ void *getBloodEffectEnableFlag(void)
     return D_401315F4;
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0066_effectSetDamageWork", func_40061720);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0066_effectSetDamageWork", func_40061720);
+extern unsigned char D_401315E0[];
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0066_effectSetDamageWork", func_40061730);
+void *func_40061720(void)
+{
+    return D_401315E0;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0066_effectSetDamageWork", func_40061740);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0066_effectSetDamageWork", func_40061730);
+extern unsigned char D_401315E4[];
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0066_effectSetDamageWork", func_40061750);
+void *func_40061730(void)
+{
+    return D_401315E4;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0066_effectSetDamageWork", func_40061760);
+extern unsigned char D_401315E8[];
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0066_effectSetDamageWork", func_40061770);
+void *func_40061740(void)
+{
+    return D_401315E8;
+}
+
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0066_effectSetDamageWork", func_40061750);
+void *func_40061750(void)
+{
+    return &D_401315D0;
+}
+
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0066_effectSetDamageWork", func_40061760);
+extern unsigned char D_401315D4[];
+
+void *func_40061760(void)
+{
+    return D_401315D4;
+}
+
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0066_effectSetDamageWork", func_40061770);
+extern unsigned char D_401315D8[];
+
+void *func_40061770(void)
+{
+    return D_401315D8;
+}
 
 extern unsigned char D_401317A4[];
 
@@ -150,12 +197,28 @@ void *getTrigGlowTime(void)
     return D_401317AC;
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0066_effectSetDamageWork", func_400617B0);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0066_effectSetDamageWork", func_400617B0);
+void func_400617B0(u8 *p)
+{
+    u8 *v = *(u8 **)(p + 0x50);
+
+    *(float *)(p + 0x28) = *(float *)(p + 0x28) * *(float *)(v + 0x70);
+    *(float *)(p + 0x24) = *(float *)(p + 0x24) * (*(float *)(v + 0x74) * *(float *)(v + 0x14));
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0066_effectSetDamageWork", func_400617E0);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0066_effectSetDamageWork", func_40061888);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0066_effectSetDamageWork", func_400619D8);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0066_effectSetDamageWork", func_400619D8);
+void func_400619D8(u8 *p)
+{
+    p += 0x5C;
+    if (*(s32 *)p != 0) {
+        *(s32 *)p = 0;
+        *(s32 *)(p + 0x4) = 0;
+        *(s32 *)(p + 0x8) = 0;
+    }
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0066_effectSetDamageWork", func_40061A00);
