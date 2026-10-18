@@ -9,19 +9,37 @@ extern u8 D_401ABD18[];
 extern u8 D_401ABD20[];
 extern u8 D_401ABD24[];
 extern u8 D_401ABD28[];
+extern void func_4002A9B0();
 extern u8 D_401ABD30[];
 extern u8 D_401ABD34[];
 extern u8 D_401ABD38[];
 extern u8 D_40129FA0[];
 extern u8 D_40129FA4[];
 extern u8 D_40129FA8[];
+extern u8 D_40129FB0[];
+extern u8 D_40129FB4[];
 extern u8 D_40129FB8[];
+extern u8 D_40129FC0[];
+extern u8 D_40129FC4[];
+extern u8 D_40129FC8[];
+extern float D_40129F90;
+extern u8 D_401ABD40[];
+extern u8 D_401ABD44[];
+extern u8 D_401ABD48[];
+extern u8 D_401ABD4C[];
+extern u8 D_4012A010[];
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0020_setSpecularity", setSpecularity);
+void setSpecularity(float fparg0)
+{
+    D_40129F90 = fparg0;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0020_setSpecularity", getAmbientColor);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0020_setSpecularity", lightsw0);
+void *lightsw0(void)
+{
+    return D_401ABD40;
+}
 
 //INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0020_setSpecularity", getlc0_r);
 u8 *getlc0_r(void)
@@ -59,7 +77,10 @@ u8 *getlv0_b(void)
     return D_40129FA8;
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0020_setSpecularity", lightsw1);
+void *lightsw1(void)
+{
+    return D_401ABD44;
+}
 
 //INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0020_setSpecularity", getlc1_r);
 u8 *getlc1_r(void)
@@ -79,9 +100,15 @@ u8 *getlc1_b(void)
     return D_401ABD18;
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0020_setSpecularity", getlv1_h);
+u8 *getlv1_h(void)
+{
+    return D_40129FB0;
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0020_setSpecularity", getlv1_p);
+void *getlv1_p(void)
+{
+    return D_40129FB4;
+}
 
 //INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0020_setSpecularity", getlv1_b);
 u8 *getlv1_b(void)
@@ -89,7 +116,10 @@ u8 *getlv1_b(void)
     return D_40129FB8;
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0020_setSpecularity", lightsw2);
+void *lightsw2(void)
+{
+    return D_401ABD48;
+}
 
 //INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0020_setSpecularity", getlc2_r);
 u8 *getlc2_r(void)
@@ -109,13 +139,25 @@ u8 *getlc2_b(void)
     return D_401ABD28;
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0020_setSpecularity", getlv2_h);
+void *getlv2_h(void)
+{
+    return D_40129FC0;
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0020_setSpecularity", getlv2_p);
+void *getlv2_p(void)
+{
+    return D_40129FC4;
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0020_setSpecularity", getlv2_b);
+void *getlv2_b(void)
+{
+    return D_40129FC8;
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0020_setSpecularity", lightsw3);
+void *lightsw3(void)
+{
+    return D_401ABD4C;
+}
 
 //INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0020_setSpecularity", getamb_r);
 u8 *getamb_r(void)
@@ -135,11 +177,17 @@ u8 *getamb_b(void)
     return D_401ABD38;
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0020_setSpecularity", setLightParamDefault);
+void setLightParamDefault(void)
+{
+    func_4002A9B0();
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0020_setSpecularity", rotLightVector);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0020_setSpecularity", CopyAmbFromAmbdef);
+void CopyAmbFromAmbdef(void)
+{
+    *(s128 *)D_4012A010 = *(s128 *)D_401ABD30;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0020_setSpecularity", getLightVector);
 
