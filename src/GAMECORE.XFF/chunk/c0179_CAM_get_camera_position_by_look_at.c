@@ -18,6 +18,8 @@ void GAMEUTIL_get_horse_move_status(s32 *a0, void *a1);
 void *GAMEUTIL_get_motion_kind(void *chara);
 u8 *GetLayoutClass(void *chara);
 void func_400E94F0(void *a0);
+void func_400E94C0(void *param);
+void GAMEUTIL_set_act_max_zero_clip_flag_interp_ratio_cntrl(void *a0, s32 a1);
 extern u128 ZeroVector;
 
 void *CAM_get_ground_contact_obj(u8 *a0);
@@ -28,48 +30,60 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0179_CAM_get_camera_position_b
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0179_CAM_get_camera_position_by_look_at", CAM_get_new_look_at_posi_from_camera_posi_and_rotXY);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0179_CAM_get_camera_position_by_look_at", CAM_get_interp_ratio_by_time);
+f32 GAMEUTIL_get_cos_ratio(f32 a, f32 b, f32 c, f32 d);
 
-/* NEARMISS-STUB CAM_act_ray_check_for_camera */
-#if 0 /* NEARMISS 84.1% cat=regalloc sub=- | dead a5-a7 moves at entry, bnezl vs bnez | attempts=1 */
-s32 camera_collision_check_direct(void *info);
+f32 CAM_get_interp_ratio_by_time(s32 mode, f32 a, f32 b, f32 t, f32 bias)
+{
+    f32 r = 1.0f;
+
+    if (0.0f < t)
+    {
+        r = GAMEUTIL_get_cos_ratio(a, b, 0.0f, t);
+    }
+    if (mode == 0)
+    {
+        r = 1.0f - r;
+    }
+    if (0.0f < bias)
+    {
+        r = r * (1.0f - bias) + bias;
+    }
+    return r;
+}
+
+s32 camera_collision_check_direct(void *a0, void *a1, void *a2, void *a3, void *a4, s32 a5, void *a6, s32 a7);
 void ConvertFromCollisionPointToDynamics(void *a0, void *a1);
 
-s32 CAM_act_ray_check_for_camera(void *a0)
+s32 CAM_act_ray_check_for_camera(void *out, void *a, void *b, void *c, void *d, void *e)
 {
-    u8 info[0x50];
-    s32 ret;
+    u8 buf[0x50];
+    s32 r;
 
-    ret = (camera_collision_check_direct(info) == 0);
-    if (ret != 0)
+    r = camera_collision_check_direct(buf, a, b, c, d, 0, e, 1) == 0;
+    if (!r)
     {
-        return ret;
+        if (out != NULL)
+        {
+            ConvertFromCollisionPointToDynamics(out, buf);
+        }
     }
-    if (a0 != NULL)
-    {
-        ConvertFromCollisionPointToDynamics(a0, info);
-    }
-    return ret;
+    return r;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0179_CAM_get_camera_position_by_look_at", CAM_act_ray_check_for_camera);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0179_CAM_get_camera_position_by_look_at", CAM_add_plane_offset_in_position);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0179_CAM_get_camera_position_by_look_at", CAM_get_mul_ratio_offset_per_axis);
 
-/* NEARMISS-STUB CAM_set_all_camera_base_data */
-#if 0 /* NEARMISS 41.1% cat=sched sub=- | u128 copy order and f12-f14 store placement | attempts=1 */
-void CAM_set_all_camera_base_data(u8 *a0, u128 *a1, u128 *a2, f32 f12, f32 f13, f32 f14)
+typedef union { s128 q; f32 f[4]; s32 i[4]; } Vec4;
+
+void CAM_set_all_camera_base_data(u8 *pa0, u8 *pa1, u8 *pa2, f32 f12, f32 f13, f32 f14)
 {
-    *(u128 *)a0 = *a1;
-    *(f32 *)(a0 + 0x20) = f12;
-    *(f32 *)(a0 + 0x24) = f13;
-    *(f32 *)(a0 + 0x28) = f14;
-    *(u128 *)(a0 + 0x10) = *a2;
+    ((Vec4 *)(pa0 + 0x0))->q = ((Vec4 *)(pa1 + 0x0))->q;
+    ((Vec4 *)(pa0 + 0x10))->q = ((Vec4 *)(pa2 + 0x0))->q;
+    ((Vec4 *)(pa0 + 0x20))->f[0] = f12;
+    ((Vec4 *)(pa0 + 0x24))->f[0] = f13;
+    ((Vec4 *)(pa0 + 0x28))->f[0] = f14;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0179_CAM_get_camera_position_by_look_at", CAM_set_all_camera_base_data);
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0179_CAM_get_camera_position_by_look_at", CAM_interp_reset_aim_rot_common);
 void CAM_interp_reset_aim_rot_common(u8 *a0)
@@ -112,7 +126,36 @@ s32 CAM_is_inside_of_stop_region_aim_rot_common(u8 *a0)
     return *(s32 *)(a0 + 0x8);
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0179_CAM_get_camera_position_by_look_at", CAM_init_aim_angle_rot);
+typedef struct
+{
+    s32 target;
+    s32 a;
+    s32 b;
+    f32 c;
+    s32 d;
+    f32 max;
+    f32 min;
+    s32 e;
+    s32 f;
+    u8 interp[1];
+} AimRot;
+
+void CAM_init_aim_angle_rot(AimRot *r, s32 target)
+{
+    r->target = 0;
+    r->a = 0;
+    r->b = 0;
+    r->c = -1.0f;
+    r->d = 1;
+    r->max = 1.48352957f;
+    r->min = -1.48352957f;
+    r->e = 1;
+    r->f = 0;
+    GAMEUTIL_constructor_interp_ratio_cntrl(r->interp);
+    GAMEUTIL_set_act_max_zero_clip_flag_interp_ratio_cntrl(r->interp, 1);
+    r->target = target;
+    func_400E94C0(r);
+}
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0179_CAM_get_camera_position_by_look_at", CAM_reset_aim_angle_rot);
 void CAM_reset_aim_angle_rot(u8 *a0)
@@ -192,26 +235,22 @@ u32 CAM_motion_kind_is_accept_follow_rot_motion_target(u8 *a0)
     return (u32)(*(u64 *)(a0 + 0x190) >> 30) & 1;
 }
 
-/* NEARMISS-STUB CAM_get_motion_kind_follow_rot_axis_attr_target */
-#if 0 /* NEARMISS 62.2% cat=branch-layout sub=- | null-check chain shape vs beql delay-slot | attempts=1 */
-s32 CAM_get_motion_kind_follow_rot_axis_attr_target(u8 *a0)
+int CAM_get_motion_kind_follow_rot_axis_attr_target(int *camera)
 {
-    void *obj = CAM_get_ground_contact_obj(a0);
-    void *motion;
+    int temp_v0_2;
+    void *temp_v0;
 
-    if (obj == NULL)
+    temp_v0_2 = CAM_get_ground_contact_obj(camera);
+    if (temp_v0_2 != 0)
     {
-        return 1;
+        temp_v0 = GAMEUTIL_get_motion_kind(temp_v0_2);
+        if (temp_v0 != NULL)
+        {
+            return (*(int *)((char *)(temp_v0) + 0x6C)) & 0xF;
+        }
     }
-    motion = GAMEUTIL_get_motion_kind(obj);
-    if (motion == NULL)
-    {
-        return 1;
-    }
-    return *(s32 *)((u8 *)motion + 0x6C) & 0xF;
+    return 1;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0179_CAM_get_camera_position_by_look_at", CAM_get_motion_kind_follow_rot_axis_attr_target);
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0179_CAM_get_camera_position_by_look_at", CAM_motion_kind_is_mode_lock_target);
 u32 CAM_motion_kind_is_mode_lock_target(u8 *a0)
