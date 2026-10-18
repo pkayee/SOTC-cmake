@@ -109,6 +109,30 @@ void reinit_particle_effect_lod(void *lod)
     init_particle_effect_lod(lod);
 }
 
+/* NEARMISS-STUB quit_particle_texture_user_by_id */
+#if 0 /* NEARMISS 87.4% cat=regalloc sub=- | target uses a1 entry and v1 flag; mine a0/a1 swapped; sltiu scheduled before addu | attempts=1 */
+void quit_particle_texture_user_by_id(u32 id)
+{
+    s32 off = id * 12;
+    s32 *entry = (s32 *)((u8 *)g_ainParticleTextureStore + off);
+    s32 flag = 1;
+
+    if (id > 0x27 || *(s32 *)((u8 *)D_4012B570 + off) == 0)
+    {
+        flag = 0;
+    }
+    if (flag == 1)
+    {
+        entry[1] = entry[1] - 1;
+        if (entry[1] <= 0)
+        {
+            entry[2] = 0;
+            entry[1] = 0;
+            entry[0] = (s32)g_sPtclNullName;
+        }
+    }
+}
+#endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0165_end_particle_emitter", quit_particle_texture_user_by_id);
 
 void set_particle_texture_by_id(s32 id)
@@ -155,6 +179,32 @@ void *create_particle_effect_lod(void)
     return p;
 }
 
+/* NEARMISS-STUB set_except_npe_file_data_to_particle_effect_lod */
+#if 0 /* NEARMISS 44.0% cat=regalloc sub=- | loop-carried off/D4 pointer: target reloads D4 each iter (addu v0,a2,v0 then sw 8(v0)); ours strength-reduces to a2=D4+8; also regs a4/a5 vs t0/a2 | attempts=1 */
+s32 set_except_npe_file_data_to_particle_effect_lod(u8 *lod, s32 a1, s32 a2, s32 a3)
+{
+    s32 i = 0;
+    s32 off = 0;
+    s32 count = *(s32 *)(lod + 0xD0);
+
+    for (i = 0; i < count; i++)
+    {
+        *(s32 *)((u8 *)*(void **)(lod + 0xD4) + off + 8) = -1;
+        count = *(s32 *)(lod + 0xD0);
+        off += 0x1BC;
+    }
+    if (count < 1)
+    {
+        *(s32 *)(lod + 0xD8) = a3;
+    }
+    else
+    {
+        *(s32 *)(*(u8 **)(lod + 0xD4) + 8) = a1;
+        *(s32 *)(lod + 0xD8) = a3;
+    }
+    return 1;
+}
+#endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0165_end_particle_emitter", set_except_npe_file_data_to_particle_effect_lod);
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0165_end_particle_emitter", init_particle_effect_lod);

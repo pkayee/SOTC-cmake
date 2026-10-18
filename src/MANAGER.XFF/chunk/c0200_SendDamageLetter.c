@@ -147,6 +147,19 @@ void InitDamageLetter(void)
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0200_SendDamageLetter", func_400F84C0);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0200_SendDamageLetter", func_400F85A8);
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0200_SendDamageLetter", func_400F85A8);
+typedef void (*DamageCallback)(void *, void *);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0200_SendDamageLetter", func_400F85C8);
+void func_400F85A8(void *arg0, void **arg1)
+{
+    ((DamageCallback)arg1[0])(arg0, arg1 + 4);
+    return;
+}
+
+extern void *memset(void *, s32, u32);
+
+void *func_400F85C8(s32 *arg0)
+{
+    *arg0 = 0;
+    return memset(arg0 + 4, 0x7E, 0x40);
+}

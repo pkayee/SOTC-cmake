@@ -116,6 +116,15 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0170_constructor_camera_dist_t
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0170_constructor_camera_dist_to_look_at", func_400DFDC8);
 
+/* NEARMISS-STUB func_400DFEC8 */
+#if 0 /* NEARMISS 27.7% cat=regalloc sub=- | target adds 0x60 to a1 (addiu) and loads 0x10 into v0 first; compiler folds offsets and picks v1 | attempts=1 */
+void func_400DFEC8(char *arg0, char *arg1)
+{
+    *(s128 *)(arg0 + 0x10) = *(s128 *)(arg1 + 0x70);
+    *(s128 *)(arg0 + 0x20) = *(s128 *)(arg1 + 0x80);
+    *(int *)(arg0 + 0x30) = 0;
+}
+#endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0170_constructor_camera_dist_to_look_at", func_400DFEC8);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0170_constructor_camera_dist_to_look_at", func_400DFEE8);
@@ -195,7 +204,15 @@ void set_post_boss_dead_playable_flag_camera_etc_condition(int a, int b)
     *(int *)(get_game_camera(a) + 0x18) = b;
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0170_constructor_camera_dist_to_look_at", func_400E0210);
+void func_400E0210(char *p)
+{
+    *(int *)(p + 0x0) = 0;
+    *(int *)(p + 0x4) = 0;
+    *(int *)(p + 0xC) = 0;
+    *(int *)(p + 0x10) = 0;
+    *(s128 *)(p + 0x20) = ZeroPoint;
+    *(int *)(p + 0x30) = 0;
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0170_constructor_camera_dist_to_look_at", func_400E0238);
 

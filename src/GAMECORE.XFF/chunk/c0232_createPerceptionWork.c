@@ -33,7 +33,14 @@ void forceSetPerceptionWork(void *arg0, void *work)
     }
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0232_createPerceptionWork", forceRenewLastPosPerceptionWork);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0232_createPerceptionWork", forceRenewLastPosPerceptionWork);
+void forceRenewLastPosPerceptionWork(void *arg0, void *work)
+{
+    void *actor = *(void **)((char *)work + 0x4C);
+
+    ((union PerceptionVector *)work)->q = (*(union PerceptionVector **)((char *)actor + 0x134))->q;
+    ((union PerceptionVector *)((char *)work + 0x10))->q = (*(union PerceptionVector **)((char *)actor + 0x134))->q;
+}
 
 s32 _omakeSelectFlagChk();
 

@@ -104,11 +104,31 @@ void *motionBlurTestType(void)
     return &D_4012B024;
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0102_SetVIF1MarkCallbackFunc", SetLayoutDisplayFlag);
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0102_SetVIF1MarkCallbackFunc", SetLayoutDisplayFlag);
+extern s32 D_4012B020;
+
+void SetLayoutDisplayFlag(s32 flag)
+{
+    D_4012B020 = flag;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0102_SetVIF1MarkCallbackFunc", func_4008A7E8);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0102_SetVIF1MarkCallbackFunc", GetAmbientBrightnessOfLayoutObject);
+extern f32 iosCalcFColorToBrightness(f32 *);
+
+f32 GetAmbientBrightnessOfLayoutObject(void *arg0)
+{
+    u8 *layout;
+    u8 *temp;
+
+    layout = GetLayoutClass(arg0);
+    temp = *(u8 **)(layout + 0x144);
+    if (temp != NULL && (*(u64 *)(temp + 0x280) & 2))
+    {
+        return iosCalcFColorToBrightness((f32 *)((u8 *)*(void **)(temp + 0xC) + 0x80));
+    }
+    return 0.0f;
+}
 
 void func_4008A8C8(void) {
 }

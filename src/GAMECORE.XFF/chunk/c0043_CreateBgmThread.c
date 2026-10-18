@@ -1,6 +1,18 @@
 #include "common.h"
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0043_CreateBgmThread", CreateBgmThread);
+extern void func_40044CE0(void);
+extern s32 gcCreateScriptObj(void *fn, s32 a1, void *a2, s32 a3, s32 a4, s32 a5, const char *a6);
+extern void *memset(void *, int, unsigned int);
+extern unsigned char D_40201208[];
+extern const char D_40133208[];
+
+void *CreateBgmThread(void *p)
+{
+    void *r = (void *)gcCreateScriptObj((void *)func_40044CE0, 0, p, 0x1000, 0, 1, D_40133208);
+
+    memset(D_40201208, 0, 0x9c);
+    return r;
+}
 
 extern void func_400453A0(void);
 s32 createScriptObj(void *fn, s32 a1, s32 a2, s32 a3, s32 a4, s32 a5, s32 a6, s32 a7);
@@ -36,7 +48,7 @@ extern void SetScriptLayoutObjLetterProcMode(void *, s32);
 extern s32 *_SCRMallocAlign(s32, s32, s32);
 extern void isysJumpSubThread(void (*)(void), void *);
 extern void st_activedemo(void);
-extern void func_40045CE8(void);
+extern s32 func_40045CE8(void);
 extern void func_40045D38(void);
 
 void demo_last_battle1(void)
@@ -83,9 +95,20 @@ void demo_bridge_setHorseBridle(void)
     nico_setHorseRidingStatusForHorseIndep(p, SCRGetFirstObj(gcGlobalVar + 0x2B0), SkelFocusDef_PLAYER_HAND_A_L[2], D_40133210, SkelFocusDef_PLAYER_HAND_A_R[2], D_40133220);
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0043_CreateBgmThread", func_40045CE8);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0043_CreateBgmThread", func_40045CE8);
+s32 func_40045CE8(void)
+{
+    nico_ResetPlayerHorseRidingControl(SCRGetFirstObj(gcGlobalVar + 0x2B4));
+    return createScriptObj((void *)st_unload_horse_char, 0, (s32)&rootPtn, 0x1000, 0, 1, 0, 1);
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0043_CreateBgmThread", func_40045D38);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0043_CreateBgmThread", func_40045D38);
+extern void gameflowSetPos(void *obj, f32 x, f32 y, f32 z, f32 rx, f32 ry, f32 rz);
+
+void func_40045D38(void)
+{
+    gameflowSetPos(SCRGetFirstObj(gcGlobalVar + 0x2B0), 348.0f, -59.0f, -2047.0f, 0.0f, 0.0f, 0.0f);
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0043_CreateBgmThread", func_40045D88);
 
