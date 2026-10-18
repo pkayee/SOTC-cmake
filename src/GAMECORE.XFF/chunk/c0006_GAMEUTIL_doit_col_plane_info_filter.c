@@ -12,6 +12,7 @@ extern s32 padManagerData;
 extern s32 gcGlobalVar;
 u8* GetCharacterClass(s32 chr);
 u32* isysGroupForFirst(s32 group, s32 flag);
+u32* isysGroupForNext(u32 *group, s32 flag);
 void isysGroupForExit(s32 group, s32 flag);
 void GAMEUTIL_get_1p_left_analog_input_extend(f32 *arg0, f32 *arg1, s32 arg2, f32 arg3);
 u8 *GetLayoutClass(void *chara);
@@ -132,7 +133,25 @@ f32 GAMEUTIL_get_sight_on_angle_vel_ratio_float(void)
     return ret;
 }
 #endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0006_GAMEUTIL_doit_col_plane_info_filter", GAMEUTIL_get_sight_on_angle_vel_ratio_float);
+f32 GAMEUTIL_get_sight_on_angle_vel_ratio_float(void)
+{
+    s32 v = D_40130698;
+    f32 r;
+
+    if (v == 8)
+    {
+        return 1.0f;
+    }
+    if (v < 8)
+    {
+        r = GAMEUTIL_get_interp_value(1.0f, 0.5f, GAMEUTIL_get_dist_ratio(v, 0.0f, 8.0f));
+    }
+    else
+    {
+        r = GAMEUTIL_get_interp_value(2.0f, 1.0f, GAMEUTIL_get_dist_ratio(v, 8.0f, 15.0f));
+    }
+    return r;
+}
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0006_GAMEUTIL_doit_col_plane_info_filter", GAMEUTIL_set_game_camera_free_mode_reverse_cntrlLR);
 void GAMEUTIL_set_game_camera_free_mode_reverse_cntrlLR(s32 value)
@@ -208,7 +227,25 @@ f32 GAMEUTIL_get_game_camera_free_mode_angle_vel_ratio_float(void)
     return ret;
 }
 #endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0006_GAMEUTIL_doit_col_plane_info_filter", GAMEUTIL_get_game_camera_free_mode_angle_vel_ratio_float);
+f32 GAMEUTIL_get_game_camera_free_mode_angle_vel_ratio_float(void)
+{
+    s32 v = D_401306A4;
+    f32 r;
+
+    if (v == 8)
+    {
+        return 1.0f;
+    }
+    if (v < 8)
+    {
+        r = GAMEUTIL_get_interp_value(1.0f, 0.5f, GAMEUTIL_get_dist_ratio(v, 0.0f, 8.0f));
+    }
+    else
+    {
+        r = GAMEUTIL_get_interp_value(2.0f, 1.0f, GAMEUTIL_get_dist_ratio(v, 8.0f, 15.0f));
+    }
+    return r;
+}
 
 /* NEARMISS-STUB GAMEUTIL_get_first_obj */
 #if 0 /* NEARMISS 93.7% cat=regalloc sub=- | s0 vs a0 reg choice around isysGroupForExit call | attempts=1 */
@@ -230,7 +267,21 @@ s32 GAMEUTIL_get_first_obj(s32 group)
     return obj;
 }
 #endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0006_GAMEUTIL_doit_col_plane_info_filter", GAMEUTIL_get_first_obj);
+void *GAMEUTIL_get_first_obj(void *group)
+{
+    void *found = 0;
+    void *o = 0;
+    int *g;
+
+    for (g = isysGroupForFirst((s32)group, 0); g != 0; ) {
+        o = (void *)*g;
+        found = o;
+        break;
+    }
+    if (o != 0)
+        isysGroupForExit((s32)o, 0);
+    return found;
+}
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0006_GAMEUTIL_doit_col_plane_info_filter", GAMEUTIL_get_camera_target_look_at_position);
 void GAMEUTIL_get_camera_target_look_at_position(u128 *arg0, void *arg1)
@@ -550,7 +601,21 @@ s32 GAMEUTIL_get_player_obj(void)
     return obj;
 }
 #endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0006_GAMEUTIL_doit_col_plane_info_filter", GAMEUTIL_get_player_obj);
+void *GAMEUTIL_get_player_obj(void)
+{
+    void *found = 0;
+    void *o = 0;
+    u32 *g;
+
+    for (g = isysGroupForFirst((s32)&gcGlobalVar + 0x2B0, 0); g != 0; g = isysGroupForNext(g, 0)) {
+        o = (void *)*g;
+        found = o;
+        break;
+    }
+    if (o != 0)
+        isysGroupForExit((s32)o, 0);
+    return found;
+}
 
 static inline s32 get_character_type_inl(s32 chr)
 {
@@ -608,4 +673,26 @@ s32 GAMEUTIL_is_player_obj_standing_on_horse(s32 arg0)
     return 0;
 }
 #endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0006_GAMEUTIL_doit_col_plane_info_filter", GAMEUTIL_is_player_obj_standing_on_horse);
+extern s32 ControlMode_PLAYER_RIDING_STAND;
+extern s32 ControlMode_PLAYER_RIDING_STAND_END;
+extern s32 ControlMode_PLAYER_RIDINGSTAND_WEAPON;
+extern s32 ControlMode_PLAYER_RIDING_STD_BOW;
+extern s32 ControlMode_PLAYER_RIDING_STD_BOW_NO_SYNC;
+extern s32 ControlMode_PLAYER_RIDING_STD_BOW_CANCEL;
+
+static inline s32 is_player_obj_inl(s32 chr)
+{
+    return get_character_type_inl(chr) == 2;
+}
+
+s32 GAMEUTIL_is_player_obj_standing_on_horse(s32 arg0)
+{
+    if (is_player_obj_inl(arg0))
+    {
+        s32 mode = *(s32 *)(GetCharacterClass(arg0) + 0x740);
+
+        if (mode == ControlMode_PLAYER_RIDING_STAND || mode == ControlMode_PLAYER_RIDING_STAND_END || mode == ControlMode_PLAYER_RIDINGSTAND_WEAPON || mode == ControlMode_PLAYER_RIDING_STD_BOW || mode == ControlMode_PLAYER_RIDING_STD_BOW_NO_SYNC || mode == ControlMode_PLAYER_RIDING_STD_BOW_CANCEL)
+            return 1;
+    }
+    return 0;
+}
