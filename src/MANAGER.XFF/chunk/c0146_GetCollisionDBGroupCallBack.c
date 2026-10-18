@@ -58,6 +58,48 @@ s32 CollisionObjectJudgeCallbackExceptOneObj(s32 arg0, s32 arg1)
     return arg0 != arg1;
 }
 
+/* NEARMISS-STUB CollisionObjectJudgeCallbackExceptDescendOneObj */
+#if 0 /* NEARMISS 70.37% cat=regalloc sub=- | loop ptr reg/branch layout: target keeps p in a0, obj in v0; arg1 check branch inverted | attempts=1 */
+extern u8 *GetLayoutClass();
+extern u8 *GetLayoutParentObj(u8 *);
+
+s32 CollisionObjectJudgeCallbackExceptDescendOneObj(s32 arg0, s32 arg1)
+{
+    s32 ret;
+    s32 obj;
+    s32 p;
+
+    ret = 1;
+    if (arg1 == 0)
+    {
+        return ret;
+    }
+    p = arg0;
+    while (p != 0)
+    {
+        ret = 0;
+        if (p == arg1)
+        {
+            return ret;
+        }
+        obj = (s32)GetLayoutClass(p);
+        if (obj == 0)
+        {
+            p = 0;
+        }
+        else
+        {
+            p = *(s32 *)(obj + 0x194);
+            if (p == 0)
+            {
+                p = (s32)GetLayoutParentObj(obj);
+            }
+        }
+        ret = 1;
+    }
+    return ret;
+}
+#endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0146_GetCollisionDBGroupCallBack", CollisionObjectJudgeCallbackExceptDescendOneObj);
 
 typedef struct

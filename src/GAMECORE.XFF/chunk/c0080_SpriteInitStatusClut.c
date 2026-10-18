@@ -52,6 +52,46 @@ void SpriteInitStatusClut(unsigned char *palette)
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0080_SpriteInitStatusClut", SpriteSetStatusClut);
 
+/* NEARMISS-STUB initbar */
+#if 0 /* NEARMISS 62.17% cat=regalloc sub=- | 1.0f const and float loads share fv0; target keeps ft0 live, loads a2[0] first | attempts=1 */
+typedef struct {
+    float f0;
+    float f4;
+    float f8;
+    float fC;
+    u128 q10;
+    u128 q20;
+    float f30;
+    float f34;
+    float f38;
+    int i3C;
+    float f40;
+    float f44;
+    float f48;
+    int i4C;
+    float f50;
+    float f54;
+} InitBar;
+
+void initbar(float f12, float f13, float f14, InitBar *d, int a1, float *a2, u128 *a3, u128 *t0)
+{
+    d->f0 = a2[0];
+    d->f54 = 1.0f;
+    d->f4 = a2[1];
+    d->f8 = a2[2];
+    d->fC = a2[3];
+    d->i3C = a1;
+    d->q10 = *a3;
+    d->f30 = f13;
+    d->q20 = *t0;
+    d->f34 = f14;
+    d->f48 = f12;
+    d->i4C = 0;
+    d->f38 = f12;
+    d->f40 = f12;
+    d->f44 = f12;
+}
+#endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0080_SpriteInitStatusClut", initbar);
 
 typedef struct {

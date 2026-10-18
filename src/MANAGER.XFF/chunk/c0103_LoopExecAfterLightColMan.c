@@ -21,7 +21,12 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0103_LoopExecAfterLightColMan",
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0103_LoopExecAfterLightColMan", SetGeoDispClassLightColMan);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0103_LoopExecAfterLightColMan", getColLightDebugSts);
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0103_LoopExecAfterLightColMan", getColLightDebugSts);
+
+int *getColLightDebugSts(void)
+{
+    return &D_4012B034;
+}
 
 int GetColLightDebugSts(void)
 {

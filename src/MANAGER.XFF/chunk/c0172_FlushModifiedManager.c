@@ -4,9 +4,52 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0172_FlushModifiedManager", Flu
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0172_FlushModifiedManager", EntryModifiedManager);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0172_FlushModifiedManager", RelocateModifiedManager);
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0172_FlushModifiedManager", RelocateModifiedManager);
+int RelocateModifiedManager(s32 *p, s32 n, s32 addr)
+{
+    s32 w;
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0172_FlushModifiedManager", InitModifiedManager);
+    if (n <= 0xFFFF)
+        w = n >= 0x100 ? 2 : 1;
+    else
+        w = 4;
+    if (n != 0)
+    {
+        p[4] = addr;
+        addr = addr + ((w * n + 15) & ~15);
+        p[2] = addr;
+        addr = addr + ((n + 15) & ~15);
+    }
+    return addr;
+}
+
+
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0172_FlushModifiedManager", InitModifiedManager);
+void InitModifiedManager(s32 *p, s32 n)
+{
+    s32 i;
+    s32 w;
+
+    p[0] = 0;
+    p[1] = 0;
+    if (n != 0)
+    {
+        if (n <= 0xFFFF)
+            w = n >= 0x100 ? 2 : 1;
+        else
+            w = 4;
+        p[3] = w;
+        for (i = 0; i < n; i++)
+        {
+            *((u8 *)p[2] + i) = 0;
+        }
+    }
+    else
+    {
+        p[2] = 0;
+        p[4] = 0;
+    }
+}
 
 void DeleteModifiedManager(void) {
 }

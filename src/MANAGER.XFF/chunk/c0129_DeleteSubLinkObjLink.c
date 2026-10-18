@@ -14,6 +14,24 @@ int DeleteSubLinkObjLink(unsigned char *p)
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0129_DeleteSubLinkObjLink", CreateSubLinkObjByGeometryPointer);
 
+/* NEARMISS-STUB func_400A75E8 */
+#if 0 /* NEARMISS 76.67% cat=stack-frame sub=- | frame 0x20 vs 0x30: asm keeps p and 0x15 in s1/s3 across call; xori imm used | attempts=1 */
+int func_400A75E8(unsigned char *p)
+{
+    int t = 0x15;
+    char *q = (char *)p + 0x1C;
+    char *c = (p[8] ^ t) != 0 ? 0 : q;
+
+    if (*(void (**)(void *, int))(c + 0xC) != 0)
+    {
+        (*(void (**)(void *, int))(c + 0xC))(p, *(int *)(c + 0x10));
+        *(int *)(c + 0xC) = 0;
+    }
+    c = (p[8] ^ t) != 0 ? 0 : q;
+
+    return DeleteTwoWayLink(c);
+}
+#endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0129_DeleteSubLinkObjLink", func_400A75E8);
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0129_DeleteSubLinkObjLink", InitSubLinkObj);
@@ -43,7 +61,24 @@ int getMicroCodeAddress(int i)
     return ((int *)MicroCode)[i];
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0129_DeleteSubLinkObjLink", transMicroCode);
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0129_DeleteSubLinkObjLink", transMicroCode);
+
+extern int iosDlGetLayer();
+extern void iosDlChainTailCurrent();
+extern int D_401AD4E8[];
+
+void transMicroCode(int param_1)
+{
+    int iVar1;
+
+    iVar1 = iosDlGetLayer();
+    if (D_401AD4E8[iVar1] != param_1)
+    {
+        iosDlChainTailCurrent(((int *)MicroCode)[param_1]);
+        D_401AD4E8[iVar1] = param_1;
+    }
+    return;
+}
 
 extern int D_401AD4E8[];
 

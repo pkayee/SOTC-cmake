@@ -57,6 +57,16 @@ int GetLwsOrientInitMotionPtr(char *p, int a)
     return getAnimObjResource(*(char **)(p + 0x7C) + 0x50, a);
 }
 
+/* NEARMISS-STUB GetMotKToMotP */
+#if 0 /* NEARMISS 80.7% cat=branch-layout sub=- | target tests a==0 first (beqz) then a==-0x50 with v0=0 in beq delay slot; gcc hoists -0x50 compare, no zero-return shared tail | attempts=1 */
+int GetMotKToMotP(int a)
+{
+    if (a != 0 && a != -0x50) {
+        return getAnimObjResource(a + 0x50);
+    }
+    return 0;
+}
+#endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0108_GetLwsOrientWorkSize", GetMotKToMotP);
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0108_GetLwsOrientWorkSize", ExecScriptLwsOrientClass);

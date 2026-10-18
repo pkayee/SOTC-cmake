@@ -27,7 +27,20 @@ void SCRResetMyOwnGameFlag(void *a)
         _gameFlagCls(*(int *)(p + 8));
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0060_SCRSetMyOwnGameFlag", nico_demoCharaScaleSync);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0060_SCRSetMyOwnGameFlag", nico_demoCharaScaleSync);
+extern void *isysGetThisSubThread(void);
+extern char *GetCharacterClass(void *);
+extern void func_400557D0(char *chara);
+extern void scrRun(void);
+
+void nico_demoCharaScaleSync(void)
+{
+    char *chara = GetCharacterClass(isysGetThisSubThread());
+    for (;;) {
+        func_400557D0(chara);
+        scrRun();
+    }
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0060_SCRSetMyOwnGameFlag", controllerAlertScript);
 
