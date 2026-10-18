@@ -41,6 +41,10 @@ extern s32 D_00132390[];
 extern s32 D_001380B0[];
 extern s32 D_00138230[];
 extern s32 D_001380E0[];
+extern s32 D_00138140[];
+extern s32 D_00138200[];
+extern s32 D_00138170[];
+extern s32 D_001381B8[];
 
 int CreateSema(struct SemaParam *);
 int DeleteSema(int);
@@ -222,9 +226,77 @@ int sceFsReset(void)
     return 0;
 }
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/filestub", sceFsSetIopBuf);
+s32 sceFsSetIopBuf(u32 size, u32 num)
+{
+    s32 *buf;
+    s32 status;
+    s32 ret;
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/filestub", sceFsSetIopPrio);
+    _sceFsWaitS(0xFE);
+    if (D_00132414[0] == 0)
+    {
+        sceFsInit();
+    }
+    if (func_0010ABC8() != 0)
+    {
+        _sceFsSigSema();
+        return 0xFFFEFFFC;
+    }
+    if (func_0010A220() != 0)
+    {
+        _sceFsSigSema();
+        return -16;
+    }
+    if ((size & 0x3FFF) != 0 || size == 0 || size > 0xFFFFF || num == 0 || num > 0x20)
+    {
+        _sceFsSigSema();
+        return -22;
+    }
+    buf = D_00145B40;
+    buf[0] = size;
+    buf[1] = num;
+    ret = func_0010A328(D_00147240, 0xFE, 0, buf, 8, D_00146780, 4, NULL, NULL, 0);
+    if (ret < 0)
+    {
+        _sceFsSigSema();
+        return -11;
+    }
+    status = *(s32 *)((u32)D_00146780 | 0x20000000);
+    _sceFsSigSema();
+    return status;
+}
+
+s32 sceFsSetIopPrio(s32 prio)
+{
+    s32 status;
+    s32 ret;
+
+    _sceFsWaitS(0xFD);
+    if (D_00132414[0] == 0)
+    {
+        sceFsInit();
+    }
+    if (func_0010ABC8() != 0)
+    {
+        _sceFsSigSema();
+        return 0xFFFEFFFC;
+    }
+    if (func_0010A220() != 0)
+    {
+        _sceFsSigSema();
+        return -16;
+    }
+    D_00145B40[0] = prio;
+    ret = func_0010A328(D_00147240, 0xFD, 0, D_00145B40, 8, D_00146780, 4, NULL, NULL, 0);
+    if (ret < 0)
+    {
+        _sceFsSigSema();
+        return -11;
+    }
+    status = *(s32 *)((u32)D_00146780 | 0x20000000);
+    _sceFsSigSema();
+    return status;
+}
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/filestub", sceOpen);
 
@@ -657,6 +729,67 @@ s32 sceRemove(const u8 *path)
     return func_0010BFA8(path, 0x6);
 }
 
+/* NEARMISS-STUB sceMkdir */
+#if 0 /* NEARMISS 93.5% cat=regalloc sub=- | target copies path[0] outside the loop (if(path[0]) do-while form); 2.9 emits loop-first, branch/lbu order differs | attempts=1 */
+s32 sceMkdir(const u8 *path, s32 mode)
+{
+    struct SemaParam sp;
+    s32 result;
+    s32 *buf;
+    s32 i;
+    s32 sema;
+    s32 status;
+    s32 ret;
+
+    buf = D_00145B40;
+    _sceFsWaitS(7);
+    if (D_00132414[0] == 0)
+    {
+        sceFsInit();
+    }
+    for (i = 0; i < 0x400; i++)
+    {
+        ((char *)buf)[0x10 + i] = path[i];
+        if (path[i] == 0)
+        {
+            break;
+        }
+    }
+    if (i == 0x400)
+    {
+        ((char *)buf)[0x40F] = 0;
+        i = 0x3FF;
+    }
+    buf[3] = mode;
+    sp.maxCount = 1;
+    sp.option = (u32)D_00138140;
+    sp.initCount = 0;
+    sema = CreateSema(&sp);
+    buf[0] = sema;
+    buf[1] = (s32)&result;
+    buf[2] = 4;
+    ret = func_0010A328(D_00147240, 7, 0, D_00145B40, i + 0x11, D_00146780, 4, NULL, NULL, 0);
+    if (ret < 0)
+    {
+        DeleteSema(sema);
+        _sceFsSigSema();
+        return -11;
+    }
+    status = *(s32 *)((u32)D_00146780 | 0x20000000);
+    _sceFsSigSema();
+    if (status != 0)
+    {
+        WaitSema(sema);
+        DeleteSema(sema);
+    }
+    else
+    {
+        DeleteSema(sema);
+        return -11;
+    }
+    return result;
+}
+#endif
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/filestub", sceMkdir);
 
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/filestub", sceRmdir);
@@ -667,7 +800,50 @@ s32 sceRmdir(const u8 *path)
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/filestub", sceFormat);
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/filestub", sceAddDrv);
+s32 sceAddDrv(void *drv)
+{
+    struct SemaParam sp;
+    s32 result;
+    s32 *buf;
+    s32 sema;
+    s32 status;
+    s32 ret;
+
+    buf = D_00145B40;
+    _sceFsWaitS(0xF);
+    if (D_00132414[0] == 0)
+    {
+        sceFsInit();
+    }
+    buf[3] = (s32)drv;
+    sp.maxCount = 1;
+    sp.option = (u32)D_00138170;
+    sp.initCount = 0;
+    sema = CreateSema(&sp);
+    buf[0] = sema;
+    buf[1] = (s32)&result;
+    buf[2] = 4;
+    ret = func_0010A328(D_00147240, 0xF, 0, D_00145B40, 0x10, D_00146780, 4, NULL, NULL, 0);
+    if (ret < 0)
+    {
+        DeleteSema(sema);
+        _sceFsSigSema();
+        return -11;
+    }
+    status = *(s32 *)((u32)D_00146780 | 0x20000000);
+    _sceFsSigSema();
+    if (status != 0)
+    {
+        WaitSema(sema);
+        DeleteSema(sema);
+    }
+    else
+    {
+        DeleteSema(sema);
+        return -11;
+    }
+    return result;
+}
 
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/filestub", sceDelDrv);
 s32 sceDelDrv(const u8 *path)
@@ -675,6 +851,39 @@ s32 sceDelDrv(const u8 *path)
     return func_0010BFA8(path, 0x10);
 }
 
+/* NEARMISS-STUB sceDopen */
+#if 0 /* NEARMISS 91.4% cat=regalloc sub=- | s1 ret store vs iob-base index order: target computes lui/addiu/subu of D_00147040 before sw s1,0(iob); 2.9 keeps store first; idx local made frame 0x50 vs 0x40 | attempts=1 */
+s32 sceDopen(const u8 *path)
+{
+    struct IobEntry *iob;
+    s32 ret;
+
+    _sceFsWaitS(9);
+    if (D_00132414[0] == 0)
+    {
+        sceFsInit();
+    }
+    _sceFsSigSema();
+    iob = new_iob();
+    if (iob == NULL)
+    {
+        return -19;
+    }
+    ret = func_0010BFA8(path, 9);
+    if (ret < 0)
+    {
+        WaitSema(D_00132420[0]);
+        iob->unk04 = 0;
+        SignalSema(D_00132420[0]);
+        return ret;
+    }
+    WaitSema(D_00132420[0]);
+    iob->unk00 = ret;
+    ret = iob - D_00147040;
+    SignalSema(D_00132420[0]);
+    return ret;
+}
+#endif
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/filestub", sceDopen);
 
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/filestub", sceDclose);
@@ -780,6 +989,80 @@ s32 sceDread(s32 fd, void *dirent)
     return result;
 }
 
+/* NEARMISS-STUB sceGetstat */
+#if 0 /* NEARMISS 97.66% cat=regalloc sub=- | last diffs: beqz v0 on the i==0x400 test and lui a0 (D_001381B8) regalloc; path copy = while(1){i++; if(i>=0x400)break; c=path[i]; buf[0x10+i]=c; if(c==0)break; | attempts=2 */
+s32 sceGetstat(const u8 *path, void *stat)
+{
+    struct SemaParam sp;
+    s32 result;
+    s32 *buf;
+    s32 i;
+    s32 sema;
+    s32 status;
+    s32 ret;
+    u8 c;
+
+    buf = D_00145B40;
+    _sceFsWaitS(0xC);
+    if (D_00132414[0] == 0)
+    {
+        sceFsInit();
+    }
+    i = 0;
+    c = path[0];
+    ((char *)buf)[0x10] = c;
+    if (c != 0)
+    {
+        while (1)
+        {
+            i++;
+            if (i >= 0x400)
+            {
+                break;
+            }
+            c = path[i];
+            ((char *)buf)[0x10 + i] = c;
+            if (c == 0)
+            {
+                break;
+            }
+        }
+    }
+    if (i == 0x400)
+    {
+        ((char *)buf)[0x40F] = 0;
+        i = 0x3FF;
+    }
+    buf[3] = (s32)stat;
+    sp.maxCount = 1;
+    sp.option = (u32)D_001381B8;
+    sp.initCount = 0;
+    sema = CreateSema(&sp);
+    buf[0] = sema;
+    buf[1] = (s32)&result;
+    buf[2] = 4;
+    ret = func_0010A328(D_00147240, 0xC, 0, D_00145B40, i + 0x11, D_00146780, 4, NULL, NULL, 0);
+    if (ret < 0)
+    {
+        DeleteSema(sema);
+        _sceFsSigSema();
+        return -11;
+    }
+    status = *(s32 *)((u32)D_00146780 | 0x20000000);
+    _sceFsSigSema();
+    if (status != 0)
+    {
+        WaitSema(sema);
+        DeleteSema(sema);
+    }
+    else
+    {
+        DeleteSema(sema);
+        return -11;
+    }
+    return result;
+}
+#endif
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/filestub", sceGetstat);
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/filestub", sceChstat);
@@ -792,6 +1075,66 @@ s32 sceChdir(const u8 *path)
     return func_0010BFA8(path, 0x12);
 }
 
+/* NEARMISS-STUB sceSync */
+#if 0 /* NEARMISS 91.7% cat=regalloc sub=- | same path-copy control-flow shape as sceMkdir (first byte outside loop); 2.9 scheduling/regalloc of s0/s1/s2 | attempts=1 */
+s32 sceSync(const u8 *path, s32 flag)
+{
+    struct SemaParam sp;
+    s32 result;
+    s32 *buf;
+    s32 i;
+    s32 sema;
+    s32 status;
+    s32 ret;
+
+    buf = D_00145B40;
+    _sceFsWaitS(0x13);
+    if (D_00132414[0] == 0)
+    {
+        sceFsInit();
+    }
+    for (i = 0; i < 0x400; i++)
+    {
+        ((char *)buf)[0x14 + i] = path[i];
+        if (path[i] == 0)
+        {
+            break;
+        }
+    }
+    if (i == 0x400)
+    {
+        ((char *)buf)[0x413] = 0;
+    }
+    buf[4] = flag;
+    sp.maxCount = 1;
+    sp.option = (u32)D_00138200;
+    sp.initCount = 0;
+    sema = CreateSema(&sp);
+    buf[1] = (s32)&result;
+    buf[2] = 4;
+    buf[0] = sema;
+    ret = func_0010A328(D_00147240, 0x13, 0, D_00145B40, 0x414, D_00146780, 4, NULL, NULL, 0);
+    if (ret < 0)
+    {
+        DeleteSema(sema);
+        _sceFsSigSema();
+        return -11;
+    }
+    status = *(s32 *)((u32)D_00146780 | 0x20000000);
+    _sceFsSigSema();
+    if (status != 0)
+    {
+        WaitSema(sema);
+        DeleteSema(sema);
+    }
+    else
+    {
+        DeleteSema(sema);
+        return -11;
+    }
+    return result;
+}
+#endif
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/filestub", sceSync);
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/filestub", sceMount);
