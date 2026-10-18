@@ -44,7 +44,29 @@ void SCRSetupMissile1(void *a, s32 b, s32 c, s32 d)
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0090_func_4007CFD8", func_4007D210);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0090_func_4007CFD8", func_4007D240);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0090_func_4007CFD8", func_4007D240);
+u64 *GetCollisionDBAttributeAdr(void *surface);
+
+s32 func_4007D240(void *surface)
+{
+    u64 attribute = *GetCollisionDBAttributeAdr(surface);
+    u64 flags = attribute & (0xF800UL << 20);
+    u64 material = attribute & 0x7C000000UL;
+    u64 mode = attribute & (0xF000UL << 30);
+
+    if (material == 0x04000000UL || material == 0x64000000UL || material == 0x68000000UL ||
+        material == 0x6C000000UL)
+    {
+        return 0;
+    }
+    if (material == 0x24000000UL || flags == (0x8000UL << 18) || flags == (0xB800UL << 20) ||
+        flags == (0xC000UL << 18) || flags == (0xA000UL << 19) || flags == (0xE000UL << 18) ||
+        flags == (0xA000UL << 18) || flags == (0x8000UL << 17) || mode == (0x8000UL << 28))
+    {
+        return 0;
+    }
+    return 1;
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0090_func_4007CFD8", func_4007D330);
 
@@ -86,6 +108,48 @@ void DirectTurn_Reset(char *p)
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0090_func_4007CFD8", IsTouchableObj);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0090_func_4007CFD8", nico_nargaBossStart);
+extern s32 SCRGetSizeOfBossWork(void *thread);
+extern u8 *GetScriptCharacterClass(void *thread);
+extern void CharaCtrlResetCtrlStatus(void *chara);
+extern void CharaCtrlResetAllScriptCtrlStatus(void *chara);
+extern void *SCRCharaInitBossWork(void *ptn, void *thread);
+extern void SCRReleaseBossWork(void);
+extern void SetScriptCharacterObjReleaseCallBackFunc(void *chara, void *func, void *arg);
+extern void *GetScriptClass(void *chara);
+extern void initScriptDataSystem(void *chara, void *data);
+extern void setRealColJudgeFunc(void *obj, void (*func)(void));
+extern void setRotColCheckWormCtrlWork(void *obj, s32 flag);
+extern void *getWormIKWork(void *thread);
+extern void func_4007E050(void);
+extern void nico_nargaBossAIMain(void);
+
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0090_func_4007CFD8", nico_nargaBossStart);
+void nico_nargaBossStart(void)
+{
+    void *thread = isysGetThisSubThread();
+    s32 size = SCRGetSizeOfBossWork(thread);
+    void *part = iosCreatePartition(&rootPtn, size + 0x5A93);
+    u8 *cls = GetScriptCharacterClass(thread);
+    void *mem;
+    void *boss;
+
+    *(void **)(cls + 0x114C) = part;
+    CharaCtrlResetCtrlStatus(thread);
+    CharaCtrlResetAllScriptCtrlStatus(thread);
+    cls = GetScriptCharacterClass(thread);
+    mem = _SCRMallocAlign(part, 0x5A60, 0x10);
+    *(void **)(cls + 0x1150) = mem;
+    boss = SCRCharaInitBossWork(part, thread);
+    *(void **)mem = boss;
+    SetScriptCharacterObjReleaseCallBackFunc(thread, SCRReleaseBossWork, boss);
+    CharaCtrlResetCtrlStatus(thread);
+    *(u64 *)((u8 *)mem + 0x5A58) = 0;
+    cls = GetScriptClass(thread);
+    initScriptDataSystem(thread, *(void **)(cls + 0x48));
+    setRealColJudgeFunc((u8 *)mem + 0x10, func_4007E050);
+    setRotColCheckWormCtrlWork((u8 *)mem + 0x3D00, 1);
+    getWormIKWork(thread);
+    isysJumpSubThread(nico_nargaBossAIMain, mem);
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0090_func_4007CFD8", SCRConditionNaragaBodyRot);

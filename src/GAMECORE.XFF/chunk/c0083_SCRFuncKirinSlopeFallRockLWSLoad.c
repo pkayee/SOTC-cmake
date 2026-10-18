@@ -2,9 +2,51 @@
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0083_SCRFuncKirinSlopeFallRockLWSLoad", SCRFuncKirinSlopeFallRockLWSLoad);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0083_SCRFuncKirinSlopeFallRockLWSLoad", func_40073948);
+extern void *isysGetThisSubThread(void);
+extern void SCRExecBossPreProcess(s32);
+extern void CharaCtrlResetAllScriptCtrlStatus(void *);
+extern void updateScriptDataSystem(void *);
+extern void SCRExecBossPostProcess(s32);
+extern void scrRunM(s32);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0083_SCRFuncKirinSlopeFallRockLWSLoad", func_400739A8);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0083_SCRFuncKirinSlopeFallRockLWSLoad", func_40073948);
+void func_40073948(s32 *a0)
+{
+    void *thread;
+
+    isysGetThisSubThread();
+    for (;;)
+    {
+        thread = isysGetThisSubThread();
+        SCRExecBossPreProcess(*a0);
+        CharaCtrlResetAllScriptCtrlStatus(thread);
+        updateScriptDataSystem(thread);
+        isysGetThisSubThread();
+        SCRExecBossPostProcess(*a0);
+        scrRunM(1);
+    }
+}
+
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0083_SCRFuncKirinSlopeFallRockLWSLoad", func_400739A8);
+extern unsigned char gcGlobalVar[];
+extern int *isysGroupForFirst(void *, int);
+extern int *isysGroupForNext(int *, int);
+extern void isysGroupForExit(int, int);
+extern void unloadObj(int);
+
+void func_400739A8(void)
+{
+    int m = 0;
+    int *g;
+
+    for (g = isysGroupForFirst(gcGlobalVar + 0x304, 0); g != 0; g = isysGroupForNext(g, 0))
+    {
+        m = *g;
+        unloadObj(m);
+    }
+    if (m != 0)
+        isysGroupForExit(m, 0);
+}
 
 u8* GetLayoutClass(void* chara);
 

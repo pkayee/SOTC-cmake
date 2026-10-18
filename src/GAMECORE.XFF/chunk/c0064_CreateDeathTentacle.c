@@ -15,7 +15,14 @@ int CheckDeathTentacle(void)
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0064_CreateDeathTentacle", func_4005E190);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0064_CreateDeathTentacle", func_4005E200);
+extern void isysJumpSubThread(void (*)(void), void *);
+extern void func_4005E2E0(void);
+
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0064_CreateDeathTentacle", func_4005E200);
+void func_4005E200(void *arg0)
+{
+    isysJumpSubThread(func_4005E2E0, arg0);
+}
 
 int AI_GetDeathTentWorkSize(void *arg0, int arg1)
 {
@@ -28,9 +35,21 @@ int AI_GetDeathTentWorkSize(void *arg0, int arg1)
     return var_v1;
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0064_CreateDeathTentacle", func_4005E248);
+extern void func_4005DC58(void);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0064_CreateDeathTentacle", func_4005E268);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0064_CreateDeathTentacle", func_4005E248);
+void func_4005E248(void *arg0)
+{
+    isysJumpSubThread(func_4005DC58, arg0);
+}
+
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0064_CreateDeathTentacle", func_4005E268);
+void GAMEUTIL_set_auto_get_flag_boss_interest_position(s32 flag);
+
+void func_4005E268(void)
+{
+    GAMEUTIL_set_auto_get_flag_boss_interest_position(1);
+}
 
 void GetMeshObjInfo(void *arg0, int arg1, int arg2)
 {

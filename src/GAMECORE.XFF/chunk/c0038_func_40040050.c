@@ -77,7 +77,14 @@ int gcGetNbStages(void)
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0038_func_40040050", CreateStageManager);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0038_func_40040050", SetupStageManager);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0038_func_40040050", SetupStageManager);
+
+extern void func_400402D0();
+
+void SetupStageManager(int a, int b, int c, int d)
+{
+    func_400402D0(a, -1, c, d);
+}
 
 extern void func_400402D0();
 
@@ -145,6 +152,27 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0038_func_40040050", GetStageA
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0038_func_40040050", GetStageAreaNumberByPos);
 
+/* NEARMISS-STUB GetStageNumberByPos */
+#if 0 /* NEARMISS 89.375% cat=regalloc sub=- | temp and r swapped: target loads D_40131474 into a0 and r=-1 into v0, ours opposite; r-first, nested-if variants same | attempts=1 */
+extern u8 gcGlobalVar[];
+extern s32 getstagenumber(s32 a0);
+
+s32 GetStageNumberByPos(void)
+{
+    s32 ctx[16];
+    s32 r;
+
+    ctx[1] = (s32)(gcGlobalVar + 0x340);
+    GetStageContext((StageContext *)ctx);
+    r = -1;
+    if (D_40131474 != 0 && D_40131478 != 0)
+    {
+        s32 t = getstagenumber((ctx[8] << 5) | (ctx[9] & 0x1F));
+        r = getstagenumber((t << 15) | ((ctx[8] << 5) | (ctx[9] & 0x1F)));
+    }
+    return r;
+}
+#endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0038_func_40040050", GetStageNumberByPos);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0038_func_40040050", SetStageManagerAreaPreload);
