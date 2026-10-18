@@ -57,7 +57,15 @@ void SCRFuncUnagiSetAttackParam0(void *actor, float a, float b, float c, float d
     w->unk5A7C = d;
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0163_SCRFuncUnagiThunder", SCRFuncUnagiSetAttackParam1);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0163_SCRFuncUnagiThunder", SCRFuncUnagiSetAttackParam1);
+void SCRFuncUnagiSetAttackParam1(void *actor, float fparg0, float fparg1)
+{
+    void *temp_v0;
+
+    temp_v0 = GetSCRCharaAIWorkPtr(actor);
+    (*(float *)((char *)(temp_v0) + 0x5A80)) = fparg0;
+    (*(float *)((char *)(temp_v0) + 0x5A84)) = fparg1;
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0163_SCRFuncUnagiThunder", SCRConditionUnagiSelectAttackLine);
 
@@ -78,7 +86,13 @@ int SCRConditionUnagiDamageCheck(void *arg0, int arg1)
     }
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0163_SCRFuncUnagiThunder", SCRConditionUnagiCheckAttackLine);
+extern s32 func_400D8C40();
+
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0163_SCRFuncUnagiThunder", SCRConditionUnagiCheckAttackLine);
+s32 SCRConditionUnagiCheckAttackLine(void)
+{
+    return func_400D8C40();
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0163_SCRFuncUnagiThunder", SCRFuncUnageSetAttackPos);
 

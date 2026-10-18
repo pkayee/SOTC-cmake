@@ -42,9 +42,31 @@ int reset_camera_collision_data_except_slide_move_ratio(int *p)
     return ConstructorCollisionDynamics(p + 4);
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0168_player_collision_check_direct", func_400DE1E0);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0168_player_collision_check_direct", func_400DE1E0);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0168_player_collision_check_direct", func_400DE240);
+extern int GAMEUTIL_is_horse_obj();
+extern int CollisionObjectJudgeCallbackExceptPluralObj();
+
+int func_400DE1E0(int arg0, int arg1)
+{
+    int temp_v0;
+    int var_v0;
+
+    temp_v0 = GAMEUTIL_is_horse_obj();
+    if ((temp_v0 != 1) || (var_v0 = CollisionObjectJudgeCallbackExceptPluralObj(arg0, arg1), (var_v0 != temp_v0))) {
+        var_v0 = 0;
+    }
+    return var_v0;
+}
+
+u8 *GetCharacterClass(void *chara);
+
+s32 func_400DE240(void *actor)
+{
+    return GetCharacterClass(actor) == 0;
+}
+
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0168_player_collision_check_direct", func_400DE240);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0168_player_collision_check_direct", func_400DE260);
 

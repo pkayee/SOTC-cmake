@@ -124,8 +124,38 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0121_execObjectWithNonTaskSwit
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0121_execObjectWithNonTaskSwitch", initstage);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0121_execObjectWithNonTaskSwitch", func_400A58C0);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0121_execObjectWithNonTaskSwitch", func_400A58C0);
+extern void func_400A58E8();
+
+void func_400A58C0(void)
+{
+    int uVar1;
+
+    for (;;) {
+        func_400A58E8();
+        uVar1 = isysGetThisSubThread();
+        func_400A4778(uVar1);
+    }
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0121_execObjectWithNonTaskSwitch", func_400A58E8);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0121_execObjectWithNonTaskSwitch", func_400A5960);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0121_execObjectWithNonTaskSwitch", func_400A5960);
+extern int *isysGroupForFirst(void *, int);
+extern int *isysGroupForNext(int *, int);
+extern void isysGroupForExit(int, int);
+extern void execObjectWithNonTaskSwitch(int);
+
+void func_400A5960(void)
+{
+    int m = 0;
+    int *g;
+
+    for (g = isysGroupForFirst(D_40216E08, 0); g != 0; g = isysGroupForNext(g, 0))
+    {
+        m = *g;
+        execObjectWithNonTaskSwitch(m);
+    }
+    if (m != 0)
+        isysGroupForExit(m, 0);
+}

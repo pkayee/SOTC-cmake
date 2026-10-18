@@ -565,30 +565,34 @@ void func_40041C50(s32 a0)
 }
 
 /* NEARMISS-STUB func_40041CC8 */
-#if 0 /* NEARMISS 81.72% cat=regalloc sub=- | movn base select order | attempts=1 */
+#if 0 /* NEARMISS 91.17647% cat=sched sub=- | andi low, ra save and beqz scheduled later than target | attempts=2 */
 void func_40041CC8(s32 a0)
 {
     u8 *root;
-    u8 *t;
-    u8 *e;
-    s32 r;
     s32 idx;
     s32 low;
+    s32 *sh;
+    u8 *s;
+    s32 st;
 
-    root = rootPtn;
-    idx = a0 >> 16;
-    low = a0 & 0xFFFF;
-    t = (DldSysUndefSymbol != (s32)SH_StageDataDEFAULT) ? SH_StageDataDEFAULT : NULL;
-    e = (t != NULL) ? *(u8 **)(t + 0x10) + idx * 20 : NULL;
-    if (++*(u16 *)(e + 0x10) == 1)
+    sh = (s32 *)SH_StageDataDEFAULT;
+    if (DldSysUndefSymbol == (s32)SH_StageDataDEFAULT)
     {
-        sheetMgrLoadSegmentIndex(SH_StageDataDEFAULT, idx, &r);
+        sh = 0;
+    }
+    root = rootPtn;
+    low = a0 & 0xFFFF;
+    idx = a0 >> 16;
+    s = (sh != 0) ? (u8 *)sh[4] + idx * 20 : 0;
+    if (++*(u16 *)(s + 0x10) == 1)
+    {
+        sheetMgrLoadSegmentIndex(SH_StageDataDEFAULT, idx, &st);
         sheetMgrNopSegmentIndex(0);
-        while ((u32)(r - 0xDEAF) >= 2)
+        while ((u32)(st - 0xDEAF) >= 2)
         {
             scrRun();
         }
-        if (r != 0xDEB0)
+        if (st != 0xDEB0)
         {
             initstage(root, idx, low, -1, 1, 0);
         }

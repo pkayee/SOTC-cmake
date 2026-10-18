@@ -191,4 +191,23 @@ void initSlowManager(void)
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0033_ClearStageChipParam", createSpecialEffectObj);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0033_ClearStageChipParam", updateSpecialEffectManager);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0033_ClearStageChipParam", updateSpecialEffectManager);
+
+extern char gcGlobalVar[];
+
+void updateSpecialEffectManager(void)
+{
+    int *m = 0;
+    int *g;
+
+    for (g = isysGroupForFirst(gcGlobalVar + 0x300, 0); g != 0; g = isysGroupForNext(g, 0))
+    {
+        int *vt;
+
+        m = (int *)*g;
+        vt = *(int **)((char *)m + 0x1c);
+        ((void (*)(int *))*(int *)((char *)vt + 0x10))(m);
+    }
+    if (m != 0)
+        isysGroupForExit((int)m, 0);
+}
