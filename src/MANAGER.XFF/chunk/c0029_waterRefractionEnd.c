@@ -61,9 +61,19 @@ void *getRefractLengthRatio(void)
     return D_4012A568;
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0029_waterRefractionEnd", getRefractBlendRatio);
+extern u8 D_4012A56C[];
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0029_waterRefractionEnd", getRefractBrightness);
+void *getRefractBlendRatio(void)
+{
+    return D_4012A56C;
+}
+
+extern u8 D_4012A570[];
+
+void *getRefractBrightness(void)
+{
+    return D_4012A570;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0029_waterRefractionEnd", shadowReset);
 

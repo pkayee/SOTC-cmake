@@ -25,13 +25,25 @@ int sheetFsGetStageTexSegIndex(int x, int y)
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0190_sheetFsLoadDirectFile", sheetFsAddStageTexSegIndex);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0190_sheetFsLoadDirectFile", sheetFsDecStageTexSegIndex);
+typedef struct { int idx, b; } SegIdx;
+extern SegIdx *D_401B5348;
+
+int sheetFsDecStageTexSegIndex(int i)
+{
+    return --D_401B5348[i].idx;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0190_sheetFsLoadDirectFile", sheetFsExistTexSegIndexCallBack);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0190_sheetFsLoadDirectFile", sheetFsSetStageTexSegTexSegDef);
+void sheetFsSetStageTexSegTexSegDef(int arg0, int arg1)
+{
+    D_401B5348[arg0].b = arg1;
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0190_sheetFsLoadDirectFile", sheetFsGetStageTexSegTexSegDef);
+int sheetFsGetStageTexSegTexSegDef(int arg0)
+{
+    return D_401B5348[arg0].b;
+}
 
 int sheetFsDataRead(int a, int b, int c, int d)
 {
@@ -48,9 +60,25 @@ int sheetFsSectorAlignSkip(int a, int b, int c, int d)
     return iosCdStSectorAlignSkip(a, b, c, d);
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0190_sheetFsLoadDirectFile", sheetFsLoadBootData);
+extern int D_401B5358;
+extern void iosCdStStart(int);
+extern void iosCdStStop(void);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0190_sheetFsLoadDirectFile", sheetFsLoadRootSegment);
+void sheetFsLoadBootData(void (*cb)(int, int))
+{
+    iosCdStStart(D_401B5358);
+    cb(0, 0);
+    iosCdStStop();
+}
+
+extern int D_401B5360;
+
+void sheetFsLoadRootSegment(void (*cb)(int, int))
+{
+    iosCdStStart(D_401B5360);
+    cb(0, 0);
+    iosCdStStop();
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0190_sheetFsLoadDirectFile", sheetFsLoadSegmentIndex);
 
@@ -58,13 +86,37 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0190_sheetFsLoadDirectFile", sh
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0190_sheetFsLoadDirectFile", sheetFsLoadStageTex);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0190_sheetFsLoadDirectFile", sheetFsLoadAdpcmInt);
+extern int *D_401B5384;
+extern void iosIopRead(int, int, int);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0190_sheetFsLoadDirectFile", sheetFsGetDirectFileSize);
+void sheetFsLoadAdpcmInt(int a, int i, int off, int buf, int size)
+{
+    int *t = D_401B5384 + i * 2;
+    iosIopRead(*t + off, buf, size);
+}
+
+typedef struct {
+    int offset;
+    int size;
+} FileEntry;
+
+extern FileEntry *D_401B538C;
+
+int sheetFsGetDirectFileSize(int i)
+{
+    return *(int *)((char *)D_401B538C + (i << 3) + 4);
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0190_sheetFsLoadDirectFile", sheetFsSrhSpecialFs);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0190_sheetFsLoadDirectFile", sheetFsSetSpecialFs);
+extern int D_4012E324;
+extern void iosCdSetMode(int mode);
+
+void sheetFsSetSpecialFs(int fs, int mode)
+{
+    D_4012E324 = fs;
+    iosCdSetMode(fs != 0 && mode != 0);
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0190_sheetFsLoadDirectFile", func_400ED988);
 
