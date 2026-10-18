@@ -11,23 +11,52 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0210_func_4010DCB8", sendStopK
 void deleteFastLegCtrlWork(void) {
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0210_func_4010DCB8", setDashFastLegCtrlWork);
+void setDashFastLegCtrlWork(void *arg0, s32 arg1)
+{
+    *(s32 *)((u8 *)arg0 + 0x34) = arg1;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0210_func_4010DCB8", setFinalAttainWalkFastLegCtrlWork);
+void setFinalAttainWalkFastLegCtrlWork(void *arg0, s32 arg1)
+{
+    *(s32 *)((u8 *)arg0 + 0x30) = arg1;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0210_func_4010DCB8", setAllowMaxSpeedFastLegCtrlWork);
+void setAllowMaxSpeedFastLegCtrlWork(void *arg0, f32 fparg0)
+{
+    if (*(f32 *)((u8 *)arg0 + 0x7C) < fparg0) {
+        *(f32 *)((u8 *)arg0 + 0x50) = fparg0;
+    }
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0210_func_4010DCB8", setBackFastLegCtrlWork);
+void setBackFastLegCtrlWork(void *arg0, s32 arg1)
+{
+    *(s32 *)((u8 *)arg0 + 0x38) = arg1;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0210_func_4010DCB8", setNotFastTurnFastLegCtrlWork);
+void setNotFastTurnFastLegCtrlWork(void *arg0, s32 arg1)
+{
+    *(s32 *)((u8 *)arg0 + 0x3C) = arg1;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0210_func_4010DCB8", setRunStopTurnFastLegCtrlWork);
+void setRunStopTurnFastLegCtrlWork(void *arg0, s32 arg1)
+{
+    *(s32 *)((u8 *)arg0 + 0x40) = arg1;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0210_func_4010DCB8", setWalkStopTurnFastLegCtrlWork);
+void setWalkStopTurnFastLegCtrlWork(void *arg0, s32 arg1)
+{
+    *(s32 *)((u8 *)arg0 + 0x44) = arg1;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0210_func_4010DCB8", setCurveCollisionFastLegCtrlWork);
+void setCurveCollisionFastLegCtrlWork(void *arg0, s32 arg1)
+{
+    *(s32 *)((u8 *)arg0 + 0x48) = arg1;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0210_func_4010DCB8", getChkColWidth);
+f32 getChkColWidth(void *arg0)
+{
+    return *(f32 *)((u8 *)arg0 + 0xCC);
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0210_func_4010DCB8", setRunStopTurnAngleFastLegCtrlWork);
 
