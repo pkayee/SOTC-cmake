@@ -395,9 +395,42 @@ s32 SCRConditionPlayerDamagedType(void* a, s32 b, s32 c, s32 d, s32 e, s32 f, s3
     return 0;
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0227_finishLoadMotList", SCRConditionMyselfParentColAttr);
+s32 SCRConditionMyselfParentColAttr(void* actor, s32 a1, s32 a2, s32 a3, s64 mask, s32 attr)
+{
+    u8* cls;
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0227_finishLoadMotList", SCRConditionGameObjParentColAttr);
+    if (*(s32*)(((u8* (*)(void*))GetLayoutClass)(actor) + 0x124) == 0)
+    {
+        return 0;
+    }
+    cls = GetCharacterClass((s32)actor);
+    if (attr != -1)
+        return attr == (*(s64*)(cls + 0x680) & mask);
+    return (*(s64*)(cls + 0x680) & mask) != 0;
+}
+
+s32 SCRConditionGameObjParentColAttr(void* a, s32 b, s32 c, s32 d, long mask, s32 attr, s32 g, s32* h)
+{
+    s32 ooff = *h & 0x3FFFF;
+    s32* ot = ooff != 0 ? *(s32**)((u8*)h - ooff) : 0;
+    s32* o = (ot != 0 && (s32)ot != DldSysUndefSymbol) ? (s32*)ot[4] : 0;
+    u8* cls;
+
+    if (o != 0)
+    {
+        if (o[2] != 0)
+        {
+            if (*(s32*)(((u8* (*)(void*))GetLayoutClass)((void*)o[2]) + 0x124) != 0)
+            {
+                cls = GetCharacterClass(o[2]);
+                if (attr != -1)
+                    return attr == (*(long*)(cls + 0x680) & mask);
+                return (*(long*)(cls + 0x680) & mask) != 0;
+            }
+        }
+    }
+    return 0;
+}
 
 s32 SCRConditionMyselfMotionCheck(void* a, s32 b, s32 c, s32 d, s32 e, s32 f, s32 g, s32 i, u32* h)
 {
@@ -409,21 +442,90 @@ s32 SCRConditionMyselfMotionCheck(void* a, s32 b, s32 c, s32 d, s32 e, s32 f, s3
     return p == *(u8**)w;
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0227_finishLoadMotList", SCRConditionMyselfMotionShiftCheck);
+s32 SCRConditionMyselfMotionShiftCheck(void* a, s32 b, s32 c, s32 d, s32 e, s32 f, s32 g, s32 i, u32* h)
+{
+    s32 ret = 0;
+    u8* w = GetCharacterClass((s32)a) + 0x1C0;
+    u32 v = *h;
+    s32 off = v & 0x3FFFF;
+    u8* t = off != 0 ? *(u8**)((u8*)h - off) : 0;
+    u8* p = (t != 0 && (s32)t != DldSysUndefSymbol) ? *(u8**)(t + 0x10) + ((v >> 18) & 0xFFF) * *(s32*)(*(u8**)(t + 8) + 0xC) : 0;
+    if (p == *(u8**)w)
+        ret = *(s8*)(GetCharacterClass((s32)a) + 0x35C) != 0;
+    return ret;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0227_finishLoadMotList", SCRConditionMyselfLastMotionShiftCheck);
+s32 SCRConditionMyselfLastMotionShiftCheck(void* a, s32 b, s32 c, s32 d, s32 e, s32 f, s32 g, s32 i, u32* h)
+{
+    s32 ret = 0;
+    u8* w = GetCharacterClass((s32)a) + 0x1C0;
+    u32 v = *h;
+    s32 off = v & 0x3FFFF;
+    u8* t = off != 0 ? *(u8**)((u8*)h - off) : 0;
+    u8* p = (t != 0 && (s32)t != DldSysUndefSymbol) ? *(u8**)(t + 0x10) + ((v >> 18) & 0xFFF) * *(s32*)(*(u8**)(t + 8) + 0xC) : 0;
+    if (p == *(u8**)(w + 4))
+        ret = *(s8*)(GetCharacterClass((s32)a) + 0x35C) != 0;
+    return ret;
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0227_finishLoadMotList", SCRConditionMyselfAddMotionCheck);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0227_finishLoadMotList", SCRConditionMyselfControlModeCheck);
+s32 SCRConditionMyselfControlModeCheck(void* a, s32 b, s32 c, s32 d, s32 e, s32 f, s32 g, s32 i, u32* h)
+{
+    u32 v = *h;
+    s32 off = v & 0x3FFFF;
+    u8* t = off != 0 ? *(u8**)((u8*)h - off) : 0;
+    u8* p = (t != 0 && (s32)t != DldSysUndefSymbol) ? *(u8**)(t + 0x10) + ((v >> 18) & 0xFFF) * *(s32*)(*(u8**)(t + 8) + 0xC) : 0;
+    return p == *(u8**)(GetCharacterClass((s32)a) + 0x740);
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0227_finishLoadMotList", SCRConditionPlayerMotionCheck);
+s32 SCRConditionPlayerMotionCheck(void* a, s32 b, s32 c, s32 d, s32 e, s32 f, s32 g, s32 i, u32* h)
+{
+    u8* w = GetCharacterClass(*(s32*)(((u8* (*)(void*))getSCRDataCtrlWork)(a) + 0x4058)) + 0x1C0;
+    u32 v = *h;
+    s32 off = v & 0x3FFFF;
+    u8* t = off != 0 ? *(u8**)((u8*)h - off) : 0;
+    u8* p = (t != 0 && (s32)t != DldSysUndefSymbol) ? *(u8**)(t + 0x10) + ((v >> 18) & 0xFFF) * *(s32*)(*(u8**)(t + 8) + 0xC) : 0;
+    return p == *(u8**)w;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0227_finishLoadMotList", SCRConditionPlayerMotionShiftCheck);
+s32 SCRConditionPlayerMotionShiftCheck(void* a, s32 b, s32 c, s32 d, s32 e, s32 f, s32 g, s32 i, u32* h)
+{
+    u8* w = ((u8* (*)(void*))getSCRDataCtrlWork)(a);
+    u8* m = GetCharacterClass(*(s32*)(w + 0x4058)) + 0x1C0;
+    u32 v = *h;
+    s32 off = v & 0x3FFFF;
+    s32 ret = 0;
+    u8* t = off != 0 ? *(u8**)((u8*)h - off) : 0;
+    u8* p = (t != 0 && (s32)t != DldSysUndefSymbol) ? *(u8**)(t + 0x10) + ((v >> 18) & 0xFFF) * *(s32*)(*(u8**)(t + 8) + 0xC) : 0;
+    if (p == *(u8**)m)
+        ret = *(s8*)(GetCharacterClass(*(s32*)(w + 0x4058)) + 0x35C) != 0;
+    return ret;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0227_finishLoadMotList", SCRConditionPlayerLastMotionShiftCheck);
+s32 SCRConditionPlayerLastMotionShiftCheck(void* a, s32 b, s32 c, s32 d, s32 e, s32 f, s32 g, s32 i, u32* h)
+{
+    u8* w = ((u8* (*)(void*))getSCRDataCtrlWork)(a);
+    u8* m = GetCharacterClass(*(s32*)(w + 0x4058)) + 0x1C0;
+    u32 v = *h;
+    s32 off = v & 0x3FFFF;
+    s32 ret = 0;
+    u8* t = off != 0 ? *(u8**)((u8*)h - off) : 0;
+    u8* p = (t != 0 && (s32)t != DldSysUndefSymbol) ? *(u8**)(t + 0x10) + ((v >> 18) & 0xFFF) * *(s32*)(*(u8**)(t + 8) + 0xC) : 0;
+    if (p == *(u8**)(m + 4))
+        ret = *(s8*)(GetCharacterClass(*(s32*)(w + 0x4058)) + 0x35C) != 0;
+    return ret;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0227_finishLoadMotList", SCRConditionPlayerControlModeCheck);
+s32 SCRConditionPlayerControlModeCheck(void* a, s32 b, s32 c, s32 d, s32 e, s32 f, s32 g, s32 i, u32* h)
+{
+    u8* w = ((u8* (*)(void*))getSCRDataCtrlWork)(a);
+    u32 v = *h;
+    s32 off = v & 0x3FFFF;
+    u8* t = off != 0 ? *(u8**)((u8*)h - off) : 0;
+    u8* p = (t != 0 && (s32)t != DldSysUndefSymbol) ? *(u8**)(t + 0x10) + ((v >> 18) & 0xFFF) * *(s32*)(*(u8**)(t + 8) + 0xC) : 0;
+    return p == *(u8**)(GetCharacterClass(*(s32*)(w + 0x4058)) + 0x740);
+}
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0227_finishLoadMotList", SCRConditionMyselfOverGlobalY);
 
@@ -520,7 +622,16 @@ s32 SCRConditionDPGroupIDChanged(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4, s32 a5,
 #endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0227_finishLoadMotList", SCRConditionDPGroupIDChanged);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0227_finishLoadMotList", SCRConditionGPOrDPGroupIDChanged);
+s32 SCRConditionGPOrDPGroupIDChanged(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4, s32 a5, s32 a6, s32 t3)
+{
+    s32 ret = 0;
+    u8* w = ((u8* (*)(void*))getSCRDataCtrlWork)(a0);
+    s32 id = getDPGroupID(a0, t3);
+
+    if (changedGPIndex(a0, w, *(s32*)(w + 0x4058)) || changedDPGroupID(a0, (s32)w, id, -1))
+        ret = 1;
+    return ret;
+}
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0227_finishLoadMotList", SCRConditionWayFinish);
 
