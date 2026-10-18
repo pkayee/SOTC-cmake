@@ -1,8 +1,5 @@
 #include "common.h"
 
-/* NEARMISS-STUB SetLayoutUserClipFunc */
-#if 0 /* NEARMISS 99.75% cat=rodata-const sub=- | in-TU: jump-table reloc names .rodata instead of D_401329B0; all insns match | attempts=1 */
-
 extern char *GetScriptLayoutClass(void *);
 extern void *dynamic_cast_to_camera_obj(void *);
 extern char *get_camera_obj_layout_class(void *);
@@ -27,6 +24,7 @@ static inline char *layoutClass(unsigned char *o)
         return 0;
     }
 }
+
 
 void SetLayoutUserClipFunc(unsigned char *o, void *fn)
 {
@@ -35,33 +33,7 @@ void SetLayoutUserClipFunc(unsigned char *o, void *fn)
     if (p != 0)
         *(void **)(p + 0xDC) = fn;
 }
-#endif
-extern char *GetScriptLayoutClass(void *);
-extern void *dynamic_cast_to_camera_obj(void *);
-extern char *get_camera_obj_layout_class(void *);
-extern char *GetLightClass(void *);
 
-static inline char *layoutClass(unsigned char *o)
-{
-    switch (o[8]) {
-    case 0xA:
-        return (char *)o + 0x20;
-    case 0xB:
-        return GetScriptLayoutClass(o) + 0x70;
-    case 0x11:
-        return get_camera_obj_layout_class(dynamic_cast_to_camera_obj(o));
-    case 0x13:
-        return GetLightClass(o);
-    case 9:
-    case 0xD:
-    case 0x16:
-        return (char *)o + 0x90;
-    default:
-        return 0;
-    }
-}
-
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0099_SetLayoutUserClipFunc", SetLayoutUserClipFunc);
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0099_SetLayoutUserClipFunc", CreateLayoutObj);
 

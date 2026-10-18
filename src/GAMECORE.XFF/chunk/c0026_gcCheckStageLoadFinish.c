@@ -141,8 +141,6 @@ void languageMenuUnload(void)
     sheetMgrUnloadSegmentIndex(SH_StageDataDEFAULT, 0x752, 0);
 }
 
-/* NEARMISS-STUB StartLwsDemoManager */
-#if 0 /* NEARMISS 99.85% cat=rodata-const sub=- | lo half reloc: exp addiu a0,a0,%lo(rootPtn+0x340) vs ours %lo(rootPtn); gcc puts addend only in hi half (tried &rootPtn+0x340, extern array+0x340, (s32)rootPtn+ | attempts=1 */
 typedef struct { void *func; int a; int stack; int prio; void *arg; char pad[0x10]; int x, y; } LwsParam;
 extern u8 rootPtn[];
 extern void *memset(void *, int, unsigned int);
@@ -159,10 +157,8 @@ void *StartLwsDemoManager(int x, int y, void *arg)
     p.func = (void *)func_400318D8;
     p.stack = 0x1000;
     p.prio = 3;
-    return CreateLwsDemoOrientManagerObj(rootPtn + 0x340, 0, &p);
+    return CreateLwsDemoOrientManagerObj(rootPtn, 0, &p);
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0026_gcCheckStageLoadFinish", StartLwsDemoManager);
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0026_gcCheckStageLoadFinish", func_400318D8);
 void func_400318D8(void)

@@ -273,8 +273,6 @@ s32 GetCharacterClassIKNodeBooleanInfo(u8 *obj, u8 *cc, s32 a2)
 #endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0059_getClothGeometry", GetCharacterClassIKNodeBooleanInfo);
 
-/* NEARMISS-STUB GetCharacterClassOptionNodeLocalQuaternionPos */
-#if 0 /* NEARMISS 85.53% cat=sched sub=- | in-TU: edits applied; target loads options ptr 0x354 first and quaternion ptr 0x2E8 after position store | attempts=2 */
 typedef union
 {
     u128 q;
@@ -306,16 +304,13 @@ typedef struct
 
 s32 GetCharacterClassOptionNodeLocalQuaternionPos(Vec4 *quaternion, Vec4 *position, CharacterClass *character, s32 index)
 {
-    u128 positionValue = character->positions[index].q;
     OptionNode *node = &character->options->nodes[index];
+    u128 p = character->positions[index].q;
     s32 value = node->value30;
-
-    position->q = positionValue;
+    position->q = p;
     quaternion->q = character->quaternions[index].q;
     return value;
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0059_getClothGeometry", GetCharacterClassOptionNodeLocalQuaternionPos);
 
 void isysDeleteGroupAllObj();
 
