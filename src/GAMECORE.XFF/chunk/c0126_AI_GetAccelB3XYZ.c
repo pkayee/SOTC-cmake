@@ -108,20 +108,16 @@ float AI_GetInterRatioOutCut(float value, float low, float high, float start, fl
 
     if (value <= low) {
         result = start;
-        goto done;
-    }
-    if (high <= value) {
+    } else if (high <= value) {
         result = end;
-        goto done;
+    } else {
+        span = high - low;
+        if (span == 0.0f) {
+            result = start;
+        } else {
+            return (((value - low) * (end - start)) / span) + start;
+        }
     }
-    span = high - low;
-    if (span == 0.0f) {
-        result = start;
-        goto done;
-    }
-    return (((value - low) * (end - start)) / span) + start;
-
-done:
     return result;
 }
 

@@ -84,14 +84,7 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0148_ReconstructCollisionEdgeLi
 
 int CheckCollisionFinderAlive(char *p)
 {
-    if (*(int *)(p + 0x8) == 0) {
-        goto no;
-    }
-    if (*(int *)(p + 0xC) == 0) {
-        goto no;
-    }
-    return 1;
-no:
+    if (*(int *)(p + 0x8) != 0 && *(int *)(p + 0xC) != 0) return 1;
     return 0;
 }
 
