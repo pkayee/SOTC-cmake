@@ -10,6 +10,7 @@ u8 *SCRGetFirstObj(u8 *list);
 u8 *SCRGetBossWork(void);
 s32 GetSwordFlareHitPlaneAttribute(void);
 extern u8 gcGlobalVar[];
+extern s32 DldSysUndefSymbol;
 f32 getBossPartsCurDamage(s32 a0, s32 a1);
 
 s32 SCRConditionInstantaneousPlayerInSight(void)
@@ -78,42 +79,232 @@ s32 SCRConditionVolumeCheckForPlayerPos(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4, 
     return CheckPositionInsideOfJudgeVolumeObject(buf, a0, a8, *(s32 *)(obj + 0x134));
 }
 
-/* NEARMISS-STUB SCRConditionVolumeCheckForPointPos */
-#if 0 /* NEARMISS 95.37% cat=regalloc sub=- | v0 copied to v1 before a2 load | attempts=1 */
-void SCRConditionVolumeCheckForPointPos(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4, s32 a5, s32 a6, s32 a7, s32 a8)
+s32 SCRConditionVolumeCheckForPointPos(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4, s32 a5, s32 a6, s32 a7, s32 a8)
 {
-    u8 buf[0x60];
-    u8 pos[0x10];
-    s32 point;
-    s32 getPointDataFromEvent(u8 *a0, s32 a1, u8 *a2);
+    u8 buf[0x60] __attribute__((aligned(16)));
+    s128 pt;
+    s32 r;
+    s32 getPointDataFromEvent(u8 *a0, s32 a1, s128 *a2);
     s32 CheckPositionInsideOfJudgeVolumeObject(u8 *a0, s32 a1, s32 a2, s32 a3);
 
-    point = getPointDataFromEvent(getSCRDataCtrlWork(), a1, pos);
-    if (point)
+    r = getPointDataFromEvent(getSCRDataCtrlWork(), a1, &pt);
+    if (r == 0)
     {
-        CheckPositionInsideOfJudgeVolumeObject(buf, a0, a8, point);
+        return 0;
     }
+    return CheckPositionInsideOfJudgeVolumeObject(buf, a0, a8, r);
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0228_SCRConditionInstantaneousPlayerInSight", SCRConditionVolumeCheckForPointPos);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0228_SCRConditionInstantaneousPlayerInSight", SCRFuncVolumeCheckByGameObj);
+static inline s32 *dldData(u32 *h)
+{
+    s32 off = *h & 0x3FFFF;
+    s32 *t = off != 0 ? *(s32 **)((u8 *)h - off) : 0;
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0228_SCRConditionInstantaneousPlayerInSight", SCRFuncVolumeCheckByGameObjForSelfPos);
+    return (t != 0 && (s32)t != DldSysUndefSymbol) ? (s32 *)t[4] : 0;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0228_SCRConditionInstantaneousPlayerInSight", SCRConditionHorseMotionCheck);
+static inline u8 *dldResolve(u32 *h)
+{
+    u32 v = *h;
+    s32 off = v & 0x3FFFF;
+    s32 *t = off != 0 ? *(s32 **)((u8 *)h - off) : 0;
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0228_SCRConditionInstantaneousPlayerInSight", SCRConditionMotionCheck);
+    return (t != 0 && (s32)t != DldSysUndefSymbol) ? (u8 *)t[4] + ((v >> 18) & 0xFFF) * ((s32 *)t[2])[3] : 0;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0228_SCRConditionInstantaneousPlayerInSight", SCRConditionGameObjMotionShiftCheck);
+s32 SCRFuncVolumeCheckByGameObj(u8 *actor, s32 a1, s32 a2, s32 a3, s32 a4, s32 a5, s32 a6, u32 *h, u32 *vh)
+{
+    u8 work[0x60];
+    s128 pos;
+    u8 *w;
+    s32 *o;
+    s32 equipmentInvisibilityCloak(void);
+    s32 CheckPositionInsideOfJudgeVolumeObject(u8 *a0, s32 a1, s32 a2, s32 a3);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0228_SCRConditionInstantaneousPlayerInSight", SCRConditionGameObjLastMotionShiftCheck);
+    w = getSCRDataCtrlWork();
+    o = dldData(h);
+    if (equipmentInvisibilityCloak())
+    {
+        return 0;
+    }
+    pos = **(s128 **)(*(u8 **)(w + 0x405C) + 0x134);
+    if (o != 0)
+    {
+        void *vol = (void *)o[2];
+
+        if (vol != 0 && dldResolve(vh) != 0 && CheckPositionInsideOfJudgeVolumeObject(work, (s32)vol, (s32)vh, (s32)&pos) != 0)
+        {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+s32 SCRFuncVolumeCheckByGameObjForSelfPos(u8 *actor, s32 a1, s32 a2, s32 a3, s32 a4, s32 a5, s32 a6, u32 *h, u32 *vh)
+{
+    u8 work[0x60];
+    s128 pos;
+    s32 *o;
+    u8 *GetLayoutClass(void *chara);
+    s32 CheckPositionInsideOfJudgeVolumeObject(u8 *a0, s32 a1, s32 a2, s32 a3);
+
+    o = dldData(h);
+    pos = **(s128 **)(GetLayoutClass(actor) + 0x134);
+    if (o != 0)
+    {
+        void *vol = (void *)o[2];
+
+        if (vol != 0 && dldResolve(vh) != 0 && CheckPositionInsideOfJudgeVolumeObject(work, (s32)vol, (s32)vh, (s32)&pos) != 0)
+        {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+s32 SCRConditionHorseMotionCheck(u8 *a, s32 b, s32 c, s32 d, s32 e, s32 f, s32 g, s32 i, u32 *h)
+{
+    u8 *obj;
+    u8 *anim;
+    u32 v;
+    s32 off;
+    u8 *t;
+    u8 *p;
+    u8 *GetAnimationClass(void *chara);
+
+    obj = SCRGetFirstObj(gcGlobalVar + 0x2B4);
+    if (obj == 0)
+    {
+        return 0;
+    }
+    anim = GetAnimationClass(obj);
+    v = *h;
+    off = v & 0x3FFFF;
+    t = off != 0 ? *(u8 **)((u8 *)h - off) : 0;
+    p = (t != 0 && (s32)t != DldSysUndefSymbol) ? *(u8 **)(t + 0x10) + ((v >> 18) & 0xFFF) * *(s32 *)(*(u8 **)(t + 8) + 0xC) : 0;
+    return p == *(u8 **)anim;
+}
+
+static inline s32 *dldObj(s32 *h)
+{
+    s32 off = *h & 0x3FFFF;
+    s32 *t = off != 0 ? *(s32 **)((u8 *)h - off) : 0;
+
+    return (t != 0 && (s32)t != DldSysUndefSymbol) ? (s32 *)t[4] : 0;
+}
+
+s32 SCRConditionMotionCheck(void *a, s32 b, s32 c, s32 d, s32 e, s32 f, s32 g, s32 *h1, u32 *h2)
+{
+    s32 none;
+    s32 *o = dldObj(h1);
+    u8 *m;
+    u8 *GetCharacterClass(void *chara);
+
+    if (o == 0 || o[2] == 0)
+    {
+        return 0;
+    }
+    none = GetCharacterClass((void *)o[2]) == 0;
+    if (none)
+    {
+        return 0;
+    }
+    m = GetCharacterClass((void *)o[2]) + 0x1C0;
+    return dldResolve(h2) == *(u8 **)m;
+}
+
+s32 SCRConditionGameObjMotionShiftCheck(void *a, s32 b, s32 c, s32 d, s32 e, s32 f, s32 g, s32 *h1, u32 *h2)
+{
+    s32 none;
+    s32 *o = dldObj(h1);
+    u8 *m;
+    s32 ret;
+    u8 *GetCharacterClass(void *chara);
+
+    if (o == 0 || o[2] == 0)
+    {
+        return 0;
+    }
+    none = GetCharacterClass((void *)o[2]) == 0;
+    if (none)
+    {
+        return 0;
+    }
+    m = GetCharacterClass((void *)o[2]) + 0x1C0;
+    ret = 0;
+    if (dldResolve(h2) == *(u8 **)(m + 0))
+    {
+        ret = *(s8 *)(GetCharacterClass((void *)o[2]) + 0x35C) != 0;
+    }
+    return ret;
+}
+
+s32 SCRConditionGameObjLastMotionShiftCheck(void *a, s32 b, s32 c, s32 d, s32 e, s32 f, s32 g, s32 *h1, u32 *h2)
+{
+    s32 none;
+    s32 *o = dldObj(h1);
+    u8 *m;
+    s32 ret;
+    u8 *GetCharacterClass(void *chara);
+
+    if (o == 0 || o[2] == 0)
+    {
+        return 0;
+    }
+    none = GetCharacterClass((void *)o[2]) == 0;
+    if (none)
+    {
+        return 0;
+    }
+    m = GetCharacterClass((void *)o[2]) + 0x1C0;
+    ret = 0;
+    if (dldResolve(h2) == *(u8 **)(m + 4))
+    {
+        ret = *(s8 *)(GetCharacterClass((void *)o[2]) + 0x35C) != 0;
+    }
+    return ret;
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0228_SCRConditionInstantaneousPlayerInSight", SCRConditionGameObjAddMotionCheck);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0228_SCRConditionInstantaneousPlayerInSight", SCRConditionHorseControlModeCheck);
+s32 SCRConditionHorseControlModeCheck(u8 *a, s32 b, s32 c, s32 d, s32 e, s32 f, s32 g, s32 i, u32 *h)
+{
+    u8 *obj;
+    u32 v;
+    s32 off;
+    u8 *t;
+    u8 *p;
+    u8 *GetCharacterClass(void *chara);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0228_SCRConditionInstantaneousPlayerInSight", SCRConditionControlModeCheck);
+    obj = SCRGetFirstObj(gcGlobalVar + 0x2B4);
+    if (obj == 0)
+    {
+        return 0;
+    }
+    v = *h;
+    off = v & 0x3FFFF;
+    t = off != 0 ? *(u8 **)((u8 *)h - off) : 0;
+    p = (t != 0 && (s32)t != DldSysUndefSymbol) ? *(u8 **)(t + 0x10) + ((v >> 18) & 0xFFF) * *(s32 *)(*(u8 **)(t + 8) + 0xC) : 0;
+    return p == *(u8 **)(GetCharacterClass(obj) + 0x740);
+}
+
+s32 SCRConditionControlModeCheck(void *a, s32 b, s32 c, s32 d, s32 e, s32 f, s32 g, s32 *h1, u32 *h2)
+{
+    s32 none;
+    s32 *o = dldObj(h1);
+    u8 *GetCharacterClass(void *chara);
+
+    if (o == 0 || o[2] == 0)
+    {
+        return 0;
+    }
+    none = GetCharacterClass((void *)o[2]) == 0;
+    if (none)
+    {
+        return 0;
+    }
+    return dldResolve(h2) == *(u8 **)(GetCharacterClass((void *)o[2]) + 0x740);
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0228_SCRConditionInstantaneousPlayerInSight", SCRConditionGameFlagCheckByGameObj);
 
@@ -287,45 +478,19 @@ s32 SCRConditionLessHorseSpeed(f32 a0)
     return getHorseInterpSpeed(obj) <= a0;
 }
 
-/* NEARMISS-STUB SCRConditionCheckGameObjLwsPlayMode */
-#if 0 /* NEARMISS 76.57% cat=regalloc sub=- | DLD link a7, beql polarity | attempts=1 */
-s32 SCRConditionCheckGameObjLwsPlayMode(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4, s32 a5, s32 a6, u32 *a7)
+s32 SCRConditionCheckGameObjLwsPlayMode(void *a, s32 mode, s32 c, s32 d, s32 e, s32 f, s32 g, s32 *h)
 {
-    u8 *e;
-    u32 off;
-    s32 slot;
-    extern s32 DldSysUndefSymbol;
-    u8 *GetScriptAnimationClass(void);
+    u8 *GetScriptAnimationClass(void *chara);
+    s32 off = *h & 0x3FFFF;
+    s32 *t = off != 0 ? *(s32 **)((u8 *)h - off) : 0;
+    s32 *o = (t != 0 && t != (s32 *)DldSysUndefSymbol) ? (s32 *)t[4] : 0;
 
-    off = *a7 & 0x3FFFF;
-    if (off == 0)
+    if (o != 0 && o[2] != 0)
     {
-        slot = 0;
+        return mode == *(s32 *)(GetScriptAnimationClass((void *)o[2]) + 0x344);
     }
-    else
-    {
-        slot = *(s32 *)((u8 *)a7 - off);
-    }
-    if (slot != 0 && slot != DldSysUndefSymbol)
-    {
-        e = *(u8 **)(slot + 0x10);
-    }
-    else
-    {
-        e = NULL;
-    }
-    if (e == NULL)
-    {
-        return 0;
-    }
-    if (*(u8 **)(e + 8) == NULL)
-    {
-        return 0;
-    }
-    return a1 == *(s32 *)(GetScriptAnimationClass() + 0x344);
+    return 0;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0228_SCRConditionInstantaneousPlayerInSight", SCRConditionCheckGameObjLwsPlayMode);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0228_SCRConditionInstantaneousPlayerInSight", SCRConditionOverLengthXZPlayerFromGp);
 
