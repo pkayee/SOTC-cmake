@@ -35,7 +35,7 @@ int *sceCdCallback(void (*func)(int))
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libcdvd/cdvd000", sceCdCallback);
 
 /* NEARMISS-STUB _sceCd_cd_callback */
-#if 0 /* NEARMISS 84.0% cat=branch-layout sub=- | iSignalSema/else layout | attempts=1 */
+#if 0 /* NEARMISS 84.0% cat=branch-layout sub=- | epilogue/store placement: target puts sw B74 before lui/sw tail and ld ra in b delay slot; ours puts sw B74 in b delay slot (early return or if/else both 84) | attempts=2 */
 extern s32 D_00133B54[];
 extern s32 D_00133B60[];
 extern s32 D_00133B68[];
@@ -300,6 +300,130 @@ s32 func_00117310(void)
 }
 
 
+/* NEARMISS-STUB sceCdLayerSearchFile */
+#if 0 /* NEARMISS 77.72% cat=branch-layout sub=- | name-copy loop shape (bnel with delay-slot increment, D151000 base folded to D151024 in ours) and reg alloc (fp in s2 vs s3); 36-byte uncached struct copy via C | attempts=1 */
+extern s32 D_00133B50[];
+extern s32 D_00133B5C[];
+extern s32 D_00133B68[];
+extern s32 D_00133B8C[];
+extern s32 D_00151000[];
+extern s32 D_00151140[];
+extern s32 D_00151180[];
+extern char D_001389F0[];
+extern char D_00138A10[];
+extern char D_00138A28[];
+extern char D_00138A38[];
+extern char D_00138A48[];
+extern char D_00151024[];
+s32 func_001170B0(void);
+
+typedef struct
+{
+    u8 raw[0x24];
+} CdlFileBlk;
+
+s32 sceCdLayerSearchFile(sceCdlFILE *fp, const char *name, s32 layer)
+{
+    s32 ret;
+    s32 r;
+    s32 n;
+    s32 i;
+
+    ret = 0;
+    func_001170B0();
+    r = PollSema(D_00133B68[0]);
+    if (D_00133B68[0] != r)
+    {
+        return ret;
+    }
+    D_00133B5C[0] = 1;
+    if (sceCdSync(1) != 0)
+    {
+        SignalSema(D_00133B68[0]);
+        return 0;
+    }
+    sceSifInitRpc(0);
+    if (D_00133B8C[0] < 0)
+    {
+        for (;;)
+        {
+            r = sceSifBindRpc((sceSifClientData *)D_00151180, 0x80000597, 0);
+            if (r < 0)
+            {
+                if (D_00133B50[0] > 0)
+                {
+                    scePrintf(D_001389F0);
+                }
+                n = 0x100000;
+                do
+                {
+                    n--;
+                } while (n != -1);
+                continue;
+            }
+            if (((sceSifClientData *)D_00151180)->serve == NULL)
+            {
+                n = 0x10000;
+                do
+                {
+                    n--;
+                } while (n != -1);
+                continue;
+            }
+            break;
+        }
+        D_00133B8C[0] = 0;
+    }
+    ((u8 *)D_00151000)[0x24] = name[0];
+    i = 0;
+    if (name[0] != 0)
+    {
+        i = 1;
+        while (i < 0x100)
+        {
+            ((u8 *)D_00151000)[0x24 + i] = name[i];
+            if (name[i] == 0)
+            {
+                break;
+            }
+            i++;
+        }
+    }
+    if (i == 0x100)
+    {
+        ((u8 *)D_00151000)[0x123] = 0;
+    }
+    if (D_00133B50[0] > 0)
+    {
+        scePrintf(D_00138A10, D_00151024);
+    }
+    D_00151000[0x4A] = layer;
+    D_00151000[0x49] = (s32)D_00151000;
+    sceSifWriteBackDCache(D_00151000, 0x12C);
+    r = sceSifCallRpc((sceSifClientData *)D_00151180, 0, 0, D_00151000, 0x12C, D_00151140, 4, NULL, NULL);
+    if (r < 0)
+    {
+        SignalSema(D_00133B68[0]);
+        return 0;
+    }
+    *(CdlFileBlk *)fp = *(CdlFileBlk *)(((u32)D_00151000) | 0x20000000);
+    if (D_00133B50[0] > 0)
+    {
+        scePrintf(D_00138A28, (u8 *)fp + 8);
+    }
+    if (D_00133B50[0] > 0)
+    {
+        scePrintf(D_00138A38, ((s32 *)fp)[1]);
+    }
+    if (D_00133B50[0] > 0)
+    {
+        scePrintf(D_00138A48, ((s32 *)fp)[0]);
+    }
+    ret = *(s32 *)(((u32)D_00151140) | 0x20000000);
+    SignalSema(D_00133B68[0]);
+    return ret;
+}
+#endif
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libcdvd/cdvd000", sceCdLayerSearchFile);
 
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libcdvd/cdvd000", sceCdSearchFile);
@@ -308,8 +432,7 @@ s32 sceCdSearchFile(sceCdlFILE *fp, const char *name)
     return sceCdLayerSearchFile(fp, name, 0);
 }
 
-/* NEARMISS-STUB _sceCd_ncmd_prechk */
-#if 0 /* NEARMISS 64.0% cat=branch-layout sub=- | bind retry loop shape | attempts=1 */
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libcdvd/cdvd000", _sceCd_ncmd_prechk);
 extern s32 D_00133B50[];
 extern s32 D_00133B5C[];
 extern s32 D_00133B68[];
@@ -317,18 +440,16 @@ extern s32 D_00133B7C[];
 extern s32 D_00134D10[];
 extern char D_00138A60[];
 extern char D_00138A88[];
-s32 func_001170B0(void);
+void func_001170B0(void);
 
 s32 _sceCd_ncmd_prechk(s32 arg)
 {
-    s32 r;
-    s32 n;
+    s32 i;
 
     func_001170B0();
-    r = PollSema(D_00133B68[0]);
-    if (D_00133B68[0] != r)
+    if (*(volatile s32 *)D_00133B68 != PollSema(*(volatile s32 *)D_00133B68))
     {
-        if (D_00133B50[0] > 0)
+        if (*(volatile s32 *)D_00133B50 > 0)
         {
             scePrintf(D_00138A60, arg, D_00133B5C[0]);
         }
@@ -337,42 +458,37 @@ s32 _sceCd_ncmd_prechk(s32 arg)
     D_00133B5C[0] = arg;
     if (sceCdSync(1) != 0)
     {
-        SignalSema(D_00133B68[0]);
+        SignalSema(*(volatile s32 *)D_00133B68);
         return 0;
     }
     sceSifInitRpc(0);
-    if (D_00133B7C[0] >= 0)
+    if (D_00133B7C[0] < 0)
     {
-        return 1;
-    }
-    for (;;)
-    {
-        while (sceSifBindRpc((sceSifClientData *)D_00134D10, 0x80000595, 0) < 0)
+        while (1)
         {
-            if (D_00133B50[0] > 0)
+            if (sceSifBindRpc((sceSifClientData *)D_00134D10, 0x80000595, 0) < 0)
             {
-                scePrintf(D_00138A88);
+                if (*(volatile s32 *)D_00133B50 > 0)
+                {
+                    scePrintf(D_00138A88);
+                }
+                for (i = 0x100000; i != -1; i--)
+                {
+                }
+                continue;
             }
-            n = 0x100000;
-            do
+            if (((sceSifClientData *)D_00134D10)->serve != NULL)
             {
-                n--;
-            } while (n != -1);
+                break;
+            }
+            for (i = 0x100000; i != -1; i--)
+            {
+            }
         }
-        if (((s32 *)D_00134D10)[9] != 0)
-        {
-            D_00133B7C[0] = 0;
-            return 1;
-        }
-        n = 0x10000;
-        do
-        {
-            n--;
-        } while (n != -1);
+        D_00133B7C[0] = 0;
     }
+    return 1;
 }
-#endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libcdvd/cdvd000", _sceCd_ncmd_prechk);
 
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libcdvd/cdvd000", sceCdNcmdDiskReady);
 extern s32 D_00133BC0[];
@@ -450,8 +566,7 @@ s32 sceCdSyncS(s32 mode)
     return sceSifCheckStatRpc((sceSifRpcData *)D_001356C0);
 }
 
-/* NEARMISS-STUB _sceCd_scmd_prechk */
-#if 0 /* NEARMISS 64.0% cat=branch-layout sub=- | bind retry loop shape | attempts=1 */
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libcdvd/cdvd000", _sceCd_scmd_prechk);
 extern s32 D_00133B50[];
 extern s32 D_00133B58[];
 extern s32 D_00133B6C[];
@@ -459,18 +574,16 @@ extern s32 D_00133B94[];
 extern s32 D_001356C0[];
 extern char D_00138AC0[];
 extern char D_00138AE8[];
-s32 func_001170B0(void);
+void func_001170B0(void);
 
 s32 _sceCd_scmd_prechk(s32 arg)
 {
-    s32 r;
-    s32 n;
+    s32 i;
 
     func_001170B0();
-    r = PollSema(D_00133B6C[0]);
-    if (D_00133B6C[0] != r)
+    if (*(volatile s32 *)D_00133B6C != PollSema(*(volatile s32 *)D_00133B6C))
     {
-        if (D_00133B50[0] > 0)
+        if (*(volatile s32 *)D_00133B50 > 0)
         {
             scePrintf(D_00138AC0, arg, D_00133B58[0]);
         }
@@ -479,42 +592,37 @@ s32 _sceCd_scmd_prechk(s32 arg)
     D_00133B58[0] = arg;
     if (sceCdSyncS(1) != 0)
     {
-        SignalSema(D_00133B6C[0]);
+        SignalSema(*(volatile s32 *)D_00133B6C);
         return 0;
     }
     sceSifInitRpc(0);
-    if (D_00133B94[0] >= 0)
+    if (D_00133B94[0] < 0)
     {
-        return 1;
-    }
-    for (;;)
-    {
-        while (sceSifBindRpc((sceSifClientData *)D_001356C0, 0x80000593, 0) < 0)
+        while (1)
         {
-            if (D_00133B50[0] > 0)
+            if (sceSifBindRpc((sceSifClientData *)D_001356C0, 0x80000593, 0) < 0)
             {
-                scePrintf(D_00138AE8);
+                if (*(volatile s32 *)D_00133B50 > 0)
+                {
+                    scePrintf(D_00138AE8);
+                }
+                for (i = 0x100000; i != -1; i--)
+                {
+                }
+                continue;
             }
-            n = 0x100000;
-            do
+            if (((sceSifClientData *)D_001356C0)->serve != NULL)
             {
-                n--;
-            } while (n != -1);
+                break;
+            }
+            for (i = 0x100000; i != -1; i--)
+            {
+            }
         }
-        if (((s32 *)D_001356C0)[9] != 0)
-        {
-            D_00133B94[0] = 0;
-            return 1;
-        }
-        n = 0x10000;
-        do
-        {
-            n--;
-        } while (n != -1);
+        D_00133B94[0] = 0;
     }
+    return 1;
 }
-#endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libcdvd/cdvd000", _sceCd_scmd_prechk);
 
 /* NEARMISS-STUB _sceCdSC */
 #if 0 /* NEARMISS 0.0% cat=branch-layout sub=- | beq chain: target bodies out of line (beq to shared store), our compile inverts to bnel and uses a0 for the 0x8011 base; no mechanical fix found | attempts=2 */
@@ -574,8 +682,314 @@ s32 _sceCdSC(s32 code, s32 *out)
 #endif
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libcdvd/cdvd000", _sceCdSC);
 
+/* NEARMISS-STUB sceCdInit */
+#if 0 /* NEARMISS 64.92% cat=regalloc sub=- | bind-loop shape now matches (while(1), 0x100000 delays); remaining: mode kept in s8 not s3, per-global lui hoists (s5 B9C, s4 B98) not kept live across function | attempts=2 */
+extern s32 D_00133B50[];
+extern s32 D_00133B60[];
+extern s32 D_00133B64[];
+extern s32 D_00133B68[];
+extern s32 D_00133B6C[];
+extern s32 D_00133B78[];
+extern s32 D_00133B7C[];
+extern s32 D_00133B84[];
+extern s32 D_00133B88[];
+extern s32 D_00133B8C[];
+extern s32 D_00133B90[];
+extern s32 D_00133B94[];
+extern s32 D_00133B98[];
+extern s32 D_00133B9C[];
+extern s32 D_00151200[];
+extern s32 D_001511A8[];
+extern s32 D_00134D40[];
+extern char D_00138B00[];
+extern char D_00138B20[];
+s32 func_001170B0(void);
+void func_00117198(void);
+s32 func_00117310(void);
+
+s32 sceCdInit(s32 mode)
+{
+    s32 ret;
+    s32 r;
+    s32 n;
+    s32 a0;
+    s32 a1;
+    s32 a2;
+
+    ret = 0;
+    if (sceCdSyncS(1) != 0)
+    {
+        return ret;
+    }
+    sceSifInitRpc(0);
+    D_00133B64[0] = 1;
+    D_00133B88[0] = -1;
+    D_00133B8C[0] = -1;
+    D_00133B7C[0] = -1;
+    D_00133B94[0] = -1;
+    D_00133B90[0] = -1;
+    D_00133B78[0] = 0;
+    D_00133B9C[0] = D_00133B9C[0] + 1;
+    D_00133B98[0] = -1;
+    for (;;)
+    {
+        r = sceSifBindRpc((sceSifClientData *)D_001511A8, 0x80000592, 0);
+        if (r < 0)
+        {
+            if (D_00133B50[0] > 0)
+            {
+                scePrintf(D_00138B00, D_00133B9C[0]);
+            }
+            n = 0x10000;
+            do
+            {
+                n--;
+            } while (n != -1);
+            continue;
+        }
+        if (((sceSifClientData *)D_001511A8)->serve == NULL)
+        {
+            n = 0x10000;
+            do
+            {
+                n--;
+            } while (n != -1);
+            continue;
+        }
+        break;
+    }
+    D_00133B98[0] = 0;
+    D_00151200[0] = mode;
+    sceSifWriteBackDCache(D_00151200, 4);
+    r = sceSifCallRpc((sceSifClientData *)D_001511A8, 0, 0, D_00151200, 4, D_00134D40, 16, NULL, NULL);
+    if (r < 0)
+    {
+        D_00133B64[0] = 0;
+        return 0;
+    }
+    a2 = *(s32 *)(((u32)D_00134D40 + 0xC) | 0x20000000);
+    a1 = *(s32 *)(((u32)D_00134D40 + 0x4) | 0x20000000);
+    a0 = *(s32 *)(((u32)D_00134D40 + 0x8) | 0x20000000);
+    ret = 1;
+    if (a2 == 0xFF)
+    {
+    }
+    else if (a2 == 0xFE)
+    {
+        D_00133B50[0] = ret;
+    }
+    else if (((a2 < a1 ? a1 : a1 + 0xFF) >> 8) < 2)
+    {
+        ret = 2;
+    }
+    else if (((a2 < a0 ? a0 : a0 + 0xFF) >> 8) < 2)
+    {
+        ret = 2;
+    }
+    D_00133B64[0] = 0;
+    if (mode == 5)
+    {
+        if (D_00133B50[0] > 0)
+        {
+            scePrintf(D_00138B20);
+        }
+        func_00117198();
+        D_00133B68[0] = -1;
+        D_00133B6C[0] = -1;
+        D_00133B60[0] = -1;
+        D_00133B84[0] = 0;
+    }
+    else
+    {
+        func_001170B0();
+        func_00117310();
+        D_00133B84[0] = 1;
+    }
+    return ret;
+}
+#endif
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libcdvd/cdvd000", sceCdInit);
 
+/* NEARMISS-STUB sceCdDiskReady_old */
+#if 0 /* NEARMISS 66.98% cat=regalloc sub=- | regalloc: target keeps mode in s2, B6C lui in s3, B50 lui s6 kept across function, D134D40 in s7; ours shifts all of them by one reg and saves 8 regs | attempts=1 */
+extern s32 D_00133B50[];
+extern s32 D_00133B6C[];
+extern s32 D_00133B80[];
+extern s32 D_00133B90[];
+extern s32 D_001511D0[];
+extern s32 D_00151210[];
+extern s32 D_00134D40[];
+extern char D_00138B30[];
+extern char D_00138B48[];
+extern char D_00138B68[];
+s32 func_001170B0(void);
+
+s32 sceCdDiskReady_old(s32 mode)
+{
+    s32 r;
+    s32 n;
+    s32 ie;
+    s32 ret;
+
+    if (D_00133B50[0] > 0)
+    {
+        scePrintf(D_00138B30);
+    }
+    ie = DIntr();
+    D_00133B80[0] = 1;
+    if (ie != 0)
+    {
+        EIntr();
+    }
+    func_001170B0();
+    r = PollSema(D_00133B6C[0]);
+    if (D_00133B6C[0] != r)
+    {
+        return (mode == 8) ? -1 : 6;
+    }
+    if (sceCdSyncS(1) != 0)
+    {
+        SignalSema(D_00133B6C[0]);
+        return (mode == 8) ? -1 : 6;
+    }
+    sceSifInitRpc(0);
+    if (D_00133B90[0] < 0)
+    {
+        for (;;)
+        {
+            while (sceSifBindRpc((sceSifClientData *)D_001511D0, 0x8000059A, 0) < 0)
+            {
+                if (D_00133B50[0] > 0)
+                {
+                    scePrintf(D_00138B48);
+                }
+                n = 0x100000;
+                do
+                {
+                    n--;
+                } while (n != -1);
+            }
+            if (((sceSifClientData *)D_001511D0)->serve != NULL)
+            {
+                D_00133B90[0] = 0;
+                break;
+            }
+            n = 0x10000;
+            do
+            {
+                n--;
+            } while (n != -1);
+        }
+    }
+    D_00151210[0] = mode;
+    sceSifWriteBackDCache(D_00151210, 4);
+    r = sceSifCallRpc((sceSifClientData *)D_001511D0, 0, 0, D_00151210, 4, D_00134D40, 4, NULL, NULL);
+    if (r < 0)
+    {
+        SignalSema(D_00133B6C[0]);
+        return (mode == 8) ? -1 : 6;
+    }
+    if (D_00133B50[0] > 0)
+    {
+        scePrintf(D_00138B68);
+    }
+    ret = *(s32 *)((u32)D_00134D40 | 0x20000000);
+    SignalSema(D_00133B6C[0]);
+    return ret;
+}
+#endif
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libcdvd/cdvd000", sceCdDiskReady_old);
 
+/* NEARMISS-STUB sceCdDiskReady */
+#if 0 /* NEARMISS 65.31% cat=branch-layout sub=- | regalloc+frame: target keeps mode in s2, pointer-less D_00151210 sw/addiu s0 base; ours keeps mode in s3 and 7 saved regs; pointer-local buffers tried 64.09 (wo | attempts=1 */
+extern s32 D_00133B50[];
+extern s32 D_00133B70[];
+extern s32 D_00133B80[];
+extern s32 D_00133B90[];
+extern s32 D_001511D0[];
+extern s32 D_00151210[];
+extern s32 D_001355C0[];
+extern char D_00138B48[];
+extern char D_00138B68[];
+extern char D_00138B80[];
+s32 func_001170B0(void);
+s32 sceCdDiskReady_old(s32 mode);
+
+s32 sceCdDiskReady(s32 mode)
+{
+    s32 r;
+    s32 n;
+    s32 retry;
+    s32 ie;
+    s32 ret;
+
+    if (D_00133B50[0] > 0)
+    {
+        scePrintf(D_00138B80);
+    }
+    func_001170B0();
+    r = PollSema(D_00133B70[0]);
+    if (D_00133B70[0] != r)
+    {
+        return (mode == 8) ? -1 : 6;
+    }
+    sceSifInitRpc(0);
+    retry = 0;
+    if (D_00133B90[0] < 0)
+    {
+        for (;;)
+        {
+            while (sceSifBindRpc((sceSifClientData *)D_001511D0, 0x8000059C, 0) < 0)
+            {
+                if (D_00133B50[0] > 0)
+                {
+                    scePrintf(D_00138B48);
+                }
+                n = 0x100000;
+                do
+                {
+                    n--;
+                } while (n != -1);
+            }
+            if (((sceSifClientData *)D_001511D0)->serve != NULL)
+            {
+                D_00133B90[0] = 0;
+                break;
+            }
+            if (retry >= 17)
+            {
+                SignalSema(D_00133B70[0]);
+                return sceCdDiskReady_old(mode);
+            }
+            retry++;
+            n = 0x10000;
+            do
+            {
+                n--;
+            } while (n != -1);
+        }
+    }
+    ie = DIntr();
+    D_00133B80[0] = 0;
+    if (ie != 0)
+    {
+        EIntr();
+    }
+    D_00151210[0] = mode;
+    sceSifWriteBackDCache(D_00151210, 4);
+    r = sceSifCallRpc((sceSifClientData *)D_001511D0, 0, 0, D_00151210, 4, D_001355C0, 4, NULL, NULL);
+    if (r < 0)
+    {
+        SignalSema(D_00133B70[0]);
+        return (mode == 8) ? -1 : 6;
+    }
+    if (D_00133B50[0] > 0)
+    {
+        scePrintf(D_00138B68);
+    }
+    ret = *(s32 *)((u32)D_001355C0 | 0x20000000);
+    SignalSema(D_00133B70[0]);
+    return ret;
+}
+#endif
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libcdvd/cdvd000", sceCdDiskReady);

@@ -8,7 +8,7 @@ typedef struct TimerCounter
 {
     struct TimerCounter *next;
     u32 unk04;
-    u32 id;
+    volatile u32 id;
     u32 flags;
     u64 startTime;
     u64 accum;
@@ -201,6 +201,56 @@ int StopTimerSystemTime(void)
     return 1;
 }
 
+/* NEARMISS-STUB func_00110880 */
+#if 0 /* NEARMISS 93.55% cat=branch-layout sub=- | loop shape: target tests exit with beqzl and back-edge b; ours bnezl; cursor/now copy scheduling differs (now in a3 early in target); single-cursor loop gets 93 | attempts=1 */
+void func_00110880(u64 now)
+{
+    TimerTable *tt;
+    TimerCounter *p;
+    u64 cmp;
+    u64 k;
+    u32 mode;
+    u32 shift;
+
+    tt = (TimerTable *)D_00133A18;
+    p = tt->activeList;
+    if (tt->activeId >= 0)
+    {
+        return;
+    }
+    mode = *(volatile u32 *)0x10001010;
+    if (p == NULL)
+    {
+        SetT2_COMP(0);
+        SetT2_MODE(mode & 0xFFFFF7FF);
+        return;
+    }
+    cmp = p->unk20 + p->startTime - p->accum;
+    for (;;)
+    {
+        p = p->next;
+        if (p == NULL)
+        {
+            break;
+        }
+        k = p->unk20 + p->startTime - p->accum;
+        if (k >= cmp + 0x7333)
+        {
+            break;
+        }
+        cmp = k;
+    }
+    shift = mode & 3;
+    if ((s64)(cmp - now) < 0x7333)
+    {
+        SetT2_COMP(*(volatile u32 *)0x10001000 + (u32)((u64)0x7333 >> (shift * 4)));
+        SetT2_MODE(mode & 0xFFFFF7FF);
+        return;
+    }
+    SetT2_MODE(mode & 0xFFFFF7FF);
+    SetT2_COMP((u32)(cmp >> (shift * 4)));
+}
+#endif
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/timer", func_00110880);
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/timer", func_00110A10);
@@ -295,8 +345,7 @@ int AllocTimerCounter(void)
     return ret;
 }
 
-/* NEARMISS-STUB iFreeTimerCounter */
-#if 0 /* NEARMISS 97.0% cat=branch-layout sub=- | target beql (branch-likely, taken=continue) with delay slot lui D_00133A18 hoisted; error return laid out inline before it; ours bne to out-of-line error block. | attempts=2 */
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/timer", iFreeTimerCounter);
 int iFreeTimerCounter(int id)
 {
     TimerCounter *tc;
@@ -325,8 +374,6 @@ int iFreeTimerCounter(int id)
     tt->numUsed--;
     return ret;
 }
-#endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/timer", iFreeTimerCounter);
 
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/timer", FreeTimerCounter);
 int FreeTimerCounter(int id)

@@ -243,13 +243,11 @@ int sceDmaWatch(sceDmaChan *d, void *addr, int mode, int timeout)
     return 0;
 }
 
-/* NEARMISS-STUB sceDmaPause */
-#if 0 /* NEARMISS 85.97% cat=regalloc sub=- | enabler in a2/D_CTRL in a1 vs swapped | attempts=1 */
 u_int sceDmaPause(sceDmaChan *d)
 {
-    u_int old;
-    u_int enabler;
     int intr;
+    u_int enabler;
+    u_int old;
 
     intr = DIntr();
     enabler = *(volatile u_int *)0x1000F520;
@@ -257,16 +255,14 @@ u_int sceDmaPause(sceDmaChan *d)
         *(volatile u_int *)0x1000F590 = enabler | 0x10000;
     }
     *(volatile u_int *)0x1000E000;
-    old = *(u_int *)d;
-    *(u_int *)d = old & 0xFFFFFEFF;
+    old = *(volatile u_int *)d;
+    *(volatile u_int *)d = old & 0xFFFFFEFF;
     *(volatile u_int *)0x1000F590 = enabler;
     if (intr) {
         EIntr();
     }
     return old;
 }
-#endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libdma", sceDmaPause);
 
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libdma", sceDmaRestart);
 int sceDmaRestart(sceDmaChan *d, u_int chcr)

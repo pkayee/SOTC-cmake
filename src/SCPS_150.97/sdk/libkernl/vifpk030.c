@@ -1,3 +1,15 @@
 #include "common.h"
+#include "sdk/ee/libvifpk.h"
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/vifpk030", sceVif1PkCnt);
+void sceVif1PkCnt(sceVif1Packet *pPacket, u_int flag)
+{
+    u_int *pCurrent;
+
+    pPacket->pDmaTag = sceVif1PkTerminate(pPacket);
+    pCurrent = pPacket->pCurrent;
+    *pCurrent = flag | 0x10000000;
+    pCurrent++;
+    pPacket->pVifCode = NULL;
+    pPacket->pCurrent = pCurrent + 1;
+    *pCurrent = 0;
+}
