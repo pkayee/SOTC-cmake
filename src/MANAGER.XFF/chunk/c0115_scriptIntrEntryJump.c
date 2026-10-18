@@ -2,15 +2,36 @@
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0115_scriptIntrEntryJump", scriptIntrEntryJump);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0115_scriptIntrEntryJump", scriptIntrDeleteJump);
+void isysDeleteGroupWithLinkParam(s32 obj, void *group, s32 a2, s32 flag);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0115_scriptIntrEntryJump", scriptIntrAllDeleteJump);
+void scriptIntrDeleteJump(char *s, s32 a, s32 c)
+{
+    if (*(s32 *)(s + 4) & 1)
+        isysDeleteGroupWithLinkParam(a, s + 8, c, 0);
+}
+
+s32 func_40097B10(s32 p);
+s32 isysDeleteAllGroup(s32 obj, s32 (*func)(s32), s32 a2, s32 flag);
+
+s32 scriptIntrAllDeleteJump(s32 a, s32 b, s32 c, s32 d)
+{
+    return isysDeleteAllGroup(a, func_40097B10, c, d);
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0115_scriptIntrEntryJump", scriptIntrEntryChildThread);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0115_scriptIntrEntryJump", scriptIntrDeleteChildThread);
+void scriptIntrDeleteChildThread(u64 *s, s32 a, s32 c)
+{
+    if ((int)(*s >> 33) & 1)
+        isysDeleteGroupWithLinkParam(a, (char *)s + 0x10, c, 0);
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0115_scriptIntrEntryJump", scriptIntrAllDeleteSubThread);
+s32 func_40097B38(s32 p);
+
+s32 scriptIntrAllDeleteSubThread(s32 a, s32 b, s32 c, s32 d)
+{
+    return isysDeleteAllGroup(a, func_40097B38, c, d);
+}
 
 void scriptIntrSegInit(void) {
 }

@@ -6,7 +6,15 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0084_func_40075120", motrootdyn
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0084_func_40075120", chainhang);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0084_func_40075120", motrootdyn_startfreefall);
+extern void charrootdyn_updateCharacterClassParentGeometry(int, void *, int);
+extern void func_4006DCF0(int, int);
+extern u128 ZeroPoint;
+
+void motrootdyn_startfreefall(int arg0, int arg1)
+{
+    charrootdyn_updateCharacterClassParentGeometry(arg1, &ZeroPoint, arg1 + 0x6C0);
+    func_4006DCF0(arg0, arg1);
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0084_func_40075120", motrootdyn_startfreefall_from_pendulum);
 
@@ -14,11 +22,19 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0084_func_40075120", func_40075
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0084_func_40075120", func_40075528);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0084_func_40075120", freefallnostab);
+extern int func_4006E0C0();
+
+int freefallnostab(int a, int b, int c, int d, int e)
+{
+    return func_4006E0C0(a, b, c, d, e, 0);
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0084_func_40075120", motrootdyn_startmotionfall);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0084_func_40075120", motionfall);
+int motionfall(int a, int b, int c, int d, int e)
+{
+    return func_4006E0C0(a, b, c, d, e, 1);
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0084_func_40075120", func_40075680);
 
@@ -30,7 +46,16 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0084_func_40075120", norootdyna
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0084_func_40075120", directplay);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0084_func_40075120", charrootdyn_debugDispParentGeometryStatus);
+extern void GetGeometryPointerSurfacePlane(char *);
+extern void GetCollisionDBLastPointOnCurrentPlane(float *, char *, int);
+
+void charrootdyn_debugDispParentGeometryStatus(char *c)
+{
+    float p[4] __attribute__((aligned(16)));
+
+    GetGeometryPointerSurfacePlane(c + 0xC0);
+    GetCollisionDBLastPointOnCurrentPlane(p, c + 0xC0, *(int *)(c + 0x138));
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0084_func_40075120", func_40075BC8);
 
