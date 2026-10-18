@@ -35,6 +35,8 @@ typedef struct {
     u8 *attr34;
 } ColSet;
 
+extern s32 func_400B09E8(void *, void *, void *, void *, void *, f32, void *);
+
 static inline s32 clipTransFar4D(u8 *self, Q4 *cur, void *d, s32 *e)
 {
     Q4 tmp;
@@ -118,7 +120,38 @@ s32 ClipCollisionDBDoubleSide(s32 a, s32 b, s32 c, s32 d)
     return r;
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0143_GetCollisionDBAttribute", ClipCollisionFinderCallBack);
+s32 *ClipCollisionFinderCallBack(u8 *self, void *b, Q4 *c, s32 *list, s32 (*cb)(), s32 arg)
+{
+    s32 n;
+    s32 i;
+    s32 *e;
+    s32 *best;
+    Q4 cur;
+
+    n = list[0];
+    if (list[1] < n) {
+        n = list[1];
+    }
+    if (n != 0) {
+        cur.q = c->q;
+        best = 0;
+        e = (s32 *)list[2];
+        i = n;
+        while (i--) {
+            if (e[0] != 0 && cb(e, arg) && ClipCollisionDB(self, b, &cur, e)) {
+                cur.q = ((Q4 *)(self + 0x40))->q;
+                best = e;
+            }
+            e += 2;
+        }
+        if (best != 0) {
+            *(s32 *)self = best[0];
+            *(s32 *)(self + 4) = best[1];
+        }
+        return best;
+    }
+    return 0;
+}
 
 s32 *ClipCollisionFinder(u8 *self, void *b, Q4 *c, s32 *list)
 {
@@ -260,7 +293,41 @@ s32 ClipCollisionFinderWithKeep4D(u8 *self, void *b, Q4 *c, s32 *list, f32 f)
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0143_GetCollisionDBAttribute", NippingCheckCollisionFindetWithKeep4D);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0143_GetCollisionDBAttribute", ClipCollisionFinderWithKeep_VWallOnly);
+s32 ClipCollisionFinderWithKeep_VWallOnly(u8 *self, Q4 *c, Q4 *d, u8 *obj, f32 f)
+{
+    s32 hit;
+    s32 n;
+    s32 code;
+    u8 *e;
+    s32 *dst;
+    Q4 cur;
+    Q4 t;
+    KeepOut o;
+
+    hit = 0;
+    ((Q4 *)self)->q = d->q;
+    n = *(s32 *)(obj + 0x20);
+    if (n != 0) {
+        cur.q = c->q;
+        e = *(u8 **)(obj + 0x24);
+        while (n--) {
+            code = func_400B09E8(&o, &t, &cur, self, e, f, obj);
+            if (code != 0) {
+                if ((u32)(code - 5) < 2) {
+                    cur.q = o.v.q;
+                }
+                ((Q4 *)self)->q = o.v.q;
+                ((Q4 *)(self + 0x10))->q = t.q;
+                dst = (s32 *)(self + 0x20);
+                dst[0] = *(s32 *)e;
+                dst[1] = *(s32 *)(e + 4);
+                hit = code;
+            }
+            e += 0x14;
+        }
+    }
+    return hit;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0143_GetCollisionDBAttribute", ClipCollisionFinderWithKeepSlopeLimit);
 
@@ -379,4 +446,37 @@ s32 ClipCollisionFinderFarPlaneWithKeep(u8 *self, Q4 *c, void *d, s32 *list, f32
     return 0;
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0143_GetCollisionDBAttribute", ClipCollisionFinderFarPlaneWithKeep4D);
+s32 ClipCollisionFinderFarPlaneWithKeep4D(u8 *self, Q4 *c, void *d, s32 *list, f32 f)
+{
+    s32 n;
+    s32 hit;
+    s32 *e;
+    s32 *dst;
+    Q4 v;
+    KeepOut o;
+
+    hit = 0;
+    n = list[0];
+    if (list[1] < n) {
+        n = list[1];
+    }
+    e = (s32 *)list[2];
+    if (n != 0) {
+        ((Q4 *)self)->q = c->q;
+        while (n--) {
+            if (e[0] != 0 && func_400BC558(&o, &v, self, d, e, f)) {
+                hit = 1;
+                ((Q4 *)self)->q = o.v.q;
+                ((Q4 *)(self + 0x10))->q = v.q;
+                dst = (s32 *)(self + 0x20);
+                dst[0] = e[0];
+                dst[1] = e[1];
+            }
+            e += 2;
+        }
+        if (hit) {
+            return 1;
+        }
+    }
+    return 0;
+}
