@@ -126,22 +126,18 @@ s32 get_max_object_animation_camera_region(void)
     return 0x32;
 }
 
-/* NEARMISS-STUB get_cur_total_object_animation_camera_region */
-#if 0 /* NEARMISS 86.46% cat=branch-layout sub=- | movn conditional move (if v!=0 n++) gives sltu+addu in our build | attempts=1 */
-s32 get_cur_total_object_animation_camera_region(void)
-{
-    s32 i;
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0198_add_object_animation_camera_region", get_cur_total_object_animation_camera_region);
+s32 get_cur_total_object_animation_camera_region(void) {
     s32 n = 0;
-    s32 *p = (s32 *)D_401C1E60;
+    s32 i;
 
-    for (i = 0x31; i >= 0; i--, p++)
-    {
-        n = (*p) ? n + 1 : n;
+    for (i = 0; i < 50; i++) {
+        if (D_401C1E60[i] != 0) {
+            n++;
+        }
     }
     return n;
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0198_add_object_animation_camera_region", get_cur_total_object_animation_camera_region);
 
 extern s32 D_4012E364;
 extern s32 D_4012E368;
