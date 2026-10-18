@@ -94,8 +94,6 @@ int SCRConditionTortoiseGeyserHitColAttr(void *actor, int a, int b, int c, long 
     return value == (mask & *(long *)(GetSCRCharaAIWorkPtr(actor) + 0x4198));
 }
 
-/* NEARMISS-STUB SCRFuncKameFallPatienceCunterInit */
-#if 0 /* NEARMISS 97.06% cat=stack-frame sub=- | in-TU: extra addiu sp,sp,0x20 vs exp; offset edit 0x41C0->0x41A0 applied | attempts=1 */
 
 extern char *GetSCRCharaAIWorkPtr(void *);
 s32 _gameFlagChk();
@@ -108,5 +106,3 @@ void SCRFuncKameFallPatienceCunterInit(void *a, f32 base, f32 add)
     if (_gameFlagChk(0x117) || _gameFlagChk(0x118) || _gameFlagChk(0x119) || _gameFlagChk(0x11A))
         *(f32 *)(ai + 0x41A0) += add;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0161_nico_kameBodyExpression", SCRFuncKameFallPatienceCunterInit);

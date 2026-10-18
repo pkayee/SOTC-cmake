@@ -6,7 +6,6 @@ void func_400D7B48(void)
 {
 }
 #endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0162_func_400D7B48", func_400D7B48);
 
 extern void *GetSCRCharaAIWorkPtr(void *);
 extern u8 gcGlobalVar[];
