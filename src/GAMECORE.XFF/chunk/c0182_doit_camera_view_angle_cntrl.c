@@ -489,12 +489,8 @@ void func_400EBA38(void) {
 void func_400EBA40(void) {
 }
 
-//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0182_doit_camera_view_angle_cntrl", func_400EBA48);
-void *get_camera_position(s32 obj);
-void *get_camera_direction(s32 obj);
-void *get_camera_up_direction(s32 obj);
-void doit_game_camera(u8 *a, u8 *b, f32 value);
-
+/* NEARMISS-STUB func_400EBA48 */
+#if 0 /* NEARMISS 100.0% cat=no-c-form sub=volatile-dead-copy | scores 100 only with volatile u128 locals that force dead 16-byte copies: a codegen trick, not original-looking C; human ruling: not accepted | attempts=1 */
 void func_400EBA48(f32 value, u8 *cam)
 {
     s32 obj = *(s32 *)cam;
@@ -504,6 +500,8 @@ void func_400EBA48(f32 value, u8 *cam)
 
     doit_game_camera(cam + 0x20, cam, value);
 }
+#endif
+INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0182_doit_camera_view_angle_cntrl", func_400EBA48);
 
 void func_400EBAC0(void) {
 }
