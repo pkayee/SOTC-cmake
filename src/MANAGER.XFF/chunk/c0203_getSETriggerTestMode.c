@@ -1,54 +1,246 @@
 #include "common.h"
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0203_getSETriggerTestMode", getSETriggerTestMode);
+extern s32 D_4012E390;
+extern s32 D_4012E394;
+extern s32 rootPtn;
+extern const char D_40135488[];
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0203_getSETriggerTestMode", AnimeTableInfoDebugMode);
+void isysRequestDeleteObj();
+void iosFree(void *);
+void seStopLoopType();
+u8 *GetSubLinkClass();
+void stop_camera_lws_animation_callback();
+void end_camera_lws_animation();
+void stop_camera_lws_animation_geometry_pointer_reference();
+void stop_wind_emitter_callback();
+void end_wind_emitter();
+void stop_wind_emitter_geometry_pointer_reference();
+void sndSepCont();
+void sndSepPause();
+void stop_particle_emitter_callback();
+void end_particle_emitter();
+void stop_particle_emitter_geometry_pointer_reference();
+void iosJumpRecoverPoint(const char *);
+void *iosMallocAlign(void *, s32, s32);
+void sheetFileRead(s32, void *, s32);
+u8 *GetGeometryPointerObject();
+u8 *GetLayoutClass();
+u8 *CreateSubLinkObjByGeometryPointer();
+s32 sePlay3D();
+void SetSubLinkObjDeleteFuncInfo();
+s32 boot_wind_emitter();
+s32 boot_wind_emitter_by_box();
+void func_400FAE50();
+void func_400FAE38();
+void func_400FB0B8();
+void func_400FB080();
+void func_400FAD00();
+void func_400FAD48();
+s32 boot_particle_emitter();
+s32 boot_wind_emitter_by_judge_volume();
+void func_400FAB58();
+void func_400FAB90();
+s32 boot_camera_lws_animation(s32, s32, f32, s32, s32, s32);
+typedef struct WindKick { s32 id; s32 owner; } WindKick;
+
+s32 *getSETriggerTestMode(void) {
+    return &D_4012E394;
+}
+
+void AnimeTableInfoDebugMode(s32 v) {
+    D_4012E390 = v;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0203_getSETriggerTestMode", SequenceKickCameraVibration);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0203_getSETriggerTestMode", func_400FAB58);
+void func_400FAB58(s32 a, s32 *b) {
+    stop_camera_lws_animation_callback(*b);
+    end_camera_lws_animation(*b);
+    stop_camera_lws_animation_geometry_pointer_reference(*b);
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0203_getSETriggerTestMode", func_400FAB90);
+void func_400FAB90() {
+    isysRequestDeleteObj();
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0203_getSETriggerTestMode", getBootParent);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0203_getSETriggerTestMode", SequenceKickParticle);
+u8 *SequenceKickParticle(s32 owner, s32 g) {
+    u8 *obj = CreateSubLinkObjByGeometryPointer(g, 8);
+    WindKick local;
+    WindKick tmp;
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0203_getSETriggerTestMode", KickParticleGetResourceId);
+    if (obj != NULL) {
+        tmp.id = boot_particle_emitter(owner, g, func_400FAD48, obj);
+        tmp.owner = owner;
+        local = tmp;
+        if (local.id != -1) {
+            if (local.id == 0) {
+                isysRequestDeleteObj(obj);
+                obj = NULL;
+            } else {
+                SetSubLinkObjDeleteFuncInfo(obj, func_400FAD00, &local, 8);
+            }
+        } else {
+            obj = NULL;
+        }
+    }
+    return obj;
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0203_getSETriggerTestMode", func_400FAD00);
+s32 KickParticleGetResourceId() {
+    return **(s32 **)(GetSubLinkClass() + 0x10);
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0203_getSETriggerTestMode", func_400FAD48);
+void func_400FAD00(s32 a, s32 *b) {
+    stop_particle_emitter_callback(b[1], b[0]);
+    end_particle_emitter(b[1], b[0], 1);
+    stop_particle_emitter_geometry_pointer_reference(b[1], b[0]);
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0203_getSETriggerTestMode", SequenceKickSE);
+void func_400FAD48() {
+    isysRequestDeleteObj();
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0203_getSETriggerTestMode", seSetKeyOnOff);
+u8 *SequenceKickSE(s32 a0, s32 a1) {
+    u8 *obj = CreateSubLinkObjByGeometryPointer(a1, 4);
+    s32 r = sePlay3D(a0, a1, obj, func_400FAE50);
+    s32 local = r;
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0203_getSETriggerTestMode", func_400FAE38);
+    if (r == 0) {
+        isysRequestDeleteObj(obj);
+        obj = NULL;
+    } else {
+        SetSubLinkObjDeleteFuncInfo(obj, func_400FAE38, &local, 4);
+    }
+    return obj;
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0203_getSETriggerTestMode", func_400FAE50);
+void seSetKeyOnOff(s32 a, s32 on) {
+    s32 *v = *(s32 **)(GetSubLinkClass() + 0x10);
+    s32 id = *v;
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0203_getSETriggerTestMode", SequenceKickWind);
+    if (on != 0) {
+        sndSepCont(id);
+    } else {
+        sndSepPause(id);
+    }
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0203_getSETriggerTestMode", SequenceKickWindBox);
+void func_400FAE38(s32 a, s32 *b) {
+    seStopLoopType(*b);
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0203_getSETriggerTestMode", SequenceKickWindVolumeShape);
+void func_400FAE50() {
+    isysRequestDeleteObj();
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0203_getSETriggerTestMode", func_400FB080);
+u8 *SequenceKickWind(s32 owner, s32 g) {
+    u8 *obj = CreateSubLinkObjByGeometryPointer(g + 0x10, 8);
+    WindKick local;
+    WindKick tmp;
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0203_getSETriggerTestMode", func_400FB0B8);
+    tmp.id = boot_wind_emitter(owner, g, func_400FB0B8, obj);
+    tmp.owner = owner;
+    local = tmp;
+    if (local.id < 0) {
+        isysRequestDeleteObj(obj);
+        obj = NULL;
+    } else {
+        SetSubLinkObjDeleteFuncInfo(obj, func_400FB080, &local, 8);
+    }
+    return obj;
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0203_getSETriggerTestMode", initLoadObjEditWork);
+u8 *SequenceKickWindBox(s32 owner, s32 g) {
+    u8 *obj = CreateSubLinkObjByGeometryPointer(g + 0x10, 8);
+    WindKick local;
+    WindKick tmp;
+
+    tmp.id = boot_wind_emitter_by_box(owner, g, func_400FB0B8, obj);
+    tmp.owner = owner;
+    local = tmp;
+    if (local.id < 0) {
+        isysRequestDeleteObj(obj);
+        obj = NULL;
+    } else {
+        SetSubLinkObjDeleteFuncInfo(obj, func_400FB080, &local, 8);
+    }
+    return obj;
+}
+
+u8 *SequenceKickWindVolumeShape(s32 owner, s32 g) {
+    u8 *obj = CreateSubLinkObjByGeometryPointer(g + 0x10, 8);
+    u8 *geo;
+    WindKick local;
+    WindKick tmp;
+
+    geo = GetGeometryPointerObject(g + 0x10);
+    tmp.id = boot_wind_emitter_by_judge_volume(owner, geo, func_400FB0B8, obj);
+    tmp.owner = owner;
+    local = tmp;
+    if (local.id < 0) {
+        isysRequestDeleteObj(obj);
+        obj = NULL;
+    } else {
+        SetSubLinkObjDeleteFuncInfo(obj, func_400FB080, &local, 8);
+    }
+    return obj;
+}
+
+void func_400FB080(s32 a, s32 *b) {
+    stop_wind_emitter_callback(*b);
+    end_wind_emitter(*b);
+    stop_wind_emitter_geometry_pointer_reference(*b);
+}
+
+void func_400FB0B8() {
+    isysRequestDeleteObj();
+}
+
+void *initLoadObjEditWork(s32 sheet, s32 unused, s32 size) {
+    void *p = iosMallocAlign(&rootPtn, size, 0x10);
+
+    sheetFileRead(sheet, p, size);
+    return p;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0203_getSETriggerTestMode", delLoadObjEditWork);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0203_getSETriggerTestMode", getEditWorkSize);
+s32 getEditWorkSize(s32 *a) {
+    if (a != NULL) {
+        if (a[0] == 0x53494442) {
+            return a[1];
+        }
+        iosJumpRecoverPoint(D_40135488);
+    }
+    return 0;
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0203_getSETriggerTestMode", getEditWorkInitData);
+u8 *getEditWorkInitData(u8 *a) {
+    if (a != NULL) {
+        return a + *(s32 *)(a + 8);
+    }
+    return NULL;
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0203_getSETriggerTestMode", getEditWorkDebugHeader);
+u8 *getEditWorkDebugHeader(u8 *a) {
+    if (a != NULL) {
+        s32 v = *(s32 *)(a + 0xC);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0203_getSETriggerTestMode", getEditWorkDebugData);
+        if (v != 0) {
+            return a + v;
+        }
+    }
+    return NULL;
+}
+
+u8 *getEditWorkDebugData(u8 *a) {
+    if (a != NULL && *(s32 *)(a + 0xC) != 0) {
+        return a + *(s32 *)(a + 0xC) + 0x20;
+    }
+    return NULL;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0203_getSETriggerTestMode", chkEtiInfoWork);
 
