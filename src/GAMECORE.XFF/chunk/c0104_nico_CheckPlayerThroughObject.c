@@ -64,7 +64,19 @@ int nico_CheckPlayerThroughObject(char *o)
     return nico_CheckThroughObject_inl(p, o);
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0104_nico_CheckPlayerThroughObject", nico_CheckThroughObject);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0104_nico_CheckPlayerThroughObject", nico_CheckThroughObject);
+int nico_CheckThroughObject(void *a, char *o)
+{
+    char buf[0x50];
+    if (o != 0) {
+        void *t = *(void **)(o + 8);
+        u8 *lc;
+        if (t == 0) return 0;
+        lc = GetLayoutClass(a);
+        if (ClipCollisionDirectCallBackOneObj(buf, *(void **)(lc + 0x138), *(void **)(lc + 0x134), t, 0, 0, 0, 0) != 0) return 1;
+    }
+    return 0;
+}
 
 typedef struct {
     int a[4];
@@ -162,9 +174,31 @@ void nico_resetPlayerHorseBridle(void *a)
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0104_nico_CheckPlayerThroughObject", func_4008DBB0);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0104_nico_CheckPlayerThroughObject", func_4008DC60);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0104_nico_CheckPlayerThroughObject", func_4008DC60);
+extern u32 charrootdyn_getCollisionAttribute(void);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0104_nico_CheckPlayerThroughObject", func_4008DCA0);
+s32 func_4008DC60(void)
+{
+    u32 attr = charrootdyn_getCollisionAttribute();
+    s32 ret = 0;
+
+    if (((attr & 3) == 1) || ((attr & 4) != 0)) {
+        ret = 1;
+    }
+    return ret;
+}
+
+void *GAMEUTIL_get_motion_kind(void *chara);
+
+void func_4008DCA0(void *chara, u8 *obj)
+{
+    if (*(s32 *)(obj + 0xD1C) == 1) {
+        u8 *m = GAMEUTIL_get_motion_kind(chara);
+        if (m == 0 || *(s32 *)(m + 0x90) != 0x31) {
+            *(s32 *)(obj + 0xD1C) = 0;
+        }
+    }
+}
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0104_nico_CheckPlayerThroughObject", SCRPlayerRotateStop);
 void SCRPlayerRotateStop(void *chara)

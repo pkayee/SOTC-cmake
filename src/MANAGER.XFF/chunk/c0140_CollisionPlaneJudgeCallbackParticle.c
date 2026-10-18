@@ -14,6 +14,37 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0140_CollisionPlaneJudgeCallbac
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0140_CollisionPlaneJudgeCallbackParticle", ConstructorCollisionPoint);
 
+/* NEARMISS-STUB ConstructorCollisionDynamics */
+#if 0 /* NEARMISS 85.28% cat=cse-hoist sub=- | dead float 1.0 stores to memset local dropped; const hoist and store order differ | attempts=1 */
+void ConstructorCollisionDynamics(s64 *param_1)
+{
+    s64 local[6];
+    float *fl;
+    s64 a;
+    s64 b;
+    s64 c;
+    s64 d;
+    s64 e;
+    s64 f;
+
+    memset(local, 0, 0x30);
+    fl = (float *)local;
+    a = local[0];
+    b = local[1];
+    c = local[2];
+    d = local[3];
+    e = local[4];
+    f = local[5];
+    fl[5] = 1.0f;
+    param_1[0] = a;
+    param_1[1] = b;
+    param_1[2] = c;
+    param_1[3] = d;
+    param_1[4] = e;
+    param_1[5] = f;
+    fl[3] = 1.0f;
+}
+#endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0140_CollisionPlaneJudgeCallbackParticle", ConstructorCollisionDynamics);
 
 void CopyGeometryPointer();
@@ -24,6 +55,16 @@ void CopyCollisionPoint(char *dst, char *src)
     *(s128 *)(dst + 0x40) = *(s128 *)(src + 0x40);
 }
 
+/* NEARMISS-STUB CopyCollisionDynamics */
+#if 0 /* NEARMISS 38.09% cat=call-abi sub=- | target keeps src/dst+0x20 pointers in a2/a3 and loads first 16B into v1; ours uses a1/a0 offsets, v0 | attempts=1 */
+void CopyCollisionDynamics(char *dst, char *src)
+{
+    *(s128 *)(dst + 0x0) = *(s128 *)(src + 0x0);
+    *(s128 *)(dst + 0x10) = *(s128 *)(src + 0x10);
+    *(s32 *)(dst + 0x20) = *(s32 *)(src + 0x20);
+    *(s32 *)(dst + 0x24) = *(s32 *)(src + 0x24);
+}
+#endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0140_CollisionPlaneJudgeCallbackParticle", CopyCollisionDynamics);
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0140_CollisionPlaneJudgeCallbackParticle", FilterCopyCollisionDynamics);
