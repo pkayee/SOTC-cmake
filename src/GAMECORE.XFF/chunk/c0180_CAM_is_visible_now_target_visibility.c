@@ -1,5 +1,12 @@
 #include "common.h"
 
+/* GAMECORE c0180 PROVEN 100 (wt-rea-c0180). */
+extern float GAMEUTIL_get_difference_yaw_and_yaw(float, float);
+extern float GAMEUTIL_get_difference_pitch_and_pitch(float, float);
+
+/* GAMECORE c0180 PROVEN 100 (wt-rea-c0180). */
+extern int GAMEUTIL_inc_or_dec_for_near_to_aim_yaw(int, float, float, float);
+
 s32 CAM_is_visible_now_target_visibility(void *param)
 {
     return *(s32*)((u8*)param + 0x44) == 0;
@@ -196,9 +203,39 @@ void func_400E94F0(void *param)
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0180_CAM_is_visible_now_target_visibility", func_400E94F8);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0180_CAM_is_visible_now_target_visibility", func_400E9590);
+float func_400E9590(float a, float b, float c, int *p)
+{
+    float d1;
+    float d2;
+    if (*p == 0) {
+        d1 = GAMEUTIL_get_difference_yaw_and_yaw(c, a);
+        d2 = GAMEUTIL_get_difference_yaw_and_yaw(c, b);
+    } else {
+        d1 = GAMEUTIL_get_difference_pitch_and_pitch(c, a);
+        d2 = GAMEUTIL_get_difference_pitch_and_pitch(c, b);
+    }
+    if (d1 < d2) {
+        return a;
+    }
+    return b;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0180_CAM_is_visible_now_target_visibility", func_400E9628);
+void func_400E9628(int *p, int flag, float a, float b)
+{
+    int r;
+    if (p[0] == 1 || p[4] == 1) {
+        p[1] = 1;
+    } else if (p[1] == 1 || flag != 0) {
+        r = GAMEUTIL_inc_or_dec_for_near_to_aim_yaw(0, a, 1.0f, b);
+        if (r == 1) {
+            p[1] = 2;
+        } else if (r == -1) {
+            p[1] = 3;
+        } else {
+            p[1] = 0;
+        }
+    }
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0180_CAM_is_visible_now_target_visibility", func_400E96C0);
 

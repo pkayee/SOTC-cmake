@@ -29,6 +29,73 @@ void nico_setHorseBridleRightLong(void *actor);
 void nico_setHorseBridleDoubleLong(void *actor);
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0105_SCRPlayerCombatMode", SCRPlayerCombatMode);
+/* READY 100 percent in scratch (rea-c0105). Loop-free; the camera-mode test is written as an or-condition around the horse block, and the motion-kind helper is a local static inline. */
+
+extern s32 get_main_cameraman(void);
+extern u8 *get_game_camera(s32 man);
+extern s32 get_boss_interest_position_game_camera(void *out, u8 *cam);
+extern s32 GAMEUTIL_get_boss_interest_position(void *out, s32 kind);
+extern s32 get_game_camera_cur_mode(u8 *cam);
+extern void *GAMEUTIL_get_horse_obj(void);
+extern u8 *GetLayoutClass(void *o);
+/* READY 100 percent in scratch (rea-c0105). Leave GetGeometryPointerObject and SendCharaNodeParentSetMsg undeclared here (implicit int): prototyping either one drops to 99.6. geo local must be declared inside the if block. */
+
+extern s32 *SkelFocusDef_PLAYER_HAND_A_L;
+extern f32 D_40134730[];
+void nico_setHorseRidingStatusForHorse(void *actor, void *parent, s32 node, const f32 *point, f32 span);
+void SendCharaControlChangeMsg(void *a, void *b);
+void SendCharaControlledChangeMsg(void *a, void *b, void *geo);
+void SendCharaAddMotionSyncStartMsg(void *a, void *b);
+
+/* READY 100 percent in scratch (rea-c0105). Leave GetGeometryPointerObject and SendCharaNodeParentSetMsg undeclared here (implicit int): prototyping either one drops to 99.6. */
+
+extern s32 *SkelFocusDef_PLAYER_HAND_A_L;
+
+/* READY 100 percent in scratch (rea-c0105). Leave GetGeometryPointerObject and SendCharaNodeParentSetMsg undeclared here (implicit int). u8 geo[64] on the stack. */
+
+extern s32 *SkelFocusDef_PLAYER_HAND_A_L;
+extern u8 gcGlobalVar[];
+extern u8 IdentityQuaternion[];
+extern u8 ZeroPoint[];
+s32 SCRGetFirstObj();
+void SetGeometryPointerNodePosState(void *, void *, void *, void *, void *);
+
+/* READY 100 percent in scratch (rea-c0105). Explicit r=0/r=1 in every arm (if/else inside if/else); r=1 default forms give 86. */
+
+u8 *GetCharacterClass(void *chara);
+
+/* READY 100 percent in scratch (rea-c0105). Same shape as head with kind 2, result compared to 1, offset 0x200. */
+
+extern u8 gcGlobalVar[];
+s32 func_4008F6B8(void *a0);
+s32 func_4008F6E8(u128 *out, u8 *work, void *obj);
+void begin_motion_ik_interest(u8 *ik);
+void request_end_motion_ik_interest(u8 *ik);
+void doit_motion_ik_interest(u8 *ik, void *chara, u128 *pos, f32 speed);
+
+/* READY 100 percent in scratch (rea-c0105). Keep work + 0x170 spelled out at each use (a hoisted ik local scores 87.6). ZeroPoint must be u8 array (matches nico_ForceChange READY). Needs func_4008F6E8 from this dir. */
+
+extern u8 gcGlobalVar[];
+
+/* READY 100 percent in scratch (rea-c0105). Own inline helper because getHorse is defined later in the file. */
+
+extern s32 *SkelFocusDef_PLAYER_HAND_A_L;
+static inline void *getHorseB(void *a)
+{
+    void *h = *(void **)(GetCharacterClass(a) + 0x940);
+    if (h != a && *(s16 *)(GetCharacterClass(h) + 0x360) == 3)
+        return h;
+    return 0;
+}
+
+static inline s32 motionLow3(void *a)
+{
+    u8 *motion = GAMEUTIL_get_motion_kind(a);
+    if (motion != NULL)
+        return *(u16 *)(motion + 0x6E) & 0x7;
+    return 0;
+}
+
 void SCRPlayerCombatMode(void *a0)
 {
     RequestCharacterMotionShiftFunc(a0, func_4008F430);
@@ -76,9 +143,41 @@ void SCRHorseKick(void *a0)
     RequestCharacterMotionShiftFunc(a0, func_4008F678);
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0105_SCRPlayerCombatMode", nico_playerIK_attention_head);
+void nico_playerIK_attention_head(void **a0)
+{
+    void *obj = *a0;
+    s32 kind = func_4008F6B8(obj);
+    u8 *work = GetSCRCharaAIWorkPtr(obj);
+    u128 pos;
+    if (kind == 1 && func_4008F6E8(&pos, work, obj) == kind)
+    {
+        begin_motion_ik_interest(work + 0x170);
+    }
+    else
+    {
+        request_end_motion_ik_interest(work + 0x170);
+        pos = *(u128 *)ZeroPoint;
+    }
+    doit_motion_ik_interest(work + 0x170, a0, &pos, *(f32 *)(gcGlobalVar + 0x180));
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0105_SCRPlayerCombatMode", nico_playerIK_attention_chest);
+void nico_playerIK_attention_chest(void **a0)
+{
+    void *obj = *a0;
+    s32 kind = func_4008F6B8(obj);
+    u8 *work = GetSCRCharaAIWorkPtr(obj);
+    u128 pos;
+    if (kind == 2 && func_4008F6E8(&pos, work, obj) == 1)
+    {
+        begin_motion_ik_interest(work + 0x200);
+    }
+    else
+    {
+        request_end_motion_ik_interest(work + 0x200);
+        pos = *(u128 *)ZeroPoint;
+    }
+    doit_motion_ik_interest(work + 0x200, a0, &pos, *(f32 *)(gcGlobalVar + 0x180));
+}
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0105_SCRPlayerCombatMode", nico_playeGripDamage);
 void nico_playeGripDamage(void *a0)
@@ -100,7 +199,12 @@ void nico_playeGripholdOff(void)
     *(s32 *)(work + 0xF0) = 0;
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0105_SCRPlayerCombatMode", nico_setPlayerHorseBridle);
+void nico_setPlayerHorseBridle(void *a)
+{
+    void *h = getHorseB(a);
+    if (h != 0)
+        nico_setHorseRidingStatusForHorse(h, a, SkelFocusDef_PLAYER_HAND_A_L[2], D_40134730, 0.035f);
+}
 
 static inline void *getHorse(void *a)
 {
@@ -138,13 +242,76 @@ void nico_setPlayerHorseBridleDoubleLong(void *a)
         nico_setHorseBridleDoubleLong(h);
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0105_SCRPlayerCombatMode", nico_ChangePlayerHorseRidingControlWithParentObj);
+void nico_ChangePlayerHorseRidingControlWithParentObj(void *o)
+{
+    u8 *c = GetLayoutClass(o);
+    if (*(s32 *)(c + 0x124) != 0)
+    {
+        u8 *geo = c + 0xC0;
+        u8 *work = GetSCRCharaAIWorkPtr(o);
+        void *p = GetGeometryPointerObject(geo);
+        SendCharaControlChangeMsg(o, p);
+        SendCharaControlledChangeMsg(p, o, geo);
+        SendCharaAddMotionSyncStartMsg(o, p);
+        SendCharaNodeParentSetMsg(o, GetGeometryPointerObject(geo), 0x10000);
+        nico_setHorseRidingStatusForHorse(p, o, SkelFocusDef_PLAYER_HAND_A_L[2], D_40134730, 0.035f);
+        *(s32 *)(work + 0xD28) = 1;
+    }
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0105_SCRPlayerCombatMode", nico_ChangePlayerHorseRidingControlWithVCol);
+void nico_ChangePlayerHorseRidingControlWithVCol(void *o)
+{
+    u8 *c = GetCharacterClass(o);
+    if (*(s32 *)(c + 0xDB0) != 0)
+    {
+        u8 *geo = c + 0xDD0;
+        u8 *work = GetSCRCharaAIWorkPtr(o);
+        void *p = GetGeometryPointerObject(geo);
+        SendCharaControlChangeMsg(o, p);
+        SendCharaControlledChangeMsg(p, o, geo);
+        SendCharaAddMotionSyncStartMsg(o, p);
+        SendCharaNodeParentSetMsg(o, GetGeometryPointerObject(geo), 0x10000);
+        nico_setHorseRidingStatusForHorse(p, o, SkelFocusDef_PLAYER_HAND_A_L[2], D_40134730, 0.035f);
+        *(s32 *)(work + 0xD28) = 1;
+    }
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0105_SCRPlayerCombatMode", nico_ChangePlayerHorseRidingControlWithHCol);
+void nico_ChangePlayerHorseRidingControlWithHCol(void *o)
+{
+    u8 *c = GetCharacterClass(o);
+    if (*(s32 *)(c + 0xED0) != 0)
+    {
+        u8 *geo = c + 0xEE0;
+        u8 *work = GetSCRCharaAIWorkPtr(o);
+        void *p = GetGeometryPointerObject(geo);
+        SendCharaControlChangeMsg(o, p);
+        SendCharaControlledChangeMsg(p, o, geo);
+        SendCharaAddMotionSyncStartMsg(o, p);
+        SendCharaNodeParentSetMsg(o, GetGeometryPointerObject(geo), 0x10000);
+        nico_setHorseRidingStatusForHorse(p, o, SkelFocusDef_PLAYER_HAND_A_L[2], D_40134730, 0.035f);
+        *(s32 *)(work + 0xD28) = 1;
+    }
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0105_SCRPlayerCombatMode", nico_ForceChangePlayerHorseRidingControl);
+void nico_ForceChangePlayerHorseRidingControl(void *o)
+{
+    u8 geo[64];
+    s32 first = SCRGetFirstObj(gcGlobalVar + 0x2B4);
+    if (first != 0)
+    {
+        u8 *work;
+        void *p;
+        SetGeometryPointerNodePosState(geo, (void *)first, 0, IdentityQuaternion, ZeroPoint);
+        work = GetSCRCharaAIWorkPtr(o);
+        p = GetGeometryPointerObject(geo);
+        SendCharaControlChangeMsg(o, p);
+        SendCharaControlledChangeMsg(p, o, geo);
+        SendCharaAddMotionSyncStartMsg(o, p);
+        SendCharaNodeParentSetMsg(o, GetGeometryPointerObject(geo), 0x10000);
+        nico_setHorseRidingStatusForHorse(p, o, SkelFocusDef_PLAYER_HAND_A_L[2], D_40134730, 0.035f);
+        *(s32 *)(work + 0xD28) = 1;
+    }
+}
 
 void *GetGeometryPointerObject(void *chara);
 void SendCharaNodeParentSetMsg(void *chara, void *parent, s32 flag);
@@ -196,18 +363,19 @@ void SetPlayerHellDangerPoint(void *a0)
     player_setHellDangerPoint(a0, GetSCRCharaAIWorkPtr() + 0x1B30);
 }
 
-/* NEARMISS-STUB nico_playerClothOverSurfDetectFunc */
-#if 0 /* NEARMISS 86.36% cat=branch-layout sub=- | extra b to shared epilogue; result var in v0 not a0 | attempts=1 */
-s32 nico_playerClothOverSurfDetectFunc(s32 a0)
+s32 nico_playerClothOverSurfDetectFunc(void *o)
 {
-    u8 *c = GetCharacterClass((void *)a0);
-    a0 = 1;
-    if (*(s8 *)(c + 0x35E) != 0 && 0.8f < *(f32 *)(c + 0x1020))
-        a0 = 0;
-    return a0;
+    u8 *c = GetCharacterClass(o);
+    s32 r;
+    if (*(s8 *)(c + 0x35E) != 0) {
+        if (0.8f < *(f32 *)(c + 0x1020))
+            r = 0;
+        else
+            r = 1;
+    } else
+        r = 1;
+    return r;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0105_SCRPlayerCombatMode", nico_playerClothOverSurfDetectFunc);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0105_SCRPlayerCombatMode", nico_playerRootReverseByZRot);
 
@@ -373,7 +541,24 @@ s32 func_4008F6B8(void *a0)
     return 0;
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0105_SCRPlayerCombatMode", func_4008F6E8);
+s32 func_4008F6E8(u128 *out, u8 *work, void *obj)
+{
+    s32 r = 0;
+    s32 w;
+    u8 *cam = get_game_camera(get_main_cameraman());
+    if (get_boss_interest_position_game_camera(out, cam) == 1 || ((w = *(s32 *)(work + 0x160)) == 1 && GAMEUTIL_get_boss_interest_position(out, 1) == w))
+        r = 1;
+    if (get_game_camera_cur_mode(cam) == 5 || motionLow3(obj) == 2)
+    {
+        void *horse = GAMEUTIL_get_horse_obj();
+        if (horse != 0)
+        {
+            r = 1;
+            *out = **(u128 **)(GetLayoutClass(horse) + 0x134);
+        }
+    }
+    return r;
+}
 
 void func_4008F7E0(void) {
 }
