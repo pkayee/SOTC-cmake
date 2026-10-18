@@ -144,8 +144,18 @@ void _sceCd_cd_read_intr(CdReadIntrData *data)
     _sceCd_cd_callback(D_00133BA0);
 }
 
+extern s32 D_00133B60[];
+extern s32 D_00133B68[];
+extern s32 D_00133B6C[];
+extern s32 D_00133B70[];
+extern s32 D_00133B74[];
+extern char D_001389A8[];
+extern char D_001389B8[];
+extern char D_001389C8[];
+extern char D_001389D8[];
+
 /* NEARMISS-STUB func_001170B0 */
-#if 0 /* NEARMISS 91.0% cat=regalloc sub=- | SemaParam store order/const reuse | attempts=1 */
+#if 0 /* NEARMISS 91.44% cat=regalloc sub=- | SemaParam: sw/lui scheduling (initCount delay-slot placement, D_00133B74 lui hoist); no reorder fixed it | attempts=2 */
 extern s32 D_00133B60[];
 extern s32 D_00133B68[];
 extern s32 D_00133B6C[];
@@ -171,8 +181,8 @@ void func_001170B0(void)
         }
     }
     sp.maxCount = 1;
-    sp.option = (u32)D_001389A8;
     sp.initCount = 1;
+    sp.option = (u32)D_001389A8;
     D_00133B68[0] = CreateSema(&sp);
     sp.option = (u32)D_001389B8;
     D_00133B6C[0] = CreateSema(&sp);
@@ -187,13 +197,12 @@ void func_001170B0(void)
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libcdvd/cdvd000", func_001170B0);
 
 /* NEARMISS-STUB func_00117198 */
-#if 0 /* NEARMISS 84.0% cat=cse-hoist sub=- | target hoists lui D_00133B60 into s0 | attempts=1 */
+#if 0 /* NEARMISS 90.75% cat=cse-hoist sub=- | store before SignalSema needs volatile; target has lui s0 B60 after the sw, ours hoists lui s0 above lui v1 BA0 (scheduling) | attempts=2 */
 extern s32 D_00133B54[];
 extern s32 D_00133B60[];
 extern s32 D_00133B68[];
 extern s32 D_00133B6C[];
 extern s32 D_00133B70[];
-extern s32 D_00133BA0[];
 
 void func_00117198(void)
 {
@@ -201,7 +210,7 @@ void func_00117198(void)
 
     if (D_00133B54[0] != 0)
     {
-        D_00133BA0[0] = -1;
+        ((volatile s32 *)D_00133BA0)[0] = -1;
         SignalSema(D_00133B60[0]);
     }
     DeleteSema(D_00133B68[0]);
@@ -508,7 +517,7 @@ s32 _sceCd_scmd_prechk(s32 arg)
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libcdvd/cdvd000", _sceCd_scmd_prechk);
 
 /* NEARMISS-STUB _sceCdSC */
-#if 0 /* NEARMISS 0.0% cat=branch-layout sub=- | beq chain with shared store | attempts=1 */
+#if 0 /* NEARMISS 0.0% cat=branch-layout sub=- | beq chain: target bodies out of line (beq to shared store), our compile inverts to bnel and uses a0 for the 0x8011 base; no mechanical fix found | attempts=2 */
 extern s32 D_00133B68[];
 extern s32 D_00133B6C[];
 extern s32 D_00133BC0[];
