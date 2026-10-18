@@ -127,7 +127,7 @@ segments:
         - [ 0x626a0, c, chunk/c0081_ResetCharacterObjGeoDynamics ]
         - [ 0x636b0, c, chunk/c0082_SetCharacterClassWindDynamics ]
         - [ 0x64500, c, chunk/c0083_GetRootRotStatus ]
-        - [ 0x65120, c, chunk/c0084_func_40075120 ]
+        - [ 0x65168, c, chunk/c0084_func_40075120 ]
         - [ 0x66e40, c, chunk/c0085_func_40076E40 ]
         - [ 0x683f0, c, chunk/c0086_edgepoint ]
         - [ 0x693a0, c, chunk/c0087_GetPleneFittingPointWithNormal ]
