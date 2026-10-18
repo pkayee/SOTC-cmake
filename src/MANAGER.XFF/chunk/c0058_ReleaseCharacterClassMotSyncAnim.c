@@ -13,8 +13,7 @@ static inline u8 *chrClass(u8 *obj)
     }
 }
 
-/* NEARMISS-STUB ReleaseCharacterClassMotSyncAnim */
-#if 0 /* NEARMISS 96.0% cat=sched sub=- | first class select movz form vs chrClass movn; s2/s3 group register order | attempts=1 */
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0058_ReleaseCharacterClassMotSyncAnim", ReleaseCharacterClassMotSyncAnim);
 u8 *isysGroupForFirst();
 u8 *isysGroupForNext();
 void isysRequestDeleteObj();
@@ -23,58 +22,37 @@ void isysDeleteGroupAllObj();
 
 void ReleaseCharacterClassMotSyncAnim(u8 *obj)
 {
-    u8 *cc = chrClass(obj);
-    u8 *grp = cc + 0xD02;
+    u8 *grp;
+    u8 *grp2;
     u8 *node;
-    u8 *last = NULL;
+    u8 *last;
 
-    node = isysGroupForFirst(grp, 0);
-    if (node != NULL)
-    {
-        last = *(u8 **)node;
-        for (;;)
-        {
-            isysRequestDeleteObj(last);
-            node = isysGroupForNext(node, 0);
-            if (node == NULL)
-            {
-                break;
-            }
-            last = *(u8 **)node;
-        }
-    }
-    if (last != NULL)
-    {
-        isysGroupForExit(last, 0);
-    }
-    isysDeleteGroupAllObj(grp);
-
-    cc = chrClass(obj);
-    grp = cc + 0xD06;
-    node = isysGroupForFirst(grp, 0);
+    grp = chrClass(obj) + 0xD02;
     last = NULL;
-    if (node != NULL)
+    for (node = isysGroupForFirst(grp, 0); node != NULL; node = isysGroupForNext(node, 0))
     {
         last = *(u8 **)node;
-        for (;;)
-        {
-            isysRequestDeleteObj(last);
-            node = isysGroupForNext(node, 0);
-            if (node == NULL)
-            {
-                break;
-            }
-            last = *(u8 **)node;
-        }
+        isysRequestDeleteObj(last);
     }
     if (last != NULL)
     {
         isysGroupForExit(last, 0);
     }
     isysDeleteGroupAllObj(grp);
+
+    grp2 = chrClass(obj) + 0xD06;
+    last = NULL;
+    for (node = isysGroupForFirst(grp2, 0); node != NULL; node = isysGroupForNext(node, 0))
+    {
+        last = *(u8 **)node;
+        isysRequestDeleteObj(last);
+    }
+    if (last != NULL)
+    {
+        isysGroupForExit(last, 0);
+    }
+    isysDeleteGroupAllObj(grp2);
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0058_ReleaseCharacterClassMotSyncAnim", ReleaseCharacterClassMotSyncAnim);
 
 /* NEARMISS-STUB FlushCharacterObjImmediate */
 #if 0 /* NEARMISS 96.41% cat=regalloc sub=- | cc in s2 vs s1; early obj+0x90 hoist and extra lbu reload in target | attempts=1 */
