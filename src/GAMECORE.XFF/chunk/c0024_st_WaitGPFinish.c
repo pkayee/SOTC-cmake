@@ -1,5 +1,21 @@
 #include "common.h"
 
+/* NEARMISS-STUB st_WaitGPFinish */
+#if 0 /* NEARMISS 71.72% cat=call-abi sub=- | compiler CSEs one *p load; target has two loads of gpfinishctr via a1 before daddu | attempts=1 */
+extern u64 gpfinishctr;
+extern void scrRun(void);
+
+void st_WaitGPFinish(s64 arg)
+{
+    u64 *p = &gpfinishctr;
+    s64 target = arg + (s64)*p;
+
+    while ((s64)*p < target)
+    {
+        scrRun();
+    }
+}
+#endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0024_st_WaitGPFinish", st_WaitGPFinish);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0024_st_WaitGPFinish", func_4002F388);

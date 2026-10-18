@@ -49,7 +49,18 @@ void scrDemoInit(void)
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0230_createScrDemoManager", func_40126440);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0230_createScrDemoManager", func_40126508);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0230_createScrDemoManager", func_40126508);
+extern void bgmStop(void *, s32, f32);
+
+void func_40126508(s32 a0, s32 a1, s32 a2, s32 a3, s32 *p)
+{
+    if (p[6] != 0)
+    {
+        bgmStop((void *)p[6], 0, 100.0f);
+        p[7] = 1;
+        p[6] = 0;
+    }
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0230_createScrDemoManager", updateEyeWork);
 
