@@ -6,7 +6,12 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0173_mcManager", mcWrite);
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0173_mcManager", mcRead);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0173_mcManager", mcReqSetWaitFunc);
+extern int D_401B1744;
+
+void mcReqSetWaitFunc(int arg0)
+{
+    D_401B1744 = arg0;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0173_mcManager", mcGetInfo);
 
@@ -24,7 +29,12 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0173_mcManager", mcFormat);
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0173_mcManager", mcUnformat);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0173_mcManager", mcGetProcessPer);
+extern float D_4012BB38;
+
+float mcGetProcessPer(void)
+{
+    return D_4012BB38;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0173_mcManager", mcDirectFileCreate);
 
@@ -38,10 +48,33 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0173_mcManager", mcReqGetDir);
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0173_mcManager", mcGetLastSaveGameDataIndex);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0173_mcManager", mcGetGameClearFlag);
+extern int D_4012BB40;
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0173_mcManager", mcSetGameClearFlag);
+int mcGetGameClearFlag(void)
+{
+    return D_4012BB40;
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0173_mcManager", mcGetCompleteTimeAttack);
+void mcSetGameClearFlag(void)
+{
+    D_4012BB40 = 1;
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0173_mcManager", mcSetCompleteTimeAttack);
+extern int D_4012BB44;
+extern int D_4012BB48;
+
+void mcGetCompleteTimeAttack(int *arg0, int *arg1)
+{
+    *arg0 = D_4012BB44;
+    *arg1 = D_4012BB48;
+}
+
+void mcSetCompleteTimeAttack(int arg0, int arg1)
+{
+    if (arg0 != 0) {
+        D_4012BB44 = 1;
+    }
+    if (arg1 != 0) {
+        D_4012BB48 = 1;
+    }
+}
