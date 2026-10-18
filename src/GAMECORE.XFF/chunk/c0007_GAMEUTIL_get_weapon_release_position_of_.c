@@ -405,10 +405,9 @@ f32 GAMEUTIL_get_cur_velocity_move_angle(f32 *p)
     return *p;
 }
 
-/* NEARMISS-STUB GAMEUTIL_constructor_look_at_vs_offset */
-#if 0 /* NEARMISS 99.2% cat=sched sub=- | all 6 float stores and constants match; gcc schedules the 0x40 store after 0x3c (shared ft2 value) and the 0x44..0x50 stores first; target keeps 0x40 first and  | attempts=1 */
-void GAMEUTIL_constructor_interp_ratio_cntrl(void *cntrl);
-void GAMEUTIL_set_act_max_zero_clip_flag_interp_ratio_cntrl(void *cntrl, s32 flag);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0007_GAMEUTIL_get_weapon_release_position_of_", GAMEUTIL_constructor_look_at_vs_offset);
+void GAMEUTIL_constructor_interp_ratio_cntrl(void *p);
+void GAMEUTIL_set_act_max_zero_clip_flag_interp_ratio_cntrl(void *p, s32 f);
 void GAMEUTIL_reset_look_at_vs_offset(u8 *p);
 
 void GAMEUTIL_constructor_look_at_vs_offset(u8 *p)
@@ -416,17 +415,15 @@ void GAMEUTIL_constructor_look_at_vs_offset(u8 *p)
     *(s32 *)(p + 0x18) = 0;
     GAMEUTIL_constructor_interp_ratio_cntrl(p + 0x1C);
     GAMEUTIL_set_act_max_zero_clip_flag_interp_ratio_cntrl(p + 0x1C, 1);
-    *(f32 *)(p + 0x40) = 0.17453291f;
-    *(f32 *)(p + 0x44) = 0.6981316208839417f;
-    *(f32 *)(p + 0x48) = 0.7999999523162842f;
-    *(f32 *)(p + 0x4C) = 1.4499999284744263f;
-    *(f32 *)(p + 0x50) = 0.61086518f;
-    *(f32 *)(p + 0x3C) = 0.17453291f;
-    *(s32 *)(p + 0x00) = 0;
+    *(f32 *)(p + 0x3C) = 0.174532910f;
+    *(f32 *)(p + 0x40) = 0.174532910f;
+    *(f32 *)(p + 0x44) = 0.698131623f;
+    *(f32 *)(p + 0x48) = 0.8f;
+    *(f32 *)(p + 0x4C) = 1.45f;
+    *(f32 *)(p + 0x50) = 0.6108652f;
+    *(s32 *)(p + 0) = 0;
     GAMEUTIL_reset_look_at_vs_offset(p);
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0007_GAMEUTIL_get_weapon_release_position_of_", GAMEUTIL_constructor_look_at_vs_offset);
 
 void GAMEUTIL_set_parameter_look_at_vs_offset(f32 a, f32 b, f32 c, f32 d, f32 e, u8 *p)
 {
