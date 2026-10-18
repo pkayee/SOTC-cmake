@@ -205,7 +205,7 @@ segments:
         - [ 0xc53f8, c, chunk/c0159_GetReplayNextPhase ]
         - [ 0xc62d0, c, chunk/c0160_demo_title ]
         - [ 0xc6f38, c, chunk/c0161_nico_kameBodyExpression ]
-        - [ 0xc7b48, c, chunk/c0162_func_400D7B48 ]
+        - [ 0xc7b50, c, chunk/c0162_func_400D7B48 ]
         - [ 0xc89f8, c, chunk/c0163_SCRFuncUnagiThunder ]
         - [ 0xc9750, c, chunk/c0164_SCRSetupWeaponPlayer ]
         - [ 0xca5b8, c, chunk/c0165_func_400DA5B8 ]
