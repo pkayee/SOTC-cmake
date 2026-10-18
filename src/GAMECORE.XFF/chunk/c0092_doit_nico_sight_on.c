@@ -8,8 +8,32 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0092_doit_nico_sight_on", func
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0092_doit_nico_sight_on", get_object_local_merge_yaw_nico_sight_on);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0092_doit_nico_sight_on", get_radiate_direction_nico_sight_on);
+extern float GAMEUTIL_increase_yaw(int, float, float);
+extern float GAMEUTIL_increase_pitch(int, int, float, float, float, float);
+extern void GAMEUTIL_get_direction_by_yaw_pitch(void *, float, float);
+
+void get_radiate_direction_nico_sight_on(void *out, char *p)
+{
+    float yaw = GAMEUTIL_increase_yaw(0, *(float *)(p + 0x280), *(float *)(p + 0x248));
+    float pitch = GAMEUTIL_increase_pitch(0, 0, *(float *)(p + 0x284), 0.0f, 1.4835296f, -1.4835296f);
+
+    GAMEUTIL_get_direction_by_yaw_pitch(out, yaw, pitch);
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0092_doit_nico_sight_on", set_parameter_nico_sight_on);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0092_doit_nico_sight_on", set_option_parameter_nico_sight_on);
+extern void set_pitch_parameter_effective_ratio_nico_yaw_pitch_cntrl(void *, float);
+extern void set_reverse_input_pitch_flag_nico_yaw_pitch_cntrl(void *, int);
+extern void set_reverse_input_yaw_flag_nico_yaw_pitch_cntrl(void *, int);
+extern void set_yaw_parameter_effective_ratio_nico_yaw_pitch_cntrl(void *, float);
+
+void set_option_parameter_nico_sight_on(void *work, int yaw, int pitch, float ratio)
+{
+    void *control;
+
+    control = (char *)work + 0xC;
+    set_reverse_input_yaw_flag_nico_yaw_pitch_cntrl(control, yaw);
+    set_reverse_input_pitch_flag_nico_yaw_pitch_cntrl(control, pitch);
+    set_yaw_parameter_effective_ratio_nico_yaw_pitch_cntrl(control, ratio);
+    set_pitch_parameter_effective_ratio_nico_yaw_pitch_cntrl(control, ratio);
+}

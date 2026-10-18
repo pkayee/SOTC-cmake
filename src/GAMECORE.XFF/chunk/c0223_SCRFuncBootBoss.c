@@ -7,7 +7,39 @@ void SCRFuncBootBoss(void)
     bossStatStartDemo();
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0223_SCRFuncBootBoss", SCRFuncSetGameFlagByGameObj);
+extern s32 DldSysUndefSymbol;
+
+static inline u8 *dldResolve(u32 *h)
+{
+    u32 v = *h;
+    s32 off = v & 0x3FFFF;
+    u8 *t = off != 0 ? *(u8 **)((u8 *)h - off) : 0;
+
+    return (t != 0 && t != (u8 *)DldSysUndefSymbol) ? *(u8 **)(t + 0x10) + ((v >> 18) & 0xFFF) * *(s32 *)(*(u8 **)(t + 8) + 0xC) : 0;
+}
+
+static inline s32 *dldObj(s32 *h)
+{
+    s32 off = *h & 0x3FFFF;
+    s32 *t = off != 0 ? *(s32 **)((u8 *)h - off) : 0;
+
+    return (t != 0 && t != (s32 *)DldSysUndefSymbol) ? (s32 *)t[4] : 0;
+}
+
+void gStatGobjDispGflagSet(void *obj);
+
+void SCRFuncSetGameFlagByGameObj(void *a, s32 b, s32 c, s32 d, s32 e, s32 *h)
+{
+    s32 *o = dldObj(h);
+
+    if (o != 0 && o[2] != 0)
+    {
+        if (dldResolve((u32 *)(o + 4)) != 0)
+        {
+            gStatGobjDispGflagSet(dldResolve((u32 *)(o + 4)));
+        }
+    }
+}
 void _gameFlagSet(s32 idx);
 
 void SCRFuncSetGameFlag(s32 unused, s32 idx)
@@ -29,7 +61,22 @@ void SCRFuncSetMyselfMotionSpeedRatio(s32 a0, s32 a1)
     SCRSetCharaMotionPlaySpeedRatio(a0, a1);
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0223_SCRFuncBootBoss", SCRFuncSetAttakIKPosForMotionCheck);
+u8 *GetCharacterClass(void *chara);
+void *getSCRDataCtrlWork();
+void updateAttackWaistIKWork(void *chara, void *ik);
+
+int SCRFuncSetAttakIKPosForMotionCheck(void *a, s32 b, s32 c, s32 d, s32 e, s32 f, u32 *h)
+{
+    u8 *m = GetCharacterClass(a) + 0x1C0;
+    u8 *w = getSCRDataCtrlWork(a);
+    u8 *p = dldResolve(h);
+
+    if (p == *(u8 **)m)
+    {
+        updateAttackWaistIKWork(a, *(void **)(*(u8 **)(w + 0x405C) + 0x134));
+    }
+}
+
 void *getSCRDataCtrlWork(void);
 
 void SCRFuncParentRelateInit(void)

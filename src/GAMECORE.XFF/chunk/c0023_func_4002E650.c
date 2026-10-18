@@ -277,7 +277,18 @@ f32 gStatGetPlayerAccessoriesDamgeRaitoToBoss(void)
     return r;
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0023_func_4002E650", gStatLoadPlayerChara);
+void gStatLoadPlayerChara(s32 a)
+{
+    s32 id = 0xB1;
+    s32 c = D_40130ED8;
+    if (c == 0 || c != id) {
+        if (c != 0)
+            stagemanager_unloadstagecore(c);
+        stagemanager_loadstagecore(&rootPtn, 0xB1, a, 0);
+    }
+    D_40130ED8 = 0xB1;
+    gStatLoadPlayerAccessories();
+}
 
 void gStatUnloadPlayerChara(void)
 {
@@ -420,7 +431,17 @@ void gstatBootMcSetLastSaveOmakeStat(OmakeStat *src)
     *(OmakeStat *)D_40200E70 = *src;
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0023_func_4002E650", gstatBootMcCurSetLastSaveOmakeStat);
+void gstatBootMcCurSetLastSaveOmakeStat(void)
+{
+    s32 n;
+    s32 one;
+
+    *(OmakeStat *)D_40200E70 = *(OmakeStat *)D_40200DF0;
+    n = getGameClearCnt();
+    one = 1;
+    D_40130EF0 = one;
+    D_40130EF4 = n;
+}
 
 void gstatBootMcSetExistIcoData(s32 v)
 {
