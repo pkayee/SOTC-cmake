@@ -4,7 +4,7 @@ extern s32 D_4021E1E0;
 extern s32 D_4021E1E4;
 extern s32 DldSysUndefSymbol;
 
-u8* getSCRDataCtrlWork(void);
+u8* getSCRDataCtrlWork();
 u8* GetDamageClass(s32 a0);
 s32 GetDamagerClassDamageSheetType(u8* damage);
 u8* GetCharacterClass(s32 chr);
@@ -298,7 +298,7 @@ s32 SCRConditionPlayerParentColAttrAndEquipmentCheck(void* actor, s32 a1, s32 a2
     {
         return 0;
     }
-    w = ((u8* (*)(void*))getSCRDataCtrlWork)(actor);
+    w = getSCRDataCtrlWork(actor);
     t = dldTable(h);
     o = (t != 0 && (s32)t != DldSysUndefSymbol) ? (s32*)t[4] : 0;
     if (o != 0 && o[2] != 0)
@@ -328,7 +328,7 @@ s32 SCRConditionPlayerParentRangeColAttrAndEquipmentCheck(void* actor, s32 a1, s
     {
         return 0;
     }
-    w = ((u8* (*)(void*))getSCRDataCtrlWork)(actor);
+    w = getSCRDataCtrlWork(actor);
     step = 0x200000;
 
     if (type != 0x1E00000)
@@ -481,7 +481,7 @@ s32 SCRConditionMyselfControlModeCheck(void* a, s32 b, s32 c, s32 d, s32 e, s32 
 
 s32 SCRConditionPlayerMotionCheck(void* a, s32 b, s32 c, s32 d, s32 e, s32 f, s32 g, s32 i, u32* h)
 {
-    u8* w = GetCharacterClass(*(s32*)(((u8* (*)(void*))getSCRDataCtrlWork)(a) + 0x4058)) + 0x1C0;
+    u8* w = GetCharacterClass(*(s32*)(getSCRDataCtrlWork(a) + 0x4058)) + 0x1C0;
     u32 v = *h;
     s32 off = v & 0x3FFFF;
     u8* t = off != 0 ? *(u8**)((u8*)h - off) : 0;
@@ -491,7 +491,7 @@ s32 SCRConditionPlayerMotionCheck(void* a, s32 b, s32 c, s32 d, s32 e, s32 f, s3
 
 s32 SCRConditionPlayerMotionShiftCheck(void* a, s32 b, s32 c, s32 d, s32 e, s32 f, s32 g, s32 i, u32* h)
 {
-    u8* w = ((u8* (*)(void*))getSCRDataCtrlWork)(a);
+    u8* w = getSCRDataCtrlWork(a);
     u8* m = GetCharacterClass(*(s32*)(w + 0x4058)) + 0x1C0;
     u32 v = *h;
     s32 off = v & 0x3FFFF;
@@ -505,7 +505,7 @@ s32 SCRConditionPlayerMotionShiftCheck(void* a, s32 b, s32 c, s32 d, s32 e, s32 
 
 s32 SCRConditionPlayerLastMotionShiftCheck(void* a, s32 b, s32 c, s32 d, s32 e, s32 f, s32 g, s32 i, u32* h)
 {
-    u8* w = ((u8* (*)(void*))getSCRDataCtrlWork)(a);
+    u8* w = getSCRDataCtrlWork(a);
     u8* m = GetCharacterClass(*(s32*)(w + 0x4058)) + 0x1C0;
     u32 v = *h;
     s32 off = v & 0x3FFFF;
@@ -519,7 +519,7 @@ s32 SCRConditionPlayerLastMotionShiftCheck(void* a, s32 b, s32 c, s32 d, s32 e, 
 
 s32 SCRConditionPlayerControlModeCheck(void* a, s32 b, s32 c, s32 d, s32 e, s32 f, s32 g, s32 i, u32* h)
 {
-    u8* w = ((u8* (*)(void*))getSCRDataCtrlWork)(a);
+    u8* w = getSCRDataCtrlWork(a);
     u32 v = *h;
     s32 off = v & 0x3FFFF;
     u8* t = off != 0 ? *(u8**)((u8*)h - off) : 0;
@@ -610,22 +610,16 @@ s32 SCRConditionAPChanged(s32 a0)
     return changedAPIndex(a0, getSCRDataCtrlWork());
 }
 
-/* NEARMISS-STUB SCRConditionDPGroupIDChanged */
-#if 0 /* NEARMISS 84.0% cat=cse-hoist sub=- | target copies getDPGroupID result to s2, a2 from v0; we CSE into a1 | attempts=1 */
 s32 SCRConditionDPGroupIDChanged(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4, s32 a5, s32 a6, s32 t3)
 {
-    s32 group;
-    getSCRDataCtrlWork();
-    group = getDPGroupID(a0, t3);
-    return changedDPGroupID(a0, group, group, -1);
+    u8* w = getSCRDataCtrlWork(a0);
+    return changedDPGroupID(a0, (s32)w, getDPGroupID(a0, t3), -1);
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0227_finishLoadMotList", SCRConditionDPGroupIDChanged);
 
 s32 SCRConditionGPOrDPGroupIDChanged(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4, s32 a5, s32 a6, s32 t3)
 {
     s32 ret = 0;
-    u8* w = ((u8* (*)(void*))getSCRDataCtrlWork)(a0);
+    u8* w = getSCRDataCtrlWork(a0);
     s32 id = getDPGroupID(a0, t3);
 
     if (changedGPIndex(a0, w, *(s32*)(w + 0x4058)) || changedDPGroupID(a0, (s32)w, id, -1))
