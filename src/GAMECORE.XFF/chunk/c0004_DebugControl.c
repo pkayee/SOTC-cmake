@@ -121,14 +121,11 @@ void DebugDispPositionColor(s32 a0, f32 radius, f32 *color)
     DebugDispRadiusIndicator(a0, radius, 1);
 }
 
-/* NEARMISS-STUB DebugDispTargetStatusForce */
-#if 0 /* NEARMISS 48.6% cat=stack-frame sub=- | expected keeps a 16-byte frame and jal GetCharacterClass (non-tail call, sd ra); gcc emits tail j GetCharacterClass; void/value return variants both tail-call | attempts=1 */
-u8 *DebugDispTargetStatusForce(s32 a0, s32 a1)
+void DebugDispTargetStatusForce(s32 a0, s32 a1)
 {
-    return GetCharacterClass(a1);
+    GetCharacterClass(a1);
+    return;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0004_DebugControl", DebugDispTargetStatusForce);
 
 void DebugPrintf3D_InitContext(s32 a0, s32 a1)
 {
@@ -237,22 +234,16 @@ void SetObjectGeoAndUnparent(s32 a0, s32 a1, u128 *a2)
     }
 }
 
-/* NEARMISS-STUB DebugIsPlayer */
-#if 0 /* NEARMISS 62.5% cat=branch-layout sub=- | expected beqz/bnel on the GetLayoutClass result in v0 and emits b+li 1; gcc copies result to v1 and/or emits sltiu; explicit ret-var form gave 57.5 | attempts=1 */
-s32 DebugIsPlayer(void)
+s32 DebugIsPlayer(s32 a0)
 {
-    u8 *layout = GetLayoutClass();
+    u8 *layout = GetLayoutClass(a0);
 
-    if (layout == 0) {
-        return 0;
+    if (layout != NULL && strcmp(*(char **)(layout + 0x130), D_40132500) == 0)
+    {
+        return 1;
     }
-    if (strcmp(*(char **)(layout + 0x130), D_40132500) != 0) {
-        return 0;
-    }
-    return 1;
+    return 0;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0004_DebugControl", DebugIsPlayer);
 
 void *isysGroupForFirst(s32 group, s32 flag);
 void *isysGroupForNext(void *link, s32 flag);
@@ -402,31 +393,19 @@ void func_4001AD38();
 void createScriptObj(void *fn, void *a1, void *a2, s32 a3, s32 a4, s32 a5, void *a6, s32 a7);
 
 /* NEARMISS-STUB DebugDispMotionTurnRequest */
-#if 0 /* NEARMISS 64.3% cat=branch-layout sub=- | range check gcc fuses into one unsigned compare (target keeps slti+bgtz with a0 bool); lui of D_401304B0 hoisted above the range test; p copied to a4 not a3; 0x | attempts=1 */
+#if 0 /* NEARMISS 83.98% cat=branch-layout sub=range-flag-inline | ok flag = static inline helper with nested ifs (i<6 then i>0, return 1/0) gives the slti/bgtz materialised a0 bool; left: delay-slot fills (li a0,1 / lui D_4013 | attempts=3 */
+static inline s32 chk_inl(s32 i) { if (i < 6) { if (i > 0) return 1; } return 0; }
 void DebugDispMotionTurnRequest(u8 *p)
 {
-    s32 idx;
-    s32 ok;
-    s32 val;
-    s16 sVar;
-    u8 *tbl;
+    s32 idx = *(s32 *)(p + 0xBD4);
+    s32 ok = chk_inl(idx);
+    s16 type;
 
-    idx = *(s32 *)(p + 0xBD4);
-    ok = 1;
-    if (5 < idx) {
-        ok = 0;
-    }
-    if (idx < 1) {
-        ok = 0;
-    }
-    if (((D_401304B0 - 1U) < 2) && ok) {
-        val = *(s32 *)(p + 0x134);
-        sVar = *(s16 *)(p + 0x360);
-        *(s32 *)(D_40130510 + idx * 0x30) = val;
-        tbl = D_401304F0;
-        if (sVar == 2 || sVar == 4 || sVar == 3) {
-            createScriptObj(func_4001AD38, tbl + *(s32 *)(p + 0xBD4) * 0x30, &rootPtn, 0x1000, 0, 1, 0, 0);
-            return;
+    if ((D_401304B0 == 1 || D_401304B0 == 2) && ok) {
+        *(s32 *)(D_40130510 + idx * 0x30) = *(s32 *)(p + 0x134);
+        type = *(s16 *)(p + 0x360);
+        if (type == 2 || type == 4 || type == 3) {
+            createScriptObj(func_4001AD38, D_401304F0 + *(s32 *)(p + 0xBD4) * 0x30, &rootPtn, 0x1000, 0, 1, 0, 0);
         }
     }
 }

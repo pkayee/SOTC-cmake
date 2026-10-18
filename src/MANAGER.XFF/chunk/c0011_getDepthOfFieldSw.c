@@ -195,51 +195,29 @@ s32 fsEffectCreateSetScript(s32 a0, s32 a1, s32 a2)
 }
 
 /* NEARMISS-STUB fsEffectManagerSetDemoParam */
-#if 0 /* NEARMISS 84.02% cat=regalloc sub=- | second DLD resolve base in a1 vs a0; lui placement | attempts=1 */
-void fsEffectManagerSetDemoParam(u32 *param_1)
+#if 0 /* NEARMISS 95.37% cat=regalloc sub=stack-hoist | target hoists &D_40124820 into a1 and uses it for both DLD-resolve compare and store; ours reloads lui per access; (g-pointer variant 0%) | attempts=2 */
+static inline u8 *dldRef(u32 *lp, s32 fld)
 {
-    u32 *ref;
-    u32 off;
-    s32 *n;
-    FsEffect *e;
-    FsEffect *cur;
-    s32 r;
+    u8 *slot;
+    u32 off = *lp & 0x3FFFF;
 
-    ref = &param_1[1];
-    off = *ref & 0x3ffff;
-    if (off != 0) {
-        n = *(s32 **)((u8 *)ref - off);
-    } else {
-        n = NULL;
-    }
-    if (n == NULL || (s32)n == DldSysUndefSymbol) {
-        e = NULL;
-    } else {
-        e = (FsEffect *)n[4];
-    }
+    slot = off ? *(u8 **)((u8 *)lp - off) : NULL;
+    return (slot != NULL && slot != (u8 *)DldSysUndefSymbol) ? *(u8 **)(slot + fld) : NULL;
+}
 
-    ref = &param_1[2];
-    off = *ref & 0x3ffff;
-    if (off != 0) {
-        n = *(s32 **)((u8 *)ref - off);
-    } else {
-        n = NULL;
-    }
-    if (n == NULL || (s32)n == DldSysUndefSymbol) {
-        r = 0;
-    } else {
-        r = n[4];
-    }
+void fsEffectManagerSetDemoParam(u8 *m)
+{
+    s32 e = (s32)dldRef((u32 *)(m + 4), 0x10);
+    s32 f = (s32)dldRef((u32 *)(m + 8), 0x10);
 
-    if (e != NULL) {
-        cur = (FsEffect *)D_40124820;
-        if (cur == NULL) {
-            D_40124820 = (s32)e;
-        } else if (!(e->prio < cur->prio)) {
-            D_40124820 = (s32)e;
+    if (e != 0) {
+        if (D_40124820 == 0) {
+            D_40124820 = e;
+        } else if (!(*(s32 *)(e + 4) < *(s32 *)(D_40124820 + 4))) {
+            D_40124820 = e;
         }
     }
-    D_40124824 = r;
+    D_40124824 = f;
 }
 #endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0011_getDepthOfFieldSw", fsEffectManagerSetDemoParam);
@@ -319,6 +297,31 @@ void fsEffectManagerInit(void)
     }
 }
 #endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0011_getDepthOfFieldSw", fsEffectManagerInit);
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0011_getDepthOfFieldSw", fsEffectManagerInit);
+typedef struct FsEffectBig {
+    s32 f0;
+    s32 pri;
+    s32 f8;
+    u8 rest[168];
+} FsEffectBig;
+extern s32 FsEffect_DEFAULT;
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0011_getDepthOfFieldSw", initFsEffect);
+void fsEffectManagerInit(void)
+{
+    if (FsEffect_DEFAULT != 0) {
+        *(FsEffectBig *)&D_401AA950 = *(FsEffectBig *)FsEffect_DEFAULT;
+    }
+}
+
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0011_getDepthOfFieldSw", initFsEffect);
+void initFsEffect(u8 *obj)
+{
+    FsEffectBig *p = *(FsEffectBig **)(obj + 0x10);
+
+    if (p->f8 != 0 && p != 0) {
+        *(FsEffectBig *)&D_401AA950 = *p;
+    }
+    if (FsEffect_DEFAULT != 0) {
+        *(FsEffectBig *)&D_401AA950 = *(FsEffectBig *)FsEffect_DEFAULT;
+    }
+}

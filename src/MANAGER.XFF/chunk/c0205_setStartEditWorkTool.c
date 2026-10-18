@@ -42,14 +42,11 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0205_setStartEditWorkTool", ini
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0205_setStartEditWorkTool", loadPathData);
 
-/* NEARMISS-STUB delPathData */
-#if 0 /* NEARMISS 48.6% cat=call-abi sub=- | target keeps jal iosFree + frame (non-tail, ra restored after call); ours emits j iosFree (sibcall). void/s32 return and iosFree proto variants all still sibcal | attempts=1 */
-void delPathData(void* arg0, void* arg1, void* arg2)
+void delPathData(void *arg0, void *arg1, void *arg2)
 {
     iosFree(arg2);
+    return;
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0205_setStartEditWorkTool", delPathData);
 
 u8* getPointDataHeader(u8* arg0)
 {

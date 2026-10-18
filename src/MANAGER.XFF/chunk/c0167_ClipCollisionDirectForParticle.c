@@ -1,6 +1,12 @@
 #include "common.h"
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0167_ClipCollisionDirectForParticle", ClipCollisionDirectForParticle);
+s32 ClipCollisionDirectCallBack();
+s32 CollisionPlaneJudgeCallbackParticle();
+
+s32 ClipCollisionDirectForParticle(s32 a0, s32 a1, s32 a2, s32 a3)
+{
+    return ClipCollisionDirectCallBack(a0, a1, a2, a3, 0, 0, 0, CollisionPlaneJudgeCallbackParticle, 0);
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0167_ClipCollisionDirectForParticle", func_400D2E50);
 

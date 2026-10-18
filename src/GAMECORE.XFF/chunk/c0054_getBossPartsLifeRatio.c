@@ -6,7 +6,16 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0054_getBossPartsLifeRatio", S
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0054_getBossPartsLifeRatio", SCRReleaseBossWork);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0054_getBossPartsLifeRatio", SCRGetBossCollisionAttribute);
+void GetGeometryPointerSurfaceAttribute();
+u8 *GetDamageClass();
+
+u64 SCRGetBossCollisionAttribute(s32 a0)
+{
+    u64 attr[2];
+
+    GetGeometryPointerSurfaceAttribute(attr, GetDamageClass(a0) + 0x10);
+    return attr[0];
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0054_getBossPartsLifeRatio", SCRGetBossPartsDamage);
 
