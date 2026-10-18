@@ -2662,15 +2662,12 @@ s32 sceNetcnfifDmaCheck(u32 id)
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_00123280);
 
-//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_001232A8);
-extern s32 D_00135A60[];
-extern s32 D_00138EF0[];
-
-s32 CreateSema(s32 *);
-
+/* NEARMISS-STUB func_001232A8 */
+#if 0 /* NEARMISS 76.46% cat=volatile-alias sub=- | target reloads D_00135A60 after sw (bltz+lw); plain forms forward the stored reg and if-convert to movz; 4 forms tried, all 76.46 | attempts=2 */
 s32 func_001232A8(void)
 {
     s32 param[8];
+    u32 addr;
 
     if (D_00135A60[0] >= 0)
     {
@@ -2679,13 +2676,16 @@ s32 func_001232A8(void)
     param[1] = 1;
     param[2] = 0;
     param[5] = (s32)D_00138EF0;
-    D_00135A60[0] = CreateSema(param);
-    if (((volatile s32 *)D_00135A60)[0] < 0)
+    addr = (u32)D_00135A60;
+    ((s32 *)addr)[0] = CreateSema(param);
+    if (D_00135A60[0] < 0)
     {
         return -1;
     }
-    return ((volatile s32 *)D_00135A60)[0];
+    return D_00135A60[0];
 }
+#endif
+INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_001232A8);
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_00123308);
 extern s32 D_00135A60[];
 
@@ -2732,23 +2732,25 @@ s32 sce_call_rpc(void *a0, void *a1, s32 a2)
 
 s32 PollSema(s32);
 
+/* NEARMISS-STUB sce_sync */
+#if 0 /* NEARMISS 90.29% cat=volatile-alias sub=- | needs the banned qualifier: plain forms forward first load | attempts=1 */
 s32 sce_sync(s32 mode)
 {
     s32 ret = 1;
 
-    if (((volatile s32 *)D_00135A60)[0] < 0)
+    if (D_00135A60[0] < 0)
     {
         return -1;
     }
     switch (mode)
     {
     case 0:
-        WaitSema(((volatile s32 *)D_00135A60)[0]);
+        WaitSema(D_00135A60[0]);
         ret = 0;
         func_00123308();
         break;
     case 1:
-        if (PollSema(((volatile s32 *)D_00135A60)[0]) != -1)
+        if (PollSema(D_00135A60[0]) != -1)
         {
             ret = 0;
             func_00123308();
@@ -2759,3 +2761,5 @@ s32 sce_sync(s32 mode)
     }
     return ret;
 }
+#endif
+INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sce_sync);

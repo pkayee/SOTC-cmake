@@ -186,7 +186,7 @@ s32 sceTtyWrite(u8 *buf, s32 len)
         }
     }
     D_0014B150[0].wrLen = cnt + 0xC;
-    pkt->len = ((volatile TtyCtl *)D_0014B150)->wrLen;
+    pkt->len = ((TtyCtl *)D_0014B150)->wrLen;
     if (sceDeci2ReqSend(D_0014B150[0].handle, pkt->type) < 0)
     {
         D_0014B150[0].wrBusy = 0;
@@ -209,7 +209,8 @@ s32 sceTtyWrite(u8 *buf, s32 len)
 #endif
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/tty", sceTtyWrite);
 
-//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/tty", sceTtyRead);
+/* NEARMISS-STUB sceTtyRead */
+#if 0 /* NEARMISS 91.73% cat=volatile-alias sub=- | needs the banned qualifier: target re-loads D_0014B168[0]->count inside the poll loop (lw in loop); plain C hoists count load out of loop, loop becomes beqz sel | attempts=1 */
 s32 sceTtyRead(u8 *buf, s32 len)
 {
     s32 i;
@@ -221,7 +222,7 @@ s32 sceTtyRead(u8 *buf, s32 len)
     {
         dst = buf + i;
         n = i + 1;
-        while (((volatile TtyQueue *)D_0014B168[0])->count == 0)
+        while (D_0014B168[0]->count == 0)
             ;
         *dst = *D_0014B150[0].queue->rd;
         QueuePeekReadDone(D_0014B150[0].queue);
@@ -233,6 +234,8 @@ s32 sceTtyRead(u8 *buf, s32 len)
     }
     return i;
 }
+#endif
+INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/tty", sceTtyRead);
 
 /* NEARMISS-STUB sceTtyInit */
 #if 0 /* NEARMISS 81.1% cat=regalloc sub=- | store order/delay slot: target hoists lui D_0014B2C0 into bgez delay slot, buf in v0 not v1, unk08 store before jal and unk02 in delay slot (we swap); source or | attempts=1 */
@@ -244,7 +247,7 @@ s32 sceTtyInit(void)
 
     FlushCache(0);
     D_0014B150[0].handle = sceDeci2Open(0x210, &D_0014B150[0], sceTtyHandler);
-    if (((volatile TtyCtl *)D_0014B150)->handle < 0)
+    if (((TtyCtl *)D_0014B150)->handle < 0)
     {
         return 0;
     }

@@ -353,18 +353,23 @@ void glZOffset(f32 z)
 //INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0016_glRotatef", glSetReg);
 void glSetReg(s64 a, s64 b)
 {
+    typedef union
+    {
+        u8 *ptr;
+        s64 val;
+    } Slot;
     u8 *base = D_401248C0;
-    u8 **slot = (u8 **)(base + 4);
+    Slot *slot = (Slot *)(base + 4);
     u8 *p;
     u8 *q;
 
-    p = *slot;
-    *(s64 *)p = b;
+    p = slot->ptr;
+    ((Slot *)p)->val = b;
     p += 8;
     q = p + 8;
-    *(u8 * volatile *)slot = p;
-    *(s64 *)p = a;
-    *slot = q;
+    slot->ptr = p;
+    ((Slot *)p)->val = a;
+    slot->ptr = q;
 }
 
 //INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0016_glRotatef", glGetCurrentMatrix);
