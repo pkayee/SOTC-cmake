@@ -13,13 +13,58 @@ int spriteDeleteObject(int a, int b, int c, int d)
     return iosFree(a, b, c, d);
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0035_spriteSetValue", spriteSetPosition);
+/* MANAGER c0035 sprite obj: +0x30 x, +0x34 y, +0x38 z=1.0 */
+void spriteSetPosition(char *p, float x, float y)
+{
+    *(float *)(p + 0x30) = x;
+    *(float *)(p + 0x34) = y;
+    *(float *)(p + 0x38) = 1.0f;
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0035_spriteSetValue", spriteSetTextureCoordinateST);
+/* MANAGER c0035: ST rect at +0x20..+0x2C, flags u64 at +0x68 |= 0x10 (statement order from 120-perm search) */
+void spriteSetTextureCoordinateST(char *p, float s, float t, float ds, float dt)
+{
+    *(float *)(p + 0x20) = s;
+    *(float *)(p + 0x24) = t;
+    *(u64 *)(p + 0x68) |= 0x10;
+    *(float *)(p + 0x28) = s + ds;
+    *(float *)(p + 0x2C) = t + dt;
+}
 
+/* NEARMISS-STUB spriteSetTextureCoordinateSTFromUV */
+#if 0 /* NEARMISS 99.51% cat=regalloc sub=- | REA READY drop-in scored 99.51 in-TU (apply_ready) | attempts=1 */
+/* MANAGER c0035: texture size from p->tex(+0x0)->+0x20->+0x1C (log2 w at bits16-19, log2 h at 20-23); UV (+0.5 texel) -> ST */
+void spriteSetTextureCoordinateSTFromUV(char *p, float u, float v, float du, float dv)
+{
+    u32 sz = *(u32 *)(*(char **)(*(char **)p + 0x20) + 0x1C);
+    float w = (float)(1 << ((sz >> 16) & 0xF));
+    float h = (float)(1 << ((sz >> 20) & 0xF));
+    float iw = 1.0f / w;
+    float ih = 1.0f / h;
+    u += 0.5f;
+    v += 0.5f;
+    du = du + u;
+    dv = dv + v;
+    *(u64 *)(p + 0x68) |= 0x10;
+    *(float *)(p + 0x20) = u * iw;
+    *(float *)(p + 0x28) = du * iw;
+    *(float *)(p + 0x24) = v * ih;
+    *(float *)(p + 0x2C) = dv * ih;
+}
+#endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0035_spriteSetValue", spriteSetTextureCoordinateSTFromUV);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0035_spriteSetValue", spriteSetTextureCoordinateUV);
+/* MANAGER c0035: UV rect as ints at +0x10..+0x1C, raw size floats at +0x40/+0x44, flags +0x68 &= ~0x10 (order from 5040-perm search) */
+void spriteSetTextureCoordinateUV(char *p, float u, float v, float du, float dv)
+{
+    *(float *)(p + 0x40) = du;
+    *(s32 *)(p + 0x10) = (s32)u;
+    *(u64 *)(p + 0x68) &= ~0x10;
+    *(s32 *)(p + 0x14) = (s32)v;
+    *(s32 *)(p + 0x18) = (s32)(u + du);
+    *(s32 *)(p + 0x1C) = (s32)(v + dv);
+    *(float *)(p + 0x44) = dv;
+}
 
 void spriteSetColor(char *p, int a1, int a2, int a3, int a4)
 {
@@ -40,6 +85,18 @@ void spriteSetRotation(void *arg0, float fparg0)
     (*(float *)((char *)(arg0) + 0x4C)) = fparg0;
 }
 
+/* NEARMISS-STUB spriteSetBlendMode */
+#if 0 /* NEARMISS 48.28% cat=regalloc sub=- | REA READY drop-in scored 48.28 in-TU (apply_ready) | attempts=1 */
+/* MANAGER c0035: +0x60 = a; flags u64 at +0x68: bits0-1 = b, bits2-3 = c (u32 args zero-extended: dsll32/dsrl32) */
+void spriteSetBlendMode(char *p, s32 a, u32 b, u32 c)
+{
+    u64 f = *(u64 *)(p + 0x68);
+    f = (f & ~3) | (b & 3);
+    f = (f & ~0xC) | ((c & 3) << 2);
+    *(s32 *)(p + 0x60) = a;
+    *(u64 *)(p + 0x68) = f;
+}
+#endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0035_spriteSetValue", spriteSetBlendMode);
 
 //INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0035_spriteSetValue", spriteSetIdentifier);
