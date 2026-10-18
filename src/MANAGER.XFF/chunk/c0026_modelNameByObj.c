@@ -1,38 +1,83 @@
 #include "common.h"
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0026_modelNameByObj", modelNameByObj);
+int modelNameByObj(void *arg0)
+{
+    return (*(int *)((char *)((*(void **)((char *)(arg0) + 0x20))) + 0x70));
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0026_modelNameByObj", modelNameByHeader);
+int modelNameByHeader(void *arg0)
+{
+    return (*(int *)((char *)(arg0) + 0x70));
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0026_modelNameByObj", modelSetMatrixTransTag);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0026_modelNameByObj", modelGetTextureObjByIndex);
+int modelGetTextureObjByIndex(void *arg0, int arg1)
+{
+    return (*(int *)((char *)(((arg1 << 5) + (*(int *)((char *)(arg0) + 0x40)))) + 0x10));
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0026_modelNameByObj", modelGetTextureResourceByIndex);
+int modelGetTextureResourceByIndex(void *arg0, int arg1)
+{
+    return (*(int *)((char *)((*(void **)((char *)(((arg1 << 5) + (*(int *)((char *)(arg0) + 0x40)))) + 0x10))) + 0x20));
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0026_modelNameByObj", modelDeleteDispModelClass);
+typedef struct
+{
+    unsigned long a : 9;
+    unsigned int cnt : 15;
+    unsigned long b : 40;
+} LF;
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0026_modelNameByObj", modelGetLinkCount);
+void modelDeleteDispModelClass(char **p)
+{
+    ((LF *)(*(char **)(*p + 0x20) + 0x18))->cnt--;
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0026_modelNameByObj", modelIncLinkCount);
+int modelGetLinkCount(char *p)
+{
+    return ((LF *)(p + 0x18))->cnt;
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0026_modelNameByObj", modelDecLinkCount);
+void modelIncLinkCount(char *p)
+{
+    ((LF *)(p + 0x18))->cnt++;
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0026_modelNameByObj", modelGetWorkSize);
+void modelDecLinkCount(char *p)
+{
+    ((LF *)(p + 0x18))->cnt--;
+}
+
+int modelGetWorkSize(void *arg0)
+{
+    return ((*(int *)((char *)(arg0) + 0x64)) * 0x30) + ((*(int *)((char *)(arg0) + 0x54)) << 6) + 0xA1;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0026_modelNameByObj", modelInitialize);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0026_modelNameByObj", modelGetName);
+int modelGetName(void *arg0)
+{
+    return (*(int *)((char *)(arg0) + 0x70));
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0026_modelNameByObj", modelSetSurface);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0026_modelNameByObj", modelGetDlLayerIndex);
+extern void *modelGetDlLayer(void *model, void *layer);
+
+void *modelGetDlLayerIndex(char *model, int index)
+{
+    return modelGetDlLayer(model, *(char **)(model + 0x50) + index * 0x120);
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0026_modelNameByObj", modelSetEnviroment);
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0026_modelNameByObj", modelInit);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0026_modelNameByObj", ModelDispGetWorkSize);
+int ModelDispGetWorkSize(void)
+{
+    return 0x2E3;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0026_modelNameByObj", func_40032540);
 
