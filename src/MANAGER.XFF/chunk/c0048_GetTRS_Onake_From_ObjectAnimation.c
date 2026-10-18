@@ -3,7 +3,7 @@
 extern u128 All1Vector;
 
 void func_40043360();
-void func_40043588();
+s32 func_40043588();
 void func_40044F58();
 s32 GetMotionResourceOriginalFrames();
 s32 GetMotionResourceFrames();
@@ -168,13 +168,10 @@ void GetMotionNodeGeoToolCoord() {
     func_40043360();
 }
 
-/* NEARMISS-STUB GetMotionNodeIntFrameDirectResource */
-#if 0 /* NEARMISS 99.17% cat=regalloc sub=a3-vs-t0 | see attempt (kX15 haiku best) | attempts=2 */
-void GetMotionNodeIntFrameDirectResource(s32 a0, u8 *res, s32 i) {
-    func_40043588(a0, *(u8 *)(*(u8 **)(res + 8) + i), *(s32 *)(*(u8 **)(res + 0x10) + i * 4));
+int GetMotionNodeIntFrameDirectResource(void *a, char *n, int i, int d)
+{
+    return func_40043588(a, *(unsigned char *)(*(char **)(n + 8) + i), (*(int **)(n + 0x10))[i], d);
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0048_GetTRS_Onake_From_ObjectAnimation", GetMotionNodeIntFrameDirectResource);
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0048_GetTRS_Onake_From_ObjectAnimation", GetMotionFloatFrameWithLimitCaribration);
 

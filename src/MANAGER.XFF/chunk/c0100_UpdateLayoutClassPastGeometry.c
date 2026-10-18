@@ -129,25 +129,51 @@ void CallLayoutObjDebugResetFunc(u8 *obj)
     }
 }
 
-/* NEARMISS-STUB GetLayoutClassCollisionBoundaryInfo */
-#if 0 /* NEARMISS 48.0% cat=regalloc sub=- | see attempt (kX15 haiku best) | attempts=1 */
-extern u128 ZeroVector;
+typedef union {
+    s128 q;
+    float f[4];
+    int i[4];
+} Vec4;
 
-s32 GetLayoutClassCollisionBoundaryInfo(u8 *out, u8 *obj)
+typedef struct {
+    char pad0[0x2C];
+    float radius;
+} BoundaryData;
+
+typedef struct {
+    char pad0[0x20];
+    BoundaryData *data;
+} CollisionInfo;
+
+typedef struct {
+    char pad0[0x90];
+    float scale;
+    char pad94[0xA0];
+    Vec4 *center;
+    char pad138[0x4C];
+    CollisionInfo *collision;
+} LayoutClass;
+
+typedef struct {
+    Vec4 center;
+} Boundary;
+
+extern Vec4 ZeroVector;
+
+int GetLayoutClassCollisionBoundaryInfo(Boundary *out, LayoutClass *layout)
 {
-    u8 *dst = out;
-    u8 *o = obj;
+    CollisionInfo *col = layout->collision;
 
-    if (*(s32 *)(o + 0x184) != 0) {
-        *(u128 *)dst = *(u128 *)*(u8 **)(o + 0x134);
-        *(f32 *)(dst + 0xC) = *(f32 *)(*(u8 **)(o + 0x184) + 0x2C) * *(f32 *)(o + 0x90);
+    if (col != 0) {
+        BoundaryData *bd = col->data;
+
+        out->center.q = layout->center->q;
+        out->center.f[3] = bd->radius * layout->scale;
         return 0;
     }
-    *(u128 *)dst = ZeroVector;
+    out->center.q = ZeroVector.q;
     return -1;
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0100_UpdateLayoutClassPastGeometry", GetLayoutClassCollisionBoundaryInfo);
 
 //INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0100_UpdateLayoutClassPastGeometry", SetLayoutObjCollisionEnableFlag);
 void SetLayoutObjCollisionEnableFlag(u8 *obj, s32 v)
