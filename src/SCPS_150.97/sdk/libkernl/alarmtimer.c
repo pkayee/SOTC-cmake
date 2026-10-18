@@ -281,8 +281,78 @@ void *sceSifSetRebootNotifyBuffer(void *buf, s32 size)
 }
 
 
+/* NEARMISS-STUB sceSifAddRebootNotifyHandler */
+#if 0 /* NEARMISS 97.7% cat=no-c-form sub=- | live $gp stored to entry+8 (sw gp,8) | attempts=1 */
+typedef struct SifNotifyEntry
+{
+    s32 (*handler)(s32, s32);
+    s32 data;
+    s32 gp;
+    s32 pad;
+} SifNotifyEntry;
+
+s32 sceSifAddRebootNotifyHandler(s32 id, s32 (*handler)(s32, s32), s32 arg)
+{
+    SifNotifyEntry *tbl;
+    s32 count;
+    s32 intr;
+
+    if (id < 0)
+    {
+        id &= 0x7FFFFFFF;
+        tbl = (SifNotifyEntry *)D_0014AE08;
+        count = 0x20;
+    }
+    else
+    {
+        tbl = (SifNotifyEntry *)D_00133A38[0];
+        count = D_00133A3C[0];
+    }
+    if ((u32)id >= (u32)count)
+    {
+        return 0x80000069;
+    }
+    intr = DIntr();
+    tbl[id].handler = handler;
+    tbl[id].data = arg;
+    tbl[id].gp = 0;
+    if (intr != 0)
+    {
+        EIntr();
+    }
+    return 0;
+}
+#endif
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/alarmtimer", sceSifAddRebootNotifyHandler);
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/alarmtimer", sceSifRemoveRebootNotifyHandler);
 
+/* NEARMISS-STUB sceSifExecNotifyHandler */
+#if 0 /* NEARMISS 48.2% cat=no-c-form sub=- | gp swapped around jalr, gp returned | attempts=1 */
+s32 sceSifExecNotifyHandler(s32 mode, s32 arg)
+{
+    SifNotifyEntry *tbl;
+    s32 count;
+    s32 i;
+
+    if (mode == 0)
+    {
+        tbl = (SifNotifyEntry *)D_00133A38[0];
+        count = D_00133A3C[0];
+    }
+    else
+    {
+        tbl = (SifNotifyEntry *)D_0014AE08;
+        count = 0x20;
+    }
+    for (i = 0; i < count; i++)
+    {
+        if (tbl[i].handler != NULL)
+        {
+            tbl[i].handler(arg, tbl[i].data);
+        }
+    }
+    return 0;
+}
+#endif
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/alarmtimer", sceSifExecNotifyHandler);
