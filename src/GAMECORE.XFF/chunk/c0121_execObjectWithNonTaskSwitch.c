@@ -2,22 +2,78 @@
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0121_execObjectWithNonTaskSwitch", execObjectWithNonTaskSwitch);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0121_execObjectWithNonTaskSwitch", scrRun);
+extern int isysGetThisSubThread();
+extern int func_400A4778();
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0121_execObjectWithNonTaskSwitch", scrRunM);
+int scrRun(void)
+{
+    return func_400A4778(isysGetThisSubThread());
+}
+
+void scrRunM(int n)
+{
+    void *t = isysGetThisSubThread();
+    int i;
+    for (i = 0; i < n; i++)
+        func_400A4778(t);
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0121_execObjectWithNonTaskSwitch", SCRSetDispFlag);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0121_execObjectWithNonTaskSwitch", GetSCRCharaAIWorkPtr);
+extern void *GetScriptCharacterClass(void *);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0121_execObjectWithNonTaskSwitch", CheckSCRCharaAIWorkPtr);
+void *GetSCRCharaAIWorkPtr(void *actor)
+{
+    void *script;
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0121_execObjectWithNonTaskSwitch", SCRSimpleExecCharaGeometry);
+    script = GetScriptCharacterClass(actor);
+    return *(void **)((char *)script + 0x1150);
+}
+
+int CheckSCRCharaAIWorkPtr(int arg0)
+{
+    int var_v0;
+
+    var_v0 = 0;
+    if (arg0 != 0) {
+        var_v0 = (*(int *)((char *)(GetScriptCharacterClass((void *)arg0)) + 0x1150));
+    }
+    return var_v0;
+}
+
+extern void func_400A5440();
+extern int D_40131BB4;
+
+void SCRSimpleExecCharaGeometry(int arg0)
+{
+    D_40131BB4 = arg0;
+    func_400A5440();
+    D_40131BB4 = 0;
+}
 
 void scrInit(void) {
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0121_execObjectWithNonTaskSwitch", __execScrLwsOri);
+extern void ExecScriptLwsOrientClass(void *, void *, void *, float, float);
+extern float ViewIntervalClip(void *, void *, float);
+extern void *get_main_cameraman_camera_obj(void);
+struct OrientationGlobalsView {
+    char pad00[0x188];
+    float interval;
+    char pad18C[0x1E4];
+    char context[0];
+};
+extern struct OrientationGlobalsView gcGlobalVar;
+
+void __execScrLwsOri(void *actor)
+{
+    float interval;
+
+    interval = ViewIntervalClip(actor, get_main_cameraman_camera_obj(),
+                                gcGlobalVar.interval);
+    ExecScriptLwsOrientClass(actor, get_main_cameraman_camera_obj(),
+                            gcGlobalVar.context, interval, 1.0f / interval);
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0121_execObjectWithNonTaskSwitch", func_400A5088);
 
@@ -27,7 +83,16 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0121_execObjectWithNonTaskSwit
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0121_execObjectWithNonTaskSwitch", func_400A52E8);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0121_execObjectWithNonTaskSwitch", st_motionsyncanimation);
+extern void func_400A5398();
+extern void isysSleepSubThread();
+
+void st_motionsyncanimation(void)
+{
+    for (;;) {
+        func_400A5398();
+        isysSleepSubThread();
+    }
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0121_execObjectWithNonTaskSwitch", func_400A5398);
 
@@ -35,8 +100,22 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0121_execObjectWithNonTaskSwit
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0121_execObjectWithNonTaskSwitch", simpleExecCharaGeometry);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0121_execObjectWithNonTaskSwitch", AddDefaultAIGroup);
+extern char D_40216E08[];
+extern int isysAddGroupWithLinkParam();
 
+int AddDefaultAIGroup(int a, int b, int c, int d)
+{
+    return isysAddGroupWithLinkParam(a, (int)D_40216E08, 0, 0);
+}
+
+/* NEARMISS-STUB initdefaultaitask */
+#if 0 /* NEARMISS 99.0% cat=rodata-const sub=- | in-TU: hi16 reloc carries D_40135D48+0xcf0 addend in exp, ours also on lo16 | attempts=1 */
+void *initdefaultaitask(void)
+{
+    isysInitGroup(D_40216E08);
+    return gcCreateScriptObj(func_400A58C0, 0, rootPtn, 0x1000, 0, 4, D_40135D48 + 0xcf0);
+}
+#endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0121_execObjectWithNonTaskSwitch", initdefaultaitask);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0121_execObjectWithNonTaskSwitch", _initstage);
