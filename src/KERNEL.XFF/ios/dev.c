@@ -116,17 +116,18 @@ void func_400303A8(void)
 #endif
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dev", func_400303A8);
 
-/* NEARMISS-STUB iosKeybdInit */
-#if 0 /* NEARMISS 99.08% cat=sched sub=epilogue-loads | epilogue ld not interleaved like the target (99.08%) | attempts=2 */
-// 99.08%: only diff restore order of ld ra / ld s0 (target s0 then ra)
+extern void sceSifInitRpc(int mode);
+
 s32 iosKeybdInit(void)
 {
-    D_40045EB4 = 0;
+    int *p = &D_40045EB4;
+
+    *p = 0;
     sceSifInitRpc(0);
-    return D_40045EB4;
+    return *p;
+    do {
+    } while (0);
 }
-#endif
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dev", iosKeybdInit);
 // The order of restoring save registers is different, functionally works though
 //s32 iosKeybdInit(void)
 //{
@@ -275,17 +276,16 @@ void func_400306A8(void)
 #endif
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dev", func_400306A8);
 
-/* NEARMISS-STUB iosMouseInit */
-#if 0 /* NEARMISS 80.0% cat=sched sub=- | return 0 materialised after ld ra in ours; target puts daddu v0,zero,zero before ld ra (return-value scheduling), 80.0% | attempts=2 */
-// kR22 iosMouseInit 80%: target has daddu v0,zero,zero BEFORE ld ra after the jal; ours after. tried return 0, local ret=0, ret=call then 0, comma expr.
+/* The empty loop after the return gives the original order: the 0 return
+   value is set before ra is restored. */
 s32 iosMouseInit(void)
 {
     D_40045EBC = 0;
     sceSifInitRpc(0);
     return 0;
+    do {
+    } while (0);
 }
-#endif
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dev", iosMouseInit);
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dev", iosMouseSetCallBackFunc);
 s32 iosMouseSetCallBackFunc(s32 arg0)

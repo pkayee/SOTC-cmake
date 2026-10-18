@@ -35,8 +35,7 @@ typedef struct {
     s32 hwVoiceL;    /* 0x68 */
     s32 hwVoiceR;    /* 0x6C */
     s32 directPitch; /* 0x70 */
-    s16 volPhase0; /* 0x74 */
-    s16 volPhase1; /* 0x76 */
+    s16 volPhase[2]; /* 0x74 */
     s32 lfoPitchSpeed; /* 0x78 */
     s32 lfoPitchDepth; /* 0x7C */
     union {
@@ -526,7 +525,12 @@ void Sg2SlotSetAdsr(s32 idx, s32 adsr1, s32 adsr2)
     Sg2RemoteSend(2, idx, a1, a2);
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotSetVolPhase);
+void Sg2SlotSetVolPhase(s32 s, s32 a, s32 b)
+{
+    D_401117B0[s].volPhase[0] = a;
+    D_401117B0[s].volPhase[1] = b;
+    D_401117B0[s].flags |= 0x100;
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/slot", Sg2SlotSetLoop);
 void Sg2SlotSetLoop(s32 idx)

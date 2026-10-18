@@ -243,24 +243,28 @@ f32 GAMEUTIL_get_interp_value(f32 a, f32 b, f32 t) {
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0007_initmanager", GAMEUTIL_get_interp_value3D);
 
-/* NEARMISS-STUB GAMEUTIL_get_interp_value_ratio_pow */
-#if 0 /* NEARMISS 90.0% cat=sched sub=const-load-order | powf result compare: target loads 0.0 and 1.0 after the call (mtc1 zero before lui), ours hoists one | attempts=1 */
-f32 GAMEUTIL_get_interp_value_ratio_pow(f32 a, f32 b, f32 t, f32 e) {
-    f32 r = powf(t, e);
+f32 GAMEUTIL_get_interp_value_ratio_pow(f32 a, f32 b, f32 t, f32 power)
+{
+    f32 ratio = powf(t, power);
+    f32 result;
 
-    if (r <= 0.0f) {
-        return b;
+    if (ratio <= 0.0f) {
+        result = b;
+        goto done;
     }
-    if (1.0f <= r) {
-        return a;
+    if (ratio >= 1.0f) {
+        result = a;
+        goto done;
     }
     if (a == b) {
-        return a;
+        result = a;
+        goto done;
     }
-    return r * a + (1.0f - r) * b;
+    result = (ratio * a) + ((1.0f - ratio) * b);
+
+done:
+    return result;
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0007_initmanager", GAMEUTIL_get_interp_value_ratio_pow);
 
 /* NEARMISS-STUB GAMEUTIL_get_spring_damp_offset */
 #if 0 /* NEARMISS 68.68% cat=regalloc sub=- | no cause recorded | attempts=1 */
