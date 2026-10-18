@@ -6,6 +6,17 @@ u8 *GetSCRCharaAIWorkPtr();
 u8 *GetLayoutClass(void *chara);
 void boot_camera_lws_animation_by_script(s32 param);
 extern s32 SCameraLwsAnimationParam_PLAYER_ACCUMULATE_ATTACK_CAM_VIB;
+extern char gcGlobalVar[];
+void *SCRGetFirstObj(void *);
+int get_game_camera(int);
+int get_main_cameraman();
+void begin_object_interest_game_camera(int, int);
+int ClipCollisionDirectCallBackOneObj(void *, void *, void *, void *, int, int, int, int);
+extern char rootPtn[];
+extern float IdentityQuaternion[];
+extern float ZeroPoint[];
+void SetGeometryPointerNodePosState(void *, void *, int, float *, float *);
+void loadObj(void *, void *, void *, void *, int, int);
 
 void RequestCharacterMotionShiftFunc(void *chara, void (*func)(void));
 void func_4008ADA8(void);
@@ -32,11 +43,65 @@ void func_4008BF50(void);
 void func_4008C068(void);
 void func_4008F418(void);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0104_nico_CheckPlayerThroughObject", nico_CheckPlayerThroughObject);
+/* Inline, so gcc defers its own copy until after the caller below. */
+static inline int nico_CheckThroughObject_inl(void *a, char *o)
+{
+    char buf[0x50];
+    if (o != 0) {
+        void *t = *(void **)(o + 8);
+        u8 *lc;
+        if (t == 0) return 0;
+        lc = GetLayoutClass(a);
+        if (ClipCollisionDirectCallBackOneObj(buf, *(void **)(lc + 0x138), *(void **)(lc + 0x134), t, 0, 0, 0, 0) != 0) return 1;
+    }
+    return 0;
+}
+
+int nico_CheckPlayerThroughObject(char *o)
+{
+    void *p = SCRGetFirstObj(gcGlobalVar + 0x2B0);
+    if (p == 0) return 0;
+    return nico_CheckThroughObject_inl(p, o);
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0104_nico_CheckPlayerThroughObject", nico_CheckThroughObject);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0104_nico_CheckPlayerThroughObject", nico_CreatePlayerGetItemObject);
+typedef struct {
+    int a[4];
+    int b[3];
+    int c;
+    void *geom;
+    int d[2];
+    int e;
+    int f[3];
+} LoadReq;
+
+/* req.e is assigned twice: gcc keeps one store, but the duplicate gives the
+   original store order. */
+void nico_CreatePlayerGetItemObject(void *node, void *parent)
+{
+    char geom[0x40];
+    LoadReq req;
+
+    SetGeometryPointerNodePosState(geom, node, 0x10000, IdentityQuaternion, ZeroPoint);
+    req.e = 1;
+    req.a[0] = 0;
+    req.a[1] = 0;
+    req.a[2] = 0;
+    req.a[3] = 0;
+    req.geom = geom;
+    req.b[0] = 0;
+    req.b[1] = 0;
+    req.b[2] = 0;
+    req.c = 1;
+    req.d[0] = 0;
+    req.d[1] = 0;
+    req.e = 1;
+    req.f[0] = 0;
+    req.f[1] = 0;
+    req.f[2] = 0;
+    loadObj(parent, &req, rootPtn, gcGlobalVar + 0x280, 0, 4);
+}
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0104_nico_CheckPlayerThroughObject", player_IsHorseCtrlOff);
 s32 player_IsHorseCtrlOff(void)
@@ -62,11 +127,38 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0104_nico_CheckPlayerThroughOb
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0104_nico_CheckPlayerThroughObject", func_4008D978);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0104_nico_CheckPlayerThroughObject", nico_deletePlayerParachute);
+void unloadObj(void *);
+void nico_ResetCharacterObjFallDownInfo(void *);
+
+void nico_deletePlayerParachute(void *actor)
+{
+    void **p = (void **)(GetSCRCharaAIWorkPtr(actor) + 0x1BE0);
+    if (*p != 0) {
+        unloadObj(*p);
+        *p = 0;
+    }
+    nico_ResetCharacterObjFallDownInfo(actor);
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0104_nico_CheckPlayerThroughObject", func_4008DAB8);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0104_nico_CheckPlayerThroughObject", nico_resetPlayerHorseBridle);
+extern char *GetCharacterClass(void *);
+extern void nico_resetHorseRidingStatusForHorse(void *);
+
+static inline void *getHorse(void *a)
+{
+    void *h = *(void **)(GetCharacterClass(a) + 0x940);
+    if (h != a && *(short *)(GetCharacterClass(h) + 0x360) == 3)
+        return h;
+    return 0;
+}
+
+void nico_resetPlayerHorseBridle(void *a)
+{
+    void *h = getHorse(a);
+    if (h != 0)
+        nico_resetHorseRidingStatusForHorse(h);
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0104_nico_CheckPlayerThroughObject", func_4008DBB0);
 
@@ -82,11 +174,52 @@ void SCRPlayerRotateStop(void *chara)
     *(f32 *)(p + 0x50) = *(f32 *)(p + 0x50) * 0.5f;
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0104_nico_CheckPlayerThroughObject", SCRPlayerPickUp);
+extern void _omakeGetFlagSet(int);
+extern void _omakeSelectFlagSet(int);
+extern void SCRPlayerGetWeapon(int);
+extern void SetLayoutObjAccessSwitch(void *, int);
+extern void isysRequestDeleteObj(void *);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0104_nico_CheckPlayerThroughObject", SCRPlayerCallHorse);
+void SCRPlayerPickUp(void *a)
+{
+    char *w = GetSCRCharaAIWorkPtr(a);
+    if (*(void **)(w + 0xD20) == 0)
+        return;
+    *(s32 *)(w + 0x70) = 9;
+    _omakeGetFlagSet(0x10);
+    _omakeSelectFlagSet(0x10);
+    SCRPlayerGetWeapon(9);
+    SetLayoutObjAccessSwitch(*(void **)(w + 0xD20), 0);
+    *(void **)(w + 0xD20) = 0;
+    if (*(void **)(w + 0x110) != 0) {
+        isysRequestDeleteObj(*(void **)(w + 0x110));
+        *(void **)(w + 0x110) = 0;
+    }
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0104_nico_CheckPlayerThroughObject", SCRPlayerCallHorseEnd);
+void SCRPlayerCallHorse(void *actor)
+{
+    int temp_s0;
+    int temp_v0;
+
+    (*(signed char *)((char *)(GetSCRCharaAIWorkPtr(actor)) + 0xD2C)) = 1;
+    temp_s0 = get_game_camera(get_main_cameraman());
+    temp_v0 = (int)SCRGetFirstObj(gcGlobalVar + 0x2B4);
+    if (temp_v0 != 0) {
+        begin_object_interest_game_camera(temp_s0, temp_v0);
+    }
+}
+
+void end_object_interest_game_camera(int);
+
+void SCRPlayerCallHorseEnd(void *actor)
+{
+    void *temp_s0;
+
+    temp_s0 = GetSCRCharaAIWorkPtr(actor);
+    end_object_interest_game_camera(get_game_camera(get_main_cameraman()));
+    (*(signed char *)((char *)(temp_s0) + 0xD2C)) = 0;
+}
 
 void SCRPlayerReset(void) {
 }
@@ -240,7 +373,17 @@ void SCRPlayerFullPower(void *chara)
 void func_4008E160(void) {
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0104_nico_CheckPlayerThroughObject", torchAttached);
+void torchAttached(void *actor, float fparg0)
+{
+    void *temp_v0;
+
+    temp_v0 = GetSCRCharaAIWorkPtr(actor);
+    if ((*(int *)((char *)(temp_v0) + 0x70)) == 9) {
+        (*(float *)((char *)(temp_v0) + 0x84)) = fparg0;
+        (*(signed char *)((char *)(temp_v0) + 0x95)) = 0;
+        (*(float *)((char *)(temp_v0) + 0x88)) = (float) (*(float *)((char *)(gcGlobalVar) + 0x180));
+    }
+}
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0104_nico_CheckPlayerThroughObject", sendArrowPos);
 void sendArrowPos(u128 *dst, void *chara)
@@ -255,6 +398,25 @@ s32 sendArrowInfo(void)
     return *(s32 *)(GetSCRCharaAIWorkPtr() + 0x20);
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0104_nico_CheckPlayerThroughObject", nico_ResetPlayerHorseRidingControlAndContinueMotionCurrentSpeed);
+void ChangeCharacterObjControlTarget(int, int);
+void ChangeCharacterObjControlledTarget(int, int, int, int);
+void ResetCharacterClassSyncMode(void *);
+void ContinueMotionCurrentSpeed(void *);
+extern unsigned char InitialGeometryPointer[];
+
+void nico_ResetPlayerHorseRidingControlAndContinueMotionCurrentSpeed(void *arg0)
+{
+    void *temp_s0;
+    void *temp_s2;
+
+    temp_s0 = (*(void **)((char *)(GetCharacterClass(arg0)) + 0x950));
+    temp_s2 = GetCharacterClass(temp_s0);
+    ChangeCharacterObjControlTarget((int) temp_s0, (int) temp_s0);
+    ChangeCharacterObjControlledTarget((int) arg0, (int) arg0, (int) InitialGeometryPointer, 0);
+    ResetCharacterClassSyncMode(temp_s2);
+    (*(int *)((char *)(GetSCRCharaAIWorkPtr(temp_s0)) + 0xD28)) = 0;
+    nico_resetHorseRidingStatusForHorse(arg0);
+    ContinueMotionCurrentSpeed(arg0);
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0104_nico_CheckPlayerThroughObject", func_4008E288);
