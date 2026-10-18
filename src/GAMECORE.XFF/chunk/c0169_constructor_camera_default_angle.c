@@ -10,11 +10,26 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0169_constructor_camera_defaul
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0169_constructor_camera_default_angle", func_400DF098);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0169_constructor_camera_default_angle", get_cur_attr_camera_default_angle);
+extern s32 GAMEUTIL_get_cur_status_status_manager();
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0169_constructor_camera_default_angle", is_safety_camera_default_angle);
+s32 get_cur_attr_camera_default_angle(s32 a, s32 b, s32 c, s32 d)
+{
+    return GAMEUTIL_get_cur_status_status_manager(a, b, c, d);
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0169_constructor_camera_default_angle", is_must_reach_normal_default_angle);
+s32 is_safety_camera_default_angle(void)
+{
+    return GAMEUTIL_get_cur_status_status_manager() != 1;
+}
+
+void *CAM_get_ground_contact_obj(void *);
+int GAMEUTIL_is_boss_obj(void *, int);
+
+int is_must_reach_normal_default_angle(char *c)
+{
+    if (GAMEUTIL_is_boss_obj(CAM_get_ground_contact_obj(c + 0x240), 1) == 1 || *(int *)(*(char **)c + 4) == 2) return 1;
+    return 0;
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0169_constructor_camera_default_angle", func_400DF220);
 

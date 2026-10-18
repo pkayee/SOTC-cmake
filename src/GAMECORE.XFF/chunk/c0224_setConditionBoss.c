@@ -1,12 +1,31 @@
 #include "common.h"
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0224_setConditionBoss", setConditionBoss);
+extern int execCondition();
+extern int setConditionResultBoss();
+extern int setConditionResultHorse();
+extern int _gameWorkSet();
+extern void *getSCRDataCtrlWork(void *);
+extern void setSCRAttainRange(void *, unsigned int *);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0224_setConditionBoss", setConditionHorse);
+int setConditionBoss(int a, int b, int c, int d, int e, int f, int g)
+{
+    return setConditionResultBoss(execCondition(a, g));
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0224_setConditionBoss", SCRFuncSetGameWork);
+int setConditionHorse(int a, int b, int c, int d, int e, int f, int g)
+{
+    return setConditionResultHorse(execCondition(a, g));
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0224_setConditionBoss", SCRFuncSetAttainRange);
+int SCRFuncSetGameWork(int a, int b, int c, int d)
+{
+    return _gameWorkSet(b, c, c, d);
+}
+
+void SCRFuncSetAttainRange(void *a, int b, int c, int d, int e, int f, int g, unsigned int *h)
+{
+    setSCRAttainRange(getSCRDataCtrlWork(a), h);
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0224_setConditionBoss", func_4011EB70);
 

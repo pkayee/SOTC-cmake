@@ -357,7 +357,45 @@ void setAttainmentObjAndOffset(u8* work, u8* obj, u128* offset)
     *(u128*)(work + 0xD0) = *offset;
 }
 #endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0198_delISysPathObj", setAttainmentObjAndOffset);
+typedef union {
+    s128 q;
+    float f[4];
+    int i[4];
+} Vec4;
+
+typedef struct {
+    s8 pad0[0x90];
+    s32 active;
+    s32 target;
+    s8 link[0xC];
+    s32 linked;
+    s32 unkA8;
+    s32 unkAC;
+    s8 padB0[0x20];
+    Vec4 offset;
+    s8 padE0[0x310];
+    s32 unk3F0;
+} Attainment;
+
+void setAttainmentObjAndOffset(Attainment *a, s32 target, Vec4 *offset)
+{
+    a->active = 1;
+    if (a->linked != 0)
+    {
+        a->linked = 0;
+        DeleteTwoWayLink(a->link);
+    }
+    a->target = target;
+    if (target != 0)
+    {
+        AddTwoWayLinkNext(GetLayoutClass((void*)target) + 0x118, a->link);
+        a->linked = 1;
+    }
+    a->unk3F0 = 0;
+    a->unkA8 = 0;
+    a->unkAC = 0;
+    a->offset.q = offset->q;
+}
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0198_delISysPathObj", setAttainModePathWork);
 void setAttainModePathWork(u8* work, s32 value)
@@ -471,60 +509,70 @@ void setPathRayWideParam(u8* work, f32 rad, s32 value)
     *(s32*)(work + 0x3C20) = value;
 }
 
-/* NEARMISS-STUB setEventLineAttr */
-#if 0 /* NEARMISS 97.84% cat=branch-layout sub=- | branch-layout (loop blez/slt) | attempts=1 */
-u8* getLineData();
-u8* getPathInfo(u8* work);
+typedef struct {
+    s8 *data;
+    s32 *point;
+    s32 *line;
+    s32 *root;
+    s32 f10;
+    s32 f14;
+    s8 pad[0xC];
+} PathE;
 
-void setEventLineAttr(u8* work, s32 type, s32 flag)
+typedef struct {
+    PathE e[4];
+    s32 n;
+    s32 pad;
+} PathSet;
+
+void setEventLineAttr(u8* work, s32 id, s32 attr)
 {
-    u8* info = getPathInfo(work);
+    PathSet *s = (PathSet *)getPathInfo(work);
     s32 i;
-    s32 j;
-    for (i = 0; i < *(s32*)(info + 0x90); i++)
+    u32 j;
+
+    for (i = 0; i < s->n; i++)
     {
-        u8* block = *(u8**)(info + 8 + i * 0x24);
-        if (block != NULL)
+        s32 *arr = s->e[i].line;
+
+        if (arr == 0)
         {
-            for (j = 0; j < *(s32*)block; j++)
+            continue;
+        }
+        for (j = 0; j < *arr; j++)
+        {
+            u8* l = getLineData(arr, j);
+
+            if (id == *(s16*)(l + 0x10) || id == *(s16*)(l + 0x12))
             {
-                u8* line = getLineData(block, j);
-                if (type == *(s16*)(line + 0x10) || type == *(s16*)(line + 0x12))
-                {
-                    *(s32*)(line + 8) |= flag;
-                }
+                *(s32*)(l + 8) |= attr;
             }
         }
     }
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0198_delISysPathObj", setEventLineAttr);
 
-/* NEARMISS-STUB unsetEventLineAttr */
-#if 0 /* NEARMISS 97.95% cat=branch-layout sub=- | branch-layout | attempts=1 */
-u8* getLineData();
-u8* getPathInfo(u8* work);
-
-void unsetEventLineAttr(u8* work, s32 type, s32 flag)
+void unsetEventLineAttr(u8* work, s32 id, s32 attr)
 {
-    u8* info = getPathInfo(work);
+    PathSet *s = (PathSet *)getPathInfo(work);
     s32 i;
-    s32 j;
-    for (i = 0; i < *(s32*)(info + 0x90); i++)
+    u32 j;
+
+    for (i = 0; i < s->n; i++)
     {
-        u8* block = *(u8**)(info + 8 + i * 0x24);
-        if (block != NULL)
+        s32 *arr = s->e[i].line;
+
+        if (arr == 0)
         {
-            for (j = 0; j < *(s32*)block; j++)
+            continue;
+        }
+        for (j = 0; j < *arr; j++)
+        {
+            u8* l = getLineData(arr, j);
+
+            if (id == *(s16*)(l + 0x10) || id == *(s16*)(l + 0x12))
             {
-                u8* line = getLineData(block, j);
-                if (type == *(s16*)(line + 0x10) || type == *(s16*)(line + 0x12))
-                {
-                    *(s32*)(line + 8) &= ~flag;
-                }
+                *(s32*)(l + 8) &= ~attr;
             }
         }
     }
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0198_delISysPathObj", unsetEventLineAttr);

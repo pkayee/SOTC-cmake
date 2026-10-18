@@ -2,11 +2,27 @@
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0047_bootscelogo", bootscelogo);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0047_bootscelogo", bootscelogoscript);
+extern s32 ScriptSpriteMenuObjDef_SPRITE_SCE_LOGO_LAYOUT;
+void _SCRStartSpriteMenuAnim(s32 obj, s32 a1, s32 a2, s32 a3, s32 a4, s32 a5);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0047_bootscelogo", SCRBossDebugDeath);
+void bootscelogoscript(s32 a, s32 b)
+{
+    _SCRStartSpriteMenuAnim(ScriptSpriteMenuObjDef_SPRITE_SCE_LOGO_LAYOUT, 0, 0, a, b, 0);
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0047_bootscelogo", SCRMammothBreaksWall);
+extern void RequestCharacterMotionShiftFunc(void *character, void (*func)(void *character));
+extern void func_4004A408(void *character);
+extern void func_4004A448(void *character);
+
+void SCRBossDebugDeath(void *character)
+{
+    RequestCharacterMotionShiftFunc(character, &func_4004A408);
+}
+
+void SCRMammothBreaksWall(void *character)
+{
+    RequestCharacterMotionShiftFunc(character, func_4004A448);
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0047_bootscelogo", func_4004A408);
 
