@@ -64,7 +64,16 @@ void SetViewContext(void *arg0, int arg1, int arg2, float fparg0, float fparg1, 
     (*(float *)((char *)(arg0) + 8)) = (float) ((float) arg1 / (float) arg2);
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0194_GetScreenRadius", create_camera_context);
+extern char rootPtn[];
+void *iosMallocAlign(void *, s32, s32);
+void constructor_camera_context(void *);
+
+void *create_camera_context(void)
+{
+    void *c = iosMallocAlign(rootPtn, 0x620, 0x10);
+    constructor_camera_context(c);
+    return c;
+}
 
 void iosFree(void *);
 
@@ -79,13 +88,39 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0194_GetScreenRadius", construc
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0194_GetScreenRadius", GetScreenRadiusParticle);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0194_GetScreenRadius", init_camera_context_manager);
+extern char D_401C10C0[];
+extern void *D_401C1040;
+extern int D_4012E354;
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0194_GetScreenRadius", push_camera_context);
+void init_camera_context_manager(void)
+{
+    char *c = D_401C10C0;
+    constructor_camera_context(c);
+    D_4012E354 = 0;
+    D_401C1040 = c;
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0194_GetScreenRadius", pop_camera_context);
+void push_camera_context(void *m)
+{
+    if (D_4012E354 < 31) {
+        D_4012E354++;
+        (&D_401C1040)[D_4012E354] = m;
+        SetVSMatrix(m);
+    }
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0194_GetScreenRadius", get_cur_camera_context);
+void pop_camera_context(void)
+{
+    if (D_4012E354 > 0) {
+        D_4012E354--;
+        SetVSMatrix((&D_401C1040)[D_4012E354]);
+    }
+}
+
+int get_cur_camera_context(void)
+{
+    return (int) (&D_401C1040)[D_4012E354];
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0194_GetScreenRadius", func_400F2588);
 
