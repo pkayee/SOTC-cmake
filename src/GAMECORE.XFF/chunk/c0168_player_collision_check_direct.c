@@ -68,16 +68,71 @@ s32 func_400DE240(void *actor)
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0168_player_collision_check_direct", func_400DE240);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0168_player_collision_check_direct", func_400DE260);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0168_player_collision_check_direct", func_400DE260);
+
+extern int GAMEUTIL_is_boss_obj(void *obj, int flag);
+
+float func_400DE260(void *arg0, float *arg1)
+{
+    float f20;
+    float f21;
+
+    f20 = arg1[1];
+    f21 = arg1[0];
+    if (GAMEUTIL_is_boss_obj(arg0, 1) == 1)
+    {
+        return f20;
+    }
+    else
+    {
+        return f21;
+    }
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0168_player_collision_check_direct", func_400DE2A8);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0168_player_collision_check_direct", func_400DE438);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0168_player_collision_check_direct", func_400DE588);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0168_player_collision_check_direct", func_400DE588);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0168_player_collision_check_direct", func_400DE5A8);
+float func_400DE588(float *arg0, float *arg1, s32 arg2)
+{
+    float temp_f0;
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0168_player_collision_check_direct", func_400DE5D8);
+    temp_f0 = arg0[arg2] - arg1[arg2];
+    return temp_f0 * temp_f0;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0168_player_collision_check_direct", func_400DE5F8);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0168_player_collision_check_direct", func_400DE5A8);
+
+float func_400DE5A8(float *arg0, float *arg1, float *arg2, s32 arg3)
+{
+    float temp_f0;
+    float temp_f1;
+
+    temp_f0 = arg0[arg3] - arg1[arg3];
+    temp_f1 = arg1[arg3] - arg2[arg3];
+    temp_f0 = temp_f0 + temp_f0;
+    return temp_f0 * temp_f1;
+}
+
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0168_player_collision_check_direct", func_400DE5D8);
+
+float func_400DE5D8(float *arg0, float *arg1, s32 arg2)
+{
+    float temp_f0;
+
+    temp_f0 = arg0[arg2] - arg1[arg2];
+    return temp_f0 * temp_f0;
+}
+
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0168_player_collision_check_direct", func_400DE5F8);
+
+s32 func_400DE5F8(float arg0)
+{
+    if (0.0f <= arg0 && arg0 < 1.0f)
+    {
+        return 1;
+    }
+    return 0;
+}
