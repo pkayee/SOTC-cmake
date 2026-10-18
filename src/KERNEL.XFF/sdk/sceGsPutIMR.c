@@ -1,3 +1,14 @@
 #include "common.h"
+#include "sdk/ee/libgraph.h"
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/sdk/sceGsPutIMR", sceGsPutIMR);
+u_long GsGetIMR(void);
+u_long GsPutIMR(u_long imr);
+
+u_long sceGsPutIMR(u_long imr)
+{
+    u_long old;
+
+    old = GsGetIMR();
+    GsPutIMR(imr);
+    return old;
+}
