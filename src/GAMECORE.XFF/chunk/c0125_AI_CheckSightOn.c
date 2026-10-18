@@ -9,7 +9,47 @@ void AI_InitAnimalOptimize(char *pa0)
     *(int *)(pa0 + 0x8) = 0;
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0125_AI_CheckSightOn", AI_OptFloatFrameSample);
+u8 *GetCharacterClass(void *chara);
+u8 *GetLayoutClass(void *chara);
+s32 AI_CheckViewInCameraClipVolume(void *a0, void *a1);
+void *iosgluGetCameraContext(void);
+f32 GetScreenRadius(void *a0, void *a1, f32 a2);
+
+typedef struct {
+    s32 inView;
+    f32 minRadius;
+    f32 radius;
+} OptSample;
+
+static inline s32 isFloatVisible(OptSample *s, u8 *l)
+{
+    s32 buf[4];
+
+    s->inView = AI_CheckViewInCameraClipVolume(buf, *(void **)(l + 0x134));
+    if (s->inView != 0) {
+        s->radius = GetScreenRadius(iosgluGetCameraContext(), *(void **)(l + 0x134), 1.0f);
+        if (s->radius < s->minRadius) {
+            return 0;
+        }
+        return 1;
+    }
+    return 0;
+}
+
+s32 AI_OptFloatFrameSample(void *obj, OptSample *s)
+{
+    u8 *c = GetCharacterClass(obj);
+    u8 *l = GetLayoutClass(obj);
+
+    if (isFloatVisible(s, l) == 0) {
+        c[0x51B] = 0;
+        c[0x52A] = 1;
+        return 0;
+    }
+    c[0x52A] = 0;
+    c[0x51B] = 1;
+    return 1;
+}
 
 extern s128 ZeroVector;
 

@@ -12,9 +12,40 @@ u8 *GetScrLwsOriClass(u8 *p)
     return p + 0x20;
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0125_CreateScriptLwsOri", FlushScriptLwsOri);
+typedef struct {
+    void (*fn)(int);
+    int arg;
+} LwsCb;
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0125_CreateScriptLwsOri", SetScrLwsOriObjReleaseCallBackFunc);
+void flushScriptObj();
+void FlushCharacterObj();
+void FlushChildGroupManagerObj();
+void iosFree();
+
+void FlushScriptLwsOri(u8 *o)
+{
+    u8 *c = o[8] != 0x16 ? 0 : o + 0x20;
+    LwsCb *cb = (LwsCb *)(c + 0x115C);
+
+    if (cb->fn != 0) {
+        cb->fn(cb->arg);
+    }
+    flushScriptObj(o);
+    FlushCharacterObj(o);
+    FlushChildGroupManagerObj(o);
+    if (*(void **)(c + 0x1154) != 0) {
+        iosFree(*(void **)(c + 0x1154));
+    }
+}
+
+void SetScrLwsOriObjReleaseCallBackFunc(u8 *o, s32 a, s32 b)
+{
+    u8 *c = o[8] != 0x16 ? 0 : o + 0x20;
+    s32 *f = (s32 *)(c + 0x115C);
+
+    f[0] = a;
+    f[1] = b;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0125_CreateScriptLwsOri", InitScriptLwsOrientObj);
 
@@ -29,9 +60,26 @@ s32 GetScriptLwsOrientObjWorkSize(s32 arg0)
     return temp_s1 + GetScriptObjWorkSize(arg0 + 0x134);
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0125_CreateScriptLwsOri", SetScriptLwsOrientObjDefaultScriptFunc);
+extern int D_4012B2A4;
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0125_CreateScriptLwsOri", CreateScriptLwsOrientDefObj);
+void SetScriptLwsOrientObjDefaultScriptFunc(int arg0)
+{
+    D_4012B2A4 = arg0;
+}
+
+void func_400A24A0(void);
+void func_400A1EA0(int **, void *, void *);
+void *_isysCreateObj(void *, s32, s32, s32, void (*)(void), s32);
+int GetLwsOrientNodeNum(int);
+
+void *CreateScriptLwsOrientDefObj(void *grp, int size, int **res)
+{
+    int n = GetLwsOrientNodeNum(*(int *)((char *)*res + 0x20)) * 12 + 0x33;
+    void *o = _isysCreateObj(grp, 0x17, 0x80, size + n, func_400A24A0, 0x10);
+
+    func_400A1EA0(res, o, grp);
+    return o;
+}
 
 char *GetScriptLwsOrientDefinfo(unsigned char *p)
 {
