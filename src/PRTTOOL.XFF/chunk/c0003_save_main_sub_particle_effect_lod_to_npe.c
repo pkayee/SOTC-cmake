@@ -1,5 +1,13 @@
 #include "common.h"
 
+extern int D_400193CC;
+extern int D_400193C4;
+extern char D_4002B910[];
+extern char D_4002BF08[];
+
+extern int D_400193D0;
+extern int D_400198E0;
+
 INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0003_save_main_sub_particle_effect_lod_to_npe", save_main_sub_particle_effect_lod_to_npe_file);
 
 INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0003_save_main_sub_particle_effect_lod_to_npe", func_40014858);
@@ -149,16 +157,68 @@ INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0003_save_main_sub_particle_eff
 
 INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0003_save_main_sub_particle_effect_lod_to_npe", func_40015ED0);
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0003_save_main_sub_particle_effect_lod_to_npe", func_40015EE0);
+//INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0003_save_main_sub_particle_effect_lod_to_npe", func_40015EE0);
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0003_save_main_sub_particle_effect_lod_to_npe", func_40015F08);
+char *func_40015EE0(void) {
+    if (D_400193C4 == 1) {
+        return D_4002B910;
+    }
+    return D_4002BF08;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0003_save_main_sub_particle_effect_lod_to_npe", func_40015F38);
+//INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0003_save_main_sub_particle_effect_lod_to_npe", func_40015F08);
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0003_save_main_sub_particle_effect_lod_to_npe", func_40015F68);
+char *func_40015F08(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + 0x20;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0003_save_main_sub_particle_effect_lod_to_npe", func_40015F98);
+//INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0003_save_main_sub_particle_effect_lod_to_npe", func_40015F38);
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0003_save_main_sub_particle_effect_lod_to_npe", func_40015FC8);
+char *func_40015F38(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + 0x4;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0003_save_main_sub_particle_effect_lod_to_npe", func_40015FD8);
+//INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0003_save_main_sub_particle_effect_lod_to_npe", func_40015F68);
+
+char *func_40015F68(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + 0x60;
+}
+
+char *func_40015F98(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + 0x64;
+}
+
+//INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0003_save_main_sub_particle_effect_lod_to_npe", func_40015FC8);
+
+int *func_40015FC8(void) {
+    return &D_400193CC;
+}
+
+int *func_40015FD8(void) {
+    D_400198E0 = D_400193D0;
+    return &D_400198E0;
+}
