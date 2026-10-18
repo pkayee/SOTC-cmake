@@ -31,32 +31,21 @@ int SCRConditionKameFallPatienceCunterCheck(void *actor)
     return r;
 }
 
-/* NEARMISS-STUB SCRFuncKameSetMissileRadius */
-#if 0 /* NEARMISS 93.1% cat=branch-layout sub=- | work ptr reg v0 vs v1 swap; p2 store should be likely-branch delay slot | attempts=1 */
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0162_func_400D7B48", SCRFuncKameSetMissileRadius);
 void SCRFuncKameSetMissileRadius(f32 param_1, f32 param_2, f32 param_3)
 {
     void *GetSCRCharaAIWorkPtr();
-    s32 v;
-    void *work;
+    u8 *work;
 
     work = GetSCRCharaAIWorkPtr();
     if (param_1 != 0.0f) {
-        *(s32 *)((u8 *)work + 0x41A4) = 0;
-    } else {
-        v = 1;
-        if (param_2 != 0.0f) {
-            *(s32 *)((u8 *)work + 0x41A4) = 1;
-            return;
-        }
-        v = 2;
-        if (param_3 != 0.0f) {
-            *(s32 *)((u8 *)work + 0x41A4) = v;
-        }
+        *(s32 *)(work + 0x41A4) = 0;
+    } else if (param_2 != 0.0f) {
+        *(s32 *)(work + 0x41A4) = 1;
+    } else if (param_3 != 0.0f) {
+        *(s32 *)(work + 0x41A4) = 2;
     }
-    return;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0162_func_400D7B48", SCRFuncKameSetMissileRadius);
 
 void SCRFuncKameDemoFlagSet(void *actor)
 {
