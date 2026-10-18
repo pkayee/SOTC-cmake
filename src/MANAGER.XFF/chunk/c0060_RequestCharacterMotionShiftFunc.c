@@ -1,27 +1,30 @@
 #include "common.h"
 
-/* NEARMISS-STUB RequestCharacterMotionShiftFunc */
-#if 0 /* NEARMISS 60.0% cat=regalloc sub=- | xor/movz ternary shape kind==9||0x16 ? p+0x90 : 0; temp in a0/a3 not a2 | attempts=1 */
-/* best C (60.5%): RequestCharacterMotionShiftFunc, see cause in RESULT line */
-void RequestCharacterMotionShiftFunc(s32 param_1, s32 param_2)
+static inline u8 *chrClass(u8 *obj)
 {
-    s32 iVar2;
-    s8 cVar1;
-
-    iVar2 = param_1 + 0x90;
-    if (*(u8 *)(param_1 + 8) != 9 && (iVar2 = 0, *(u8 *)(param_1 + 8) == 0x16))
+    switch (obj[8])
     {
-        iVar2 = param_1 + 0x90;
-    }
-    cVar1 = *(s8 *)(iVar2 + 0x52D);
-    if (cVar1 < 8)
-    {
-        *(s8 *)(iVar2 + 0x52D) = *(s8 *)(iVar2 + 0x52D) + 1;
-        *(s32 *)(cVar1 * 4 + iVar2 + 0x540) = param_2;
+        case 9:
+            return obj + 0x90;
+        case 0x16:
+            return obj + 0x90;
+        default:
+            return NULL;
     }
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0060_RequestCharacterMotionShiftFunc", RequestCharacterMotionShiftFunc);
+
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0060_RequestCharacterMotionShiftFunc", RequestCharacterMotionShiftFunc);
+void RequestCharacterMotionShiftFunc(u8 *obj, s32 func)
+{
+    u8 *cc = chrClass(obj);
+    s8 n = cc[0x52D];
+
+    if (n < 8)
+    {
+        cc[0x52D]++;
+        *(s32 *)(cc + n * 4 + 0x540) = func;
+    }
+}
 
 /* NEARMISS-STUB GetCharacterClassNodeQuaternionPos */
 #if 0 /* NEARMISS 99.8% cat=regalloc sub=arg reg v1 vs v0 for const 1 store | const 1 in v1 not v0 at sb 0x523 (after GetMotionMatrix call) | attempts=1 */
@@ -65,20 +68,17 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0060_RequestCharacterMotionShif
 
 
 
-/* NEARMISS-STUB ResetCharacterClassSyncMode */
-#if 0 /* NEARMISS 87.0% cat=sched sub=- | store order after DeleteTwoWayLink | attempts=1 */
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0060_RequestCharacterMotionShiftFunc", ResetCharacterClassSyncMode);
 void ResetCharacterClassSyncMode(s32 param_1)
 {
     if (*(s32 *)(param_1 + 0xC70) != 0)
     {
         DeleteTwoWayLink(param_1 + 0xC80);
+        *(u8 *)(param_1 + 0xD00) = 0;
         *(s32 *)(param_1 + 0xC70) = 0;
         *(u8 *)(param_1 + 0xD01) = 0;
-        *(u8 *)(param_1 + 0xD00) = 0;
     }
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0060_RequestCharacterMotionShiftFunc", ResetCharacterClassSyncMode);
 
 
 
@@ -245,45 +245,31 @@ f32 GetCharacterClassCurAnimationCurFrame(s32 param_1)
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0060_RequestCharacterMotionShiftFunc", regularizeMatAry);
 
-/* NEARMISS-STUB acceptMotionShiftFunc */
-#if 0 /* NEARMISS 87.69% cat=regalloc sub=- | cmp 0x16 emitted as xori not li+xor; movz select copies p+0x90 via a0 not v1 and cVar1 in v1 not a0; target lbu a0 keeps cVar1 in a0 | attempts=1 */
-void acceptMotionShiftFunc(s32 param_1)
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0060_RequestCharacterMotionShiftFunc", acceptMotionShiftFunc);
+void acceptMotionShiftFunc(u8 *obj)
 {
-    u8 cVar1;
-    s8 cVar5;
+    u8 *cc = chrClass(obj);
+    s8 cVar1;
     s32 iVar2;
-    s32 iVar4;
     s32 *piVar3;
 
-    cVar1 = *(u8 *)(param_1 + 8);
-    iVar2 = param_1 + 0x90;
-    if (cVar1 != 9)
+    cVar1 = *(s8 *)(cc + 0x52D);
+    if (cVar1 > 0)
     {
-        iVar2 = 0;
-        if (cVar1 == 0x16)
-        {
-            iVar2 = param_1 + 0x90;
-        }
-    }
-    cVar5 = *(s8 *)(iVar2 + 0x52D);
-    if (cVar5 > 0)
-    {
-        piVar3 = (s32 *)(iVar2 + 0x540);
-        iVar4 = cVar5;
+        piVar3 = (s32 *)(cc + 0x540);
+        iVar2 = cVar1;
         do
         {
             if (*piVar3 != 0)
             {
-                ((void (*)(s32))*piVar3)(param_1);
+                ((void (*)(u8 *))*piVar3)(obj);
                 *piVar3 = 0;
             }
             piVar3++;
-        } while (--iVar4 != 0);
+        } while (--iVar2 != 0);
     }
-    *(s8 *)(iVar2 + 0x52D) = 0;
+    *(s8 *)(cc + 0x52D) = 0;
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0060_RequestCharacterMotionShiftFunc", acceptMotionShiftFunc);
 
 /* NEARMISS-STUB GetCalcNumObjWorkSize */
 #if 0 /* NEARMISS 57.9% cat=branch-layout sub=if(p3) movn vs branch | compiler emits movn for if(p3) iVar2=iVar3+0x66; asm uses beqz branch; also register names t0/a4-a6 differ | attempts=1 */
@@ -345,65 +331,32 @@ f32 GetCharSuspension1D(f32 param_1, f32 param_2, f32 param_3, f32 param_4, f32 
 #endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0060_RequestCharacterMotionShiftFunc", GetCharSuspension1D);
 
-/* NEARMISS-STUB SetCharacterObjControlCallBackFunc */
-#if 0 /* NEARMISS 50.0% cat=regalloc sub=- | kind select xori+movz vs xor-reg | attempts=1 */
-void SetCharacterObjControlCallBackFunc(s32 param_1, s32 param_2)
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0060_RequestCharacterMotionShiftFunc", SetCharacterObjControlCallBackFunc);
+void SetCharacterObjControlCallBackFunc(u8 *obj, s32 f)
 {
-    s32 iVar1;
-    s32 kind;
-    s32 base;
-
-    kind = *(u8 *)(param_1 + 8);
-    base = param_1 + 0x90;
-    iVar1 = base;
-    if (kind != 9)
-    {
-        iVar1 = 0;
-        if (kind == 0x16)
-        {
-            iVar1 = base;
-        }
-    }
-    *(s32 *)(iVar1 + 0x9B8) = param_2;
+    *(s32 *)(chrClass(obj) + 0x9B8) = f;
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0060_RequestCharacterMotionShiftFunc", SetCharacterObjControlCallBackFunc);
 
 
 
-/* NEARMISS-STUB SetCharacterObjControlBypassFunc */
-#if 0 /* NEARMISS 50.0% cat=regalloc sub=- | kind select xori+movz vs xor-reg | attempts=1 */
-void SetCharacterObjControlBypassFunc(s32 param_1, s32 param_2)
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0060_RequestCharacterMotionShiftFunc", SetCharacterObjControlBypassFunc);
+void SetCharacterObjControlBypassFunc(u8 *obj, s32 f)
 {
-    s32 iVar1;
+    u8 *cc = chrClass(obj);
 
-    iVar1 = param_1 + 0x90;
-    if (*(u8 *)(param_1 + 8) != 9 && (iVar1 = 0, *(u8 *)(param_1 + 8) == 0x16))
-    {
-        iVar1 = param_1 + 0x90;
-    }
-    *(s32 *)(iVar1 + 0x9BC) = param_2;
+    *(s32 *)(cc + 0x9BC) = f;
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0060_RequestCharacterMotionShiftFunc", SetCharacterObjControlBypassFunc);
 
 
-/* NEARMISS-STUB ChangeCharacterObjCollisionEnableFlag */
-#if 0 /* NEARMISS 91.39% cat=regalloc sub=- | callee-saved regs swapped: ours s2=param_2 s3=param_1, target s2=param_1 (struct base) s3=param_2; xor/movn shape and loop match | attempts=1 */
-void ChangeCharacterObjCollisionEnableFlag(s32 param_1, s32 param_2)
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0060_RequestCharacterMotionShiftFunc", ChangeCharacterObjCollisionEnableFlag);
+void ChangeCharacterObjCollisionEnableFlag(u8 *obj, s32 param_2)
 {
-    s32 iVar2;
+    u8 *cc = chrClass(obj);
     s32 *piVar3;
     s32 iVar4;
-    u8 cVar1;
+    s32 iVar2;
 
-    cVar1 = *(u8 *)(param_1 + 8);
-    iVar2 = param_1 + 0x90;
-    if (cVar1 != 9 && cVar1 != 0x16)
-    {
-        iVar2 = 0;
-    }
-    piVar3 = (s32 *)(iVar2 + 0x5A0);
+    piVar3 = (s32 *)(cc + 0x5A0);
     for (iVar4 = 3; iVar4 != -1; iVar4--)
     {
         iVar2 = *piVar3++;
@@ -412,25 +365,18 @@ void ChangeCharacterObjCollisionEnableFlag(s32 param_1, s32 param_2)
             SetLayoutObjCollisionEnableFlag(iVar2, param_2);
         }
     }
-    SetLayoutObjCollisionEnableFlag(param_1, param_2);
+    SetLayoutObjCollisionEnableFlag(obj, param_2);
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0060_RequestCharacterMotionShiftFunc", ChangeCharacterObjCollisionEnableFlag);
 
-/* NEARMISS-STUB ChangeCharacterObjCollisionResourceAttribute */
-#if 0 /* NEARMISS 92.0% cat=regalloc sub=- | saved-arg regs s8 vs s2 | attempts=1 */
-void ChangeCharacterObjCollisionResourceAttribute(s32 param_1, s32 param_2, s32 param_3, s32 param_4, s32 param_5, s32 param_6, s32 param_7)
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0060_RequestCharacterMotionShiftFunc", ChangeCharacterObjCollisionResourceAttribute);
+void ChangeCharacterObjCollisionResourceAttribute(u8 *obj, s32 param_2, s32 param_3, s32 param_4, s32 param_5, s32 param_6, s32 param_7)
 {
-    s32 iVar2;
+    u8 *cc = chrClass(obj);
     s32 *piVar3;
     s32 iVar4;
+    s32 iVar2;
 
-    iVar2 = param_1 + 0x90;
-    if (*(u8 *)(param_1 + 8) != 9 && *(u8 *)(param_1 + 8) != 0x16)
-    {
-        iVar2 = 0;
-    }
-    piVar3 = (s32 *)(iVar2 + 0x5A0);
+    piVar3 = (s32 *)(cc + 0x5A0);
     for (iVar4 = 3; iVar4 != -1; iVar4--)
     {
         iVar2 = *piVar3++;
@@ -439,40 +385,22 @@ void ChangeCharacterObjCollisionResourceAttribute(s32 param_1, s32 param_2, s32 
             ChangeLayoutObjCollisionResourceAttribute(iVar2, param_2, param_3, param_4, param_5, param_6, param_7);
         }
     }
-    ChangeLayoutObjCollisionResourceAttribute(param_1, param_2, param_3, param_4, param_5, param_6, param_7);
+    ChangeLayoutObjCollisionResourceAttribute(obj, param_2, param_3, param_4, param_5, param_6, param_7);
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0060_RequestCharacterMotionShiftFunc", ChangeCharacterObjCollisionResourceAttribute);
 
-/* NEARMISS-STUB SetCharacterObjCollisionProcFlag */
-#if 0 /* NEARMISS 59.8% cat=regalloc sub=p2 kept in s1 across jal | asm keeps param_2 in s1 across FlushCollisionFinder (frame 0x20, sd s1); C proves p2==0 in flush branch so gcc stores constant zero, frame 0x10; also movz for t | attempts=1 */
 void FlushCollisionFinder();
 
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0060_RequestCharacterMotionShiftFunc", SetCharacterObjCollisionProcFlag);
 void SetCharacterObjCollisionProcFlag(s32 param_1, s32 param_2)
 {
-    s32 iVar1;
+    u8 *cc = chrClass((u8 *)param_1);
 
-    iVar1 = param_1 + 0x90;
-    if (*(u8 *)(param_1 + 8) != 9 && (iVar1 = 0, *(u8 *)(param_1 + 8) == 0x16))
+    if (*(s8 *)(cc + 0x51F) != 0 && param_2 == 0)
     {
-        iVar1 = param_1 + 0x90;
+        FlushCollisionFinder(cc + 0xD90);
     }
-    if (*(s8 *)(iVar1 + 0x51F) == 0)
-    {
-        *(s8 *)(iVar1 + 0x51F) = param_2;
-    }
-    else if (param_2 == 0)
-    {
-        FlushCollisionFinder(iVar1 + 0xD90);
-        *(s8 *)(iVar1 + 0x51F) = param_2;
-    }
-    else
-    {
-        *(s8 *)(iVar1 + 0x51F) = param_2;
-    }
+    *(s8 *)(cc + 0x51F) = param_2;
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0060_RequestCharacterMotionShiftFunc", SetCharacterObjCollisionProcFlag);
 void GetGeometryPointerSurfaceAttribute();
 
 u64 GetGeometryPointerCharColAttr(s32 param_1)
@@ -483,43 +411,30 @@ u64 GetGeometryPointerCharColAttr(s32 param_1)
     return auStack_20[0];
 }
 
-/* NEARMISS-STUB GetParentCharColAttr */
-#if 0 /* NEARMISS 84.4% cat=no-c-form sub=mid-function glabel func_400587E8 | asm has mid-function glabel func_400587E8 (second entry after lw 0x124, C cannot emit); also movn/beqzl layout and reg order differ | attempts=1 */
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0060_RequestCharacterMotionShiftFunc", GetParentCharColAttr);
 u8 *GetLayoutClass();
 
-s32 GetParentCharColAttr(u64 *param_1, s32 param_2)
+s32 GetParentCharColAttr(u64 *param_1, u8 *obj)
 {
-    s32 iVar1;
-    s32 iVar2;
-    s32 iVar3;
-    s32 iVar4;
+    u8 *layout;
+    u8 *cc;
 
-    iVar4 = 0;
-    iVar1 = (s32)GetLayoutClass(param_2);
-    if (iVar1 != 0)
+    layout = GetLayoutClass(obj);
+    if (layout != NULL)
     {
-        iVar1 = *(s32 *)(iVar1 + 0x124);
-        if (iVar1 != 0)
+        if (*(s32 *)(layout + 0x124) != 0)
         {
-            iVar2 = *(u8 *)(param_2 + 8);
-            iVar3 = param_2 + 0x90;
-            if (iVar2 != 9 && iVar2 != 0x16)
+            cc = chrClass(obj);
+            if (cc != NULL)
             {
-                iVar3 = 0;
-            }
-            if (iVar3 != 0)
-            {
-                iVar4 = 1;
-                *param_1 = *(u64 *)(iVar3 + 0x680);
-                return iVar4;
+                *param_1 = *(u64 *)(cc + 0x680);
+                return 1;
             }
         }
     }
     *param_1 = 0;
-    return iVar4;
+    return 0;
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0060_RequestCharacterMotionShiftFunc", GetParentCharColAttr);
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0060_RequestCharacterMotionShiftFunc", PredictMotionGeometryPotential);
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0060_RequestCharacterMotionShiftFunc", PredictMotionGeometryPotentialWithScaleElem);
