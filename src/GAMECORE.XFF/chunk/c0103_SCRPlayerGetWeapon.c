@@ -327,6 +327,37 @@ s32 getPlayerLastParentObj(void)
     return D_40131B48;
 }
 
+/* NEARMISS-STUB playerPlaneJudgeFunc */
+#if 0 /* NEARMISS 89.2% cat=regalloc sub=hi-mid-swap | gcc loads 0xF800<<20 mid-mask constant before 0xF000<<30 hi-mask; hi and mid swap registers (a2/a3) so mid chain and final bne compare wrong regs; reorders and  | attempts=1 */
+s64 *GetCollisionDBAttributeAdr(void);
+
+s32 playerPlaneJudgeFunc(void)
+{
+    s64 attr;
+    s64 kind;
+    s64 hi;
+    s64 mid;
+
+    attr = *(s64 *)GetCollisionDBAttributeAdr();
+    kind = attr & 0x7C000000;
+    hi = attr & ((s64)0xF000 << 30);
+    mid = attr & ((s64)0xF800 << 20);
+
+    if (kind == 0x34000000 || kind == 0x64000000 || kind == 0x68000000 || kind == 0x6C000000 || kind == 0x24000000 || kind == 0x48000000 || kind == 0x30000000 || kind == 0x04000000)
+    {
+        return 0;
+    }
+    if (mid == ((s64)0x8000 << 18) || mid == ((s64)0xB800 << 20) || mid == ((s64)0x8000 << 16) || mid == ((s64)0xC000 << 18) || mid == ((s64)0xA000 << 19) || mid == ((s64)0xA000 << 18))
+    {
+        return 0;
+    }
+    if (hi != ((s64)0x8000 << 28))
+    {
+        return 1;
+    }
+    return 0;
+}
+#endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0103_SCRPlayerGetWeapon", playerPlaneJudgeFunc);
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0103_SCRPlayerGetWeapon", torchObjRelease);
@@ -392,4 +423,57 @@ s32 nico_playerCheckNippingWithHorseAndWall(s32 obj)
     return 0;
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0103_SCRPlayerGetWeapon", player_setWeaponScriptSwitch);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0103_SCRPlayerGetWeapon", player_setWeaponScriptSwitch);
+extern s32 DldSysUndefSymbol;
+
+void player_setWeaponScriptSwitch(s32 obj, u8 *arg)
+{
+    u8 *chara;
+    u8 *q;
+    u8 *q2;
+    s32 word;
+    s32 *p;
+    s32 r;
+
+    chara = GetCharacterClass(obj);
+    q = arg + 0x14;
+    word = *(s32 *)q;
+    if ((word & 0x3FFFF) != 0)
+    {
+        p = *(s32 **)(q - (word & 0x3FFFF));
+    }
+    else
+    {
+        p = 0;
+    }
+    if (p != 0 && (s32)p != DldSysUndefSymbol)
+    {
+        r = p[4] + (((u32)word >> 18) & 0xFFF) * ((s32 *)p[2])[3];
+    }
+    else
+    {
+        r = 0;
+    }
+    *(s32 *)(chara + 0x1074) = r;
+
+    chara = GetCharacterClass(obj);
+    q2 = arg + 0x18;
+    word = *(s32 *)q2;
+    if ((word & 0x3FFFF) != 0)
+    {
+        p = *(s32 **)(q2 - (word & 0x3FFFF));
+    }
+    else
+    {
+        p = 0;
+    }
+    if (p != 0 && (s32)p != DldSysUndefSymbol)
+    {
+        r = p[4] + (((u32)word >> 18) & 0xFFF) * ((s32 *)p[2])[3];
+    }
+    else
+    {
+        r = 0;
+    }
+    *(s32 *)(chara + 0x1078) = r;
+}
