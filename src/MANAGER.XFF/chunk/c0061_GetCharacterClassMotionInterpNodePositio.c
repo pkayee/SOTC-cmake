@@ -1,5 +1,18 @@
 #include "common.h"
 
+static inline u8 *chrClass(u8 *obj)
+{
+    switch (obj[8])
+    {
+        case 9:
+            return obj + 0x90;
+        case 0x16:
+            return obj + 0x90;
+        default:
+            return NULL;
+    }
+}
+
 extern s32 motdebugprint;
 extern s32 D_4012AA00;
 extern s32 D_4012AA04;
@@ -93,31 +106,30 @@ s32 SetCharacterObjMotionShiftCallBackEntry(void *obj, s32 idx, s32 p2, s32 p3, 
 #endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0061_GetCharacterClassMotionInterpNodePositio", SetCharacterObjMotionShiftCallBackEntry);
 
-/* NEARMISS-STUB SetCharacterObjParentPlaneDiscontinuousJudgeFunc */
-#if 0 /* NEARMISS 55.0% cat=regalloc sub=- | xor-register+movz vs xori; obj+0x90 computed before branch | attempts=1 */
-/* best partial shape (none at 100%), MANAGER.XFF c0061, scratch only */
-
-/* SetCharacterObjParentPlaneDiscontinuousJudgeFunc: 55.8% (best of the setters) */
-static inline u8 *CharacterObjJudgeSlot(u8 *obj) {
-    u8 t = obj[8];
-
-    if (t != 9 && t != 0x16) {
-        return NULL;
-    }
-    return obj + 0x90;
-}
-
 void SetCharacterObjParentPlaneDiscontinuousJudgeFunc(u8 *obj, s32 val) {
-    u8 *p = CharacterObjJudgeSlot(obj);
+    u8 *cc = chrClass(obj);
 
-    *(s32 *)(p + 0xBB0) = val;
+    *(s32 *)(cc + 0xBB0) = val;
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0061_GetCharacterClassMotionInterpNodePositio", SetCharacterObjParentPlaneDiscontinuousJudgeFunc);
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0061_GetCharacterClassMotionInterpNodePositio", SetCharacterObjParentPlaneDiscontinuousJudgeFunc);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0061_GetCharacterClassMotionInterpNodePositio", SetCharacterObjParentPointXZFitGpChangeJudgeFunc);
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0061_GetCharacterClassMotionInterpNodePositio", SetCharacterObjParentPointXZFitGpChangeJudgeFunc);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0061_GetCharacterClassMotionInterpNodePositio", SetCharacterObjColSphereOverrideFunc);
+void SetCharacterObjParentPointXZFitGpChangeJudgeFunc(u8 *obj, s32 a1, s32 a2) {
+    u8 *cc = chrClass(obj);
+
+    *(s32 *)(cc + 0xA7C) = a1;
+    *(u8 *)(cc + 0xA80) = a2;
+}
+
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0061_GetCharacterClassMotionInterpNodePositio", SetCharacterObjColSphereOverrideFunc);
+
+void SetCharacterObjColSphereOverrideFunc(u8 *obj, s32 a1, s32 a2) {
+    u8 *cc = chrClass(obj);
+
+    *(s32 *)(cc + 0x574) = a1;
+    *(s32 *)(cc + 0x570) = a2;
+}
 
 /* NEARMISS-STUB SetInertiaRotInterpMode */
 #if 0 /* NEARMISS 69.0% cat=regalloc sub=- | xor-reg+movz slot select vs xori+movn; store order | attempts=1 */
@@ -212,7 +224,13 @@ s32 CallMotShiftCallBackElemEntryFunc(MotShiftCallBackListEntry *list, s32 id, v
     return -1;
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0061_GetCharacterClassMotionInterpNodePositio", SetCharacterObjScriptKeyEnableFlagOnDemoOrient);
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0061_GetCharacterClassMotionInterpNodePositio", SetCharacterObjScriptKeyEnableFlagOnDemoOrient);
+
+void SetCharacterObjScriptKeyEnableFlagOnDemoOrient(u8 *obj, s32 a1) {
+    u8 *cc = chrClass(obj);
+
+    *(u8 *)(cc + 0x527) = a1;
+}
 
 //INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0061_GetCharacterClassMotionInterpNodePositio", getMotionDebugPrintMode);
 
