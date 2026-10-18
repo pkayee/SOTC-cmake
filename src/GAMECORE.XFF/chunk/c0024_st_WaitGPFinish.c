@@ -6,11 +6,29 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0024_st_WaitGPFinish", func_40
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0024_st_WaitGPFinish", st_jumphokoraflow);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0024_st_WaitGPFinish", jumphokoraflowDemoStart);
+extern int jumphokoraFlag;
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0024_st_WaitGPFinish", jumphokoraflowDemoEnd);
+int jumphokoraflowDemoStart(void)
+{
+    return jumphokoraFlag & 1;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0024_st_WaitGPFinish", jumphokoraGetDemoInfo);
+void jumphokoraflowDemoEnd(int a)
+{
+    int *f = &jumphokoraFlag;
+
+    f[1] = a;
+    f[0] |= 2;
+}
+
+extern int D_40200EE0;
+extern int D_40200EE4;
+
+void jumphokoraGetDemoInfo(int *arg0, int *arg1)
+{
+    *arg0 = D_40200EE0;
+    *arg1 = D_40200EE4;
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0024_st_WaitGPFinish", func_4002FA60);
 
