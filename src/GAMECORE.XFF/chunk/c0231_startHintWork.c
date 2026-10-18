@@ -5,12 +5,13 @@ void _gameIWorkSet(s32 idx, s32 val);
 extern s32 DldSysUndefSymbol;
 extern char *getSCRDataCtrlWork(void *);
 
-s32 startHintWork(void)
+void startHintWork(void)
 {
     if (_gameIWorkChk(14) == -1)
     {
         _gameIWorkSet(14, 0);
     }
+    return;
 }
 
 s32 SCRConditionHintPlayFunc(void *a, s32 b, s32 c, s32 d, s32 e, s32 f, s32 g, s32 i, u32 *h)
