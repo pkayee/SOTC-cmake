@@ -226,52 +226,39 @@ void set_screen_size(CamScreen *s, s32 w, s32 h)
     *scale = (((f32)s->wide / (f32)dispW) / ((f32)h / (f32)dispH)) * (f32)drawH / 448.0f;
 }
 
-/* NEARMISS-STUB set_screen_wide_and_progressive */
-#if 0 /* NEARMISS 65.08% cat=branch-layout sub=- | target branch order: beqz wide to else arm, delay slots filled with lui v0 and single swc1 at the join | attempts=1 */
 void set_screen_wide_and_progressive(s32 wide, s32 progressive)
 {
-    if (wide != 0)
-    {
-        if (progressive != 0)
-        {
-            D_4012E36C = 1.0f;
-        }
-        else
-        {
+    if (wide != 0) {
+        if (progressive == 0) {
             D_4012E36C = 1.3333333f;
-        }
-    }
-    else
-    {
-        if (progressive != 0)
-        {
-            D_4012E36C = 0.75f;
-        }
-        else
-        {
+        } else {
             D_4012E36C = 1.0f;
+        }
+    } else {
+        if (progressive == 0) {
+            D_4012E36C = 1.0f;
+        } else {
+            D_4012E36C = 0.75f;
         }
     }
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0198_add_object_animation_camera_region", set_screen_wide_and_progressive);
 
 void set_view_angle(CamScreen *s, f32 angle)
 {
     s->viewAngle = angle;
 }
 
-/* NEARMISS-STUB set_scissor_screen_size */
-#if 0 /* NEARMISS 74.0% cat=regalloc sub=- | target copies computed element ptr v0 into a0 (daddu a0,v0,0) before the two stores; C keeps it in one reg | attempts=1 */
+typedef struct ScissorCntrl {
+    char pad0[0x190];
+    s32 width[2];
+    s32 height[2];
+} ScissorCntrl;
+
 void set_scissor_screen_size(CamScreen *s, s32 idx, s32 x, s32 y)
 {
-    s32 *p = (s32 *)((u8 *)s + 0x190 + idx * 4);
-
-    p[0] = x;
-    p[2] = y;
+    ((ScissorCntrl *)s)->width[idx] = x;
+    ((ScissorCntrl *)s)->height[idx] = y;
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0198_add_object_animation_camera_region", set_scissor_screen_size);
 
 s32 get_screen_width(CamScreen *s)
 {
@@ -352,14 +339,12 @@ void create_original_clip_matrix(f32 fov, f32 aspect, f32 nearZ, f32 farZ, u8 *m
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0198_add_object_animation_camera_region", create_original_clip_matrix);
 
 /* NEARMISS-STUB update_clip_screen */
-#if 0 /* NEARMISS 80.71% cat=call-abi sub=- | float arg lwc1 f12 scheduled after jal in target; callee relocs to not-yet-C func_400F5E40/EC8 | attempts=1 */
+#if 0 /* NEARMISS 81.0% cat=sched sub=- | in-TU: arg load order lw/lwc1 around jal func_400F5E40 | attempts=2 */
 void update_clip_screen(CamScreen *s)
 {
     f32 angle;
-    s32 h = s->height;
-    f32 v = s->viewAngle;
 
-    angle = func_400F5E40(h, v);
+    angle = func_400F5E40(s->height, s->viewAngle);
     func_400F5EC8(s, angle);
     func_400F5F80(s);
     func_400F5FD0(s, angle);

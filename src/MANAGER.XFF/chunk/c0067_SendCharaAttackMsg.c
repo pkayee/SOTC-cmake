@@ -2,13 +2,73 @@
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0067_SendCharaAttackMsg", SendCharaAttackMsg);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0067_SendCharaAttackMsg", SendCharaControlChangeMsg);
+typedef struct { int arg; char pad[0x4C]; int type; char pad2[0xC]; } CharaMsg;
+extern char *GetCharacterClass(void *);
+extern void _isysSendSubMsg(void *, CharaMsg *, int);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0067_SendCharaAttackMsg", SendCharaControlledChangeMsg);
+int SendCharaControlChangeMsg(void *actor, int arg)
+{
+    CharaMsg m;
+    char *c = GetCharacterClass(actor);
+    if (c == 0)
+        return 0;
+    m.arg = arg;
+    m.type = 1;
+    _isysSendSubMsg(c + 0x1028, &m, sizeof(m));
+    return 1;
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0067_SendCharaAttackMsg", SendCharaMotionSyncStartMsg);
+typedef struct {
+    char geo[0x40];
+    void *from;
+    int ctrl;
+    int pad48;
+    int pad4C;
+    int type;
+    char pad[0xC];
+} CtrlMsg;
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0067_SendCharaAttackMsg", SendCharaAddMotionSyncStartMsg);
+extern void CopyGeometryPointer(void *, void *);
+
+int SendCharaControlledChangeMsg(void *a, void *b, void *geo)
+{
+    char *ca = GetCharacterClass(a);
+    char *cb = GetCharacterClass(b);
+    CtrlMsg msg;
+
+    if (ca == 0)
+        return 0;
+    msg.from = b;
+    msg.type = 2;
+    CopyGeometryPointer(&msg, geo);
+    msg.ctrl = *(int *)(cb + 0x744);
+    _isysSendSubMsg(ca + 0x1028, (CharaMsg *)&msg, 0x60);
+    return 1;
+}
+
+int SendCharaMotionSyncStartMsg(void *actor, int arg)
+{
+    CharaMsg m;
+    char *c = GetCharacterClass(actor);
+    if (c == 0)
+        return 0;
+    m.arg = arg;
+    m.type = 3;
+    _isysSendSubMsg(c + 0x1028, &m, sizeof(m));
+    return 1;
+}
+
+int SendCharaAddMotionSyncStartMsg(void *actor, int arg)
+{
+    CharaMsg m;
+    char *c = GetCharacterClass(actor);
+    if (c == 0)
+        return 0;
+    m.arg = arg;
+    m.type = 5;
+    _isysSendSubMsg(c + 0x1028, &m, sizeof(m));
+    return 1;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0067_SendCharaAttackMsg", SendCharaNodeParentSetMsg);
 

@@ -7,6 +7,9 @@ void iosFree(void* arg0);
 void changeVolume(s32 arg0);
 extern u8 D_4012EAA0[];
 extern u8* D_4012E3C8;
+extern s32 rootPtn;
+void *iosMallocAlign(void *, s32, s32);
+void sheetFileRead(void *, void *, s32);
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0205_setStartEditWorkTool", setStartEditWorkTool);
 
@@ -40,7 +43,12 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0205_setStartEditWorkTool", fun
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0205_setStartEditWorkTool", initEtiInfoWork);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0205_setStartEditWorkTool", loadPathData);
+void *loadPathData(void *f, void *b, int size)
+{
+    void *p = iosMallocAlign(&rootPtn, size, 16);
+    sheetFileRead(f, p, size);
+    return p;
+}
 
 void delPathData(void *arg0, void *arg1, void *arg2)
 {
@@ -86,6 +94,30 @@ u8* getPointData(u8* arg0, s32 arg1)
     return temp;
 }
 
+/* NEARMISS-STUB getConnectLineArray */
+#if 0 /* NEARMISS 88.0% cat=branch-layout sub=- | in-TU: target branch-around temp=NULL (bnez, daddu in delay), ours movz | attempts=1 */
+u8* getConnectLineArray(u8* arg0, s32 arg1)
+{
+    u8* temp = NULL;
+
+    if (arg0 != NULL && arg1 >= 0)
+    {
+        temp = arg0 + arg1 * 48 + 0x10;
+        if ((u32)arg1 >= *(u32*)arg0)
+        {
+            temp = NULL;
+        }
+    }
+    if (temp != NULL)
+    {
+        if (*(s32*)(temp + 0x10) != 0)
+        {
+            return arg0 + *(s32*)(temp + 0x14);
+        }
+    }
+    return NULL;
+}
+#endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0205_setStartEditWorkTool", getConnectLineArray);
 
 u8* getLineData(u8* arg0, s32 arg1)
@@ -185,9 +217,42 @@ u8* getSubPointData(u8* arg0, s32 arg1)
     return temp;
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0205_setStartEditWorkTool", getChildGoalPointIdxArray);
+static inline u8* getChildGoalPoint(u8* t, s32 i)
+{
+    if (t == NULL || i < 0 || (u32)i >= *(u32*)t)
+    {
+        return NULL;
+    }
+    return t + i * 48 + 0x10;
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0205_setStartEditWorkTool", getChildSubPointIdxArray);
+u8* getChildGoalPointIdxArray(u8* arg0, s32 arg1)
+{
+    u8* p = getChildGoalPoint(arg0, arg1);
+
+    if (p != NULL)
+    {
+        if (*(s32*)(p + 0x14) != 0)
+        {
+            return arg0 + *(s32*)(p + 0x18);
+        }
+    }
+    return NULL;
+}
+
+u8* getChildSubPointIdxArray(u8* arg0, s32 arg1)
+{
+    u8* p = getChildGoalPoint(arg0, arg1);
+
+    if (p != NULL)
+    {
+        if (*(s32*)(p + 0x14) != 0)
+        {
+            return arg0 + *(s32*)(p + 0x18);
+        }
+    }
+    return NULL;
+}
 
 u8* getInterestDataHeader(u8* arg0)
 {
