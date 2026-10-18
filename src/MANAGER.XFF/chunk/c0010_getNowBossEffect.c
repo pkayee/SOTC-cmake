@@ -2,12 +2,14 @@
 
 extern s32 D_401247D0;
 extern s32 D_401247D4;
+extern s32 D_401247D8;
 extern s32 D_401247DC;
 extern s32 D_401247E0;
 extern s32 D_401247E4;
 extern s32 D_401247E8;
 extern s32 D_401247F0;
 extern s32 D_401247F4;
+extern f32 D_401AA940[];
 
 //INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0010_getNowBossEffect", getNowBossEffect);
 
@@ -27,7 +29,14 @@ void setBossDeathEffect(u32 param_1, u32 param_2) {
     p[1] = (f32)param_2 * 0.000244140625f;
 }
 #endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0010_getNowBossEffect", setBossDeathEffect);
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0010_getNowBossEffect", setBossDeathEffect);
+
+void setBossDeathEffect(u32 a, u32 b) {
+    D_401247D0 |= 1;
+    D_401247D8 = 0;
+    D_401AA940[0] = (f32)a * 0.000244140625f;
+    D_401AA940[1] = (f32)b * 0.000244140625f;
+}
 
 void setShadowEffect(void) {
     D_401247D4 = 1;
