@@ -95,7 +95,7 @@ void nico_UnparentObject(void *obj)
 }
 
 /* NEARMISS-STUB nico_SendAttackMailToVCol */
-#if 0 /* NEARMISS 97.58% cat=regalloc sub=- | getSelectWeapon result kept in s0, a2=sp before a1 | attempts=1 */
+#if 0 /* NEARMISS 97.58% cat=call-abi sub=- | in-TU: SendCharaAttackMsg prototype clash (exp (void*,void*,void*,int,float) vs TU f32-first decl); 5th float arg missing | attempts=2 */
 void nico_SendAttackMailToVCol(void *obj)
 {
     u8 *cls = GetCharacterClass(obj);
@@ -141,7 +141,13 @@ void nico_SendPlayerFallDownDamageMail(void *obj)
     SendCharaAttackMsg(*(f32 *)(cls + 0x50C), obj, obj, &InitialGeometryPointer, -3);
 }
 #endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0017_CancelCaptionSubThreadAll", nico_SendPlayerFallDownDamageMail);
+void nico_SendPlayerFallDownDamageMail(void *actor)
+{
+    void *g = &InitialGeometryPointer;
+    char *c = GetCharacterClass(actor);
+    SendCharaAttackMsg(*(f32 *)(c + 0x50C), actor, actor, g, -3);
+}
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0017_CancelCaptionSubThreadAll", nico_SendPlayerFallDownDamageMail);
 
 extern s32 InitialGeometryPointer;
 f32 player_GetBoundDamageLevel(void *obj);
@@ -230,7 +236,20 @@ s32 nico_CheckCharacterVColPlaneAttribute(void *obj, u64 a, u64 b)
     return (*(u64 *)(cls + 0xDC0) & a) == b;
 }
 #endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0017_CancelCaptionSubThreadAll", nico_CheckCharacterVColPlaneAttribute);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0017_CancelCaptionSubThreadAll", nico_CheckCharacterVColPlaneAttribute);
+int nico_CheckCharacterVColPlaneAttribute(void *a, long mask, long val)
+{
+    char *c = GetCharacterClass(a);
+
+    int ret = 0;
+
+    if (*(int *)(c + 0xDB0) != 0) {
+        ret = 1;
+        if (((*(long *)(c + 0xDC0) & mask)) != val)
+            ret = 0;
+    }
+    return ret;
+}
 
 void *GetCharacterClass(void *obj);
 
@@ -255,7 +274,20 @@ s32 nico_CheckCharacterGPColPlaneAttribute(void *obj, u64 a, u64 b)
     return r;
 }
 #endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0017_CancelCaptionSubThreadAll", nico_CheckCharacterGPColPlaneAttribute);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0017_CancelCaptionSubThreadAll", nico_CheckCharacterGPColPlaneAttribute);
+int nico_CheckCharacterGPColPlaneAttribute(void *a, long mask, long val)
+{
+    char *c = GetCharacterClass(a);
+
+    int ret = 0;
+
+    if (*(int *)(c + 0x124) != 0) {
+        ret = 1;
+        if (((*(long *)(c + 0x680) & mask)) != val)
+            ret = 0;
+    }
+    return ret;
+}
 
 u64 GetGeometryPointerCharColAttr();
 
@@ -285,7 +317,15 @@ void nico_timeSlow(void)
     ChangeGameAnimeTimeScaleRatio(r, ((r - cur) * 30.0f) / (f32)p[0x44]);
 }
 #endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0017_CancelCaptionSubThreadAll", nico_timeSlow);
+void nico_timeSlow(void *a)
+{
+    u8 **anim = (u8 **)GetAnimationClass();
+    f32 rate = 0.75f;
+    f32 cur = GetCurrentGameAnimeTimeScaleRatio();
+
+    ChangeGameAnimeTimeScaleRatio(rate, (rate - cur) * 30.0f / (f32)*(u8 *)(*anim + 0x44));
+}
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0017_CancelCaptionSubThreadAll", nico_timeSlow);
 
 void *GetAnimationClass(void);
 f32 GetGameAnimeTimeScaleRatio(void);
@@ -310,7 +350,15 @@ void nico_timeResume(void)
     ChangeGameAnimeTimeScaleRatio(r, ((r - cur) * 30.0f) / (f32)(*(u8 **)anim)[0x45]);
 }
 #endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0017_CancelCaptionSubThreadAll", nico_timeResume);
+void nico_timeResume(void)
+{
+    u8 **anim = (u8 **)GetAnimationClass();
+    f32 r = GetGameAnimeTimeScaleRatio();
+    f32 cur = GetCurrentGameAnimeTimeScaleRatio();
+
+    ChangeGameAnimeTimeScaleRatio(r, (r - cur) * 30.0f / (f32)*(u8 *)(*anim + 0x45));
+}
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0017_CancelCaptionSubThreadAll", nico_timeResume);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0017_CancelCaptionSubThreadAll", nico_StabCharacterRootRotationToXZ);
 

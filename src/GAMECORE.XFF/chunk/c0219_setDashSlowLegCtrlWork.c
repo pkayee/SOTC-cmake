@@ -1,16 +1,40 @@
 #include "common.h"
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0219_setDashSlowLegCtrlWork", setDashSlowLegCtrlWork);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0219_setDashSlowLegCtrlWork", setDashSlowLegCtrlWork);
+void setDashSlowLegCtrlWork(void *arg0, int arg1)
+{
+    (*(int *)((char *)(arg0) + 0x30)) = arg1;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0219_setDashSlowLegCtrlWork", setStabilizeYSlowLegCtrlWork);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0219_setDashSlowLegCtrlWork", setStabilizeYSlowLegCtrlWork);
+void setStabilizeYSlowLegCtrlWork(void *arg0, int arg1)
+{
+    (*(int *)((char *)(arg0) + 0x3C)) = arg1;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0219_setDashSlowLegCtrlWork", setMoveModeSlowLegCtrlWork);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0219_setDashSlowLegCtrlWork", setMoveModeSlowLegCtrlWork);
+void setMoveModeSlowLegCtrlWork(void *arg0, int arg1)
+{
+    (*(int *)((char *)(arg0) + 0x34)) = arg1;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0219_setDashSlowLegCtrlWork", setMotScaleMaxSlowLegCtrlWork);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0219_setDashSlowLegCtrlWork", setMotScaleMaxSlowLegCtrlWork);
+void setMotScaleMaxSlowLegCtrlWork(void *arg0, float fparg0)
+{
+    (*(float *)((char *)(arg0) + 0x38)) = fparg0;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0219_setDashSlowLegCtrlWork", setAttainMotScaleSlowLegCtrlWork);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0219_setDashSlowLegCtrlWork", setAttainMotScaleSlowLegCtrlWork);
+void setAttainMotScaleSlowLegCtrlWork(void *arg0, float fparg0)
+{
+    (*(float *)((char *)(arg0) + 0x40)) = fparg0;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0219_setDashSlowLegCtrlWork", setGuardModeSlowLegCtrlWork);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0219_setDashSlowLegCtrlWork", setGuardModeSlowLegCtrlWork);
+void setGuardModeSlowLegCtrlWork(void *arg0, int arg1)
+{
+    (*(int *)((char *)(arg0) + 0x9C)) = arg1;
+}
 
 void deleteSlowLegCtrlWork(void) {
 }
