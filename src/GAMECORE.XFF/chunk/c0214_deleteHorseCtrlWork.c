@@ -3,17 +3,37 @@
 void deleteHorseCtrlWork(void) {
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0214_deleteHorseCtrlWork", setDashHorseCtrlWork);
+void setDashHorseCtrlWork(void *arg0, int arg1)
+{
+    (*(int *)((char *)(arg0) + 0x34)) = arg1;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0214_deleteHorseCtrlWork", setWallStopHorseCtrlWork);
+void setWallStopHorseCtrlWork(void *arg0, int arg1)
+{
+    (*(int *)((char *)(arg0) + 0x38)) = arg1;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0214_deleteHorseCtrlWork", setLimitModeHorseCtrlWork);
+void setLimitModeHorseCtrlWork(void *arg0, int arg1)
+{
+    (*(int *)((char *)(arg0) + 0x44)) = arg1;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0214_deleteHorseCtrlWork", setFinalAttainWalkHorseCtrlWork);
+void setFinalAttainWalkHorseCtrlWork(void *arg0, int arg1)
+{
+    (*(int *)((char *)(arg0) + 0x30)) = arg1;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0214_deleteHorseCtrlWork", setAllowMaxSpeedHorseCtrlWork);
+void setAllowMaxSpeedHorseCtrlWork(void *arg0, float fparg0)
+{
+    if (*(*(float **)((char *)(arg0) + 0x78)) < fparg0) {
+        (*(float *)((char *)(arg0) + 0x40)) = fparg0;
+    }
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0214_deleteHorseCtrlWork", setFreezeHorseCtrlWork);
+void setFreezeHorseCtrlWork(void *arg0, int arg1)
+{
+    (*(int *)((char *)(arg0) + 0x3C)) = arg1;
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0214_deleteHorseCtrlWork", func_40111B78);
 
