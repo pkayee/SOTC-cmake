@@ -1,14 +1,19 @@
 #include "common.h"
 
 extern u128 ZUnitVector;
-extern u128 ZeroPoint;
+typedef union {
+    u128 q;
+    f32 f[4];
+} QVec;
+
+extern QVec ZeroPoint;
 
 void constructor_camera_target_lost_angle(void *param)
 {
     *(s32*)((u8*)param + 0x0) = 0;
     *(u128*)((u8*)param + 0x10) = ZUnitVector;
     *(f32*)((u8*)param + 0x20) = *(f32*)((u8*)param + 0x24) = 0.0f;
-    *(u128*)((u8*)param + 0x30) = ZeroPoint;
+    *(u128*)((u8*)param + 0x30) = ZeroPoint.q;
 }
 
 typedef struct
@@ -92,15 +97,14 @@ void constructor_camera_target_visible_angle_manager(void *p)
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0174_constructor_camera_target_lost_angle", set_parameter_camera_target_visible_angle_manager);
 
-/* NEARMISS-STUB reset_camera_target_visible_angle_manager */
-#if 0 /* NEARMISS 69.0% cat=cse-hoist sub=- | in-TU: ZeroPoint reload per store inside loop vs hoisted u128 load | attempts=1 */
+
 typedef struct {
     s32 a;
     s32 b;
     s32 c;
     s32 d;
-    u128 p0;
-    u128 p1;
+    QVec p0;
+    QVec p1;
 } VisibleAngleEntry;
 
 typedef struct {
@@ -112,8 +116,9 @@ typedef struct {
     f32 angle1;
 } VisibleAngleManager;
 
-void reset_camera_target_visible_angle_manager(VisibleAngleManager *mgr)
+void reset_camera_target_visible_angle_manager(void *arg)
 {
+    VisibleAngleManager *mgr = arg;
     VisibleAngleEntry *entry;
     s32 i;
 
@@ -124,12 +129,10 @@ void reset_camera_target_visible_angle_manager(VisibleAngleManager *mgr)
         entry->c = 0;
         entry->b = 0;
         entry->d = 0;
-        entry->p0 = ZeroPoint;
-        entry->p1 = ZeroPoint;
+        entry->p0.q = ZeroPoint.q;
+        entry->p1.q = ZeroPoint.q;
         entry++;
     }
     mgr->active = 0;
     mgr->angle0 = mgr->angle1 = 0.0f;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0174_constructor_camera_target_lost_angle", reset_camera_target_visible_angle_manager);
