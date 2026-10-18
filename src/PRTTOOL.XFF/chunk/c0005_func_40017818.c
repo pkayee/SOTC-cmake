@@ -5,6 +5,25 @@ extern int D_400193D0;
 extern char D_4002B910[];
 extern char D_4002BF08[];
 
+/* PRTTOOL c0005: tail call, void wrapper with arg (T28 idiom: sd/ld ra frame + j, no trailing return). */
+extern s32 D_400196E4;
+extern void setPtclTranceMode(s32 mode);
+
+/* PRTTOOL c0005: if (D_4001C758 != 0) set bit 0x20 in the u64 flags (+0x1B8) of the object at D_4001C758->+4. */
+extern u8 *D_4001C758;
+
+/* PRTTOOL c0005: open the param menu at D_4001C358 once (menu+0x30 == 0): same shape as c0006 func_40019050. */
+extern u8 D_4001C358[];
+void func_40019338(void);
+void createParamMenu(u8 *menu, s32 arg);
+void cursorLockParamMenu(u8 *menu, s32 arg);
+
+/* PRTTOOL c0005: open the param menu at D_4001C390 once (menu+0x30 == 0): same shape as c0006 func_40019050. */
+extern u8 D_4001C390[];
+
+/* PRTTOOL c0005: open the param menu at D_4001C3C8 once (menu+0x30 == 0): same shape as c0006 func_40019050. */
+extern u8 D_4001C3C8[];
+
 char *func_40017818(void) {
     char *p;
     if (D_400193C4 == 1) {
@@ -735,12 +754,58 @@ char *func_40018E98(void) {
     return p + D_400193D0 * 0x1bc + 0x230;
 }
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0005_func_40017818", func_40018EE8);
+void func_40018EE8(void)
+{
+    setPtclTranceMode(D_400196E4);
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0005_func_40017818", func_40018F08);
+void func_40018F08(void)
+{
+    u8 *w = D_4001C758;
+    if (w != 0) {
+        u8 *q = *(u8 **)(w + 4);
+        *(u64 *)(q + 0x1B8) |= 0x20;
+    }
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0005_func_40017818", func_40018F30);
+void func_40018F30(void)
+{
+    u8 *menu;
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0005_func_40017818", func_40018F90);
+    menu = D_4001C358;
+    if (*(s32 *)(menu + 0x30) != 0)
+    {
+        return;
+    }
+    func_40019338();
+    createParamMenu(menu, 0);
+    cursorLockParamMenu(menu, 1);
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0005_func_40017818", func_40018FF0);
+void func_40018F90(void)
+{
+    u8 *menu;
+
+    menu = D_4001C390;
+    if (*(s32 *)(menu + 0x30) != 0)
+    {
+        return;
+    }
+    func_40019338();
+    createParamMenu(menu, 0);
+    cursorLockParamMenu(menu, 1);
+}
+
+void func_40018FF0(void)
+{
+    u8 *menu;
+
+    menu = D_4001C3C8;
+    if (*(s32 *)(menu + 0x30) != 0)
+    {
+        return;
+    }
+    func_40019338();
+    createParamMenu(menu, 0);
+    cursorLockParamMenu(menu, 1);
+}
