@@ -69,7 +69,7 @@ u8 *CreateAmbientLightObj(s32 ptn, s32 sz, AmbLightParam *p);
    target (or DldSysUndefSymbol); the wanted value is a field of that target. */
 static inline u8 *dldRef(u32 *lp, s32 fld) {
     u8 *slot;
-    u32 off = *(volatile u32 *)lp & 0x3FFFF;
+    u32 off = *lp & 0x3FFFF;
 
     slot = off ? *(u8 **)((u8 *)lp - off) : NULL;
     return (slot != NULL && slot != (u8 *)DldSysUndefSymbol) ? *(u8 **)(slot + fld) : NULL;
@@ -418,6 +418,8 @@ void initLwsOriDefSeg(DefSeg *seg) {
     }
 }
 
+/* NEARMISS-STUB deleteLwsOriDefSeg */
+#if 0 /* NEARMISS 97.31% cat=volatile-alias sub=- | 100 only with `*(volatile u32 *)lp` in dldRef (two link-word loads); volatile is not used (human, 2026-10-18) | attempts=1 */
 void deleteLwsOriDefSeg(DefSeg *seg) {
     s32 n = seg->count;
     u8 *p = seg->arr;
@@ -440,3 +442,5 @@ void deleteLwsOriDefSeg(DefSeg *seg) {
         }
     }
 }
+#endif
+INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0113_initParticleObject", deleteLwsOriDefSeg);
