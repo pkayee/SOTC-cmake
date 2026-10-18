@@ -46,6 +46,32 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0173_mcManager", mcDirectFileRe
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0173_mcManager", mcReqGetDir);
 
+/* NEARMISS-STUB mcGetLastSaveGameDataIndex */
+#if 0 /* NEARMISS 86.65625% cat=branch-layout sub=- | loop tail/early return layout and -1 test reg differ; arg copy/const order | attempts=1 */
+extern s64 *D_4012BB3C;
+
+s32 mcGetLastSaveGameDataIndex(u8 *arg0)
+{
+    s32 i;
+    u8 *p;
+
+    if (D_4012BB3C != 0) {
+        i = 0;
+        p = arg0 + 0xD8;
+        do {
+            if (*(s32 *)(p + 0xC) == 1 && *D_4012BB3C == *(s64 *)(p + 0x40)) {
+                return i;
+            }
+            i++;
+            p += 0x98;
+        } while (i < 10);
+    }
+    if (*(s32 *)(arg0 + 0x4C) != 0) {
+        return *(s32 *)(arg0 + 0x50);
+    }
+    return -1;
+}
+#endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0173_mcManager", mcGetLastSaveGameDataIndex);
 
 extern int D_4012BB40;

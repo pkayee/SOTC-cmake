@@ -20,6 +20,35 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0005_createDebugSubThreads", f
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0005_createDebugSubThreads", DebugGetCameraWithPursue2);
 
+/* NEARMISS-STUB func_4001DE08 */
+#if 0 /* NEARMISS 99.88% cat=regalloc sub=- | s0 base folds +0x170 offset: compiler emits addiu s0,v0,-0xb8 not -0x228 | attempts=1 */
+extern u8 gcGlobalVar[];
+s32 initVuColiDispWork(s32 a0);
+void iosDlPushLayer(s32 layer);
+void doit_debug_utility(f32 f);
+void disp_debug_utility(void);
+void updateVuColiDispWork(void);
+void dispVuColiDispWork(void);
+void drawGazeTool(f32 f);
+void iosDlPopLayer(void);
+void scrRun(void);
+
+void func_4001DE08(void)
+{
+    initVuColiDispWork((s32)(gcGlobalVar + 0x228));
+    while (1)
+    {
+        iosDlPushLayer(0x19);
+        doit_debug_utility(*(f32 *)(gcGlobalVar + 0x170));
+        disp_debug_utility();
+        updateVuColiDispWork();
+        dispVuColiDispWork();
+        drawGazeTool(*(f32 *)(gcGlobalVar + 0x168));
+        iosDlPopLayer();
+        scrRun();
+    }
+}
+#endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0005_createDebugSubThreads", func_4001DE08);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0005_createDebugSubThreads", GAMEUTIL_get_boss_interest_position);

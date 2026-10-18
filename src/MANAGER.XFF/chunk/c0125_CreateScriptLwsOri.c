@@ -47,6 +47,30 @@ void SetScrLwsOriObjReleaseCallBackFunc(u8 *o, s32 a, s32 b)
     f[1] = b;
 }
 
+/* NEARMISS-STUB InitScriptLwsOrientObj */
+#if 0 /* NEARMISS 99.86% cat=regalloc sub=- | callee-saved reg: compiler puts o+0x20 in v1 not s0 (expected in-place) | attempts=1 */
+void InitLwsOrientObj();
+void initScriptObj();
+void InitChildGroupManagerObj();
+
+void InitScriptLwsOrientObj(u8 *o, s32 a)
+{
+    s32 *f;
+    LwsCb *cb;
+
+    InitLwsOrientObj();
+    initScriptObj(o, a + 0x134, *(s32 *)o);
+    InitChildGroupManagerObj(o);
+    o = o[8] != 0x16 ? 0 : o + 0x20;
+    f = (s32 *)o + 0x455;
+    f[0] = 0;
+    f[1] = 0;
+    *(s32 *)(o + 0x1164) = 0;
+    cb = (LwsCb *)((s32 *)o + 0x457);
+    cb->arg = 0;
+    cb->fn = 0;
+}
+#endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0125_CreateScriptLwsOri", InitScriptLwsOrientObj);
 
 s32 GetLwsOrientWorkSize();

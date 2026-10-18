@@ -4,6 +4,22 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0143_GetCollisionDBAttribute", 
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0143_GetCollisionDBAttribute", GetCollisionDBAttributeAdr);
 
+/* NEARMISS-STUB ClipCollisionDBDoubleSide */
+#if 0 /* NEARMISS 83.7% cat=regalloc sub=- | extra s4 saved for 0/1 return; a2/a3 saved swapped (s1/s2); target returns v0 directly | attempts=1 */
+s32 ClipCollisionDB();
+
+s32 ClipCollisionDBDoubleSide(s32 a0, s32 a1, s32 a2, s32 a3)
+{
+    if (ClipCollisionDB(a0, a1, a2, a3) == 0)
+    {
+        if (ClipCollisionDB(a0, a2, a1, a3) == 0)
+        {
+            return 0;
+        }
+    }
+    return 1;
+}
+#endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0143_GetCollisionDBAttribute", ClipCollisionDBDoubleSide);
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0143_GetCollisionDBAttribute", ClipCollisionFinderCallBack);

@@ -13,7 +13,21 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0034_getSpecialEffectObjWork",
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0034_getSpecialEffectObjWork", func_4003A7E0);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0034_getSpecialEffectObjWork", StaffRollStart);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0034_getSpecialEffectObjWork", StaffRollStart);
+
+extern void func_4003A7E0(void);
+extern s32 D_40131470;
+extern s32 rootPtn;
+extern void createScriptObj(void *fn, s32 a1, void *a2, s32 a3, s32 a4, s32 a5, void *a6, s32 a7);
+
+void StaffRollStart(void)
+{
+    if (D_40131470 == 0)
+    {
+        return createScriptObj(func_4003A7E0, 0, &rootPtn, 0x2000, 0, 9, 0, 0);
+    }
+    return;
+}
 
 typedef struct {
     int v[5];

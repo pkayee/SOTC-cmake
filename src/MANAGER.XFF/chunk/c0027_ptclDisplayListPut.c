@@ -106,7 +106,23 @@ char *GetMeshClass(unsigned char *p)
     return (char *)p + 0x20;
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0027_ptclDisplayListPut", meshTransMatrix);
+extern void *iosAllocPacketPtrPath1(s32);
+
+void meshTransMatrix(s32 mtx)
+{
+    u8 *packet;
+
+    packet = iosAllocPacketPtrPath1(0x60);
+    *(u64 *)packet = 0x60000005;
+    *(u32 *)(packet + 0x8) = 0x1000101;
+    *(u32 *)(packet + 0xC) = 0x6C048000;
+    iosCopyMatrix(packet + 0x10, mtx);
+    *(u32 *)(packet + 0x50) = 0x15000006;
+    *(u32 *)(packet + 0x54) = 0;
+    *(u32 *)(packet + 0x58) = 0;
+    *(u32 *)(packet + 0x5C) = 0;
+    iosDlChainTailCurrent((s32)packet);
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0027_ptclDisplayListPut", meshTransLightMatrix);
 
