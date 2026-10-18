@@ -199,35 +199,26 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0013_updateVuColiDispWork", ba
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0013_updateVuColiDispWork", backStageGobjLoad);
 
-/* NEARMISS-STUB backStageCheckLoadSeg */
-#if 0 /* NEARMISS 96.4% cat=regalloc sub=- | tail only: target loads gameflag into v1 and keeps r=1 in v0 (lw v1,0xc(v0); addiu v0,zero,1; beqz v1; daddu a0,v1); ours loads flag into v0 and r into v1 then  | attempts=1 */
-extern s32 DldSysUndefSymbol;
-s32 _gameFlagChk();
-s32 backStageCheckLoadSeg(u32 *a0)
-{
-    u32 w = *a0;
-    u32 off = w & 0x3FFFF;
-    u8 *p = off ? *(u8 **)((u8 *)a0 - off) : 0;
-    u8 *e;
-    s32 r;
+extern int DldSysUndefSymbol;
+extern int _gameFlagChk(int);
 
-    if (p != 0 && (s32)p != DldSysUndefSymbol)
-    {
-        e = *(u8 **)(p + 0x10) + ((w >> 18) & 0xFFF) * *(s32 *)(*(u8 **)(p + 8) + 0xC);
-    }
-    else
-    {
-        e = 0;
-    }
-    r = 1;
-    if (*(s32 *)(e + 0xC) != 0)
-    {
-        r = _gameFlagChk(*(s32 *)(e + 0xC)) == 0;
-    }
-    return r;
+static inline char *dldResolve(unsigned int *h)
+{
+    unsigned int v = *h;
+    int off = v & 0x3FFFF;
+    char *t = off != 0 ? *(char **)((char *)h - off) : 0;
+
+    return (t != 0 && t != (char *)DldSysUndefSymbol) ? *(char **)(t + 0x10) + ((v >> 18) & 0xFFF) * *(int *)(*(char **)(t + 8) + 0xC) : 0;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0013_updateVuColiDispWork", backStageCheckLoadSeg);
+
+int backStageCheckLoadSeg(unsigned int *h)
+{
+    int f = *(int *)(dldResolve(h) + 0xC);
+
+    if (f == 0)
+        return 1;
+    return !_gameFlagChk(f);
+}
 
 typedef struct { s32 b[0x93]; } BSBlk;
 extern BSBlk D_401FC4E0;
