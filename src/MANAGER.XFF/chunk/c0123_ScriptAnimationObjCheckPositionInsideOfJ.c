@@ -1,5 +1,26 @@
 #include "common.h"
 
+/* NEARMISS-STUB ScriptAnimationObjCheckPositionInsideOfJudgeVolumeObject */
+#if 0 /* NEARMISS 91.35% cat=stack-frame sub=- | frame 0x80 vs 0x30 from local; target movz sp-select, a0 copy in delay slot | attempts=1 */
+extern void CheckPositionInsideOfJudgeVolumeInfo(int, int);
+
+void ScriptAnimationObjCheckPositionInsideOfJudgeVolumeObject(int arg0, int id, int arg2)
+{
+    LayoutClass *layout;
+    int local;
+    int obj = arg0;
+
+    layout = GetLayoutClass(id);
+    if (obj == 0) {
+        obj = (int)&local;
+    }
+    if (layout != 0) {
+        SetJudgeVolumeInfo(obj, *layout->unk138, layout->unk134, layout->unk13C, layout->v90, layout->v70,
+                           layout->v60, layout->scale_x, layout->scale_y, layout->scale_z);
+        CheckPositionInsideOfJudgeVolumeInfo(obj, arg2);
+    }
+}
+#endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0123_ScriptAnimationObjCheckPositionInsideOfJ", ScriptAnimationObjCheckPositionInsideOfJudgeVolumeObject);
 
 typedef struct {
@@ -101,11 +122,39 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0123_ScriptAnimationObjCheckPos
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0123_ScriptAnimationObjCheckPositionInsideOfJ", func_400A08A0);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0123_ScriptAnimationObjCheckPositionInsideOfJ", func_400A09A8);
+extern void updateParticleGeo();
+extern int kickParticle(int, int, int, int, int);
+extern void func_400A0D38(void *, void *, void *, void *);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0123_ScriptAnimationObjCheckPositionInsideOfJ", func_400A0A40);
+void func_400A09A8(void *a, void *b, void *c, void *d, void *e, void *f)
+{
+    updateParticleGeo(0, a, b, c, 0, d, f, 0, e, 1, kickParticle, 0);
+    func_400A0D38(a, d, e, f);
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0123_ScriptAnimationObjCheckPositionInsideOfJ", func_400A0AD8);
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0123_ScriptAnimationObjCheckPositionInsideOfJ", func_400A0A40);
+extern void updateParticleDissolveGeo();
+
+void func_400A0A40(void *a, void *b, void *c, void *d, void *e, void *f)
+{
+    updateParticleDissolveGeo(0, a, b, c, 0, d, f, 0, e, 1, kickParticle, 0);
+    func_400A0D38(a, d, e, f);
+}
+
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0123_ScriptAnimationObjCheckPositionInsideOfJ", func_400A0AD8);
+extern void SetGeometryPointerNodePosState(void *, void *, void *, void *, void *);
+extern void SequenceKickCameraVibration(void *, void *);
+extern u8 IdentityQuaternion[];
+extern u8 ZeroPoint[];
+
+void func_400A0AD8(void *a, void *b, void *c)
+{
+    u8 buf[64];
+
+    SetGeometryPointerNodePosState(buf, b, c, IdentityQuaternion, ZeroPoint);
+    SequenceKickCameraVibration(a, buf);
+    return;
+}
 
 extern unsigned char D_4012B1D4[];
 
@@ -123,7 +172,30 @@ void *getExternalLWSFlag(void)
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0123_ScriptAnimationObjCheckPositionInsideOfJ", func_400A0B40);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0123_ScriptAnimationObjCheckPositionInsideOfJ", func_400A0CB8);
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0123_ScriptAnimationObjCheckPositionInsideOfJ", func_400A0CB8);
+extern void FlushScriptLayoutObj(void);
+extern void FlushJudgeVolumeClass(s32);
+extern void isysFlushISYSLetterObj();
+
+void func_400A0CB8(s32 arg0)
+{
+    s32 p;
+    s32 t;
+
+    p = 0;
+    if (*(u8 *)(arg0 + 8) == 0xD)
+    {
+        p = arg0 + 0x20;
+    }
+    FlushScriptLayoutObj();
+    t = *(s32 *)(p + 0x33C);
+    if (t != 0)
+    {
+        FlushJudgeVolumeClass(t);
+        *(s32 *)(p + 0x33C) = 0;
+    }
+    isysFlushISYSLetterObj(arg0);
+}
 
 //INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0123_ScriptAnimationObjCheckPositionInsideOfJ", func_400A0D18);
 extern void isysAddGroupWithLinkParam(void *, void *, int, int);
@@ -139,7 +211,15 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0123_ScriptAnimationObjCheckPos
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0123_ScriptAnimationObjCheckPositionInsideOfJ", func_400A0F78);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0123_ScriptAnimationObjCheckPositionInsideOfJ", func_400A10A8);
+extern u64 *GetCollisionDBAttributeAdr();
+
+s32 func_400A10A8(void)
+{
+    u64 *temp_v0;
+
+    temp_v0 = GetCollisionDBAttributeAdr();
+    return (*temp_v0 & 0xF80000000) != 0x800000000;
+}
 
 //INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0123_ScriptAnimationObjCheckPositionInsideOfJ", func_400A10E8);
 extern void seSetKeyOnOff(void);
