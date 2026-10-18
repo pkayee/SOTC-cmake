@@ -23,63 +23,40 @@ f32 getPlayerHp(void)
     return D_40200F24;
 }
 
-/* NEARMISS-STUB setPlayerHp */
-#if 0 /* NEARMISS 91.29% cat=float-ops sub=- | see kK48 batch note | attempts=1 */
-void setPlayerHp(f32 val)
-{
-    f32 hp = 0.0f;
+#define CLAMP(x, lo, hi) ((x) > (hi) ? (hi) : (x) < (lo) ? (lo) : (x))
 
-    if (_gameFWorkChk(0xB) < val)
-    {
-        hp = _gameFWorkChk(0xB);
-    }
-    else
-    {
-        if (val < hp)
-        {
-        }
-        else
-        {
-            hp = val;
-        }
-    }
+void setPlayerHp(f32 hp)
+{
+    hp = CLAMP(hp, 0.0f, _gameFWorkChk(11));
     D_40200F24 = hp;
     playerlifebar_sethp(getPlayerHp() / getPlayerMaxHp());
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0028_getPlayerHp", setPlayerHp);
 
-/* NEARMISS-STUB addPlayerHp */
-#if 0 /* NEARMISS 94.64% cat=float-ops sub=- | see kK48 batch note | attempts=1 */
-void addPlayerHp(f32 val)
+void addPlayerHp(f32 add)
 {
-    f32 hp = 0.0f;
-    f32 n;
+    f32 v;
+    f32 r;
 
-    if (val < 0.0f)
+    if (add < 0.0f)
     {
-        val = val * gStatGetPlayerAccessoriesDamgeRaitoToPlayer(val);
+        add *= gStatGetPlayerAccessoriesDamgeRaitoToPlayer(add);
     }
-    n = D_40200F24 + val;
-    if (_gameFWorkChk(0xB) < n)
+    v = D_40200F24 + add;
+    if (_gameFWorkChk(11) < v)
     {
-        hp = _gameFWorkChk(0xB);
+        r = _gameFWorkChk(11);
+    }
+    else if (v < 0.0f)
+    {
+        r = 0.0f;
     }
     else
     {
-        if (n < hp)
-        {
-        }
-        else
-        {
-            hp = n;
-        }
+        r = v;
     }
-    D_40200F24 = hp;
+    D_40200F24 = r;
     playerlifebar_sethp(getPlayerHp() / getPlayerMaxHp());
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0028_getPlayerHp", addPlayerHp);
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0028_getPlayerHp", _getPlayerHpRatio);
 f32 _getPlayerHpRatio(void)
@@ -123,58 +100,21 @@ f32 getPlayerGrip(void)
     return D_40200F20;
 }
 
-/* NEARMISS-STUB setPlayerGrip */
-#if 0 /* NEARMISS 83.74% cat=regalloc sub=- | see kK48 batch note | attempts=1 */
-void setPlayerGrip(f32 val)
+void setPlayerGrip(f32 g)
 {
-    f32 grip = 0.0f;
-
-    if (_gameFWorkChk(0xC) < val)
-    {
-        grip = _gameFWorkChk(0xC);
-    }
-    else
-    {
-        if (val < grip)
-        {
-        }
-        else
-        {
-            grip = val;
-        }
-    }
-    D_40200F20 = grip;
-    setgrip(grip / _gameFWorkChk(0xC));
+    g = CLAMP(g, 0.0f, _gameFWorkChk(12));
+    D_40200F20 = g;
+    setgrip(g / _gameFWorkChk(12));
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0028_getPlayerHp", setPlayerGrip);
 
-/* NEARMISS-STUB addPlayerGrip */
-#if 0 /* NEARMISS 86.64% cat=regalloc sub=- | see kK48 batch note | attempts=1 */
-void addPlayerGrip(f32 val)
+void addPlayerGrip(f32 add)
 {
-    f32 grip = 0.0f;
-    f32 n = D_40200F20 + val;
+    f32 v = D_40200F20 + add;
 
-    if (_gameFWorkChk(0xC) < n)
-    {
-        grip = _gameFWorkChk(0xC);
-    }
-    else
-    {
-        if (n < grip)
-        {
-        }
-        else
-        {
-            grip = n;
-        }
-    }
-    D_40200F20 = grip;
-    setgrip(grip / _gameFWorkChk(0xC));
+    v = _gameFWorkChk(12) < v ? _gameFWorkChk(12) : (v < 0.0f ? 0.0f : v);
+    D_40200F20 = v;
+    setgrip(v / _gameFWorkChk(12));
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0028_getPlayerHp", addPlayerGrip);
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0028_getPlayerHp", getPlayerMaxGrip);
 f32 getPlayerMaxGrip(void)
@@ -234,31 +174,18 @@ void setPlayerO2(f32 val)
     D_40130F4C = v;
 }
 
-/* NEARMISS-STUB addPlayerO2 */
-#if 0 /* NEARMISS 95.71% cat=regalloc sub=- | see kK48 batch note | attempts=1 */
-void addPlayerO2(f32 val)
+void addPlayerO2(float add)
 {
-    f32 o2 = D_40130F4C + val;
-    f32 v = 100.0f;
-
-    if (v < o2)
-    {
-    }
+    float v = D_40130F4C + add;
+    float r;
+    if (100.0f < v)
+        r = 100.0f;
+    else if (v < 0.0f)
+        r = 0.0f;
     else
-    {
-        v = 0.0f;
-        if (o2 < v)
-        {
-        }
-        else
-        {
-            v = o2;
-        }
-    }
-    D_40130F4C = v;
+        r = v;
+    D_40130F4C = r;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0028_getPlayerHp", addPlayerO2);
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0028_getPlayerHp", initPowerWork);
 void initPowerWork(void)
