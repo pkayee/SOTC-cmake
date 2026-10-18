@@ -1,38 +1,205 @@
 #include "common.h"
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0154_SetGeometryPointerGlobalStatePointer", SetGeometryPointerGlobalStatePointer);
+typedef union { s128 q; float f[4]; int i[4]; } Vec4;
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0154_SetGeometryPointerGlobalStatePointer", SetGeometryPointerGlobalStatePosPointer);
+void SetGeometryPointerGlobalStatePointer(Vec4 *p, int a, int b, Vec4 *u, Vec4 *v)
+{
+    p[0].i[0] = a;
+    p[3].i[0] = 6;
+    p[0].i[1] = b;
+    p[1].q = u->q;
+    p[2].q = v->q;
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0154_SetGeometryPointerGlobalStatePointer", GetGeometryPointerObject);
+void SetGeometryPointerGlobalStatePosPointer(Vec4 *p, int a, int b, Vec4 *u, Vec4 *v)
+{
+    p[0].i[0] = a;
+    p[3].i[0] = 7;
+    p[0].i[1] = b;
+    p[1].q = u->q;
+    p[2].q = v->q;
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0154_SetGeometryPointerGlobalStatePointer", GetGeometryPointerObjectParentNodeId);
+void *GetGeometryPointerObject(char *g)
+{
+    switch (*(unsigned int *)(g + 0x30)) {
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+    case 8:
+    case 9:
+    case 10:
+        return *(void **)g;
+    case 6:
+    case 7:
+        break;
+    }
+    return 0;
+}
+
+int GetGeometryPointerObjectParentNodeId(char *p)
+{
+    if (*(int *)(p + 0x30) != 1) {
+        return -1;
+    }
+    return *(int *)(p + 0x4);
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0154_SetGeometryPointerGlobalStatePointer", ConvertGeometryPointerZNormalMode);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0154_SetGeometryPointerGlobalStatePointer", GetGeometryPointerSurfaceAttribute);
+extern void GetCollisionDBAttribute(s128 *, void *);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0154_SetGeometryPointerGlobalStatePointer", GetGeometryPointerSurfaceZTopYPlaneCoordQuaternion);
+void GetGeometryPointerSurfaceAttribute(s128 *out, char *g)
+{
+    void *db;
+    switch (*(unsigned int *)(g + 0x30)) {
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+        db = g;
+        break;
+    case 0:
+    case 1:
+    case 6:
+    case 7:
+    case 8:
+        db = 0;
+        break;
+    default:
+        db = 0;
+        break;
+    }
+    if (db != 0) {
+        GetCollisionDBAttribute(out, db);
+        return;
+    }
+    *out = 0;
+}
+
+extern float YUnitVector[];
+extern float *GetCollisionDBPlane(char *);
+extern void GetPlaneZTopYPlaneCoordQuaternion(void *, float *);
+
+void GetGeometryPointerSurfaceZTopYPlaneCoordQuaternion(void *out, char *g)
+{
+    char *p;
+    float *v;
+    switch (*(int *)(g + 0x30)) {
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+        p = g;
+        break;
+    case 0:
+    case 1:
+    case 6:
+    case 7:
+    case 8:
+    default:
+        p = 0;
+        break;
+    }
+    v = YUnitVector;
+    if (p != 0)
+        v = GetCollisionDBPlane(p);
+    GetPlaneZTopYPlaneCoordQuaternion(out, v);
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0154_SetGeometryPointerGlobalStatePointer", GetGeometryPointerSurfaceYTopZMinusPlaneCoordQuaternion);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0154_SetGeometryPointerGlobalStatePointer", SetGeometryPointerNodePosState);
+void SetGeometryPointerNodePosState(Vec4 *p, int a, int b, Vec4 *u, Vec4 *v)
+{
+    p[0].i[0] = a;
+    p[3].i[0] = 1;
+    p[0].i[1] = b;
+    p[1].q = u->q;
+    p[2].q = v->q;
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0154_SetGeometryPointerGlobalStatePointer", SetGeometryPointerNodePosStateGlobalRot);
+void SetGeometryPointerNodePosStateGlobalRot(Vec4 *p, int a, int b, Vec4 *u, Vec4 *v)
+{
+    p[0].i[0] = a;
+    p[3].i[0] = 8;
+    p[0].i[1] = b;
+    p[1].q = u->q;
+    p[2].q = v->q;
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0154_SetGeometryPointerGlobalStatePointer", SetGeometryPointerChainPos);
+void SetGeometryPointerChainPos(char *pa0, int xa1, int xa2, float f12)
+{
+    *(int *)(pa0 + 0x30) = 9;
+    *(int *)(pa0 + 0x0) = xa1;
+    *(int *)(pa0 + 0x4) = xa2;
+    *(float *)(pa0 + 0x8) = f12;
+}
 
+/* NEARMISS-STUB GetGeometryPointerCollisionDB */
+#if 0 /* NEARMISS 99.0% cat=rodata-const sub=- | in-TU: jump table address lui/lw only; jtbl normalisation refuses (extra non-padding rodata words after 9 entries) | attempts=1 */
+void *GetGeometryPointerCollisionDB(char *g)
+{
+    switch (*(unsigned int *)(g + 0x30)) {
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+        return g;
+    case 0:
+    case 1:
+    case 6:
+    case 7:
+    case 8:
+        break;
+    }
+    return 0;
+}
+#endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0154_SetGeometryPointerGlobalStatePointer", GetGeometryPointerCollisionDB);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0154_SetGeometryPointerGlobalStatePointer", GetGeometryPointerWithCollisionAttributeJudgeFunc);
+extern float ZeroPoint[];
+extern void *GetLayoutObjCollisionDBWithTargetAttributeJudgeFunc(void *, void *, void *, void *);
+extern void MakeGeometryPointerCollisionInfo(void *, float *, void *, float, float);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0154_SetGeometryPointerGlobalStatePointer", CheckLegalCollisionGP);
+void *GetGeometryPointerWithCollisionAttributeJudgeFunc(void *g, void *a, void *b, void *c)
+{
+    char buf[0x10] __attribute__((aligned(16)));
+    void *db = GetLayoutObjCollisionDBWithTargetAttributeJudgeFunc(buf, a, b, c);
+    if (db != 0)
+        MakeGeometryPointerCollisionInfo(g, ZeroPoint, buf, 0.0f, 0.0f);
+    return db;
+}
+
+int CheckLegalCollisionGP(char *gp)
+{
+    int type = *(int *)(gp + 0x30);
+    switch (type) {
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+        return 1;
+    }
+    return 0;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0154_SetGeometryPointerGlobalStatePointer", ExchangeGeometryPointerCollisionEdgeOtherSideInfo);
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0154_SetGeometryPointerGlobalStatePointer", GetMultiLocalizeMatrix);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0154_SetGeometryPointerGlobalStatePointer", CopyMultiMatrix);
+typedef struct { float m[16]; } Mat;
+void iosCopyMatrix(void *dst, void *src);
+
+void CopyMultiMatrix(Mat *d, Mat *s, int n)
+{
+    while (n-- != 0) {
+        iosCopyMatrix(d, s);
+        d++;
+        s++;
+    }
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0154_SetGeometryPointerGlobalStatePointer", GetMoveVectorOnWV);
 
