@@ -13,43 +13,41 @@ extern s32 D_00147500[];
 extern u8 D_00147508[];
 extern sceSifClientData D_00147700[];
 
-/* NEARMISS-STUB _lf_bind */
-#if 0 /* NEARMISS 49.0% cat=branch-layout sub=- | bind retry loop layout: bgez shared return-0 exit, serve load in bgezl delay slot | attempts=1 */
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/eeloadfile", _lf_bind);
+typedef struct
+{
+    u8 b[4];
+} LfVersion;
+
 s32 _lf_bind(void)
 {
-    s32 ret;
     s32 i;
 
-    if (D_00132430 >= 0)
+    if (D_00132430 < 0)
     {
-        return 0;
-    }
-    for (;;)
-    {
-        ret = sceSifBindRpc(D_00147700, 0x80000006, 0);
-        if (ret < 0)
+        while (1)
         {
-            return -1;
-        }
-        if (D_00147700->serve != NULL)
-        {
-            break;
-        }
-        for (i = 0x100000; i != -1; i--)
-        {
+            if (sceSifBindRpc(D_00147700, 0x80000006, 0) < 0)
+            {
+                return -1;
+            }
+            if (D_00147700->serve != NULL)
+            {
+                D_00132430 = 0;
+                if (sceSifCallRpc(D_00147700, 0xFF, 0, NULL, 0, D_00147500, 4, NULL, NULL) < 0)
+                {
+                    return 0xFFFEFFFF;
+                }
+                *(LfVersion *)D_00147728 = *(LfVersion *)D_00147500;
+                return 0;
+            }
+            for (i = 0x100000; i != -1; i--)
+            {
+            }
         }
     }
-    D_00132430 = 0;
-    ret = sceSifCallRpc(D_00147700, 0xFF, 0, NULL, 0, D_00147500, 4, NULL, NULL);
-    if (ret < 0)
-    {
-        return 0xFFFEFFFF;
-    }
-    memcpy(D_00147728, D_00147500, 4);
     return 0;
 }
-#endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/eeloadfile", _lf_bind);
 
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/eeloadfile", _lf_version);
 s32 _lf_version(void)
