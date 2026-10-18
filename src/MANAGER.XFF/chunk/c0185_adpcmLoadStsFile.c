@@ -47,30 +47,22 @@ s32 *func_400E90E8(void)
     return &D_4012E024;
 }
 
-/* NEARMISS-STUB func_400E90F8 */
-#if 0 /* NEARMISS 91.6% cat=regalloc sub=- | x in a3 not a2; &D_4012E028 in a4 not a3; p copy a5 not t0 early | attempts=1 */
 extern char D_4012E088[];
 extern s32 D_4012E028;
 extern s32 DldSysUndefSymbol;
 extern u8 SH_AdpcmSeqDEFAULT[];
-extern void createParamMenu(char *, s32, s32);
+extern void createParamMenu(char *, s32);
 
 void func_400E90F8(s32 unused0, s32 unused1, s32 *p)
 {
     char *s = D_4012E088;
-    s32 *q = p;
-
-    if (*(s32 *)(s + 0x30) == 0)
-    {
+    if (*(s32 *)(s + 0x30) == 0) {
         u8 *sh = (DldSysUndefSymbol == (s32)SH_AdpcmSeqDEFAULT) ? 0 : SH_AdpcmSeqDEFAULT;
-        s32 x = *(s32 *)(sh + 0x10);
-        D_4012E028 = x;
-        D_4012E028 = x + *q * 56;
-        createParamMenu(s, 0, D_4012E028);
+        D_4012E028 = *(s32 *)(sh + 0x10);
+        D_4012E028 += *p * 56;
+        createParamMenu(s, 0);
     }
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0185_adpcmLoadStsFile", func_400E90F8);
 
 //INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0185_adpcmLoadStsFile", func_400E9178);
 
