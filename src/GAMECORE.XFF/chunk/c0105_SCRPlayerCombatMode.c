@@ -3,7 +3,7 @@
 void nico_delOmakeItem(void);
 void setFullPower(void);
 void RequestCharacterMotionShiftFunc(void *chara, void (*func)(void));
-u8 *GetSCRCharaAIWorkPtr(void);
+u8 *GetSCRCharaAIWorkPtr();
 void gameflowSetPauseEnable(s32 enable);
 void gameflowSetCaptionPause(s32 pause);
 void *GAMEUTIL_get_motion_kind(void *chara);
@@ -13,12 +13,13 @@ void player_setHellDangerPoint(void *chara, u8 *point);
 void player_setEdgeHangPointGeometry(void *chara, u8 *point);
 void player_setGripHangPointGeometry(void *chara, u8 *point);
 void func_4008C7C8(void);
-void func_4008F430(void);
+void func_4008F430();
+s32 SCRSetupWeaponPlayer(void *chara, s32 weapon);
 void func_4008F478(void);
 void func_4008F5B8(void);
 void func_4008F5D8(void);
-void func_4008F5F8(void);
-void func_4008F638(void);
+void func_4008F5F8(void *a0);
+void func_4008F638(void *a0);
 void func_4008F678(void);
 void func_4008F7E0(void);
 u8 *GetCharacterClass(void *chara);
@@ -195,6 +196,17 @@ void SetPlayerHellDangerPoint(void *a0)
     player_setHellDangerPoint(a0, GetSCRCharaAIWorkPtr() + 0x1B30);
 }
 
+/* NEARMISS-STUB nico_playerClothOverSurfDetectFunc */
+#if 0 /* NEARMISS 86.36% cat=branch-layout sub=- | extra b to shared epilogue; result var in v0 not a0 | attempts=1 */
+s32 nico_playerClothOverSurfDetectFunc(s32 a0)
+{
+    u8 *c = GetCharacterClass((void *)a0);
+    a0 = 1;
+    if (*(s8 *)(c + 0x35E) != 0 && 0.8f < *(f32 *)(c + 0x1020))
+        a0 = 0;
+    return a0;
+}
+#endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0105_SCRPlayerCombatMode", nico_playerClothOverSurfDetectFunc);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0105_SCRPlayerCombatMode", nico_playerRootReverseByZRot);
@@ -217,7 +229,15 @@ void func_4008F010(void)
     *(s32 *)(work + 0x10C) = tmp;
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0105_SCRPlayerCombatMode", func_4008F038);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0105_SCRPlayerCombatMode", func_4008F038);
+void nico_getOmakeItem(s32 item);
+void func_4008F038(void)
+{
+    u8 *work = GetSCRCharaAIWorkPtr();
+    nico_getOmakeItem(*(s32 *)(work + 0x10C));
+    *(s32 *)(work + 0x108) = 0;
+    *(s32 *)(work + 0x10C) = 0;
+}
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0105_SCRPlayerCombatMode", func_4008F070);
 void func_4008F070(void)
@@ -225,9 +245,35 @@ void func_4008F070(void)
     nico_delOmakeItem();
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0105_SCRPlayerCombatMode", func_4008F088);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0105_SCRPlayerCombatMode", func_4008F088);
+extern u8 gcGlobalVar[];
+void func_4008B198(s32 obj, u8 *work);
+f32 GetWeaponRange(void);
+void begin_nico_sight_on(u8 *p, s32 obj, u8 *x, f32 range);
+void func_4008B660(s32 obj);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0105_SCRPlayerCombatMode", func_4008F0E8);
+void func_4008F088(s32 obj)
+{
+    u8 *work;
+
+    work = GetSCRCharaAIWorkPtr();
+    func_4008B198(obj, work);
+    begin_nico_sight_on(work + 0x290, obj, gcGlobalVar + 0x260, GetWeaponRange());
+    func_4008B660(obj);
+}
+
+void func_4008BAC0(s32 obj);
+
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0105_SCRPlayerCombatMode", func_4008F0E8);
+void func_4008F0E8(s32 obj)
+{
+    u8 *work;
+
+    work = GetSCRCharaAIWorkPtr();
+    func_4008B198(obj, work);
+    begin_nico_sight_on(work + 0x290, obj, gcGlobalVar + 0x260, GetWeaponRange());
+    func_4008BAC0(obj);
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0105_SCRPlayerCombatMode", func_4008F148);
 
@@ -255,7 +301,15 @@ void func_4008F418(void)
     setFullPower();
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0105_SCRPlayerCombatMode", func_4008F430);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0105_SCRPlayerCombatMode", func_4008F430);
+void func_4008F430(void *chara)
+{
+    u8 *work = GetSCRCharaAIWorkPtr() + 0x60;
+
+    if (*(s32 *)(work + 0x18) == 0) {
+        *(s32 *)(work + 0x18) = SCRSetupWeaponPlayer(chara, *(s32 *)(work + 0x10));
+    }
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0105_SCRPlayerCombatMode", func_4008F478);
 
@@ -273,11 +327,41 @@ void func_4008F5D8(void)
     gameflowSetCaptionPause(0);
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0105_SCRPlayerCombatMode", func_4008F5F8);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0105_SCRPlayerCombatMode", func_4008F5F8);
+void setSelectWeapon(int w);
+void func_4008C660(void *chara, s32 arg);
+void func_4008F5F8(void *a0)
+{
+    u8 *work = GetSCRCharaAIWorkPtr(a0);
+    *(s32 *)(work + 0x70) = 1;
+    *(s32 *)(work + 0x7C) = 1;
+    setSelectWeapon(1);
+    func_4008C660(a0, -1);
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0105_SCRPlayerCombatMode", func_4008F638);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0105_SCRPlayerCombatMode", func_4008F638);
+void func_4008F638(void *a0)
+{
+    u8 *work = GetSCRCharaAIWorkPtr(a0);
+    *(s32 *)(work + 0x70) = 8;
+    *(s32 *)(work + 0x7C) = 8;
+    setSelectWeapon(8);
+    func_4008C660(a0, -1);
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0105_SCRPlayerCombatMode", func_4008F678);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0105_SCRPlayerCombatMode", func_4008F678);
+void *nico_GetPlayerCharacterRidingHorseObject(void);
+void setHorseForceScriptKey(void *actor, s32 key);
+extern s32 ScriptCtrlDef_SCRHorseKicked;
+
+void func_4008F678(void)
+{
+    void *obj = nico_GetPlayerCharacterRidingHorseObject();
+
+    if (obj != NULL) {
+        setHorseForceScriptKey(obj, ScriptCtrlDef_SCRHorseKicked);
+    }
+}
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0105_SCRPlayerCombatMode", func_4008F6B8);
 s32 func_4008F6B8(void *a0)
