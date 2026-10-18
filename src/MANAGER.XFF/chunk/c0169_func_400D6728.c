@@ -24,17 +24,13 @@ void func_400D6780(char *pa0)
     *(int *)(pa0 + 0xb8) = 0;
 }
 
-/* NEARMISS-STUB func_400D6798 */
-#if 0 /* NEARMISS 99.5% cat=struct-layout sub=- | compiler emits zero stores in offset order 0xc8,0xbc,0xc0,0xc4; target order 0xc4,0xbc,0xc8,0xc0; statement order ignored | attempts=1 */
 void func_400D6798(int *arg0)
 {
-    *(int *)((char *)arg0 + 0xc4) = 0;
     *(int *)((char *)arg0 + 0xbc) = 3;
-    *(int *)((char *)arg0 + 0xc8) = 0;
     *(int *)((char *)arg0 + 0xc0) = 0;
+    *(int *)((char *)arg0 + 0xc4) = 0;
+    *(int *)((char *)arg0 + 0xc8) = 0;
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0169_func_400D6728", func_400D6798);
 
 //INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0169_func_400D6728", func_400D67B0);
 void func_400D67B0(void *arg0)

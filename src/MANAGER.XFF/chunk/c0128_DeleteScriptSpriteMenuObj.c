@@ -14,8 +14,6 @@ void DeleteScriptSpriteMenuObj(unsigned char *p)
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0128_DeleteScriptSpriteMenuObj", CreateScriptSpriteMenuObj);
 
-/* NEARMISS-STUB spriteMenuCheckSelectPushPad */
-#if 0 /* NEARMISS 96.47% cat=branch-layout sub=- | target uses bnel branch-likely for ret=1 path; ours bnez | attempts=1 */
 extern u8 padManagerData[];
 extern int D_4012B2A8;
 
@@ -24,24 +22,9 @@ s32 spriteMenuCheckSelectPushPad(void)
     s8 *sel = *(s8 **)&D_4012B2A8;
     s32 pad = *(s32 *)(padManagerData + 0x8);
     s32 bit = 1;
-    s32 ret;
 
-    if ((pad & (bit << sel[0])) != 0)
-    {
-        ret = 1;
-    }
-    else
-    {
-        ret = -1;
-        if ((pad & (bit << sel[1])) == 0)
-        {
-            ret = 0;
-        }
-    }
-    return ret;
+    return (pad & (bit << sel[0])) ? 1 : ((pad & (bit << sel[1])) ? -1 : 0);
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0128_DeleteScriptSpriteMenuObj", spriteMenuCheckSelectPushPad);
 
 /* NEARMISS-STUB spriteMenuObjPadChangeHorse */
 #if 0 /* NEARMISS 67.0% cat=bitops sub=- | target keeps sllv+and mask for 1<<sel; ours folds to srav+andi; return-2 tail differs | attempts=1 */

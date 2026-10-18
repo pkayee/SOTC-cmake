@@ -69,17 +69,14 @@ s32 getoptnodephysicalnodeid(s32 a, s32 b, s32 c, s32 d)
     return ret;
 }
 
-/* NEARMISS-STUB GetCharacterClassNodeMatQuaternionPos */
-#if 0 /* NEARMISS 91.26% cat=regalloc sub=- | flag s4/out2 s3/out0 s5 vs ours; idx*0x40 CSE placement | attempts=1 */
+extern void GetMotionMatrix(s32, s32, s32, s32, u8 *, u8 *);
 
 void GetCharacterClassNodeMatQuaternionPos(s32 *out0, s32 *out1, s32 *out2, u8 *obj, s32 idx, s32 flag)
 {
-    s32 base;
-
     if (flag != 0)
     {
         *out1 = *(s32 *)(obj + 0x154) + idx * 0x10;
-        base = *(s32 *)(obj + 0x158);
+        *out2 = *(s32 *)(obj + 0x158) + idx * 0x40 + 0x30;
     }
     else
     {
@@ -89,9 +86,8 @@ void GetCharacterClassNodeMatQuaternionPos(s32 *out0, s32 *out1, s32 *out2, u8 *
             *(u8 *)(obj + 0x523) = 1;
         }
         *out1 = *(s32 *)(obj + 0x344) + idx * 0x10;
-        base = *(s32 *)(obj + 0x340);
+        *out2 = *(s32 *)(obj + 0x340) + idx * 0x40 + 0x30;
     }
-    *out2 = base + idx * 0x40 + 0x30;
     if (flag != 0)
     {
         *out0 = *(s32 *)(obj + 0x158) + idx * 0x40;
@@ -101,8 +97,6 @@ void GetCharacterClassNodeMatQuaternionPos(s32 *out0, s32 *out1, s32 *out2, u8 *
         *out0 = *(s32 *)(obj + 0x340) + idx * 0x40;
     }
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0062_ResetCharacterClassIKNodeInterpInfo", GetCharacterClassNodeMatQuaternionPos);
 
 //INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0062_ResetCharacterClassIKNodeInterpInfo", EnableCharacterObjAdditionMotion);
 void EnableCharacterObjAdditionMotion(u8 *obj)
@@ -136,8 +130,6 @@ void EnableCharacterObjAddParentVelocity(u8 *obj)
     cc[0xA18] = 0;
 }
 
-/* NEARMISS-STUB ReleaseCharacterClassAddMotSyncAnimAll */
-#if 0 /* NEARMISS 95.44% cat=branch-layout sub=- | inner loop: we emit b+nop where target has bnel with lw in delay slot | attempts=1 */
 s32 isysGroupForFirst();
 s32 isysGroupForNext();
 void isysRequestDeleteObj();
@@ -155,20 +147,11 @@ void ReleaseCharacterClassAddMotSyncAnimAll(u8 *obj)
     for (i = 0; i < *(s32 *)(cc + 0x3EC); i++)
     {
         grp = i * 0x80 + *(s32 *)(cc + 0x308);
-        node = isysGroupForFirst(grp, 0);
         item = 0;
-        if (node != 0)
+        for (node = isysGroupForFirst(grp, 0); node != 0; node = isysGroupForNext(node, 0))
         {
             item = *(s32 *)node;
-            do
-            {
-                isysRequestDeleteObj(item);
-                node = isysGroupForNext(node, 0);
-                if (node != 0)
-                {
-                    item = *(s32 *)node;
-                }
-            } while (node != 0);
+            isysRequestDeleteObj(item);
         }
         if (item != 0)
         {
@@ -177,11 +160,6 @@ void ReleaseCharacterClassAddMotSyncAnimAll(u8 *obj)
         isysDeleteGroupAllObj(grp);
     }
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0062_ResetCharacterClassIKNodeInterpInfo", ReleaseCharacterClassAddMotSyncAnimAll);
-
-/* NEARMISS-STUB func_40059AE8 */
-#if 0 /* NEARMISS 83.33% cat=sched sub=- | sw 0xC70 scheduled before sb 0xD01/0xD00 (target sb,sb,sw) | attempts=1 */
 
 void func_40059AE8(u8 *obj)
 {
@@ -190,13 +168,11 @@ void func_40059AE8(u8 *obj)
     if (*(s32 *)(cc + 0xC70) != 0)
     {
         DeleteTwoWayLink(cc + 0xC80);
-        cc[0xD01] = 0;
         cc[0xD00] = 0;
         *(s32 *)(cc + 0xC70) = 0;
+        cc[0xD01] = 0;
     }
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0062_ResetCharacterClassIKNodeInterpInfo", func_40059AE8);
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0062_ResetCharacterClassIKNodeInterpInfo", AddCharacterClassOptionNodeSubGeometry);
 

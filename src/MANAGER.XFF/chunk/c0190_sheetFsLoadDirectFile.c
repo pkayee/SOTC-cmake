@@ -23,20 +23,16 @@ int sheetFsGetStageTexSegIndex(int x, int y)
     return (*(Seg **)(D_401B5350 + 8))[(4 - y) * 10 + (x + 5) % 10].seg;
 }
 
-/* NEARMISS-STUB sheetFsAddStageTexSegIndex */
-#if 0 /* NEARMISS 98.75% cat=regalloc sub=- | void form: lui/base reg v0 vs target v1; tmp/ptr locals change allocation, not matched | attempts=2 */
 typedef struct { int idx, b; } SegIdx;
 extern SegIdx *D_401B5348;
 
 int sheetFsAddStageTexSegIndex(int i)
 {
-    return ++D_401B5348[i].idx;
-}
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0190_sheetFsLoadDirectFile", sheetFsAddStageTexSegIndex);
+    int r = D_401B5348[i].idx;
 
-typedef struct { int idx, b; } SegIdx;
-extern SegIdx *D_401B5348;
+    D_401B5348[i].idx = r + 1;
+    return r;
+}
 
 int sheetFsDecStageTexSegIndex(int i)
 {

@@ -4,24 +4,16 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0184_func_400E83F0", func_400E8
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0184_func_400E83F0", func_400E8A70);
 
-/* NEARMISS-STUB adpcmOpenChkComplete */
-#if 0 /* NEARMISS 95.38% cat=regalloc sub=- | mult result and array base register assigned swapped (v0/v1) | attempts=1 */
 extern s32 D_4012E018;
 extern u64 D_401B2460;
 
 u64 adpcmOpenChkComplete(s32 arg0)
 {
-    u64 ret;
-
-    ret = 1;
-    if (D_4012E018 != 0)
-    {
-        ret = (*(u64 *)((u8 *)&D_401B2460 + arg0 * 0x560) >> 36) & 1;
+    if (D_4012E018 == 0) {
+        return 1;
     }
-    return ret;
+    return (*(u64 *)((u8 *)&D_401B2460 + arg0 * 0x560) >> 36) & 1;
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0184_func_400E83F0", adpcmOpenChkComplete);
 
 //INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0184_func_400E83F0", adpcmPlay);
 extern s32 D_4012E018;

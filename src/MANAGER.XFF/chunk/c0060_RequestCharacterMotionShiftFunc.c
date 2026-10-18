@@ -26,28 +26,26 @@ void RequestCharacterMotionShiftFunc(u8 *obj, s32 func)
     }
 }
 
-/* NEARMISS-STUB GetCharacterClassNodeQuaternionPos */
-#if 0 /* NEARMISS 99.8% cat=regalloc sub=arg reg v1 vs v0 for const 1 store | const 1 in v1 not v0 at sb 0x523 (after GetMotionMatrix call) | attempts=1 */
-void GetCharacterClassNodeQuaternionPos(s32 *param_1, s32 *param_2, s32 param_3, s32 param_4, s32 param_5)
+extern void GetMotionMatrix(s32, s32, s32, s32, u8 *, u8 *);
+
+void GetCharacterClassNodeQuaternionPos(s32 *param_1, s32 *param_2, u8 *obj, s32 param_4, s32 param_5)
 {
     if (param_5 != 0)
     {
-        *param_1 = *(s32 *)(param_3 + 0x154) + param_4 * 0x10;
-        *param_2 = *(s32 *)(param_3 + 0x158) + param_4 * 0x40 + 0x30;
+        *param_1 = *(s32 *)(obj + 0x154) + param_4 * 0x10;
+        *param_2 = *(s32 *)(obj + 0x158) + param_4 * 0x40 + 0x30;
     }
     else
     {
-        if (*(s8 *)(param_3 + 0x523) == 0)
+        if (*(s8 *)(obj + 0x523) == 0)
         {
-            GetMotionMatrix(*(s32 *)(param_3 + 0x340), *(s32 *)(param_3 + 0x344), *(s32 *)(param_3 + 0x354), *(s32 *)(param_3 + 0x33C), param_3 + 0x40, param_3 + 0x90);
-            *(u8 *)(param_3 + 0x523) = 1;
+            GetMotionMatrix(*(s32 *)(obj + 0x340), *(s32 *)(obj + 0x344), *(s32 *)(obj + 0x354), *(s32 *)(obj + 0x33C), obj + 0x40, obj + 0x90);
+            obj[0x523] = 1;
         }
-        *param_1 = *(s32 *)(param_3 + 0x344) + param_4 * 0x10;
-        *param_2 = *(s32 *)(param_3 + 0x340) + param_4 * 0x40 + 0x30;
+        *param_1 = *(s32 *)(obj + 0x344) + param_4 * 0x10;
+        *param_2 = *(s32 *)(obj + 0x340) + param_4 * 0x40 + 0x30;
     }
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0060_RequestCharacterMotionShiftFunc", GetCharacterClassNodeQuaternionPos);
 extern void GetMotionMatrix(s32, s32, s32, s32, u8 *, u8 *);
 
 s32 CalcCharacterClassBaseGeo(u8 *obj)
@@ -80,8 +78,6 @@ void ResetCharacterClassSyncMode(s32 param_1)
 
 
 
-/* NEARMISS-STUB SetCharacterClassMotionNormalSyncMode */
-#if 0 /* NEARMISS 94.41% cat=regalloc sub=- | first class select is movz form (a0=0 default) vs chrClass movn form | attempts=2 */
 
 void SetCharacterClassMotionNormalSyncMode(s32 param_1, s32 param_2)
 {
@@ -94,8 +90,7 @@ void SetCharacterClassMotionNormalSyncMode(s32 param_1, s32 param_2)
         *(s32 *)(param_1 + 0xC70) = 0;
         *(u8 *)(param_1 + 0xD01) = 0;
     }
-    cc = chrClass((u8 *)param_2);
-    AddTwoWayLinkNext(cc + 0xC74, param_1 + 0xC80);
+    AddTwoWayLinkNext(chrClass((u8 *)param_2) + 0xC74, param_1 + 0xC80);
     *(u8 *)(param_1 + 0xD00) = 1;
     *(s32 *)(param_1 + 0xC70) = param_2;
     if (param_2 != 0)
@@ -108,8 +103,6 @@ void SetCharacterClassMotionNormalSyncMode(s32 param_1, s32 param_2)
         *(u8 *)(param_1 + 0xD01) = 0;
     }
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0060_RequestCharacterMotionShiftFunc", SetCharacterClassMotionNormalSyncMode);
 
 /* NEARMISS-STUB ResetCharacterClassMotInterpInfo */
 #if 0 /* NEARMISS 10.75% cat=float-ops sub=- | 1.0f in f1 and motion float in f0 vs reverse; store slots differ | attempts=2 */
