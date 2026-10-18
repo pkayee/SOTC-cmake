@@ -2,45 +2,179 @@
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0155_DispWithTorchBlur", DispWithTorchBlur);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0155_DispWithTorchBlur", CheckSwordIndicateAimPoint);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0155_DispWithTorchBlur", CheckSwordIndicateAimPoint);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0155_DispWithTorchBlur", GetSwordFlareHitPlaneAttribute);
+s32 GAMEUTIL_is_player_obj(s32 chr);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0155_DispWithTorchBlur", getMinAmbient);
+extern s32 D_40131E34;
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0155_DispWithTorchBlur", getMaxAmbient);
+s32 CheckSwordIndicateAimPoint(s32 chr)
+{
+    if (GAMEUTIL_is_player_obj(chr) == 1)
+    {
+        return D_40131E34;
+    }
+    return 0;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0155_DispWithTorchBlur", getMinAmbientLine);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0155_DispWithTorchBlur", GetSwordFlareHitPlaneAttribute);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0155_DispWithTorchBlur", getMaxAmbientLine);
+extern u64 D_40131D88;
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0155_DispWithTorchBlur", getMinAngle);
+u64 GetSwordFlareHitPlaneAttribute(void)
+{
+    return D_40131D88;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0155_DispWithTorchBlur", getMaxAngle);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0155_DispWithTorchBlur", getMinAmbient);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0155_DispWithTorchBlur", getMaxLineAngle);
+extern f32 D_40131CF0;
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0155_DispWithTorchBlur", getMinAmbientWeak);
+f32 *getMinAmbient(void)
+{
+    return &D_40131CF0;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0155_DispWithTorchBlur", getMaxAmbientWeak);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0155_DispWithTorchBlur", getMaxAmbient);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0155_DispWithTorchBlur", getMinAmbientLineWeak);
+extern f32 D_40131CF4;
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0155_DispWithTorchBlur", getMaxAmbientLineWeak);
+f32 *getMaxAmbient(void)
+{
+    return &D_40131CF4;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0155_DispWithTorchBlur", getMinAngleWeak);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0155_DispWithTorchBlur", getMinAmbientLine);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0155_DispWithTorchBlur", getMaxAngleWeak);
+extern f32 D_40131CF8;
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0155_DispWithTorchBlur", getMaxLineAngleWeak);
+f32 *getMinAmbientLine(void)
+{
+    return &D_40131CF8;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0155_DispWithTorchBlur", getMaxFogMulVal);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0155_DispWithTorchBlur", getMaxAmbientLine);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0155_DispWithTorchBlur", getFogChangeSpeed);
+extern f32 D_40131CFC;
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0155_DispWithTorchBlur", getSwordLineWidthMax);
+f32 *getMaxAmbientLine(void)
+{
+    return &D_40131CFC;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0155_DispWithTorchBlur", getSwordLineChangeSpeed);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0155_DispWithTorchBlur", getMinAngle);
+extern f32 D_40131D00;
+
+f32 *getMinAngle(void)
+{
+    return &D_40131D00;
+}
+
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0155_DispWithTorchBlur", getMaxAngle);
+extern f32 D_40131D04;
+
+f32 *getMaxAngle(void)
+{
+    return &D_40131D04;
+}
+
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0155_DispWithTorchBlur", getMaxLineAngle);
+extern f32 D_40131D08;
+
+f32 *getMaxLineAngle(void)
+{
+    return &D_40131D08;
+}
+
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0155_DispWithTorchBlur", getMinAmbientWeak);
+
+extern f32 D_40131D0C;
+
+f32 *getMinAmbientWeak(void)
+{
+    return &D_40131D0C;
+}
+
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0155_DispWithTorchBlur", getMaxAmbientWeak);
+
+extern f32 D_40131D10;
+
+f32 *getMaxAmbientWeak(void)
+{
+    return &D_40131D10;
+}
+
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0155_DispWithTorchBlur", getMinAmbientLineWeak);
+extern f32 D_40131D14;
+
+f32 *getMinAmbientLineWeak(void)
+{
+    return &D_40131D14;
+}
+
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0155_DispWithTorchBlur", getMaxAmbientLineWeak);
+extern f32 D_40131D18;
+
+f32 *getMaxAmbientLineWeak(void)
+{
+    return &D_40131D18;
+}
+
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0155_DispWithTorchBlur", getMinAngleWeak);
+extern f32 D_40131D1C;
+
+f32 *getMinAngleWeak(void)
+{
+    return &D_40131D1C;
+}
+
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0155_DispWithTorchBlur", getMaxAngleWeak);
+extern f32 D_40131D20;
+
+f32 *getMaxAngleWeak(void)
+{
+    return &D_40131D20;
+}
+
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0155_DispWithTorchBlur", getMaxLineAngleWeak);
+extern f32 D_40131D24;
+
+f32 *getMaxLineAngleWeak(void)
+{
+    return &D_40131D24;
+}
+
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0155_DispWithTorchBlur", getMaxFogMulVal);
+extern f32 D_40131D28;
+
+f32 *getMaxFogMulVal(void)
+{
+    return &D_40131D28;
+}
+
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0155_DispWithTorchBlur", getFogChangeSpeed);
+extern f32 D_40131D2C;
+
+f32 *getFogChangeSpeed(void)
+{
+    return &D_40131D2C;
+}
+
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0155_DispWithTorchBlur", getSwordLineWidthMax);
+extern f32 D_40131D30;
+
+f32 *getSwordLineWidthMax(void)
+{
+    return &D_40131D30;
+}
+
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0155_DispWithTorchBlur", getSwordLineChangeSpeed);
+extern f32 D_40131D34;
+
+f32 *getSwordLineChangeSpeed(void)
+{
+    return &D_40131D34;
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0155_DispWithTorchBlur", getSwordLlineChangeThreshold);
 
