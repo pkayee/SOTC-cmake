@@ -8,7 +8,6 @@ void SCRFuncBootBoss(void)
 }
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0223_SCRFuncBootBoss", SCRFuncSetGameFlagByGameObj);
-
 void _gameFlagSet(s32 idx);
 
 void SCRFuncSetGameFlag(s32 unused, s32 idx)
@@ -31,7 +30,6 @@ void SCRFuncSetMyselfMotionSpeedRatio(s32 a0, s32 a1)
 }
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0223_SCRFuncBootBoss", SCRFuncSetAttakIKPosForMotionCheck);
-
 void *getSCRDataCtrlWork(void);
 
 void SCRFuncParentRelateInit(void)
@@ -94,7 +92,30 @@ void SCRFuncAddAngryValue(f32 value)
     *(f32 *)(work + 0x40D8) = *(f32 *)(work + 0x40D8) + value;
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0223_SCRFuncBootBoss", SCRFuncSetOrientCheckWork);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0223_SCRFuncBootBoss", SCRFuncSetOrientCheckWork);
+
+extern s32 DldSysUndefSymbol;
+void *getSCRDataCtrlWork(void);
+
+static inline u8 *dldElemOC(u32 *lp)
+{
+    u8 *slot;
+    u32 w = *lp;
+    u32 off = w & 0x3FFFF;
+
+    slot = off ? *(u8 **)((u8 *)lp - off) : NULL;
+    return (slot != NULL && slot != (u8 *)DldSysUndefSymbol)
+               ? *(u8 **)(slot + 0x10) + ((w >> 18) & 0xFFF) * *(s32 *)(*(u8 **)(slot + 8) + 0xC)
+               : NULL;
+}
+
+void SCRFuncSetOrientCheckWork(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4, s32 a5, u32 *lpB, s32 a7, u32 *lpA)
+{
+    u8 *work = (u8 *)getSCRDataCtrlWork();
+
+    *(s32 *)(work + 0x4098) = (s32)dldElemOC(lpA);
+    *(s32 *)(work + 0x409C) = (s32)dldElemOC(lpB);
+}
 
 void GAMEUTIL_set_auto_get_flag_boss_interest_position(s32 flag);
 
@@ -173,7 +194,6 @@ void SCRFuncSetSearchRadius(f32 radius)
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0223_SCRFuncBootBoss", SCRFuncResetSearchRadius);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0223_SCRFuncBootBoss", SCRFuncSetSpeedByHorseForWormCtrl);
-
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0223_SCRFuncBootBoss", SCRFuncSetDistByHorseForWormCtrl);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0223_SCRFuncBootBoss", SCRFuncSetAttainPosForEscapeToPlayer);
@@ -209,7 +229,25 @@ void SCRFuncSegmentLoadWait(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4, s32 a5, s32 
     }
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0223_SCRFuncBootBoss", SCRFuncSetPerceptionParam);
+extern s32 DldSysUndefSymbol;
+void setPerceptionParam(u8 *work, u8 *param);
+
+static inline u8 *dldElem(u32 *lp)
+{
+    u8 *slot;
+    u32 w = *lp;
+    u32 off = w & 0x3FFFF;
+
+    slot = off ? *(u8 **)((u8 *)lp - off) : NULL;
+    return (slot != NULL && slot != (u8 *)DldSysUndefSymbol)
+               ? *(u8 **)(slot + 0x10) + ((w >> 18) & 0xFFF) * *(s32 *)(*(u8 **)(slot + 8) + 0xC)
+               : NULL;
+}
+
+void SCRFuncSetPerceptionParam(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4, s32 a5, u32 *lp)
+{
+    setPerceptionParam((u8 *)getSCRDataCtrlWork() + 0x4010, dldElem(lp));
+}
 
 s32 stagemanager_getSegmentVariation(s32 a0);
 void stagemanager_changeSegmentVariation(s32 a0);
