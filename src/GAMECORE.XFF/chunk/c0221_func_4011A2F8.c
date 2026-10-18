@@ -36,12 +36,56 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0221_func_4011A2F8", setAttack
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0221_func_4011A2F8", setAttackHeadDataFormNowMode);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0221_func_4011A2F8", func_4011AA38);
+void func_4011AA38(void *actor, int a1, int a2, void *a3)
+{
+    u8 *w = (u8 *)getSCRDataCtrlWork(actor) + 0x40A0;
+
+    *(s32 *)(w + 0x10) = 0;
+    *(s32 *)(w + 0x8) = *(s32 *)(w + 0x8) + 1;
+    if (a3 != 0) {
+        *(f32 *)(w + 0x14) = *(f32 *)((u8 *)a3 + 0x4C);
+    }
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0221_func_4011A2F8", func_4011AA80);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0221_func_4011A2F8", func_4011ABD0);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0221_func_4011A2F8", func_4011ABD0);
+void func_4011ABD0(void *actor, int a1, int a2, void *a3)
+{
+    u8 *w = (u8 *)getSCRDataCtrlWork(actor) + 0x40A0;
 
+    if (a3 != 0) {
+        *(f32 *)(w + 0x14) = *(f32 *)((u8 *)a3 + 0x4C);
+    }
+}
+
+/* NEARMISS-STUB func_4011AC08 */
+#if 0 /* NEARMISS 66.5% cat=regalloc sub=- | ret var in v1 not v0; const 1 hoisted to a2; compiler tail shape differs | attempts=1 */
+u32 func_4011AC08(void *actor, void *a1)
+{
+    u8 *w;
+    s32 type;
+    u32 ret = 0;
+
+    w = (u8 *)getSCRDataCtrlWork(actor) + 0x4010;
+    if (a1 != 0) {
+        type = *(s32 *)((u8 *)a1 + 0x18);
+        if (type == 1) {
+            ret = *(u32 *)(w + 0x2C);
+        } else if (type < 2) {
+            ret = 1;
+            if (type != 0) {
+                ret = 0;
+            }
+        } else if (type == 2) {
+            ret = *(u32 *)(w + 0x30) | *(u32 *)(w + 0x34);
+        } else {
+            ret = 0;
+        }
+    }
+    return ret;
+}
+#endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0221_func_4011A2F8", func_4011AC08);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0221_func_4011A2F8", func_4011AC80);
@@ -52,7 +96,13 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0221_func_4011A2F8", SCRFuncCh
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0221_func_4011A2F8", SCRFuncDamageSendFunc);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0221_func_4011A2F8", SCRFuncSetNextRouteMaxAngle);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0221_func_4011A2F8", SCRFuncSetNextRouteMaxAngle);
+extern void setRouteMinAngle(void *, f32);
+
+void SCRFuncSetNextRouteMaxAngle(void *actor, f32 deg)
+{
+    setRouteMinAngle(getSCRDataCtrlWork(actor), (180.0f - deg) * 3.1415926f / 180.0f);
+}
 
 extern void *getSCRDataCtrlWork(void *);
 extern void setEventLineAttr(void *, int, int);

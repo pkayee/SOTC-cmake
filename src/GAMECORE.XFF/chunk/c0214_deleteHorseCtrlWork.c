@@ -35,13 +35,63 @@ void setFreezeHorseCtrlWork(void *arg0, int arg1)
     (*(int *)((char *)(arg0) + 0x3C)) = arg1;
 }
 
+/* NEARMISS-STUB func_40111B78 */
+#if 0 /* NEARMISS 98.3% cat=regalloc sub=- | lui/addiu swapped v0/v1 and 0x38=1 store scheduled before 0x30 | attempts=1 */
+extern float D_40137728;
+extern s32 _resetBaseMoveWork(s32 arg0, void *arg1);
+void func_40111BC8(void *arg0);
+
+void func_40111B78(s32 arg0, void *arg1)
+{
+    float f;
+
+    _resetBaseMoveWork(arg0, arg1);
+    f = D_40137728;
+    (*(float *)((char *)(arg1) + 0x40)) = f;
+    (*(int *)((char *)(arg1) + 0x30)) = 1;
+    (*(int *)((char *)(arg1) + 0xD0)) = 0;
+    (*(int *)((char *)(arg1) + 0x34)) = 0;
+    (*(int *)((char *)(arg1) + 0x38)) = 1;
+    (*(int *)((char *)(arg1) + 0xAC)) = 0;
+    (*(int *)((char *)(arg1) + 0x3C)) = 0;
+    func_40111BC8(arg1);
+}
+#endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0214_deleteHorseCtrlWork", func_40111B78);
 
+/* NEARMISS-STUB func_40111BC8 */
+#if 0 /* NEARMISS 80.0% cat=struct-layout sub=- | lwc1 f0 scheduled after lq 0x10 copy; store order 0x60/0xA8 differs; compiler reuses float addr | attempts=1 */
+extern f32 D_4013772C;
+extern f32 D_40137730;
+extern u128 fltMaxVector;
+
+void func_40111BC8(void *arg0)
+{
+    f32 f1;
+    f32 f0;
+
+    f1 = D_4013772C;
+    f0 = D_40137730;
+    *(u128 *)((char *)arg0 + 0x50) = *(u128 *)((char *)arg0 + 0x10);
+    *(f32 *)((char *)arg0 + 0xA4) = f0;
+    *(f32 *)((char *)arg0 + 0x60) = f1;
+    *(f32 *)((char *)arg0 + 0xA8) = f1;
+    *(s32 *)((char *)arg0 + 0xA0) = 0;
+    *(s32 *)((char *)arg0 + 0xB4) = 0;
+    *(u128 *)((char *)arg0 + 0xC0) = fltMaxVector;
+}
+#endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0214_deleteHorseCtrlWork", func_40111BC8);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0214_deleteHorseCtrlWork", func_40111C08);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0214_deleteHorseCtrlWork", func_40111D98);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0214_deleteHorseCtrlWork", func_40111D98);
+void chkEstimatCollisionCore(void *arg0, s32 arg1, void *arg2, f32 arg3, f32 arg4, f32 arg5);
+
+void func_40111D98(void *arg0, s32 arg1, f32 arg2, f32 arg3)
+{
+    chkEstimatCollisionCore(arg0, arg1, (char *)arg0 + 0x120, arg2, arg3, *(f32 *)(*(char **)((char *)arg0 + 0xCC) + 0x68));
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0214_deleteHorseCtrlWork", func_40111DC0);
 

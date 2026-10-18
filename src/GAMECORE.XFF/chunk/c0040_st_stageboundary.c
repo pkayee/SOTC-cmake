@@ -2,7 +2,21 @@
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0040_st_stageboundary", st_stageboundary);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0040_st_stageboundary", func_400421B8);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0040_st_stageboundary", func_400421B8);
+
+extern s32 GetWorldLayoutSheetSegHeader(void);
+extern void setLightParam(s32 param);
+
+s32 func_400421B8(void *param)
+{
+    s32 hdr;
+
+    hdr = GetWorldLayoutSheetSegHeader();
+    if (hdr != 0) {
+        setLightParam(*(s32 *)(hdr + 0x10) + *(s32 *)((u8 *)param + 0x20) * 0x9c);
+    }
+    return 0;
+}
 
 typedef struct {
     long v[8];
@@ -120,9 +134,45 @@ void time_attack_end(void)
     gstatKaisouMode = 0;
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0040_st_stageboundary", time_attack_start);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0040_st_stageboundary", time_attack_start);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0040_st_stageboundary", time_attack_retry);
+extern s32 D_402010DC;
+extern int D_402010D8;
+extern void gStatCheckPointSave(void);
+extern s32 getGameHardMode(void);
+extern s32 gstatBootMcChkExistIcoData(void);
+extern void omakeStatInit(s32 a, void *b, s32 c);
+extern void setSmallManagerSystemLock(int arg0);
+extern void gStatInitNotOmakeInit(void);
+extern void bossStatTimeAttackJumpSekiban(s32);
+
+void time_attack_start(void)
+{
+    s32 uVar1;
+    s32 uVar2;
+
+    gStatCheckPointSave();
+    gstatTimeAttackMode = 1;
+    gstatKaisouMode = D_402010DC;
+    gStatInitNotOmakeInit();
+    if (gstatKaisouMode == 0) {
+        uVar1 = gstatBootMcChkExistIcoData();
+        uVar2 = getGameHardMode();
+        omakeStatInit(uVar1, 0, uVar2);
+    }
+    setSmallManagerSystemLock(1);
+    bossStatTimeAttackJumpSekiban(D_402010D8);
+}
+
+extern void gStatInitNotOmakeInit(void);
+extern void bossStatTimeAttackJumpSekiban(s32);
+extern int D_402010D8;
+
+void time_attack_retry(void)
+{
+    gStatInitNotOmakeInit();
+    bossStatTimeAttackJumpSekiban(D_402010D8);
+}
 
 typedef struct {
     char pad[0xAC];

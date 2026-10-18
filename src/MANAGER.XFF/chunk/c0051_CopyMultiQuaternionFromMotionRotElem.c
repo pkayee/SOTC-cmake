@@ -72,6 +72,25 @@ void convert_from_quater_to_rotXYZ_motion_ik_base(void *arg0, void *arg1, char *
     convert_from_quater_to_rotXYZ_direct_motion_ik_base(arg0, arg1, *(s32 *)(p + 0x14));
 }
 
+/* NEARMISS-STUB convert_from_quater_to_rotXYZ_direct_motion_ik_base */
+#if 0 /* NEARMISS 40.8% cat=no-c-form sub=- | target has break 0 (unreachable in C; __builtin_trap unsupported); branch order differs | attempts=1 */
+extern void GetEulerYXZFromQuaternion(void *, void *);
+extern void GetEulerZXYFromQuaternion(void *, void *);
+
+void convert_from_quater_to_rotXYZ_direct_motion_ik_base(void *arg0, void *arg1, s32 arg2)
+{
+    if (arg2 == 0)
+    {
+        GetEulerYXZFromQuaternion(arg0, arg1);
+        return;
+    }
+    if (arg2 != 1)
+    {
+        return;
+    }
+    GetEulerZXYFromQuaternion(arg0, arg1);
+}
+#endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0051_CopyMultiQuaternionFromMotionRotElem", convert_from_quater_to_rotXYZ_direct_motion_ik_base);
 
 extern void convert_from_rotXYZ_to_quater_direct_motion_ik_base(void *, void *, s32);
@@ -86,4 +105,25 @@ void convert_from_rotXYZ_to_quater_motion_ik_base(void *arg0, void *arg1, char *
     convert_from_rotXYZ_to_quater_direct_motion_ik_base(arg0, arg1, *(s32 *)(p + 0x14));
 }
 
+/* NEARMISS-STUB convert_from_rotXYZ_to_quater_direct_motion_ik_base */
+#if 0 /* NEARMISS 0.0% cat=no-c-form sub=- | target has break 0 trap on fall-through path (no C form); branch layout differs | attempts=1 */
+extern void GetQuaternionByEulerYXZ(f32, f32, f32);
+extern void GetQuaternionByEulerZXY(f32, f32, f32);
+
+void convert_from_rotXYZ_to_quater_direct_motion_ik_base(void *arg0, void *arg1, s32 arg2)
+{
+    f32 *f = arg1;
+
+    if (arg2 != 0)
+    {
+        if (arg2 == 1)
+        {
+            GetQuaternionByEulerZXY(f[0], f[1], f[2]);
+            return;
+        }
+        return;
+    }
+    GetQuaternionByEulerYXZ(f[0], f[1], f[2]);
+}
+#endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0051_CopyMultiQuaternionFromMotionRotElem", convert_from_rotXYZ_to_quater_direct_motion_ik_base);
