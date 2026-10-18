@@ -10,7 +10,17 @@ void AI_GetNegaVector(void *arg0, void *arg1)
     (*(float *)((char *)(arg0) + 0xC)) = (float) (*(float *)((char *)(arg1) + 0xC));
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0127_AI_GetRandomCylinderOfs", AI_CheckDamage_Bow);
+u8 *GetDamageClass(s32 a0);
+
+s32 AI_CheckDamage_Bow(void *a, void *obj)
+{
+    u8 *d = GetDamageClass((s32)obj);
+
+    if ((d != 0) && (*(s32 *)d == 3)) {
+        return *(s32 *)(d + 0x60) == 1;
+    }
+    return 0;
+}
 
 u8 *GetDamageClass(s32 a0);
 s32 GetDamagerClassDamageSheetType(u8 *damage);

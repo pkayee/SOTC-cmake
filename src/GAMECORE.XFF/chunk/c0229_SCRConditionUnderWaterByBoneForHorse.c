@@ -203,7 +203,13 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0229_SCRConditionUnderWaterByB
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0229_SCRConditionUnderWaterByBoneForHorse", SCRConditionAtkChackThreeRayParallel);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0229_SCRConditionUnderWaterByBoneForHorse", func_40125880);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0229_SCRConditionUnderWaterByBoneForHorse", func_40125880);
+u64 *GetCollisionDBAttributeAdr(void *surface);
+
+int func_40125880(void *surface)
+{
+    return (*GetCollisionDBAttributeAdr(surface) & 0xF80000000ULL) == 0x600000000ULL;
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0229_SCRConditionUnderWaterByBoneForHorse", func_401258C0);
 

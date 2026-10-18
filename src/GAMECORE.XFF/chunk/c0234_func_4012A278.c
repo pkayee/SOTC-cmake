@@ -23,7 +23,13 @@ void nico_BeardTest(void) {
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0234_func_4012A278", nico_Meet2Main);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0234_func_4012A278", func_4012AC10);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0234_func_4012A278", func_4012AC10);
+s64 *GetCollisionDBAttributeAdr(void);
+
+s32 func_4012AC10(void)
+{
+    return (*GetCollisionDBAttributeAdr() & 0x7C000000) != 0x30000000;
+}
 
 extern int GetCharacterClassInitParamNbOptionNodes();
 extern void iosJumpRecoverPoint(void *);

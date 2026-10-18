@@ -13,11 +13,11 @@ extern char *getEditWorkInitData(int);
 extern void AI_InitAnimalWork(void *, int);
 extern void Kite_InitKitePathWork(void *, void *, float, float);
 extern void Kite_SetAnimalID_KitePathWork(void *, int);
-extern void SetScriptObjDeleteCallBackFunc(void *, void (*)(void), void *);
+extern void SetScriptObjDeleteCallBackFunc(void *, void (*)(void *, u8 *), void *);
 extern void func_400B79B8(void *);
 extern void func_400B75A8(void *);
 extern void func_400B7810(void *);
-extern void func_400B8390(void);
+extern void func_400B8390(void *, u8 *);
 extern void func_400B7308(void);
 
 void nico_SmallKiteStart(void)
@@ -55,7 +55,23 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0136_nico_SmallKiteStart", Kit
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0136_nico_SmallKiteStart", KiteInitFunc);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0136_nico_SmallKiteStart", func_400B8390);
+extern void iosFree(void *);
+
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0136_nico_SmallKiteStart", func_400B8390);
+void func_400B8390(void *a0, u8 *a1)
+{
+    s32 v;
+
+    if (a1 != NULL)
+    {
+        v = *(s32 *)(a1 + 0x300);
+        if (v != 0)
+        {
+            return iosFree((void *)v);
+        }
+    }
+    return;
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0136_nico_SmallKiteStart", func_400B83C8);
 
