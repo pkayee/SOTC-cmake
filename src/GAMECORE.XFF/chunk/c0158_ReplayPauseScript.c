@@ -98,9 +98,7 @@ void SetTimeAttackTimeFlag(s32 arg0)
 
 float GetTimeAttackTimeLimit(void)
 {
-    float limit = g_TimeAttack.limit;
-    float elapsed = g_TimeAttack.elapsed;
-    return limit - elapsed;
+    return g_TimeAttack.limit - g_TimeAttack.elapsed;
 }
 
 struct ReplayView {

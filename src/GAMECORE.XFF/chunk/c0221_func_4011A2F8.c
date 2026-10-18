@@ -94,19 +94,15 @@ int SCRFuncLineAllReset(void *actor)
 extern int getDPGroupID(void *, int);
 extern void setUserPathGroupID(char *, int, int);
 
-/* NEARMISS-STUB SCRFuncSetDPGroupID */
-#if 0 /* NEARMISS 77.0% cat=cse-hoist sub=- | in-TU: 100 only with their dead store w=0 after setUserPathGroupID (rule 13); plain form 77.6 tail-call vs frame | attempts=1 */
 void SCRFuncSetDPGroupID(void *a, int b, int c, int d, int e, int name)
 {
     void *w = getSCRDataCtrlWork(a);
     int id = getDPGroupID(a, name);
     if (id != -1) {
         setUserPathGroupID(w, id, -1);
-        w = 0;
     }
+    return;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0221_func_4011A2F8", SCRFuncSetDPGroupID);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0221_func_4011A2F8", SCRFuncSetAttainPlayer);
 
@@ -133,25 +129,17 @@ void SCRFuncSetAttainLostPlayerPos(void *actor, f32 y)
     setAttainmentPos(w, &t);
 }
 
-/* NEARMISS-STUB SCRFuncSetAttainMyselfPosAndGlobalY */
-#if 0 /* NEARMISS 85.0% cat=regalloc sub=- | in-TU: target keeps layout ptr in s0 and arg in s1 (frame 0x30); ours frame 0x28; ref needs unused local w (dead var, rule 13) | attempts=1 */
-typedef union { s128 q; f32 f[4]; s32 i[4]; } Vec4;
 extern u8 *GetLayoutClass(void *chara);
-extern void setAttainmentPos(u8 *work, Vec4 *pos);
 
 void SCRFuncSetAttainMyselfPosAndGlobalY(void *a, f32 y)
 {
+    char *w = getSCRDataCtrlWork(a);
     Vec4 p;
-    void *l;
 
-    getSCRDataCtrlWork(a);
-    l = GetLayoutClass(a);
-    p.q = (*(Vec4 **)(l + 0x134))->q;
+    p.q = (*(Vec4 **)(GetLayoutClass(a) + 0x134))->q;
     p.f[1] = y;
-    setAttainmentPos(l, &p);
+    setAttainmentPos(w, &p);
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0221_func_4011A2F8", SCRFuncSetAttainMyselfPosAndGlobalY);
 
 void SCRFuncSetAttainPlayerPosAndGlobalY(void *actor, f32 y)
 {

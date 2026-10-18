@@ -204,8 +204,6 @@ void stagemanager_checkstageAlreadyLoaded(void)
     sheetMgrChkStageIndexResolve();
 }
 
-/* NEARMISS-STUB stagemanager_checkstageAlreadyLoadedByStrptr */
-#if 0 /* NEARMISS 86.0% cat=call-abi sub=- | sibcall j vs jal | attempts=1 */
 void stagemanager_checkstageAlreadyLoadedByStrptr(u32 *a0)
 {
     u32 a2;
@@ -220,11 +218,14 @@ void stagemanager_checkstageAlreadyLoadedByStrptr(u32 *a0)
     a2 = *a0;
     off = a2 & 0x3FFFF;
     p = (off != 0) ? *(u8 **)((u8 *)a0 - off) : NULL;
-    e = 0;
     if ((s32)p != 0 && (s32)p != DldSysUndefSymbol)
     {
         q = *(u8 **)(p + 8);
         e = *(s32 *)(p + 0x10) + ((a2 >> 18) & 0xFFF) * *(s32 *)(q + 0xC);
+    }
+    else
+    {
+        e = 0;
     }
     if (e != 0)
     {
@@ -241,9 +242,8 @@ void stagemanager_checkstageAlreadyLoadedByStrptr(u32 *a0)
         r = -1;
     }
     sheetMgrChkStageIndexResolve(r);
+    return;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0039_stagemanager_createsubthread", stagemanager_checkstageAlreadyLoadedByStrptr);
 
 extern s32 DldSysUndefSymbol;
 extern u8 SH_StageDataDEFAULT[];
@@ -269,8 +269,6 @@ void stagemanager_checkstageAlreadyLoadedByStageData(s32 a0)
     return;
 }
 
-/* NEARMISS-STUB stagemanager_unloadstageByStrptr */
-#if 0 /* NEARMISS 76.59% cat=call-abi sub=- | sibcall j createScriptObj vs jal | attempts=1 */
 void func_40041DD8(s32 a0);
 
 void stagemanager_unloadstageByStrptr(u32 *a0)
@@ -311,9 +309,8 @@ void stagemanager_unloadstageByStrptr(u32 *a0)
         r = -1;
     }
     createScriptObj((void *)func_40041DD8, r, *(void **)(gcGlobalVar + 0x308), 0x1000, 0, 1, 0, 0);
+    return;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0039_stagemanager_createsubthread", stagemanager_unloadstageByStrptr);
 
 extern s32 D_40131488;
 void func_4003C750(void);

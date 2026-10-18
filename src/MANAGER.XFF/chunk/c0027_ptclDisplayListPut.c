@@ -24,7 +24,7 @@ extern unsigned char D_401ABDC8[];
 
 void ptclmanBegin(void)
 {
-    (*(int *)((char *)(D_401ABDC8) + 0)) = iosGetPacketPtrPath1();
+    (*(int *)((char *)(D_401ABDC8) + 0)) = (int)iosGetPacketPtrPath1();
     (*(int *)((char *)(D_401ABDC8) + 4)) = 0;
 }
 

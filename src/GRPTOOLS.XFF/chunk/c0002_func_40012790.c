@@ -16,7 +16,7 @@ s32 DebugDispGameLightClass(s32 a0, s32 a1, f32 f);
 s32 DebugDispGlobalLightClass(s32 a0, s32 a1, f32 f);
 
 //INCLUDE_ASM("asm/GRPTOOLS.XFF/nonmatchings/chunk/c0002_func_40012790", func_40012790);
-s32 func_40012790(void)
+s32 func_40012790()
 {
     return DebugDispGameLightClass(*(s32 *)(D_40016174 + 0x58), 0, 3.0f);
 }
@@ -184,8 +184,6 @@ void func_400129D8(void)
     }
 }
 
-/* NEARMISS-STUB func_40012A30 */
-#if 0 /* NEARMISS 79.14% cat=call-abi sub=- | target jal+epilogue, gcc emits tail j | attempts=1 */
 void func_40012A30(s32 a0, s32 a1)
 {
     u8 *p = D_40016174;
@@ -201,9 +199,8 @@ void func_40012A30(s32 a0, s32 a1)
         func_40011D80(p, val);
         func_40012790(a0, a1);
     }
+    return;
 }
-#endif
-INCLUDE_ASM("asm/GRPTOOLS.XFF/nonmatchings/chunk/c0002_func_40012790", func_40012A30);
 
 //INCLUDE_ASM("asm/GRPTOOLS.XFF/nonmatchings/chunk/c0002_func_40012790", func_40012AA8);
 void func_40012AA8(s32 a0, s32 a1)
@@ -271,7 +268,7 @@ u8 *func_400137A8(void) {
 }
 
 //INCLUDE_ASM("asm/GRPTOOLS.XFF/nonmatchings/chunk/c0002_func_40012790", func_400137B8);
-s32 func_400137B8(void)
+s32 func_400137B8()
 {
     return DebugDispGlobalLightClass(*(s32 *)(D_400166FC + 0xF8), 0, 3.0f);
 }
@@ -448,8 +445,6 @@ void func_400139A0(void)
     }
 }
 
-/* NEARMISS-STUB func_400139F8 */
-#if 0 /* NEARMISS 79.14% cat=call-abi sub=- | target jal+epilogue, gcc emits tail j (unscored sed copy) | attempts=1 */
 void func_400139F8(s32 a0, s32 a1)
 {
     u8 *p = D_400166FC;
@@ -465,9 +460,8 @@ void func_400139F8(s32 a0, s32 a1)
         func_40012B50(p, val);
         func_400137B8(a0, a1);
     }
+    return;
 }
-#endif
-INCLUDE_ASM("asm/GRPTOOLS.XFF/nonmatchings/chunk/c0002_func_40012790", func_400139F8);
 
 //INCLUDE_ASM("asm/GRPTOOLS.XFF/nonmatchings/chunk/c0002_func_40012790", func_40013A70);
 void func_40013A70(s32 a0, s32 a1)

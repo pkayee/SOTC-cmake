@@ -39,20 +39,15 @@ void SCRFuncSetAttainPointPosForLanding(void *a, int ev)
     }
 }
 
-/* NEARMISS-STUB SCRFuncSetAttainNearPlayerPoint */
-#if 0 /* NEARMISS 96.0% cat=call-abi sub=- | in-TU: missing 5th arg addiu a4,-1 before call; first load reg lw v0 vs a2 | attempts=1 */
 void SCRFuncSetAttainNearPlayerPoint(void *a, float dy)
 {
     Vec4 p;
     char *w = getSCRDataCtrlWork(a);
     p.q = (*(Vec4 **)(*(char **)(w + 0x405C) + 0x134))->q;
-    getNearPointPosUserPathWork(w, &p, *(int *)(*(char **)(w + 0x405C) + 0x134), 1, -1);
+    getNearPointPosUserPathWork(w, &p, *(int *)(*(char **)(w + 0x405C) + 0x134), 1);
     p.f[1] += dy;
     setAttainmentPos(w, &p);
 }
-extern void getNearPointPosUserPathWork(char *, Vec4 *, int, int, int);
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0222_SCRFuncUpdatePathSystem", SCRFuncSetAttainNearPlayerPoint);
 
 void SCRFuncSetAttainNearMyselfPoint(void *a, float dy)
 {
@@ -186,8 +181,6 @@ void SCRFuncStartStageLayoutLWS(void *a, s32 mode, s32 flag, s32 d, s32 e, s32 f
         setGameFlagForGameObj(*(s32 *)(p + 0x48));
 }
 
-/* NEARMISS-STUB SCRFuncStartGameObjectLWS */
-#if 0 /* NEARMISS 85.0% cat=cse-hoist sub=- | in-TU: their body needs dead store g=NULL to reach 100; without it 85.45 (tail branch/beqz differs). REVIEW | attempts=1 */
 void SCRFuncStartGameObjectLWS(void *a, s32 lws, s32 flag, s32 d, s32 e, s32 *h)
 {
     s32 off = *h & 0x3FFFF;
@@ -198,12 +191,10 @@ void SCRFuncStartGameObjectLWS(void *a, s32 lws, s32 flag, s32 d, s32 e, s32 *h)
         _SCRStartLWS(g[2], -1, lws, NULL);
         if (flag != 0) {
             setGameFlagForGameObj(g[2]);
-            g = NULL;
         }
     }
+    return;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0222_SCRFuncUpdatePathSystem", SCRFuncStartGameObjectLWS);
 
 s32 SCRFuncStartGameObjectLWSCheckStatus(void *a, s32 mode, s32 flag, s32 d, s32 e, s32 *h)
 {
