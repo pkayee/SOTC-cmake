@@ -49,18 +49,18 @@ void GetCharacterClassNodeQuaternionPos(s32 *param_1, s32 *param_2, s32 param_3,
 #endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0060_RequestCharacterMotionShiftFunc", GetCharacterClassNodeQuaternionPos);
 /* NEARMISS-STUB CalcCharacterClassBaseGeo */
-#if 0 /* NEARMISS 99.0% cat=regalloc sub=- | const 1 in v1 vs v0 | attempts=1 */
-s32 CalcCharacterClassBaseGeo(s32 param_1)
-{
-    s8 cVar1;
+#if 0 /* NEARMISS 99.55% cat=regalloc sub=- | const 1 in v1 not v0 at sb 0x523 | attempts=2 */
 
-    cVar1 = *(s8 *)(param_1 + 0x523);
-    if (cVar1 == 0)
+s32 CalcCharacterClassBaseGeo(u8 *obj)
+{
+    s8 n = *(s8 *)(obj + 0x523);
+
+    if (n == 0)
     {
-        GetMotionMatrix(*(s32 *)(param_1 + 0x340), *(s32 *)(param_1 + 0x344), *(s32 *)(param_1 + 0x354), *(s32 *)(param_1 + 0x33C), param_1 + 0x40, param_1 + 0x90);
-        *(s8 *)(param_1 + 0x523) = 1;
+        GetMotionMatrix(*(s32 *)(obj + 0x340), *(s32 *)(obj + 0x344), *(s32 *)(obj + 0x354), *(s32 *)(obj + 0x33C), obj + 0x40, obj + 0x90);
+        *(s8 *)(obj + 0x523) = 1;
     }
-    return cVar1;
+    return n;
 }
 #endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0060_RequestCharacterMotionShiftFunc", CalcCharacterClassBaseGeo);
@@ -84,10 +84,11 @@ void ResetCharacterClassSyncMode(s32 param_1)
 
 
 /* NEARMISS-STUB SetCharacterClassMotionNormalSyncMode */
-#if 0 /* NEARMISS 65.0% cat=regalloc sub=- | s1/s2 swap, const 9 hoist | attempts=1 */
+#if 0 /* NEARMISS 94.41% cat=regalloc sub=- | first class select is movz form (a0=0 default) vs chrClass movn form | attempts=2 */
+
 void SetCharacterClassMotionNormalSyncMode(s32 param_1, s32 param_2)
 {
-    s32 iVar1;
+    u8 *cc;
 
     if (*(s32 *)(param_1 + 0xC70) != 0)
     {
@@ -96,33 +97,26 @@ void SetCharacterClassMotionNormalSyncMode(s32 param_1, s32 param_2)
         *(s32 *)(param_1 + 0xC70) = 0;
         *(u8 *)(param_1 + 0xD01) = 0;
     }
-    iVar1 = param_2 + 0x90;
-    if (*(u8 *)(param_2 + 8) != 9 && (iVar1 = 0, *(u8 *)(param_2 + 8) == 0x16))
-    {
-        iVar1 = param_2 + 0x90;
-    }
-    AddTwoWayLinkNext(iVar1 + 0xC74, param_1 + 0xC80);
+    cc = chrClass((u8 *)param_2);
+    AddTwoWayLinkNext(cc + 0xC74, param_1 + 0xC80);
     *(u8 *)(param_1 + 0xD00) = 1;
     *(s32 *)(param_1 + 0xC70) = param_2;
-    if (param_2 == 0)
+    if (param_2 != 0)
     {
-        *(u8 *)(param_1 + 0xD01) = 0;
+        cc = chrClass((u8 *)param_2);
+        *(u8 *)(param_1 + 0xD01) = *(u8 *)(cc + 0xFD0);
     }
     else
     {
-        iVar1 = param_2 + 0x90;
-        if (*(u8 *)(param_2 + 8) != 9 && *(u8 *)(param_2 + 8) != 0x16)
-        {
-            iVar1 = 0;
-        }
-        *(u8 *)(param_1 + 0xD01) = *(u8 *)(iVar1 + 0xFD0);
+        *(u8 *)(param_1 + 0xD01) = 0;
     }
 }
 #endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0060_RequestCharacterMotionShiftFunc", SetCharacterClassMotionNormalSyncMode);
 
 /* NEARMISS-STUB ResetCharacterClassMotInterpInfo */
-#if 0 /* NEARMISS 10.0% cat=regalloc sub=- | 1.0f in f0 swap, store reorder | attempts=1 */
+#if 0 /* NEARMISS 10.75% cat=float-ops sub=- | 1.0f in f1 and motion float in f0 vs reverse; store slots differ | attempts=2 */
+
 void ResetCharacterClassMotInterpInfo(s32 param_1)
 {
     s32 motion;
@@ -168,37 +162,33 @@ void ResetCharacterClassMotionInterpRootOfs(s32 param_1)
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0060_RequestCharacterMotionShiftFunc", GetScalableTurnQuaternionArray);
 
-/* NEARMISS-STUB GetCharacterClassCurrentAnimationPositionInfo */
-#if 0 /* NEARMISS 33.22% cat=call-abi sub=- | float arg to GetMotionRootFloatFrame: target passes float in f12 with a0=p1 unchanged and a2=mode unchanged; our prototype puts shape/branch order differently ( | attempts=1 */
+void GetMotionRootIntFrame(s32 a0, s32 a1, s32 a2);
 void GetMotionRootFloatFrame(s32 a0, s32 a1, s32 a2, f32 f);
-void GetCharacterClassCurrentAnimationPositionInfo(s32 param_1, s32 param_2, s32 param_3)
+s32 GetMotionResourceFrames();
+
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0060_RequestCharacterMotionShiftFunc", GetCharacterClassCurrentAnimationPositionInfo);
+void GetCharacterClassCurrentAnimationPositionInfo(s32 param_1, u8 *param_2, s32 param_3)
 {
+    u8 *base;
     s32 iVar2;
     s32 uVar1;
 
-    iVar2 = *(s32 *)(param_2 + 0x1C0) + 0x50;
-    if (param_3 == 1)
+    base = param_2 + 0x1C0;
+    iVar2 = *(s32 *)base + 0x50;
+    switch (param_3)
     {
-        GetMotionRootFloatFrame(param_1, iVar2, param_3, *(f32 *)(param_2 + 0x1C8));
-        return;
-    }
-    if (param_3 < 2)
-    {
-        if (param_3 == 0)
-        {
+        case 0:
             GetMotionRootIntFrame(param_1, iVar2, param_3);
             return;
-        }
-    }
-    else if (param_3 == 2)
-    {
-        uVar1 = GetMotionResourceFrames(iVar2);
-        GetMotionRootIntFrame(param_1, iVar2, uVar1);
-        return;
+        case 1:
+            GetMotionRootFloatFrame(param_1, iVar2, param_3, *(f32 *)(base + 0x8));
+            return;
+        case 2:
+            uVar1 = GetMotionResourceFrames(iVar2);
+            GetMotionRootIntFrame(param_1, iVar2, uVar1);
+            return;
     }
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0060_RequestCharacterMotionShiftFunc", GetCharacterClassCurrentAnimationPositionInfo);
 
 //INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0060_RequestCharacterMotionShiftFunc", GetCharacterClassCurAnimationFrameRate);
 
@@ -272,7 +262,7 @@ void acceptMotionShiftFunc(u8 *obj)
 }
 
 /* NEARMISS-STUB GetCalcNumObjWorkSize */
-#if 0 /* NEARMISS 57.9% cat=branch-layout sub=if(p3) movn vs branch | compiler emits movn for if(p3) iVar2=iVar3+0x66; asm uses beqz branch; also register names t0/a4-a6 differ | attempts=1 */
+#if 0 /* NEARMISS 63.23% cat=branch-layout sub=if(p3) movn vs branch | if(p3) if-converted to movn vs target beqz branch; t0/s0 regalloc | attempts=2 */
 s32 GetCollisionFinderWorkSize();
 
 s32 GetCalcNumObjWorkSize(s32 param_1, s32 param_2, s32 param_3, s32 param_4)
@@ -291,20 +281,22 @@ s32 GetCalcNumObjWorkSize(s32 param_1, s32 param_2, s32 param_3, s32 param_4)
     {
         iVar2 = iVar2 + param_2 * 0x13b + 0x33;
     }
+    iVar2 = iVar2 + 0x333;
     iVar1 = GetCollisionFinderWorkSize(param_4);
-    return iVar2 + 0x333 + iVar1;
+    return iVar2 + iVar1;
 }
 #endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0060_RequestCharacterMotionShiftFunc", GetCalcNumObjWorkSize);
 /* NEARMISS-STUB GetCharSuspension1D */
-#if 0 /* NEARMISS 43.0% cat=call-abi sub=- | args in f16-f19 + raw stack floats | attempts=1 */
+#if 0 /* NEARMISS 43.57% cat=branch-layout sub=- | if(x>=0) if-converted (c.le.s bc1tl) vs target c.lt.s bc1f real branches | attempts=2 */
+
 f32 GetCharSuspension1D(f32 param_1, f32 param_2, f32 param_3, f32 param_4, f32 param_5, f32 param_6, f32 param_7, f32 param_8, f32 *param_9, f32 param_10, f32 param_11)
 {
     f32 fVar1;
     f32 fVar2;
     f32 fVar3;
 
-    if (0.0f <= param_1 - param_2)
+    if (param_1 - param_2 >= 0.0f)
     {
         param_6 = param_7;
     }
