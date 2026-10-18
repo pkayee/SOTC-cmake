@@ -8,21 +8,49 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0091_func_4007DF08", nico_narg
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0091_func_4007DF08", SCRFuncNargaWallCheckMain);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0091_func_4007DF08", SCRConditionNargaWallCheck);
+extern void *GetSCRCharaAIWorkPtr(void *);
+
+int SCRConditionNargaWallCheck(void *actor, int wall)
+{
+    return wall == *(int *)((char *)GetSCRCharaAIWorkPtr(actor) + 0x5A50);
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0091_func_4007DF08", SCRFuncNargaSetWallAttainPos);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0091_func_4007DF08", SCRFuncNargaFloatMain);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0091_func_4007DF08", SCRFuncNargaSetPlayerDamage);
+void SCRFuncNargaSetPlayerDamage(int a, int b)
+{
+    *(int *)((char *)GetSCRCharaAIWorkPtr(a) + 0x5A54) = b;
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0091_func_4007DF08", SCRFuncNargaSetPlayerAttainmentPos);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0091_func_4007DF08", SCRConditionNargaPlayerDamage);
+int SCRConditionNargaPlayerDamage(void *actor)
+{
+    return (*(int *)((char *)(GetSCRCharaAIWorkPtr(actor)) + 0x5A54)) != 0;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0091_func_4007DF08", SCRFuncNargaWayVolumeMain);
+extern int DldSysUndefSymbol;
+extern char *GetLayoutClass(void *);
+extern void CheckCollisionInsideOfSurfaceXZ(void *, void *, void *);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0091_func_4007DF08", SCRConditionNargaWallNear);
+void SCRFuncNargaWayVolumeMain(void *a, int b, int c, int d, int e, int *h)
+{
+    char *ai = GetSCRCharaAIWorkPtr(a);
+    int off = *h & 0x3FFFF;
+    int *t = off != 0 ? *(int **)((char *)h - off) : 0;
+    int *o = (t != 0 && t != (int *)DldSysUndefSymbol) ? (int *)t[4] : 0;
+    void *g;
+
+    if (o != 0 && (g = (void *)o[2]) != 0)
+        CheckCollisionInsideOfSurfaceXZ(ai + 0x5A58, g, *(void **)(GetLayoutClass(a) + 0x134));
+}
+
+int SCRConditionNargaWallNear(void *actor, int a, int b, int c, long mask, long value)
+{
+    return value == (*(long *)(GetSCRCharaAIWorkPtr(actor) + 0x5A58) & mask);
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0091_func_4007DF08", constructor_nico_sight_on);
 
