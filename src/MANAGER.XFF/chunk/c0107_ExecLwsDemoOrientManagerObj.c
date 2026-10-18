@@ -6,15 +6,28 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0107_ExecLwsDemoOrientManagerOb
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0107_ExecLwsDemoOrientManagerObj", CreateLwsDemoOrientManagerObj);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0107_ExecLwsDemoOrientManagerObj", SetLwoDemoOrientManagerObjCutFinishFlag);
+void SetLwoDemoOrientManagerObjCutFinishFlag(void *arg0, int arg1)
+{
+    (*(int *)((char *)(arg0) + 0xB0)) = arg1;
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0107_ExecLwsDemoOrientManagerObj", FlushLwsDemoOrientManagerObj);
+extern int flushScriptObj();
+
+int FlushLwsDemoOrientManagerObj(int a, int b, int c, int d)
+{
+    return flushScriptObj(a, b, c, d);
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0107_ExecLwsDemoOrientManagerObj", func_4008E7F0);
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0107_ExecLwsDemoOrientManagerObj", func_4008E880);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0107_ExecLwsDemoOrientManagerObj", GetLwsDemoOrientManagerObjWorkSize);
+extern int GetScriptObjWorkSize();
+
+int GetLwsDemoOrientManagerObjWorkSize(int a, int b, int c, int d)
+{
+    return GetScriptObjWorkSize(a, b, c, d);
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0107_ExecLwsDemoOrientManagerObj", func_4008E8C0);
 
