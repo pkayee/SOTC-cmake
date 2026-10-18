@@ -2,52 +2,210 @@
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0126_AI_GetAccelB3XYZ", AI_GetAccelB3XYZ);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0126_AI_GetAccelB3XYZ", AI_GetAccelC3);
+float AI_GetAccelC3(float fparg0, float fparg1, float fparg2, float fparg3, float fparg4, float fparg5)
+{
+    float var_f17;
+
+    var_f17 = fparg5;
+    if (var_f17 < 0.0333667f) {
+        var_f17 = 0.0333667f;
+    }
+    return ((((12.0f / var_f17) * (fparg3 - fparg2)) - ((fparg1 + fparg0) * 6.0f)) + (fparg4 * var_f17)) / var_f17;
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0126_AI_GetAccelB3XYZ", AI_GetAccelC3XYZ);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0126_AI_GetAccelB3XYZ", AI_GetTimeFromAccelC3);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0126_AI_GetAccelB3XYZ", AI_GetVelocity2);
+float AI_GetVelocity2(float fparg0, float fparg1, float fparg2, float fparg3)
+{
+    return fparg2 + (fparg0 * 0.5f * fparg3 * fparg3) + (fparg1 * fparg3);
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0126_AI_GetAccelB3XYZ", AI_GetVelocity3);
+float AI_GetVelocity3(float fparg0, float fparg1, float fparg2, float fparg3, float fparg4)
+{
+    return fparg3 + ((fparg0 / 3.0f) * fparg4 * fparg4 * fparg4) + (fparg1 * 0.5f * fparg4 * fparg4) + (fparg2 * fparg4);
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0126_AI_GetAccelB3XYZ", AI_GetVelocity3XYZ);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0126_AI_GetAccelB3XYZ", AI_GetPosition3);
+float AI_GetPosition3(float fparg0, float fparg1, float fparg2, float fparg3, float fparg4, float fparg5)
+{
+    float temp_f1;
+    float temp_f2;
+
+    temp_f2 = fparg5 * fparg5;
+    temp_f1 = temp_f2 * fparg5;
+    return fparg3 + ((fparg0 * (temp_f1 * fparg5)) / 12.0f) + ((fparg1 * temp_f1) / 6.0f) + (fparg2 * 0.5f * temp_f2) + (fparg4 * fparg5);
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0126_AI_GetAccelB3XYZ", AI_GetPosition3XYZ);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0126_AI_GetAccelB3XYZ", AI_GetRotVelocity);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0126_AI_GetAccelB3XYZ", AI_GetTimeOfCurrMotion);
+typedef struct {
+    char pad0[0x50];
+    char frames[0xC];
+    int fps;
+} MotionResource;
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0126_AI_GetAccelB3XYZ", AI_GetCurMotionKind);
+typedef struct {
+    MotionResource *res;
+    char pad4[0x28];
+    float rate;
+} MotionState;
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0126_AI_GetAccelB3XYZ", AI_GetCurControlMode);
+typedef struct {
+    char pad0[0x44];
+    float speed;
+} MotionCtrl;
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0126_AI_GetAccelB3XYZ", AI_GetInterRatio);
+typedef struct {
+    char pad0[0x1C0];
+    MotionState motion;
+    char pad1F0[0xEA8];
+    MotionCtrl *ctrl;
+} AIObj;
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0126_AI_GetAccelB3XYZ", AI_GetInterRatioOutCut);
+extern int GetMotionResourceFrames(void *);
+
+float AI_GetTimeOfCurrMotion(AIObj *obj, float scale)
+{
+    MotionState *m = &obj->motion;
+    MotionResource *res = m->res;
+
+    if (res != 0) {
+        float speed = obj->ctrl->speed;
+
+        return GetMotionResourceFrames(res->frames) * m->rate / (res->fps * speed * scale);
+    }
+    return 0.0f;
+}
+
+u8 *GetCharacterClass(void *chara);
+
+int AI_GetCurMotionKind(void *actor)
+{
+    return (*(int *)((char *)(GetCharacterClass(actor)) + 0x1C0));
+}
+
+int AI_GetCurControlMode(void *actor)
+{
+    return (*(int *)((char *)(GetCharacterClass(actor)) + 0x740));
+}
+
+float AI_GetInterRatio(float x, float start, float end, float low, float high)
+{
+    end -= start;
+    if (end == 0.0f) return low;
+    return ((x - start) * (high - low)) / end + low;
+}
+
+float AI_GetInterRatioOutCut(float value, float low, float high, float start, float end)
+{
+    float span;
+    float result;
+
+    if (value <= low) {
+        result = start;
+        goto done;
+    }
+    if (high <= value) {
+        result = end;
+        goto done;
+    }
+    span = high - low;
+    if (span == 0.0f) {
+        result = start;
+        goto done;
+    }
+    return (((value - low) * (end - start)) / span) + start;
+
+done:
+    return result;
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0126_AI_GetAccelB3XYZ", AI_GetHitPosPerpendicular);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0126_AI_GetAccelB3XYZ", AI_GetLengthSquarePerpendicular);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0126_AI_GetAccelB3XYZ", AI_GetAreaDistScale);
+float AI_GetAreaDistScale(float fparg0, float fparg1)
+{
+    float temp_f0;
+    float var_f0;
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0126_AI_GetAccelB3XYZ", AI_GetAreaDistScale2);
+    var_f0 = fparg0;
+    if (!(fparg0 < fparg1)) {
+        var_f0 = fparg1;
+    }
+    temp_f0 = var_f0 / fparg0;
+    return temp_f0 * temp_f0;
+}
+
+float AI_GetAreaDistScale2(float fparg0, float fparg1)
+{
+    float var_f0;
+
+    var_f0 = fparg0;
+    if (!(fparg0 < fparg1)) {
+        var_f0 = fparg1;
+    }
+    return var_f0 / fparg0;
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0126_AI_GetAccelB3XYZ", AI_GetTrgDir);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0126_AI_GetAccelB3XYZ", AI_PlayerParentFlag);
+int GetGeometryPointerObject(int);
+int GetLayoutClass(int);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0126_AI_GetAccelB3XYZ", AI_CheckNormZero);
+int AI_PlayerParentFlag(int arg0, int arg1)
+{
+    return GetGeometryPointerObject(GetLayoutClass(arg1) + 0xC0) == arg0;
+}
+
+int AI_CheckNormZero(float *v)
+{
+    if (v[0] < 0.0f) {
+        if (!(-0.0001f < v[0]))
+            goto nonzero;
+    } else if (!(v[0] < 0.0001f)) {
+        goto nonzero;
+    }
+    if (v[1] < 0.0f) {
+        if (!(-0.0001f < v[1]))
+            goto nonzero;
+    } else if (!(v[1] < 0.0001f)) {
+        goto nonzero;
+    }
+    if (v[2] < 0.0f) {
+        if (!(-0.0001f < v[2]))
+            goto nonzero;
+    } else if (!(v[2] < 0.0001f)) {
+        goto nonzero;
+    }
+    return 0;
+nonzero:
+    return 1;
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0126_AI_GetAccelB3XYZ", AI_GetSideSignalFromDirLev);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0126_AI_GetAccelB3XYZ", AI_GetRandomCircleOfsXZ);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0126_AI_GetAccelB3XYZ", AI_GetRandomCircleOfsXY);
+extern float iosGetRandom(void);
+extern float iosGetTableCos(short);
+extern float iosGetTableSin(short);
+
+void AI_GetRandomCircleOfsXY(float *out, float min, float max)
+{
+    float a = iosGetRandom() * 2.0f * 3.1415926f;
+    float r = min + (max - min) * iosGetRandom();
+    short ang = (int)(a * 32768.0f / 3.1415926f);
+
+    out[0] = iosGetTableCos(ang) * r;
+    out[1] = -iosGetTableSin(ang) * r;
+    out[2] = 0.0f;
+    out[3] = 0.0f;
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0126_AI_GetAccelB3XYZ", AI_GetRandomRectOfsXY);
