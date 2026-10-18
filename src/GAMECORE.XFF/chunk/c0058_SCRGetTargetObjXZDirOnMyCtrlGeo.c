@@ -187,30 +187,27 @@ void _SCRSetupLWS(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4)
     CreateScriptAnimationSequence(seq);
 }
 
-/* NEARMISS-STUB _SCRStartLWS */
-#if 0 /* NEARMISS 99.1% cat=sched sub=- | sw s0,0x358(v0) before sw zero,0(s0) | attempts=1 */
-void PlayScriptAnimationSequence();
-u8 *GetScriptAnimationClass();
-void *get_main_cameraman_camera_obj();
-void ExecObjectAnimation(void *obj, void *cam, f32 f1, f32 f2);
-void _SCRStartLWS(void *a0, s32 a1, s32 a2, s32 *a3)
-{
-    u8 *cls;
+void PlayScriptAnimationSequence(void *, int, int, int);
+char *GetScriptAnimationClass(void *);
+void *get_main_cameraman_camera_obj(void);
+void ExecObjectAnimation(void *, void *, f32, f32);
+typedef struct {
+    char pad[0x180];
+    float a;
+    float b;
+} SCRStartLWSGVar;
 
-    if (a0 != NULL)
-    {
-        PlayScriptAnimationSequence(a0, 0, a1, a2);
-        if (a3 != NULL)
-        {
-            cls = GetScriptAnimationClass(a0);
-            *(s32 **)(cls + 0x358) = a3;
-            *a3 = 0;
-        }
-        ExecObjectAnimation(a0, get_main_cameraman_camera_obj(), *(f32 *)((u8 *)&gcGlobalVar + 0x180), *(f32 *)((u8 *)&gcGlobalVar + 0x184));
+void _SCRStartLWS(void *o, int a, int b, int *done)
+{
+    if (o == 0)
+        return;
+    PlayScriptAnimationSequence(o, 0, a, b);
+    if (done != 0) {
+        *(int *)(GetScriptAnimationClass(o) + 0x358) = (int)done;
+        *done = 0;
     }
+    ExecObjectAnimation(o, get_main_cameraman_camera_obj(), ((SCRStartLWSGVar *)&gcGlobalVar)->a, ((SCRStartLWSGVar *)&gcGlobalVar)->b);
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0058_SCRGetTargetObjXZDirOnMyCtrlGeo", _SCRStartLWS);
 
 /* NEARMISS-STUB SCRSetLWSGeometryWithNoParentChange */
 #if 0 /* NEARMISS 89.8% cat=regalloc sub=- | value load v1 before s0 copy | attempts=1 */
@@ -321,7 +318,32 @@ s32 SCRGetCollisionCallBack(void *a0, u128 *a1, u128 *a2, s32 a3, s32 a4, s32 a5
     return r;
 }
 #endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0058_SCRGetTargetObjXZDirOnMyCtrlGeo", SCRGetCollisionCallBack);
+typedef int qword __attribute__((mode(TI)));
+
+typedef union {
+    qword q;
+    float v[4];
+} Vec;
+
+extern int ClipCollisionDirectCallBack(void *, float *, float *, int, int, int, int, int, int);
+extern void CopyGeometryPointer(void *, void *);
+
+int SCRGetCollisionCallBack(void *out, qword *a, qword *b, int d, int e, int f)
+{
+    Vec va;
+    Vec vb;
+    char buf[0x50] __attribute__((aligned(16)));
+    int r;
+
+    va.q = *a;
+    va.v[3] = 1.0f;
+    vb.q = *b;
+    vb.v[3] = 1.0f;
+    r = ClipCollisionDirectCallBack(buf, va.v, vb.v, d, 0, 0, 0, e, f);
+    if (r != 0 && out != 0)
+        CopyGeometryPointer(out, buf);
+    return r;
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0058_SCRGetTargetObjXZDirOnMyCtrlGeo", _SCRGetCollisionTwoBoneRay3D);
 
@@ -356,7 +378,27 @@ void *SCRGetGetGeometryPointerLegalParentObj(void)
     return obj;
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0058_SCRGetTargetObjXZDirOnMyCtrlGeo", SCRCreateScriptCharObj);
+extern s32 gcGlobalVar;
+extern s32 rootPtn;
+extern char st_collisionalias[];
+extern char st_motionsyncanimation[];
+void *initScriptCharObj(void *, void *, void *, int, void *, void *, void *, int);
+void isysAddGroupWithLinkParam(void *, void *, int, int);
+void *SCRCreateScriptCharObj(void *a, u8 *param)
+{
+    u8 *list = (u8 *)&gcGlobalVar + 0x280;
+    void *obj;
+
+    *(int *)(param + 0x1C) = 1;
+    *(int *)(param + 0x10) = 1;
+    *(int *)(param + 0x2C) = 1;
+    obj = initScriptCharObj(&rootPtn, a, param, 4, list, st_collisionalias, st_motionsyncanimation, 1);
+    if (obj != 0) {
+        isysAddGroupWithLinkParam(obj, list + 4, 0, 0);
+        isysAddGroupWithLinkParam(obj, list - 0x10, 0, 0);
+    }
+    return obj;
+}
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0058_SCRGetTargetObjXZDirOnMyCtrlGeo", SCRDeleteAllActiveScriptAnimationObj);
 void allArrowRelease();
