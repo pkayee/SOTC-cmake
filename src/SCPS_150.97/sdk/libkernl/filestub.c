@@ -659,7 +659,76 @@ INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/filestub", sceWrite);
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/filestub", sceIoctl);
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/filestub", sceIoctl2);
+extern s32 D_00138110[];
+s32 sceIoctl2(s32 fd, s32 cmd, void *in, u32 inlen, void *out, u32 outlen)
+{
+    struct SemaParam sp;
+    s32 result;
+    struct IobEntry *iob;
+    s32 *buf;
+    s32 sema;
+    s32 status;
+    s32 ret;
+
+    buf = D_00145B40;
+    iob = get_iob(fd);
+    _sceFsWaitS(0x1A);
+    if (D_00132414[0] == 0)
+    {
+        sceFsInit();
+    }
+    if (iob == NULL || iob->unk04 == 0)
+    {
+        _sceFsSigSema();
+        return -9;
+    }
+    if (inlen > 0x400 || outlen > 0x400)
+    {
+        _sceFsSigSema();
+        return -0x16;
+    }
+    if (in == NULL)
+    {
+        buf[0x107] = 0;
+    }
+    else
+    {
+        memcpy((char *)buf + 0x14, in, inlen);
+    }
+    buf[3] = iob->unk00;
+    buf[4] = cmd;
+    buf[0x107] = inlen;
+    sp.maxCount = 1;
+    sp.option = (u32)D_00138110;
+    sp.initCount = 0;
+    sema = CreateSema(&sp);
+    buf[0x106] = outlen;
+    buf[1] = (s32)&result;
+    buf[2] = 4;
+    buf[0x105] = (s32)out;
+    buf[0] = sema;
+    sceSifWriteBackDCache(D_00145B40, 0x420);
+    ret = func_0010A328(D_00147240, 0x1A, 0, D_00145B40, 0x420, D_00146780, 4, NULL, NULL, 0);
+    if (ret < 0)
+    {
+        DeleteSema(sema);
+        _sceFsSigSema();
+        return -11;
+    }
+    status = *(s32 *)((u32)D_00146780 | 0x20000000);
+    _sceFsSigSema();
+    if (status != 0)
+    {
+        WaitSema(sema);
+        DeleteSema(sema);
+    }
+    else
+    {
+        DeleteSema(sema);
+        return -11;
+    }
+    return result;
+}
 
 s32 func_0010BFA8(const u8 *path, s32 rpc)
 {
