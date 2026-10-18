@@ -98,6 +98,27 @@ int is_reset_or_lws_movie_game_camera(char *p)
     return 0;
 }
 
+/* NEARMISS-STUB is_reset_or_lws_movie_or_cutout_game_camera */
+#if 0 /* NEARMISS 73.4% cat=call-abi sub=- | compiler keeps 1 in v0 not s0; flag var in a2/v1 reg order and param copy a1 differ | attempts=1 */
+extern int act_camera_cutout_game_camera_param_manager(int *, char *);
+
+int is_reset_or_lws_movie_or_cutout_game_camera(char *p)
+{
+    int m = *(int *)(p + 0x13c0);
+    int flag = 0;
+
+    if (m == 0 || m == 8) {
+        flag = 1;
+    }
+    if (flag == 1) {
+        return 1;
+    }
+    if (act_camera_cutout_game_camera_param_manager((int *)(p + 0x50), p) != 1) {
+        return 0;
+    }
+    return 1;
+}
+#endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0188_func_400F2F40", is_reset_or_lws_movie_or_cutout_game_camera);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0188_func_400F2F40", is_reset_or_lws_fixed_point_or_lws_movie_or_cutout_game_camera);
@@ -203,7 +224,24 @@ int is_proper_camera_target_game_camera(void *camera)
     return 0;
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0188_func_400F2F40", is_playing_lws_movie_now_game_camera);
+extern u8 *get_game_camera(u8 *cam);
+extern s32 get_camera_obj(void *cam);
+extern void *get_camera_position(void *obj);
+extern void *get_main_type_camera_lws_animation();
+
+int is_playing_lws_movie_now_game_camera(u8 *p)
+{
+    u8 *cam = get_game_camera(p);
+
+    if (*(s32 *)(cam + 0x13c0) != 8) {
+        void *pos = get_camera_position((void *)get_camera_obj(p));
+
+        if (get_main_type_camera_lws_animation(pos) == 0) {
+            return 0;
+        }
+    }
+    return 1;
+}
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0188_func_400F2F40", get_look_lws_anime_camera_flag);
 

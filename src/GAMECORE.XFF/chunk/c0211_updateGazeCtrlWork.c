@@ -122,7 +122,19 @@ void getGazeToolPos(s128 *out)
     *out = *(s128 *)D_4021E1C0;
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0211_updateGazeCtrlWork", func_4010F360);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0211_updateGazeCtrlWork", func_4010F360);
+s32 DEBUG_is_locking_debug_camera(void);
+void DebugGlobalMoveWith2ndController(void *a, void *b);
+
+void func_4010F360(void)
+{
+    s32 param = DEBUG_is_locking_debug_camera();
+
+    if (param != 0)
+    {
+        DebugGlobalMoveWith2ndController(D_4021E1C0, D_4021E1C0);
+    }
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0211_updateGazeCtrlWork", func_4010F3A0);
 

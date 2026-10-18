@@ -25,8 +25,42 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0171_constructor_camera_final_
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0171_constructor_camera_final_update", disp_camera_vs_ofst_cntrl_position);
 
+/* NEARMISS-STUB add_camera_vs_ofst_cntrl_param_segment */
+#if 0 /* NEARMISS 94.1% cat=no-c-form sub=- | missing unconditional break 0 after loop (trap at end, no C form without asm); loop body matches | attempts=1 */
+void add_camera_vs_ofst_cntrl_param_segment(int param)
+{
+    int i = 0;
+    int *p = (int *)D_402184E8;
+
+    do {
+        if (*p == 0) {
+            *p = param;
+            return;
+        }
+        i++;
+        p++;
+    } while (i < 10);
+}
+#endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0171_constructor_camera_final_update", add_camera_vs_ofst_cntrl_param_segment);
 
+/* NEARMISS-STUB free_camera_vs_ofst_cntrl_param_segment */
+#if 0 /* NEARMISS 94.1% cat=no-c-form sub=- | missing unconditional break 0 after loop (trap at end, no C form without asm); loop body matches | attempts=1 */
+void free_camera_vs_ofst_cntrl_param_segment(int param)
+{
+    int i = 0;
+    int *p = (int *)D_402184E8;
+
+    do {
+        if (*p == param) {
+            *p = 0;
+            return;
+        }
+        i++;
+        p++;
+    } while (i < 10);
+}
+#endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0171_constructor_camera_final_update", free_camera_vs_ofst_cntrl_param_segment);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0171_constructor_camera_final_update", doit_camera_pause_rise);
