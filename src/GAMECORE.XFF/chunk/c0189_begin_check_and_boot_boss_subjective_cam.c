@@ -21,6 +21,25 @@ u8* GAMEUTIL_get_boss_obj(void);
 u8* GetLayoutClass(void* chara);
 u8* GetScriptCharacterClass(void* chara);
 
+extern u128 ZeroVector;
+void constructor_double_spring_interp_cntrl3D(u8* a0, f32 a1, f32 a2);
+void set_rot_radi_value_flag_double_spring_interp_cntrl3D(u8* a0, s32 a1, s32 a2, s32 a3);
+typedef union { f32 f; s32 i; } F41D8Cell;
+
+extern u128 ZeroPoint;
+
+extern f32 D_401322B0;
+void constructor_game_camera_param_update_data_manager(u8* a0);
+void func_400ED778(u8* a0, u8* a1, u8* a2, u8* a3, u8* a4);
+void doit_game_camera_param_manager(f32 f, u8* a0, u8* a1, u8* a2, u8* a3);
+void get_game_camera_mode_local_parameter(u8* a0, u8* a1);
+
+void setDemoBar(f32 a0, f32 a1);
+void gameModeSet(u32 mode);
+void gameModeCls(u32 mode);
+void* CAM_get_target_obj(void* p);
+void nico_playerSetAttentionHeadActFlag(void* p, s32 flag);
+
 void begin_check_and_boot_boss_subjective_camera_lws_animation(void) {
 }
 
@@ -292,11 +311,58 @@ void func_400F4160(u8* work)
 #endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0189_begin_check_and_boot_boss_subjective_cam", func_400F4160);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0189_begin_check_and_boot_boss_subjective_cam", func_400F41D8);
+void func_400F41D8(u8* p)
+{
+    u8* a = p + 4;
+    u8* b = p + 0xA0;
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0189_begin_check_and_boot_boss_subjective_cam", func_400F4270);
+    *(s32*)p = 0;
+    CAM_init_aim_angle_rot(a, 0);
+    CAM_init_aim_angle_rot(p + 0x48, 1);
+    *(s32*)(a + 0x88) = 0;
+    ((F41D8Cell*)(a + 0x8C))->i = 0;
+    constructor_double_spring_interp_cntrl3D(b, 0.0001f, ((F41D8Cell*)(a + 0x8C))->f);
+    set_rot_radi_value_flag_double_spring_interp_cntrl3D(b, 1, 0, 0);
+    *(u128*)(p + 0xE0) = ZeroVector;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0189_begin_check_and_boot_boss_subjective_cam", func_400F4310);
+void func_400F4270(u8* p)
+{
+    u8* a = p + 0x10;
+    u8* b = p + 0x90;
+
+    *(s32*)p = 0;
+    *(s32*)a = 0;
+    *(u128*)(a + 0x10) = ZeroPoint;
+    constructor_double_spring_interp_cntrl3D(p + 0x30, 0.001f, 1.0f);
+    *(s32*)(a + 0x60) = 0;
+    *(u128*)(a + 0x70) = ZeroVector;
+    CAM_init_aim_angle_rot(b, 0);
+    CAM_init_aim_angle_rot(p + 0xD4, 1);
+    *(s32*)(b + 0x88) = 0;
+    *(s32*)(b + 0x8C) = 0;
+}
+
+void func_400F4310(u8* p, s32 flag)
+{
+    u8* a = p + 0x10;
+    u8* b = p + 0x90;
+
+    if (flag == 1) {
+        *(s32*)p = 0;
+    }
+    *(s32*)a = 0;
+    *(u128*)(a + 0x10) = ZeroPoint;
+    constructor_double_spring_interp_cntrl3D(p + 0x30, 0.001f, 1.0f);
+    *(s32*)(a + 0x60) = 0;
+    *(u128*)(a + 0x70) = ZeroVector;
+    CAM_init_aim_angle_rot(b, 0);
+    CAM_init_aim_angle_rot(p + 0xD4, 1);
+    *(s32*)(b + 0x88) = 0;
+    *(s32*)(b + 0x8C) = 0;
+    *(s32*)(p + 0x120) = 0;
+    *(s32*)(p + 0x124) = 0;
+}
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0189_begin_check_and_boot_boss_subjective_cam", func_400F43C0);
 void func_400F43C0(u8* work)
@@ -394,7 +460,16 @@ void func_400F4508(u8* work, u8* cam)
 #endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0189_begin_check_and_boot_boss_subjective_cam", func_400F4508);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0189_begin_check_and_boot_boss_subjective_cam", func_400F4578);
+void func_400F4578(u8* a0, u8* a1, u8* a2)
+{
+    u8 buf[16];
+    u8* p = a1 + 0x50;
+
+    constructor_game_camera_param_update_data_manager(buf);
+    func_400ED778(buf, a0, a1, p, a2);
+    doit_game_camera_param_manager(D_401322B0, p, buf, a0, a1);
+    get_game_camera_mode_local_parameter(a1 + 0x13E4, a1);
+}
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0189_begin_check_and_boot_boss_subjective_cam", func_400F4608);
 s32 func_400F4608(u8* a0, s32 a1, s32 a2)
@@ -496,16 +571,70 @@ void func_400F4C00(void) {
 void func_400F4C08(void) {
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0189_begin_check_and_boot_boss_subjective_cam", func_400F4C10);
+void func_400F4C10(u8* a0, u8* p)
+{
+    u8* a = p + 0x10;
+    u8* b = p + 0x90;
+
+    *(s32*)a = 0;
+    *(u128*)(a + 0x10) = ZeroPoint;
+    constructor_double_spring_interp_cntrl3D(p + 0x30, 0.001f, 1.0f);
+    *(s32*)(a + 0x60) = 0;
+    *(u128*)(a + 0x70) = ZeroVector;
+    CAM_init_aim_angle_rot(b, 0);
+    CAM_init_aim_angle_rot(p + 0xD4, 1);
+    *(s32*)(b + 0x88) = 0;
+    *(s32*)(b + 0x8C) = 0;
+    *(s32*)(p + 0x120) = 0;
+    *(s32*)(p + 0x124) = 0;
+}
 
 void func_400F4CB8(void) {
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0189_begin_check_and_boot_boss_subjective_cam", func_400F4CC0);
+void func_400F4CC0(u8* a0, u8* a1)
+{
+    setDemoBar(0.0f, 2.0f);
+    while (*(s32*)(a1 + 0x80) != 0) {
+        if (*(s32*)(a1 + 0x80) > 0) {
+            gameModeCls(1);
+            *(s32*)(a1 + 0x80) -= 1;
+        } else {
+            gameModeSet(1);
+            *(s32*)(a1 + 0x80) += 1;
+        }
+    }
+    nico_playerSetAttentionHeadActFlag(CAM_get_target_obj(a0 + 0x240), 0);
+    ((void (*)(u8*))func_400F1DD0)(a1);
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0189_begin_check_and_boot_boss_subjective_cam", func_400F4D68);
+void func_400F4D68(u8* a0, u8* a1)
+{
+    setDemoBar(0.0f, 2.0f);
+    while (*(s32*)(a1 + 0x80) != 0) {
+        if (*(s32*)(a1 + 0x80) > 0) {
+            gameModeCls(1);
+            *(s32*)(a1 + 0x80) -= 1;
+        } else {
+            gameModeSet(1);
+            *(s32*)(a1 + 0x80) += 1;
+        }
+    }
+    nico_playerSetAttentionHeadActFlag(CAM_get_target_obj(a0 + 0x240), 0);
+    ((void (*)(u8*))func_400F1DD0)(a1);
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0189_begin_check_and_boot_boss_subjective_cam", func_400F4E10);
+void func_400F4E10(u8* a0, u8* a1, s32 a2)
+{
+    func_400F4BA0();
+    ((void (*)(u8*, u8*, s32))func_400F4BA8)(a0, a1 + 0x2D24, a2);
+    ((void (*)(u8*, u8*, s32))func_400F4BF0)(a0, a1 + 0x2E00, a2);
+    ((void (*)(u8*, u8*, s32))func_400F4C00)(a0, a1 + 0x2EC0, a2);
+    ((void (*)(u8*, u8*, s32))func_400F4C08)(a0, a1 + 0x2FB0, a2);
+    ((void (*)(u8*, u8*, s32))func_400F4C10)(a0, a1 + 0x30D0, a2);
+    ((void (*)(u8*, u8*, s32))func_400F4CB8)(a0, a1 + 0x3200, a2);
+    CAM_init_camera_warp_cntrl(a0 + 0x18C0, 0, 0, 0);
+}
 
 void CAM_init_aim_angle_rot(u8* a0, s32 a1);
 void reset_pitch_rot_cntrl_camera_target_approach(u8* a0);

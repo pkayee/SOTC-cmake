@@ -1,5 +1,15 @@
 #include "common.h"
 
+typedef struct SheetSkipInfo192 {
+    int pad0;
+    char *flags;
+    char *bits;
+} SheetSkipInfo192;
+extern SheetSkipInfo192 D_401C1030;
+extern char rootPtn[];
+void *iosMallocAlign(void *, int, int);
+void *memset(void *, int, int);
+
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0192_sheetMgrInit", sheetMgrInit);
 
 extern int D_4012E334;
@@ -109,7 +119,19 @@ int sheetMgrGetSegInitHeader(void)
     return (int)D_401B53E4;
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0192_sheetMgrInit", sheetMgrCreateStageIndexSkipInfo);
+void *sheetMgrCreateStageIndexSkipInfo(int n)
+{
+    int sz = n - 1;
+    int m;
+
+    if (sz < 0)
+        sz = n + 6;
+    D_401C1030.flags = iosMallocAlign(rootPtn, n, 4);
+    m = (sz >> 3) + 1;
+    D_401C1030.bits = iosMallocAlign(rootPtn, m, 4);
+    memset(D_401C1030.flags, 0, n);
+    return memset(D_401C1030.bits, 0, m);
+}
 
 extern u8 *D_401C1038;
 
