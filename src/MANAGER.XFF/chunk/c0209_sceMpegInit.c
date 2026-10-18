@@ -1,5 +1,10 @@
 #include "common.h"
 
+s64 func_400FFE28(u8 *, s64, s64);
+s64 func_400FFF98(u8 *, s64, s64);
+
+void func_400FF7F0(void *, void *, s32);
+
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0209_sceMpegInit", sceMpegInit);
 
 //INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0209_sceMpegInit", sceMpegDelete);
@@ -8,7 +13,10 @@ s32 sceMpegDelete(u8* mp)
     return 1;
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0209_sceMpegInit", sceMpegAddBs);
+s32 sceMpegAddBs(u8 *m, void *buf, s32 len) {
+    func_400FF7F0(*(void **)(m + 0x40), buf, ((len + 0x13) / 16) * 16);
+    return 1;
+}
 
 s32 func_400FF9B8(u8 *);
 
@@ -110,7 +118,12 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0209_sceMpegInit", _sceMpegDisp
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0209_sceMpegInit", _sceMpegDispatchMpegCbNodata);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0209_sceMpegInit", func_40100540);
+s64 func_40100540(u8 *m, s64 a, s64 b) {
+    if (*(s32 *)(*(u8 **)(m + 0x40) + 0x184) != 3) {
+        return func_400FFF98(m, a, b);
+    }
+    return func_400FFE28(m, a, b);
+}
 
 s32 sceMpegClearRefBuff(u8 *m) {
     u8 *c = *(u8 **)(m + 0x40);
