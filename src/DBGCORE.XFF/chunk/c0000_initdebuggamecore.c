@@ -87,165 +87,135 @@ s32 create_sheet_edit_menu();
 void doit_sheet_edit_tool(float);
 void disp_sheet_edit_tool();
 
+void func_40011218();
+
+void func_400112B0();
+
+void func_400115A8();
+
+void func_400113E0();
+
+void func_40011640();
+
+void func_40010EF8();
+
+void func_40010E60();
+
+void func_400110C0();
+
+void func_40011168();
+
+void func_400118E8();
+
+void func_400119B8();
+
+void func_40011478();
+
+void func_40011028();
+
+void func_40010F90();
+
+void func_40011790();
+
 s32 initdebuggamecore(void)
 {
     return 0;
 }
 
-/* NEARMISS-STUB modelToolBegin */
-#if 0 /* NEARMISS 0.0% cat=regalloc sub=- | REA READY drop-in scored -1.00 in-TU (apply_ready) | attempts=1 */
 void modelToolBegin(void)
 {
     createScriptObj(func_40010E60, 0, &rootPtn, 0x4000, 0, 1, 0, 0);
 }
-#endif
-INCLUDE_ASM("asm/DBGCORE.XFF/nonmatchings/chunk/c0000_initdebuggamecore", modelToolBegin);
 
-/* NEARMISS-STUB modelTool2Begin */
-#if 0 /* NEARMISS 0.0% cat=regalloc sub=- | REA READY drop-in scored -1.00 in-TU (apply_ready) | attempts=1 */
 void modelTool2Begin(void)
 {
     createScriptObj(func_40010EF8, 0, &rootPtn, 0x4000, 0, 1, 0, 0);
 }
-#endif
-INCLUDE_ASM("asm/DBGCORE.XFF/nonmatchings/chunk/c0000_initdebuggamecore", modelTool2Begin);
 
-/* NEARMISS-STUB texToolBegin */
-#if 0 /* NEARMISS 0.0% cat=regalloc sub=- | REA READY drop-in scored -1.00 in-TU (apply_ready) | attempts=1 */
 void texToolBegin(void)
 {
     createScriptObj(func_40010F90, 0, &rootPtn, 0x4000, 0, 1, 0, 0);
 }
-#endif
-INCLUDE_ASM("asm/DBGCORE.XFF/nonmatchings/chunk/c0000_initdebuggamecore", texToolBegin);
 
-/* NEARMISS-STUB texTool2Begin */
-#if 0 /* NEARMISS 0.0% cat=regalloc sub=- | REA READY drop-in scored -1.00 in-TU (apply_ready) | attempts=1 */
 void texTool2Begin(void)
 {
     createScriptObj(func_40011028, 0, &rootPtn, 0x4000, 0, 1, 0, 0);
 }
-#endif
-INCLUDE_ASM("asm/DBGCORE.XFF/nonmatchings/chunk/c0000_initdebuggamecore", texTool2Begin);
 
-/* NEARMISS-STUB particleToolBegin */
-#if 0 /* NEARMISS 0.0% cat=regalloc sub=- | REA READY drop-in scored -1.00 in-TU (apply_ready) | attempts=1 */
 void particleToolBegin(void)
 {
     createScriptObj(func_400110C0, 0, &rootPtn, 0x4000, 0, 8, 0, 0);
 }
-#endif
-INCLUDE_ASM("asm/DBGCORE.XFF/nonmatchings/chunk/c0000_initdebuggamecore", particleToolBegin);
 
-/* NEARMISS-STUB pathToolBegin */
-#if 0 /* NEARMISS 0.0% cat=regalloc sub=- | REA READY drop-in scored -1.00 in-TU (apply_ready) | attempts=1 */
 void pathToolBegin(void)
 {
     createScriptObj(func_40011168, 0, &rootPtn, 0x4000, 0, 8, 0, 0);
 }
-#endif
-INCLUDE_ASM("asm/DBGCORE.XFF/nonmatchings/chunk/c0000_initdebuggamecore", pathToolBegin);
 
-/* NEARMISS-STUB gameLightToolBegin */
-#if 0 /* NEARMISS 0.0% cat=regalloc sub=- | REA READY drop-in scored -1.00 in-TU (apply_ready) | attempts=1 */
 void gameLightToolBegin(void)
 {
     createScriptObj(func_40011218, 0, &rootPtn, 0x4000, 0, 8, 0, 0);
 }
-#endif
-INCLUDE_ASM("asm/DBGCORE.XFF/nonmatchings/chunk/c0000_initdebuggamecore", gameLightToolBegin);
 
-/* NEARMISS-STUB globalLightToolBegin */
-#if 0 /* NEARMISS 0.0% cat=regalloc sub=- | REA READY drop-in scored -1.00 in-TU (apply_ready) | attempts=1 */
 void globalLightToolBegin(void)
 {
     createScriptObj(func_400112B0, 0, &rootPtn, 0x4000, 0, 8, 0, 0);
 }
-#endif
-INCLUDE_ASM("asm/DBGCORE.XFF/nonmatchings/chunk/c0000_initdebuggamecore", globalLightToolBegin);
 
 void fogCollisionToolBegin(void)
 {
     createScriptObj(func_40011348, 0, &rootPtn, 0x4000, 0, 8, 0, 0);
 }
 
-/* NEARMISS-STUB lightToolBegin */
-#if 0 /* NEARMISS 0.0% cat=regalloc sub=- | REA READY drop-in scored -1.00 in-TU (apply_ready) | attempts=1 */
 void lightToolBegin(void)
 {
     createScriptObj(func_400113E0, 0, &rootPtn, 0x4000, 0, 8, 0, 0);
 }
-#endif
-INCLUDE_ASM("asm/DBGCORE.XFF/nonmatchings/chunk/c0000_initdebuggamecore", lightToolBegin);
 
-/* NEARMISS-STUB swordEffectToolBegin */
-#if 0 /* NEARMISS 0.0% cat=regalloc sub=- | REA READY drop-in scored -1.00 in-TU (apply_ready) | attempts=1 */
 void swordEffectToolBegin(void)
 {
     createScriptObj(func_40011478, 0, &rootPtn, 0x4000, 0, 8, 0, 0);
 }
-#endif
-INCLUDE_ASM("asm/DBGCORE.XFF/nonmatchings/chunk/c0000_initdebuggamecore", swordEffectToolBegin);
 
 void fullScreenEffectToolBegin(void)
 {
     createScriptObj(func_40011510, 0, &rootPtn, 0x4000, 0, 8, 0, 0);
 }
 
-/* NEARMISS-STUB layerDebugToolBegin */
-#if 0 /* NEARMISS 0.0% cat=regalloc sub=- | REA READY drop-in scored -1.00 in-TU (apply_ready) | attempts=1 */
 void layerDebugToolBegin(void)
 {
     createScriptObj(func_400115A8, 0, &rootPtn, 0x4000, 0, 8, 0, 0);
 }
-#endif
-INCLUDE_ASM("asm/DBGCORE.XFF/nonmatchings/chunk/c0000_initdebuggamecore", layerDebugToolBegin);
 
-/* NEARMISS-STUB mapToolBegin */
-#if 0 /* NEARMISS 0.0% cat=regalloc sub=- | REA READY drop-in scored -1.00 in-TU (apply_ready) | attempts=1 */
 void mapToolBegin(void)
 {
     createScriptObj(func_40011640, 0, &rootPtn, 0x4000, 0, 8, 0, 0);
 }
-#endif
-INCLUDE_ASM("asm/DBGCORE.XFF/nonmatchings/chunk/c0000_initdebuggamecore", mapToolBegin);
 
 void cameramanToolBegin(void)
 {
     createScriptObj(func_400116E0, 0, &rootPtn, 0x4000, 0, 8, 0, 0);
 }
 
-/* NEARMISS-STUB windToolBegin */
-#if 0 /* NEARMISS 0.0% cat=regalloc sub=- | REA READY drop-in scored -1.00 in-TU (apply_ready) | attempts=1 */
 void windToolBegin(void)
 {
     createScriptObj(func_40011790, 0, &rootPtn, 0x4000, 0, 8, 0, 0);
 }
-#endif
-INCLUDE_ASM("asm/DBGCORE.XFF/nonmatchings/chunk/c0000_initdebuggamecore", windToolBegin);
 
 void collisionToolBegin(void)
 {
     createScriptObj(func_40011838, 0, &rootPtn, 0x4000, 0, 8, 0, 0);
 }
 
-/* NEARMISS-STUB scriptAnimToolBegin */
-#if 0 /* NEARMISS 0.0% cat=regalloc sub=- | REA READY drop-in scored -1.00 in-TU (apply_ready) | attempts=1 */
 void scriptAnimToolBegin(void)
 {
     createScriptObj(func_400118E8, 0, &rootPtn, 0x4000, 0, 8, 0, 0);
 }
-#endif
-INCLUDE_ASM("asm/DBGCORE.XFF/nonmatchings/chunk/c0000_initdebuggamecore", scriptAnimToolBegin);
 
-/* NEARMISS-STUB sheetEditToolBegin */
-#if 0 /* NEARMISS 0.0% cat=regalloc sub=- | REA READY drop-in scored -1.00 in-TU (apply_ready) | attempts=1 */
 void sheetEditToolBegin(void)
 {
     createScriptObj(func_400119B8, 0, &rootPtn, 0x4000, 0, 8, 0, 0);
 }
-#endif
-INCLUDE_ASM("asm/DBGCORE.XFF/nonmatchings/chunk/c0000_initdebuggamecore", sheetEditToolBegin);
 
 void func_40010E60(void)
 {
