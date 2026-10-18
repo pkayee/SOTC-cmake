@@ -1,17 +1,12 @@
 #include "common.h"
 
+s32 _sceMpegNextBit(void *, s32);
+
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0216__sceMpegNextHeader", _sceMpegNextHeader);
 
-/* NEARMISS-STUB func_40109790 */
-#if 0 /* NEARMISS 0.0% cat=stack-frame sub=- | tail j to func_40109630 compiled as addiu sp/sd ra/jal frame; no sibcall at default flags | attempts=1 */
-extern s32 func_40109630(void *param_1, s32 param_2);
-
-s32 func_40109790(void *param_1)
-{
-    return func_40109630(param_1, 0x20);
+void func_40109790(void *c) {
+    func_40109630(c, 0x20);
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0216__sceMpegNextHeader", func_40109790);
 
 /* NEARMISS-STUB func_40109798 */
 #if 0 /* NEARMISS 66.6% cat=stack-frame sub=- | frame 0x10 vs 0x20 (no 8-byte slot); lui/ori addr fold; a0 move scheduled earlier | attempts=1 */
@@ -34,9 +29,30 @@ void func_40109798(void *param_1)
 #endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0216__sceMpegNextHeader", func_40109798);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0216__sceMpegNextHeader", func_401097E8);
+void func_401097E8(u8 *c) {
+    _sceMpegNextBit(c, 3);
+    if (_sceMpegNextBit(c, 1) != 0) {
+        _sceMpegNextBit(c, 8);
+        _sceMpegNextBit(c, 8);
+        *(s32 *)(c + 0x154) = _sceMpegNextBit(c, 8);
+    }
+    *(s32 *)(c + 0x158) = _sceMpegNextBit(c, 0xe);
+    _sceMpegNextBit(c, 1);
+    *(s32 *)(c + 0x15c) = _sceMpegNextBit(c, 0xe);
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0216__sceMpegNextHeader", func_40109878);
+s32 func_40109878(void *c) {
+    _sceMpegNextBit(c, 1);
+    _sceMpegNextBit(c, 8);
+    _sceMpegNextBit(c, 1);
+    _sceMpegNextBit(c, 7);
+    _sceMpegNextBit(c, 1);
+    _sceMpegNextBit(c, 0x14);
+    _sceMpegNextBit(c, 1);
+    _sceMpegNextBit(c, 0x16);
+    _sceMpegNextBit(c, 1);
+    return _sceMpegNextBit(c, 0x16);
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0216__sceMpegNextHeader", func_40109910);
 
