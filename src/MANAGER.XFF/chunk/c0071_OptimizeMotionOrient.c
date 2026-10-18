@@ -10,7 +10,29 @@ void ResetCharacterClassAnimeFrameTableInfo(void *obj);
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0071_OptimizeMotionOrient", OptimizeMotionOrient);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0071_OptimizeMotionOrient", SearchSubAnimation);
+typedef struct
+{
+    s32 a;
+    s32 id;
+    s8 pad[0x3C];
+    s32 state;
+    s8 pad2[0x38];
+} SubAnim;
+
+s32 SearchSubAnimation(s8 *c, s32 id)
+{
+    s32 i;
+    SubAnim *s = *(SubAnim **)(c + 0x308);
+
+    for (i = 0; i < *(s32 *)(c + 0x3EC); i++, s++)
+    {
+        if (s->state != -2 && s->id == id)
+        {
+            return i;
+        }
+    }
+    return -1;
+}
 
 //INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0071_OptimizeMotionOrient", RequestCharacterClassSlip);
 void RequestCharacterClassSlip(void *obj)
@@ -77,17 +99,18 @@ void RequestCharacterClassMotionChangeWithParam(void *obj, s32 a1, s32 a2, f32 f
 #endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0071_OptimizeMotionOrient", RequestCharacterClassMotionChangeWithParam);
 
-/* NEARMISS-STUB RequestCharacterClassMotionDirection */
-#if 0 /* NEARMISS 60.0% cat=sched sub=- | lq hoisted above addiu/sw; target lq after sw | attempts=1 */
-void RequestCharacterClassMotionDirection(void *obj, void *src)
+typedef union
 {
-    u128 tmp = *(u128 *)src;
+    s128 q;
+    float f[4];
+    int i[4];
+} Vec4;
 
-    *(s32 *)((u8 *)obj + 0xBD4) = 1;
-    *(u128 *)((u8 *)obj + 0xBF0) = tmp;
+void RequestCharacterClassMotionDirection(char *p, Vec4 *v)
+{
+    ((Vec4 *)(p + 0xBD0))->i[1] = 1;
+    ((Vec4 *)(p + 0xBF0))->q = v->q;
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0071_OptimizeMotionOrient", RequestCharacterClassMotionDirection);
 
 //INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0071_OptimizeMotionOrient", RequestCharacterClassMotionDirectionByGPTop);
 void RequestCharacterClassMotionDirectionByGPTop(void *obj)
@@ -155,7 +178,26 @@ void ResetCharacterClassMotionShiftInfo(void *obj, void *param)
 #endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0071_OptimizeMotionOrient", ResetCharacterClassMotionShiftInfo);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0071_OptimizeMotionOrient", DebugCallCharacterObjMotionLeaveFunc);
+s32 CallMotShiftCallBackElemLeaveFunc(void *list, s32 id, void *ctx);
+
+int DebugCallCharacterObjMotionLeaveFunc(void *object)
+{
+    int remaining = 1;
+    char *character = GetCharacterClass(object);
+    char *motion = *(char **)(character + 0x1C0);
+    void (**callback)(void *) = (void (**)(void *))(motion + 0xBC);
+
+    do
+    {
+        void (*leave)(void *) = *callback++;
+
+        if (leave)
+        {
+            leave(object);
+        }
+    } while (--remaining >= 0);
+    return CallMotShiftCallBackElemLeaveFunc(character + 0x2C4, (int)motion, object);
+}
 
 //INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0071_OptimizeMotionOrient", SetCharacterObjDemoCutFinishFlag);
 void SetCharacterObjDemoCutFinishFlag(void *obj, s32 flag)
@@ -171,7 +213,18 @@ void CancelCharacterClassMotionChange(void *obj)
     *(s32 *)((u8 *)obj + 0xBD0) = 0;
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0071_OptimizeMotionOrient", getTurnLimitInterp);
+float getTurnLimitInterp(float from, float to, float time, float elapsed)
+{
+    float t;
+
+    if (time <= 0.001f)
+    {
+        return to;
+    }
+    t = elapsed / time;
+    t = (t <= 1.0f) ? t : 1.0f;
+    return to * t + from * (1.0f - t);
+}
 
 //INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0071_OptimizeMotionOrient", getRatioFromInterp);
 f32 getRatioFromInterp(f32 a, f32 b)
@@ -208,40 +261,23 @@ s32 *getJumpSpeedLimitEnableFlag(void)
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0071_OptimizeMotionOrient", entrySyncAnim);
 
-/* NEARMISS-STUB SetMotionMinimumSpeed */
-#if 0 /* NEARMISS 98.1% cat=regalloc sub=- | f0/f1 swap for lwc1 vs const | attempts=1 */
-void SetMotionMinimumSpeed(void *obj)
+void SetMotionMinimumSpeed(void *actor)
 {
-    u8 *cc = GetCharacterClass(obj);
-    f32 v = *(f32 *)(cc + 0x5B8);
-    u8 *p = cc + 0x1C0;
-
-    v = 0.01f + v;
-    if (*(s8 *)(cc + 0x5D2) != 0)
-    {
-        *(f32 *)(p + 0x1C) = v;
-    }
+    char *c = GetCharacterClass(actor);
+    char *m = c + 0x1C0;
+    float v = *(float *)(c + 0x5B8) + 0.01f;
+    if (*(signed char *)(c + 0x5D2) != 0)
+        *(float *)(m + 0x1C) = v;
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0071_OptimizeMotionOrient", SetMotionMinimumSpeed);
 
-/* NEARMISS-STUB SetMotionMaximumSpeed */
-#if 0 /* NEARMISS 98.1% cat=regalloc sub=- | f0/f1 swap for lwc1 vs const | attempts=1 */
-void SetMotionMaximumSpeed(void *obj)
+void SetMotionMaximumSpeed(void *actor)
 {
-    u8 *cc = GetCharacterClass(obj);
-    f32 v = *(f32 *)(cc + 0x5B4);
-    u8 *p = cc + 0x1C0;
-
-    v = v - 0.01f;
-
-    if (*(s8 *)(cc + 0x5D2) != 0)
-    {
-        *(f32 *)(p + 0x1C) = v;
-    }
+    char *c = GetCharacterClass(actor);
+    char *m = c + 0x1C0;
+    float v = *(float *)(c + 0x5B4) - 0.01f;
+    if (*(signed char *)(c + 0x5D2) != 0)
+        *(float *)(m + 0x1C) = v;
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0071_OptimizeMotionOrient", SetMotionMaximumSpeed);
 
 //INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0071_OptimizeMotionOrient", ContinueMotionCurrentSpeed);
 void ContinueMotionCurrentSpeed(void *obj)
