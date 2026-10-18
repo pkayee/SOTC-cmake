@@ -79,26 +79,13 @@ void getQuatPQSAnimIntFrame(void *a, unsigned char *b, void *c)
         func_40043588(a, k, v, c);
 }
 
-/* NEARMISS-STUB InitMotionBoolInfo */
-#if 0 /* NEARMISS 81.0% cat=regalloc sub=- | lb load/store order and base reg differ (target loads 0,1,2 from a3; ours 2,0,1 from v0) | attempts=1 */
-extern s8 D_4012A9F0[];
+typedef struct { s8 b[3]; } MotionBoolInfo;
+extern MotionBoolInfo D_4012A9F0;
 
-void InitMotionBoolInfo(s8 *arg0)
+void InitMotionBoolInfo(MotionBoolInfo *arg0)
 {
-    s8 *src = D_4012A9F0;
-    s8 a;
-    s8 b;
-    s8 c;
-
-    a = src[0];
-    b = src[1];
-    c = src[2];
-    arg0[0] = a;
-    arg0[1] = b;
-    arg0[2] = c;
+    *arg0 = D_4012A9F0;
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0049_GetMotionNodeParentBaseQuaternion", InitMotionBoolInfo);
 
 void SetMotionDynamicCallFunc(char *p, int a1, int a2)
 {

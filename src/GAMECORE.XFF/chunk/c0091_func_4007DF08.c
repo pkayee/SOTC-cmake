@@ -15,19 +15,15 @@ int SCRConditionNargaWallCheck(void *actor, int wall)
     return wall == *(int *)((char *)GetSCRCharaAIWorkPtr(actor) + 0x5A50);
 }
 
-/* NEARMISS-STUB SCRFuncNargaSetWallAttainPos */
-#if 0 /* NEARMISS 99.6875% cat=call-abi sub=- | extra unused GetSCRCharaAIWorkPtr result; target takes 1 arg and keeps s1 copy; 2-arg variant gives a1 vs a0 arg mismatch | attempts=1 */
 extern void *getSCRDataCtrlWork(void *);
 extern void setAttainmentPos(void *, void *);
 
-void SCRFuncNargaSetWallAttainPos(void *a, void *b)
+void SCRFuncNargaSetWallAttainPos(void *a)
 {
     char *l = GetSCRCharaAIWorkPtr(a);
-    void *s = getSCRDataCtrlWork(b);
+    void *s = getSCRDataCtrlWork(a);
     setAttainmentPos(s, l + 0x5A40);
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0091_func_4007DF08", SCRFuncNargaSetWallAttainPos);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0091_func_4007DF08", SCRFuncNargaFloatMain);
 

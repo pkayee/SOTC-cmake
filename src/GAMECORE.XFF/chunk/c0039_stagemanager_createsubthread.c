@@ -23,7 +23,7 @@ s32 stagemanager_createsubthread(s32 a0, s32 a1, s32 a2)
     return r;
 }
 
-void func_40041CC8(void);
+void func_40041CC8();
 
 void stagemanager_loadstage(s32 a0, s32 a1)
 {
@@ -565,7 +565,7 @@ void func_40041C50(s32 a0)
 }
 
 /* NEARMISS-STUB func_40041CC8 */
-#if 0 /* NEARMISS 91.17647% cat=sched sub=- | andi low, ra save and beqz scheduled later than target | attempts=2 */
+#if 0 /* NEARMISS 99.12% cat=regalloc sub=- | idx before low fixes the andi/sra slot (91.2->99.1); left: SH hi reg a3 vs a2 and sh in a2 vs a1 (target sh and s share a1); call args a0,a2,a1 order; if/else,  | attempts=3 */
 void func_40041CC8(s32 a0)
 {
     u8 *root;
@@ -581,8 +581,8 @@ void func_40041CC8(s32 a0)
         sh = 0;
     }
     root = rootPtn;
-    low = a0 & 0xFFFF;
     idx = a0 >> 16;
+    low = a0 & 0xFFFF;
     s = (sh != 0) ? (u8 *)sh[4] + idx * 20 : 0;
     if (++*(u16 *)(s + 0x10) == 1)
     {
