@@ -1004,7 +1004,7 @@ segments:
         - [ 0x34EC8, c, sdk/sceGsPutIMR, "-O2 cc=ee-gcc2.9-991111" ] # sceGsPutIMR
         - [ 0x34F08, c, sdk/sceGsGetIMR, "-O2 cc=ee-gcc2.9-991111" ] # sceGsGetIMR
         - [ 0x34F28, c, sdk/isceGsPutIMR, "-O2 cc=ee-gcc2.9-991111" ] # isceGsPutIMR
-        - [ 0x34F68, asm, sdk/sceCdRead ] # sceCdRead
+        - [ 0x34F68, c, sdk/sceCdRead, "-O2 cc=ee-gcc2.9-991111" ] # sceCdRead
         - [ 0x35148, c, sdk/sceCdReadIOPm, "-O2 cc=ee-gcc2.9-991111" ] # sceCdReadIOPm
         - [ 0x352A0, c, sdk/sceCdGetError, "-O2 cc=ee-gcc2.9-991111" ] # sceCdGetError
         - [ 0x35338, c, sdk/sceCdStatus, "-O2 cc=ee-gcc2.9-991111" ] # sceCdStatus
