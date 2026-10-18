@@ -26,7 +26,12 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0184_func_400E83F0", adpcmSetPa
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0184_func_400E83F0", adpcmMgrInit);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0184_func_400E83F0", adpcmGamePause);
+extern int D_4012E014;
+
+void adpcmGamePause(int arg0)
+{
+    D_4012E014 = arg0;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0184_func_400E83F0", func_400E8EF0);
 

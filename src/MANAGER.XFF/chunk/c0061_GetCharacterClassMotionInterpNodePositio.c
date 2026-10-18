@@ -104,7 +104,20 @@ s32 SetCharacterObjMotionShiftCallBackEntry(void *obj, s32 idx, s32 p2, s32 p3, 
     return 0;
 }
 #endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0061_GetCharacterClassMotionInterpNodePositio", SetCharacterObjMotionShiftCallBackEntry);
+s32 SetCharacterObjMotionShiftCallBackEntry(void *object, s32 index, s32 id, s32 entry, s32 leave, s32 arg) {
+    u8 *character = GetCharacterClass(object);
+
+    if (character) {
+        s32 *element = (s32 *)(index * 16 + (s32)*(u8 **)(character + 0x2C8));
+
+        element[0] = id;
+        element[1] = entry;
+        element[2] = leave;
+        element[3] = arg;
+        return 0;
+    }
+    return -1;
+}
 
 void SetCharacterObjParentPlaneDiscontinuousJudgeFunc(u8 *obj, s32 val) {
     u8 *cc = chrClass(obj);
@@ -154,7 +167,31 @@ void SetInertiaRotInterpMode(u8 *obj) {
     }
 }
 #endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0061_GetCharacterClassMotionInterpNodePositio", SetInertiaRotInterpMode);
+typedef struct {
+    long a, b, c, d;
+} Quad;
+
+void SetInertiaRotInterpMode(void *o)
+{
+    char *obj = o;
+    char *cls;
+
+    switch ((unsigned char)obj[8]) {
+    case 9:
+        cls = obj + 0x90;
+        break;
+    case 0x16:
+        cls = obj + 0x90;
+        break;
+    default:
+        cls = 0;
+    }
+
+    if (*(signed char *)(cls + 0xA16) != 0) {
+        cls[0xA19] = 1;
+        *(Quad *)(cls + 0xA40) = *(Quad *)(cls + 0xA20);
+    }
+}
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0061_GetCharacterClassMotionInterpNodePositio", DebugDispCharacterStatus);
 
 //INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0061_GetCharacterClassMotionInterpNodePositio", CallMotShiftCallBackElemLeaveFunc);
