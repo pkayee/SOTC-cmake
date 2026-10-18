@@ -35,7 +35,7 @@ s32 SignalSema(s32);
 s32 WaitSema(s32);
 void iosDmaSendSChainPath1(s32);
 void isysObjDeleteLock(s32);
-s32 isysAddGroupWithLinkParamNoWait(s32, volatile s32 *, s32, s32);
+s32 isysAddGroupWithLinkParamNoWait(s32, s32 *, s32, s32);
 void func_40024FB0(void);
 extern char D_40047600[];
 void isysObjWaitSema();
@@ -49,6 +49,8 @@ void func_40024B90(void);
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dl", func_40024B90);
 
+/* NEARMISS-STUB iosDlPopLayer */
+#if 0 /* NEARMISS 86.68% cat=alias sub=rea-fixed | needs the banned qualifier: gcc folds %lo/merges reads without it | attempts=3 */
 s32 iosDlPopLayer(void)
 {
     s32 count = D_40045A20 - 1;
@@ -57,81 +59,92 @@ s32 iosDlPopLayer(void)
     D_40045A20 = count;
     if (count < 0)
     {
-        LoaderSysPrintf(D_40047600, ((volatile DlState *)&D_40092698)->layer, D_400926C8[count]);
+        LoaderSysPrintf(D_40047600, ((DlState *)&D_40092698)->layer, D_400926C8[count]);
     }
     layer = D_400926C8[D_40045A20];
     if (layer < 0)
     {
         LoaderSysPrintf(D_400475C0);
     }
-    else if (layer >= ((volatile DlState *)&D_40092698)->layerNum)
+    else if (layer >= ((DlState *)&D_40092698)->layerNum)
     {
-        layer = ((volatile DlState *)&D_40092698)->layerNum - 1;
+        layer = ((DlState *)&D_40092698)->layerNum - 1;
     }
-    ((volatile DlState *)&D_40092698)->layer = layer;
+    ((DlState *)&D_40092698)->layer = layer;
 
     return D_400926C8[D_40045A20];
 }
+#endif
+INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dl", iosDlPopLayer);
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dl", func_40024FB0);
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dl", iosUsedPacketBufferSize);
 f32 iosUsedPacketBufferSize(void)
 {
-    volatile DlState *dl = &D_40092698;
+    DlState *dl = &D_40092698;
     u32 used = dl->packetPtrPath1 - dl->endAdrs[dl->workBufId];
 
     return used / (f32)(D_40045A1C << 4);
 }
 
-//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dl", iosCreateIVArbitrationSema);
+/* NEARMISS-STUB iosCreateIVArbitrationSema */
+#if 0 /* NEARMISS 91.58% cat=alias sub=- | needs the banned qualifier: gcc folds %lo/merges reads without it | attempts=1 */
 void iosCreateIVArbitrationSema(void)
 {
     s32 sema = iosCreateSema(0, 1, 0);
-    volatile s32 *dst = &D_40092690;
+    s32 *dst = &D_40092690;
 
     *dst = sema;
 }
+#endif
+INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dl", iosCreateIVArbitrationSema);
 
-//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dl", iosDlGetTransAdrs);
+/* NEARMISS-STUB iosDlGetTransAdrs */
+#if 0 /* NEARMISS 71.11% cat=alias sub=- | needs the banned qualifier: gcc folds %lo/merges reads without it | attempts=1 */
 s32 iosDlGetTransAdrs(void)
 {
-    volatile DlState *dl = &D_40092698;
+    s32 *base = (s32 *)&D_40092698;
 
-    return dl->createAdrs[dl->workBufId];
+    return base[2 + base[6]];
 }
+#endif
+INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dl", iosDlGetTransAdrs);
 
 /* NEARMISS-STUB iosGetPacketPtrPath1 */
 #if 0 /* NEARMISS 82.78% cat=no-c-form sub=- | pref 0x00,0x40(a0) prefetch has no C form | attempts=1 */
 // kR39 asm-free attempt: 82.78% (missing: pref 0x00,0x40 prefetch has no gcc 2.96 C form; register/addr-load arg_mism and extra/missing insns follow from it)
 s32 iosGetPacketPtrPath1(void)
 {
-    volatile DlState *dl = &D_40092698;
+    DlState *dl = &D_40092698;
 
     if (dl->packetPtrPath1 & 0xF)
     {
         dl->packetPtrPath1 = dl->packetPtrPath1 - (dl->packetPtrPath1 & 0xF) + 0x10;
     }
 
-    return ((volatile DlState *)&D_40092698)->packetPtrPath1;
+    return ((DlState *)&D_40092698)->packetPtrPath1;
 }
 #endif
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dl", iosGetPacketPtrPath1);
 
-//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dl", iosSetPacketPtrPath1);
+/* NEARMISS-STUB iosSetPacketPtrPath1 */
+#if 0 /* NEARMISS 46.8% cat=alias sub=- | needs the banned qualifier: gcc folds %lo/merges reads without it | attempts=1 */
 void iosSetPacketPtrPath1(s32 arg0)
 {
-    volatile DlState *dl = &D_40092698;
+    s32 *base = (s32 *)&D_40092698 + 4;
 
-    dl->packetPtrPath1 = arg0;
+    *base = arg0;
 }
+#endif
+INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dl", iosSetPacketPtrPath1);
 
 /* NEARMISS-STUB iosAllocPacketPtrPath1 */
 #if 0 /* NEARMISS 88.89% cat=no-c-form sub=- | pref prefetch has no C form | attempts=1 */
 // kR39 asm-free attempt: 88.89% (missing: pref 0x00,0x40 prefetch has no gcc 2.96 C form; register/addr-load arg_mism and extra/missing insns follow from it)
 s32 iosAllocPacketPtrPath1(s32 arg0)
 {
-    volatile DlState *dl = &D_40092698;
+    DlState *dl = &D_40092698;
     s32 ret = dl->packetPtrPath1;
 
     dl->packetPtrPath1 = dl->packetPtrPath1 + arg0;
@@ -146,7 +159,7 @@ INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dl", iosAllocPacketPtrPath1);
 // kR39 asm-free attempt: 10.27% (missing: pref 0x00,0x40 prefetch has no gcc 2.96 C form; register/addr-load arg_mism and extra/missing insns follow from it)
 void iosDlChainHead(s32 idx, s32 dc)
 {
-    volatile DlState *dl = &D_40092698;
+    DlState *dl = &D_40092698;
     DlRec *rec = (DlRec *)(dl->createAdrs[dl->workBufId] + idx * 0x30);
     DlPkt *pkt = (DlPkt *)dl->packetPtrPath1;
     DmaTag tag;
@@ -170,7 +183,7 @@ INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dl", iosDlChainHead);
 // kR39 asm-free attempt: 42.20% (missing: pref 0x00,0x40 prefetch has no gcc 2.96 C form; register/addr-load arg_mism and extra/missing insns follow from it)
 void iosDlChainTail(s32 idx, s32 dc)
 {
-    volatile DlState *dl = &D_40092698;
+    DlState *dl = &D_40092698;
     DlRec *rec = (DlRec *)(dl->createAdrs[dl->workBufId] + idx * 0x30);
     DlPkt *pkt = (DlPkt *)dl->packetPtrPath1;
     u32 link;
@@ -194,7 +207,7 @@ INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dl", iosDlChainTail);
 // kR39 asm-free attempt: 17.28% (missing: pref 0x00,0x40 prefetch has no gcc 2.96 C form; register/addr-load arg_mism and extra/missing insns follow from it)
 void iosDlChainHeadCurrent(s32 dc)
 {
-    volatile DlState *dl = &D_40092698;
+    DlState *dl = &D_40092698;
     s32 idx = dl->layer;
     DlRec *rec = (DlRec *)(dl->createAdrs[dl->workBufId] + idx * 0x30);
     DlPkt *pkt = (DlPkt *)dl->packetPtrPath1;
@@ -219,7 +232,7 @@ INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dl", iosDlChainHeadCurrent);
 // kR39 asm-free attempt: 47.42% (missing: pref 0x00,0x40 prefetch has no gcc 2.96 C form; register/addr-load arg_mism and extra/missing insns follow from it)
 void iosDlChainTailCurrent(s32 dc)
 {
-    volatile DlState *dl = &D_40092698;
+    DlState *dl = &D_40092698;
     s32 idx = dl->layer;
     DlRec *rec = (DlRec *)(dl->createAdrs[dl->workBufId] + idx * 0x30);
     DlPkt *pkt = (DlPkt *)dl->packetPtrPath1;
@@ -239,24 +252,27 @@ void iosDlChainTailCurrent(s32 dc)
 #endif
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dl", iosDlChainTailCurrent);
 
+/* NEARMISS-STUB iosDlSwap */
+#if 0 /* NEARMISS 82.58% cat=alias sub=rea-fixed | needs the banned qualifier: gcc folds %lo/merges reads without it | attempts=2 */
 void iosDlSwap(void)
 {
     s32 *group;
     s32 idx;
     s32 *link;
     s32 obj = 0;
+    s32 *sema = &D_40092690;
 
-    WaitSema(*(volatile s32 *)&D_40092690);
-    ((volatile DlState *)&D_40092698)->workBufId ^= 1;
-    idx = ((volatile DlState *)&D_40092698)->workBufId;
-    group = (s32 *)((volatile DlState *)&D_40092698)->lockLink + idx;
+    WaitSema(*sema);
+    ((DlState *)&D_40092698)->workBufId ^= 1;
+    idx = ((DlState *)&D_40092698)->workBufId;
+    group = (s32 *)((DlState *)&D_40092698)->lockLink + idx;
     isysObjWaitSema();
     link = isysGroupForFirstForce(group, 0);
     while (link != 0)
     {
         obj = *link;
         isysObjDeleteUnLock(obj);
-        ((volatile DlState *)&D_40092698)->lockCount[idx]--;
+        ((DlState *)&D_40092698)->lockCount[idx]--;
         link = isysGroupForNextForce(link, 0);
     }
     if (obj != 0)
@@ -266,62 +282,80 @@ void iosDlSwap(void)
     isysDeleteGroupAllObj(group);
     isysObjSignalSema();
     func_40024B90();
-    SignalSema(*(volatile s32 *)&D_40092690);
+    SignalSema(*sema);
 }
+#endif
+INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dl", iosDlSwap);
 
-//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dl", iosDlTrans);
+/* NEARMISS-STUB iosDlTrans */
+#if 0 /* NEARMISS 80.5% cat=alias sub=- | needs the banned qualifier: gcc folds %lo/merges reads without it | attempts=1 */
 void iosDlTrans(void)
 {
-    volatile DlState *dl;
-    volatile s32 *sema = &D_40092690;
+    DlState *dl;
+    s32 *sema = &D_40092690;
+    s32 *adrs;
 
     WaitSema(*sema);
     dl = &D_40092698;
-    iosDmaSendSChainPath1(dl->createAdrs[!dl->workBufId]);
+    adrs = dl->createAdrs;
+    iosDmaSendSChainPath1(adrs[!dl->workBufId]);
     D_40045A14++;
     SignalSema(*sema);
 }
+#endif
+INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dl", iosDlTrans);
 
 void iosDlLockObj(s32 arg0)
 {
     isysObjDeleteLock(arg0);
-    isysAddGroupWithLinkParamNoWait(arg0, &((volatile DlState *)&D_40092698)->lockLink[((volatile DlState *)&D_40092698)->workBufId], 0, 0);
-    ((volatile DlState *)&D_40092698)->lockCount[((volatile DlState *)&D_40092698)->workBufId]++;
+    isysAddGroupWithLinkParamNoWait(arg0, &((DlState *)&D_40092698)->lockLink[((DlState *)&D_40092698)->workBufId], 0, 0);
+    ((DlState *)&D_40092698)->lockCount[((DlState *)&D_40092698)->workBufId]++;
 }
 
-//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dl", iosDlGetWorkBufId);
+/* NEARMISS-STUB iosDlGetWorkBufId */
+#if 0 /* NEARMISS 46.8% cat=alias sub=- | needs the banned qualifier: gcc folds %lo/merges reads without it | attempts=1 */
 s32 iosDlGetWorkBufId(void)
 {
-    volatile DlState *dl = &D_40092698;
+    s32 *w = &D_40092698.workBufId;
 
-    return dl->workBufId;
+    return *w;
 }
+#endif
+INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dl", iosDlGetWorkBufId);
 
-//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dl", iosDlGetTransBufId);
+/* NEARMISS-STUB iosDlGetTransBufId */
+#if 0 /* NEARMISS 78.8% cat=alias sub=- | needs the banned qualifier: gcc folds %lo/merges reads without it | attempts=1 */
 s32 iosDlGetTransBufId(void)
 {
-    volatile DlState *dl = &D_40092698;
+    DlState *dl = &D_40092698;
+    s32 *w = &dl->workBufId;
 
-    return dl->workBufId == 0;
+    return *w == 0;
 }
+#endif
+INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dl", iosDlGetTransBufId);
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dl", iosDlGetEndAdrs);
 s32 iosDlGetEndAdrs(void)
 {
-    volatile DlState *dl = &D_40092698;
+    DlState *dl = &D_40092698;
 
     return dl->endAdrs[dl->workBufId] + (D_40045A1C << 4) - 0x1000;
 }
 
-//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dl", iosDlGetLayer);
+/* NEARMISS-STUB iosDlGetLayer */
+#if 0 /* NEARMISS 46.8% cat=alias sub=- | needs the banned qualifier: qualifier-free forms (plain DlState* local, split assign, u32 base cast, register local) all leave lui+lw folded as %lo(D+0x1c), expecte | attempts=1 */
 s32 iosDlGetLayer(void)
 {
-    volatile DlState *dl = &D_40092698;
+    DlState *dl = &D_40092698;
 
     return dl->layer;
 }
+#endif
+INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dl", iosDlGetLayer);
 
-//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dl", iosDlSetLayer);
+/* NEARMISS-STUB iosDlSetLayer */
+#if 0 /* NEARMISS 78.96% cat=alias sub=- | needs the banned qualifier: gcc folds %lo/merges reads without it | attempts=1 */
 void iosDlSetLayer(s32 arg0)
 {
     s32 layer = arg0;
@@ -330,33 +364,39 @@ void iosDlSetLayer(s32 arg0)
     {
         LoaderSysPrintf(D_400475C0);
     }
-    else if (layer >= ((volatile DlState *)&D_40092698)->layerNum)
+    else if (layer >= ((DlState *)&D_40092698)->layerNum)
     {
-        layer = ((volatile DlState *)&D_40092698)->layerNum - 1;
+        layer = ((DlState *)&D_40092698)->layerNum - 1;
     }
-    ((volatile DlState *)&D_40092698)->layer = layer;
+    ((DlState *)&D_40092698)->layer = layer;
 }
+#endif
+INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dl", iosDlSetLayer);
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dl", iosDlPushLayer);
 
-//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dl", iosDlGetLayerNum);
+/* NEARMISS-STUB iosDlGetLayerNum */
+#if 0 /* NEARMISS 46.8% cat=alias sub=- | needs the banned qualifier: gcc folds %lo/merges reads without it | attempts=1 */
 s32 iosDlGetLayerNum(void)
 {
-    volatile DlState *dl = &D_40092698;
+    s32 *base = (s32 *)&D_40092698 + 5;
 
-    return dl->layerNum;
+    return *base;
 }
+#endif
+INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dl", iosDlGetLayerNum);
 
-//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dl", iosDlRelease);
+/* NEARMISS-STUB iosDlRelease */
+#if 0 /* NEARMISS 79.73% cat=alias sub=- | needs the banned qualifier: gcc folds %lo/merges reads without it | attempts=1 */
 void iosDlRelease(void)
 {
-    volatile DlState *dl = &D_40092698;
+    DlState *dl = &D_40092698;
     s32 i;
 
     for (i = 0; i < 2; i++)
     {
-        volatile s32 *createAdrs = dl->createAdrs;
-        volatile s32 *endAdrs = dl->endAdrs;
+        s32 *createAdrs = dl->createAdrs;
+        s32 *endAdrs = dl->endAdrs;
 
         if (createAdrs[i] != 0)
         {
@@ -368,12 +408,15 @@ void iosDlRelease(void)
         }
     }
 }
+#endif
+INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dl", iosDlRelease);
 
-//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dl", InitDL);
+/* NEARMISS-STUB InitDL */
+#if 0 /* NEARMISS 76.44% cat=alias sub=- | needs the banned qualifier: gcc folds %lo/merges reads without it | attempts=1 */
 void InitDL(void)
 {
-    volatile s32 *sema;
-    volatile s32 *dst;
+    s32 *sema;
+    s32 *dst;
 
     func_40024FB0();
     sema = &D_40092690;
@@ -381,11 +424,13 @@ void InitDL(void)
     dst = &D_40045A10;
     *dst = 1;
 }
+#endif
+INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dl", InitDL);
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dl", iosDlCheckAdrs);
 s32 iosDlCheckAdrs(s32 arg0)
 {
-    volatile DlState *dl = &D_40092698;
+    DlState *dl = &D_40092698;
     u32 end = dl->endAdrs[dl->workBufId] + (D_40045A1C << 4) - 0x1000;
 
     return (u32)arg0 < end;
@@ -396,7 +441,7 @@ s32 iosDlCheckAdrs(s32 arg0)
 // kR39 asm-free attempt: 88.08% (missing: pref 0x00,0x40 prefetch has no gcc 2.96 C form; register/addr-load arg_mism and extra/missing insns follow from it)
 s32 iosDlCheckSize(void)
 {
-    volatile DlState *dl = &D_40092698;
+    DlState *dl = &D_40092698;
     s32 end = dl->endAdrs[dl->workBufId] + (D_40045A1C << 4) - 0x1000;
 
     if (dl->packetPtrPath1 & 0xF)
@@ -404,38 +449,50 @@ s32 iosDlCheckSize(void)
         dl->packetPtrPath1 = dl->packetPtrPath1 - (dl->packetPtrPath1 & 0xF) + 0x10;
     }
 
-    return end - ((volatile DlState *)&D_40092698)->packetPtrPath1;
+    return end - ((DlState *)&D_40092698)->packetPtrPath1;
 }
 #endif
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dl", iosDlCheckSize);
 
-//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dl", iosDlGetCreateAdrs);
+/* NEARMISS-STUB iosDlGetCreateAdrs */
+#if 0 /* NEARMISS 71.0% cat=alias sub=- | needs the banned qualifier: gcc folds %lo/merges reads without it | attempts=1 */
 s32 iosDlGetCreateAdrs(void)
 {
-    volatile DlState *dl = &D_40092698;
+    DlState *dl = &D_40092698;
+    s32 *w = &dl->workBufId;
 
-    return dl->createAdrs[dl->workBufId == 0 ? 1 : 0];
+    return dl->createAdrs[*w == 0 ? 1 : 0];
 }
+#endif
+INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dl", iosDlGetCreateAdrs);
 
-//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dl", iosAllocPacketPtrPath1UnCachedA);
+/* NEARMISS-STUB iosAllocPacketPtrPath1UnCachedA */
+#if 0 /* NEARMISS 64.0% cat=alias sub=- | needs the banned qualifier: gcc folds %lo/merges reads without it | attempts=1 */
 s32 iosAllocPacketPtrPath1UnCachedA(s32 arg0)
 {
-    volatile DlState *dl = &D_40092698;
+    DlState *dl = &D_40092698;
     s32 ret = dl->packetPtrPath1 | 0x30000000;
 
-    dl->packetPtrPath1 += arg0;
+    dl->packetPtrPath1 = dl->packetPtrPath1 + arg0;
 
     return ret;
 }
+#endif
+INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dl", iosAllocPacketPtrPath1UnCachedA);
 
-//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dl", iosDlTransNow);
+/* NEARMISS-STUB iosDlTransNow */
+#if 0 /* NEARMISS 69.96% cat=alias sub=- | needs the banned qualifier: gcc folds %lo/merges reads without it | attempts=1 */
 void iosDlTransNow(void)
 {
-    volatile DlState *dl;
-    volatile s32 *sema = &D_40092690;
+    DlState *dl;
+    s32 *sema = &D_40092690;
+    s32 *adrs;
 
     WaitSema(*sema);
     dl = &D_40092698;
-    iosDmaSendSChainPath1(dl->createAdrs[!dl->workBufId]);
+    adrs = dl->createAdrs;
+    iosDmaSendSChainPath1(adrs[dl->workBufId == 0 ? 1 : 0]);
     SignalSema(*sema);
 }
+#endif
+INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/dl", iosDlTransNow);
