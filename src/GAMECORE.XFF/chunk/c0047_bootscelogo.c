@@ -24,9 +24,30 @@ void SCRMammothBreaksWall(void *character)
     RequestCharacterMotionShiftFunc(character, func_4004A448);
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0047_bootscelogo", func_4004A408);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0047_bootscelogo", func_4004A408);
+extern s32 ScrIntrDef_DEAD_BOSS;
+void *SCRGetBossWork(void *actor);
+void scriptIntrSignal();
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0047_bootscelogo", func_4004A448);
+void func_4004A408(void *character)
+{
+    void *work;
+
+    work = SCRGetBossWork(character);
+    *(s32 *)((u8 *)work + 0x44) = 0;
+    work = SCRGetBossWork(character);
+    *(s32 *)((u8 *)work + 0xEC) = 1;
+    scriptIntrSignal(ScrIntrDef_DEAD_BOSS);
+}
+
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0047_bootscelogo", func_4004A448);
+extern s32 GameObject_PROTO_WALL;
+extern void _SCRStartLWS(s32, s32, s32, s32);
+
+void func_4004A448(void *character)
+{
+    _SCRStartLWS(*(s32 *)(GameObject_PROTO_WALL + 8), -1, 6, 0);
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0047_bootscelogo", func_4004A478);
 

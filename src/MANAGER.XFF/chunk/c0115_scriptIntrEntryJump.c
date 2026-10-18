@@ -38,9 +38,23 @@ void scriptIntrSegInit(void) {
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0115_scriptIntrEntryJump", scriptIntrSegDelete);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0115_scriptIntrEntryJump", func_40097B10);
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0115_scriptIntrEntryJump", func_40097B10);
+s32 func_40097B10(s32 p)
+{
+    if (p != 0 && *(s32 *)p == -0x5A5A5A5B) {
+        return 1;
+    }
+    return 0;
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0115_scriptIntrEntryJump", func_40097B38);
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0115_scriptIntrEntryJump", func_40097B38);
+s32 func_40097B38(s32 p)
+{
+    if (p != 0 && *(s32 *)p == -0x5A5A5A5C) {
+        return 1;
+    }
+    return 0;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0115_scriptIntrEntryJump", func_40097B60);
 
