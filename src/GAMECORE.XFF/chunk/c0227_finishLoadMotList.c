@@ -2,6 +2,7 @@
 
 extern s32 D_4021E1E0;
 extern s32 D_4021E1E4;
+extern s32 DldSysUndefSymbol;
 
 u8* getSCRDataCtrlWork(void);
 u8* GetDamageClass(s32 a0);
@@ -26,6 +27,16 @@ void execPointListSort(u8* work, u8* list, s32 num);
 s32 getNearPoint(u8* work, s32 a1, s32* a2, s32* a3, u8* list, s32 t1, s32 t2, s32 t3);
 void GetGeometryPointerPosition(f32* out, u8* geo);
 void SCRGetTargetPosXZDirOnMyCtrlGeo(f32* out, s32 a1, f32* out2);
+s32 getLastPassagePointIdx(u8* work);
+s32 getLastPassageAreaIdx(u8* work);
+u8* getPointDataByAreaIdx(u8* work, s32 pi, s32 area);
+u8* getPassageWork(u8* work, s32 idx);
+s32 getNowPassagePointIdx(u8* work);
+s32 getNowPassageAreaIdx(u8* work);
+u8* getPlayerColCont2(s32 chr);
+s32 ColCont2_IsParentObj(void* cont, void* obj);
+s32 ColCont2_IsColStatus(void* cont, s32 a1, s32 a2);
+s32 equipmentInvisibilityCloak(void);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0227_finishLoadMotList", finishLoadMotList);
 
@@ -89,7 +100,36 @@ s32 SCRConditionDamagedType(s32 a0, s32 a1, s32 a2, s32 a3, s32 sheetType)
     return 0;
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0227_finishLoadMotList", SCRConditionDamagedWeaponType);
+s32 SCRConditionDamagedWeaponType(s32 a0, s32 type)
+{
+    u8 *damage = GetDamageClass(a0);
+
+    if (damage != NULL && *(s32 *)damage == 3)
+    {
+        if (type == 1)
+        {
+            s32 result = 0;
+            s32 weapon = *(s32 *)(damage + 0x60);
+            if (weapon == 1 || weapon == 3)
+            {
+                result = 1;
+            }
+            return result;
+        }
+        if (type == 0)
+        {
+            s32 result = 0;
+            s32 weapon = *(s32 *)(damage + 0x60);
+            if (weapon == 5 || weapon == 0 || weapon == 2 || weapon == 4)
+            {
+                result = 1;
+            }
+            return result;
+        }
+        return type == *(s32 *)(damage + 0x60);
+    }
+    return 0;
+}
 
 /* NEARMISS-STUB SCRConditionDamagedColType */
 #if 0 /* NEARMISS 88.57% cat=cse-hoist sub=- | target computes attr!=0 before colType==-1 and reuses | attempts=1 */
@@ -130,11 +170,45 @@ s32 SCRConditionDamagedPosRight(s32 a0)
     return 1;
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0227_finishLoadMotList", SCRConditionLastPassagePointEventID);
+s32 SCRConditionLastPassagePointEventID(void* o, s32 id)
+{
+    u8* w = getSCRDataCtrlWork();
+    s32 pi = getLastPassagePointIdx(w);
+    u8* p = getPointDataByAreaIdx(w, pi, getLastPassageAreaIdx(w));
+    if (p != 0 && id == *(s16*)(p + 0x1C))
+    {
+        return 1;
+    }
+    return 0;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0227_finishLoadMotList", SCRConditionNextPointEventID);
+s32 SCRConditionNextPointEventID(u8* a, s32 id)
+{
+    u8* pt;
+    u8* w = getSCRDataCtrlWork();
+    u8* p = getPassageWork(w, 0);
+    if (p != 0)
+    {
+        pt = getPointDataByAreaIdx(w, *(s16*)(p + 0x14), *(s32*)(p + 0x1C));
+        if (pt != 0 && id == *(s16*)(pt + 0x1C))
+        {
+            return 1;
+        }
+    }
+    return 0;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0227_finishLoadMotList", SCRConditionNowPassagePointEventID);
+s32 SCRConditionNowPassagePointEventID(void* o, s32 id)
+{
+    u8* w = getSCRDataCtrlWork();
+    s32 pi = getNowPassagePointIdx(w);
+    u8* p = getPointDataByAreaIdx(w, pi, getNowPassageAreaIdx(w));
+    if (p != 0 && id == *(s16*)(p + 0x1C))
+    {
+        return 1;
+    }
+    return 0;
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0227_finishLoadMotList", SCRConditionNowPassagePointEventIDRange);
 
@@ -152,13 +226,128 @@ s32 SCRConditionCheckWayOrientAttainPlayer(void)
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0227_finishLoadMotList", SCRConditionCheckAngleToNextPoint);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0227_finishLoadMotList", SCRConditionPlayerParentColAttr);
+static inline s32* dldTable(s32* h)
+{
+    s32 off = *h & 0x3FFFF;
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0227_finishLoadMotList", SCRConditionPlayerParentRangeColAttr);
+    return off != 0 ? *(s32**)((u8*)h - off) : 0;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0227_finishLoadMotList", SCRConditionPlayerParentColAttrAndEquipmentCheck);
+static inline s32* dldObj(s32* h)
+{
+    s32* t = dldTable(h);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0227_finishLoadMotList", SCRConditionPlayerParentRangeColAttrAndEquipmentCheck);
+    return (t != 0 && (s32)t != DldSysUndefSymbol) ? (s32*)t[4] : 0;
+}
+
+s32 SCRConditionPlayerParentColAttr(void* a, s32 b, s32 c, s32 d, s32 e, s32 f, s32 g, s32* h)
+{
+    u8* w = getSCRDataCtrlWork();
+    s32* o = dldObj(h);
+    s32 ok;
+    s32 r;
+
+    if (o != 0 && o[2] != 0)
+    {
+        ok = 0;
+        if (ColCont2_IsParentObj(getPlayerColCont2(*(s32*)(w + 0x4058)), o))
+            ok = 1;
+    }
+    else
+    {
+        ok = dldTable(h) == 0;
+    }
+    r = 0;
+    if (ok)
+        r = ColCont2_IsColStatus(getPlayerColCont2(*(s32*)(w + 0x4058)), e, f) != 0;
+    return r;
+}
+
+s32 SCRConditionPlayerParentRangeColAttr(void* actor, s32 a1, s32 a2, s32 a3, long type, long from, long to)
+{
+    u8* w = getSCRDataCtrlWork();
+    long step = 0x200000;
+    long x;
+
+    if (type != 0x1E00000)
+    {
+        step = 0x800000000000L;
+        if (type != 0x3F800000000000L)
+        {
+            return 0;
+        }
+    }
+    for (x = from; x <= to; x += step)
+    {
+        if (((s32 (*)(void*, long, long))ColCont2_IsColStatus)(getPlayerColCont2(*(s32*)(w + 0x4058)), type, x))
+        {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+s32 SCRConditionPlayerParentColAttrAndEquipmentCheck(void* actor, s32 a1, s32 a2, s32 a3, s32 type, s32 val, s32 a6, s32* h)
+{
+    u8* w;
+    s32* t;
+    s32* o;
+    s32 ok;
+
+    if (equipmentInvisibilityCloak())
+    {
+        return 0;
+    }
+    w = ((u8* (*)(void*))getSCRDataCtrlWork)(actor);
+    t = dldTable(h);
+    o = (t != 0 && (s32)t != DldSysUndefSymbol) ? (s32*)t[4] : 0;
+    if (o != 0 && o[2] != 0)
+    {
+        ok = 0;
+        if (ColCont2_IsParentObj(getPlayerColCont2(*(s32*)(w + 0x4058)), o))
+            ok = 1;
+    }
+    else
+    {
+        ok = dldTable(h) == 0;
+    }
+    if (!ok)
+    {
+        return 0;
+    }
+    return ColCont2_IsColStatus(getPlayerColCont2(*(s32*)(w + 0x4058)), type, val) != 0;
+}
+
+s32 SCRConditionPlayerParentRangeColAttrAndEquipmentCheck(void* actor, s32 a1, s32 a2, s32 a3, long type, long from, long to)
+{
+    u8* w;
+    long step;
+    long x;
+
+    if (equipmentInvisibilityCloak())
+    {
+        return 0;
+    }
+    w = ((u8* (*)(void*))getSCRDataCtrlWork)(actor);
+    step = 0x200000;
+
+    if (type != 0x1E00000)
+    {
+        step = 0x800000000000L;
+        if (type != 0x3F800000000000L)
+        {
+            return 0;
+        }
+    }
+    for (x = from; x <= to; x += step)
+    {
+        if (((s32 (*)(void*, long, long))ColCont2_IsColStatus)(getPlayerColCont2(*(s32*)(w + 0x4058)), type, x))
+        {
+            return 1;
+        }
+    }
+    return 0;
+}
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0227_finishLoadMotList", SCRConditionPlayerRidingHorse);
 
@@ -188,13 +377,37 @@ s32 SCRConditionDamagedPlayer(void)
     return *(s32*)GetDamageClass(*(s32*)(getSCRDataCtrlWork() + 0x4058)) != 0;
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0227_finishLoadMotList", SCRConditionPlayerDamagedType);
+s32 SCRConditionPlayerDamagedType(void* a, s32 b, s32 c, s32 d, s32 e, s32 f, s32 g, s32 i, u32* h)
+{
+    u8* dmg = GetDamageClass(*(s32*)(getSCRDataCtrlWork() + 0x4058));
+
+    if (*(s32*)dmg == 1)
+    {
+        u32 v = *h;
+        s32 off = v & 0x3FFFF;
+        u8* t = off != 0 ? *(u8**)((u8*)h - off) : 0;
+        u8* p = (t != 0 && (s32)t != DldSysUndefSymbol) ? *(u8**)(t + 0x10) + ((v >> 18) & 0xFFF) * *(s32*)(*(u8**)(t + 8) + 0xC) : 0;
+        if (p == *(u8**)(dmg + 0x50))
+        {
+            return 1;
+        }
+    }
+    return 0;
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0227_finishLoadMotList", SCRConditionMyselfParentColAttr);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0227_finishLoadMotList", SCRConditionGameObjParentColAttr);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0227_finishLoadMotList", SCRConditionMyselfMotionCheck);
+s32 SCRConditionMyselfMotionCheck(void* a, s32 b, s32 c, s32 d, s32 e, s32 f, s32 g, s32 i, u32* h)
+{
+    u8* w = GetCharacterClass((s32)a) + 0x1C0;
+    u32 v = *h;
+    s32 off = v & 0x3FFFF;
+    u8* t = off != 0 ? *(u8**)((u8*)h - off) : 0;
+    u8* p = (t != 0 && (s32)t != DldSysUndefSymbol) ? *(u8**)(t + 0x10) + ((v >> 18) & 0xFFF) * *(s32*)(*(u8**)(t + 8) + 0xC) : 0;
+    return p == *(u8**)w;
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0227_finishLoadMotList", SCRConditionMyselfMotionShiftCheck);
 
