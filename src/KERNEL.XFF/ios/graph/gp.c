@@ -621,6 +621,34 @@ void gsReglist(void)
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gp", iosTransTex);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/graph/gp", getTWH);
+s32 getTWH(s32 n)
+{
+    s32 r = -1;
+    s32 ret = 1;
+    s32 i = 0;
+
+    if (ret >= n)
+    {
+        r = 0;
+    }
+    else
+    {
+    loop:
+        i++;
+        if (i < 11)
+        {
+            if ((1 << i) < n)
+            {
+                goto loop;
+            }
+            r = i;
+        }
+    }
+    if (r > 0)
+    {
+        return r;
+    }
+    return 1;
+}
 
 
