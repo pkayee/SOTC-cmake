@@ -72,7 +72,17 @@ void player_setEdgeHangPointGeometry(void *a, char *b)
     setHang(GetCharacterClass(a), b + 0x70);
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0117_player_updateAttrStatusAndFindHangPosWit", player_setGripHangPointGeometry);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0117_player_updateAttrStatusAndFindHangPosWit", player_setGripHangPointGeometry);
+void player_setGripHangPointGeometry(void *a, char *b)
+{
+    char *c = GetCharacterClass(a);
+    float z = 0.0f;
+
+    charrootdyn_setHColFindStatus(c, b + 0xB0, z);
+    charrootdyn_setVColFindFlag(c, b + 0xB0, z);
+    CopyGeometryPointer(c + 0xDD0, b + 0xB0);
+    charrootdyn_setFallDownLandingOffset(c, b + 0xB0);
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0117_player_updateAttrStatusAndFindHangPosWit", func_400A1830);
 

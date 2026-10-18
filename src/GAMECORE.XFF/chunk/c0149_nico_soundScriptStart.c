@@ -49,7 +49,12 @@ void setLoadingCheckFunc(int arg0, int arg1)
     D_40131C30 = arg1;
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0149_nico_soundScriptStart", func_400C9BD8);
+extern void terminateSmallManager(void);
+
+void func_400C9BD8(void *obj, int arg)
+{
+    terminateSmallManager();
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0149_nico_soundScriptStart", spritedisplaytrigger);
 

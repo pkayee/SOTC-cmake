@@ -8,7 +8,29 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0119_nico_poseidonStart", func
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0119_nico_poseidonStart", func_400A3C10);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0119_nico_poseidonStart", func_400A3CB8);
+extern void *isysGetThisSubThread(void);
+void SCRExecBossPreProcess(s32 a0);
+void CharaCtrlResetAllScriptCtrlStatus(void *chara);
+void updateScriptDataSystem(void *chara);
+void SCRExecBossPostProcess(s32 a0);
+void scrRunM(s32 n);
+
+void func_400A3CB8(s32 *a0)
+{
+    void *thread;
+
+    isysGetThisSubThread();
+    for (;;)
+    {
+        thread = isysGetThisSubThread();
+        SCRExecBossPreProcess(*a0);
+        CharaCtrlResetAllScriptCtrlStatus(thread);
+        updateScriptDataSystem(thread);
+        isysGetThisSubThread();
+        SCRExecBossPostProcess(*a0);
+        scrRunM(1);
+    }
+}
 
 extern void RequestCharacterMotionShiftFunc(void *character, void (*func)(void *character));
 extern void func_400A3228(void *character);

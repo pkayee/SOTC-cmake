@@ -4,7 +4,30 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0084_func_40073E60", func_4007
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0084_func_40073E60", SCRFuncKnightParentMoveControlScriptKey);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0084_func_40073E60", func_400744E0);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0084_func_40073E60", func_400744E0);
+void *isysGetThisSubThread(void);
+void SCRExecBossPreProcess(s32 a0);
+void CharaCtrlResetAllScriptCtrlStatus(void *chara);
+void updateScriptDataSystem(void *chara);
+void SCRExecBossPostProcess(s32 a0);
+void scrRunM(s32 n);
+
+void func_400744E0(s32 *a0)
+{
+    void *thread;
+
+    isysGetThisSubThread();
+    for (;;)
+    {
+        thread = isysGetThisSubThread();
+        SCRExecBossPreProcess(*a0);
+        CharaCtrlResetAllScriptCtrlStatus(thread);
+        updateScriptDataSystem(thread);
+        isysGetThisSubThread();
+        SCRExecBossPostProcess(*a0);
+        scrRunM(1);
+    }
+}
 
 extern void RequestCharacterMotionShiftFunc(void *character, void (*func)(void *character));
 

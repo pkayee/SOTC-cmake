@@ -16,7 +16,13 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0071_SetLayoutArrowWater", Ena
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0071_SetLayoutArrowWater", EndArrowWater);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0071_SetLayoutArrowWater", CheckEnableArrowWater);
+extern s32 D_40203690[];
+
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0071_SetLayoutArrowWater", CheckEnableArrowWater);
+s32 CheckEnableArrowWater(s32 idx)
+{
+    return D_40203690[idx * 4];
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0071_SetLayoutArrowWater", CheckStartArrowWater);
 

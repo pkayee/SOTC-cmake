@@ -434,19 +434,16 @@ void nico_mammothLegLeftTexStart(void)
     bootTexAlphaAnim(1.0f, 0.05f, isysGetThisSubThread(), D_40131810);
 }
 
-/* NEARMISS-STUB nico_mammothAllTexEnd */
-#if 0 /* NEARMISS 75.0% cat=sched sub=- | daddu a0 thread before mov.s fa0 in each call | attempts=1 */
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0085_nico_leoBossStart", nico_mammothAllTexEnd);
 void nico_mammothAllTexEnd(void)
 {
-    void *thread = isysGetThisSubThread();
+    void *th = isysGetThisSubThread();
 
-    bootTexAlphaAnim(0.0f, -0.05f, thread, D_401317C8);
-    bootTexAlphaAnim(0.0f, -0.05f, thread, D_401317E0);
-    bootTexAlphaAnim(0.0f, -0.05f, thread, D_401317F8);
-    bootTexAlphaAnim(0.0f, -0.05f, thread, D_40131810);
+    ((void (*)(void *, void *, f32, f32))bootTexAlphaAnim)(th, D_401317C8, 0.0f, -0.05f);
+    ((void (*)(void *, void *, f32, f32))bootTexAlphaAnim)(th, D_401317E0, 0.0f, -0.05f);
+    ((void (*)(void *, void *, f32, f32))bootTexAlphaAnim)(th, D_401317F8, 0.0f, -0.05f);
+    ((void (*)(void *, void *, f32, f32))bootTexAlphaAnim)(th, D_40131810, 0.0f, -0.05f);
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0085_nico_leoBossStart", nico_mammothAllTexEnd);
 
 static inline char *dldResolve(unsigned int *h)
 {

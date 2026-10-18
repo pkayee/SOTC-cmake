@@ -74,7 +74,22 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0066_effectSetDamageWork", boo
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0066_effectSetDamageWork", init_weakpoint_effect);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0066_effectSetDamageWork", fadeout_weakpoint_effect);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0066_effectSetDamageWork", fadeout_weakpoint_effect);
+extern s32 D_402032D0[];
+
+void fadeout_weakpoint_effect(void)
+{
+    s32 two = 2;
+    s32 *p = D_402032D0;
+    s32 i = 7;
+
+    do {
+        i--;
+        p[4] = 0;
+        p[1] = two;
+        p += 0x1E;
+    } while (i >= 0);
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0066_effectSetDamageWork", end_weakpoint_effect);
 

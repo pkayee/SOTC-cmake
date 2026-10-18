@@ -93,7 +93,12 @@ void nico_setHorseBridleDoubleLong(void *actor)
     }
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0078_SCRFuncConditionStillnessTimerSet", func_4006ED40);
+extern void gStatUnloadHorseChara(void);
+
+void func_4006ED40(void *character)
+{
+    gStatUnloadHorseChara();
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0078_SCRFuncConditionStillnessTimerSet", func_4006ED58);
 
