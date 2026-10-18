@@ -1,24 +1,68 @@
 #include "common.h"
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0183_get_main_cameraman", get_main_cameraman);
+extern int D_40218510;
+extern int D_40218514;
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0183_get_main_cameraman", get_main_cameraman_camera_obj);
+int get_main_cameraman(void)
+{
+    return (*(int *)((char *)(&(&D_40218510)[D_40218510]) + 8));
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0183_get_main_cameraman", get_cameraman);
+struct CameraSelectionView {
+    int selected;
+    char pad04[4];
+    void *managers[0];
+};
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0183_get_main_cameraman", get_cameraman_camera_obj);
+extern void *get_camera_obj(void *);
+
+void *get_main_cameraman_camera_obj(void)
+{
+    return get_camera_obj(((struct CameraSelectionView *)&D_40218510)->managers[((struct CameraSelectionView *)&D_40218510)->selected]);
+}
+
+extern void *D_40218518[];
+extern void func_400EBD98();
+
+void *get_cameraman(int i)
+{
+    func_400EBD98(i);
+    return D_40218518[i];
+}
+
+void *get_cameraman_camera_obj(int i)
+{
+    func_400EBD98(i);
+    return get_camera_obj(D_40218518[i]);
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0183_get_main_cameraman", employ_cameraman);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0183_get_main_cameraman", change_main_cameraman);
+void change_main_cameraman(int arg0)
+{
+    func_400EBD98();
+    D_40218510 = arg0;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0183_get_main_cameraman", get_main_cameraman_id);
+int get_main_cameraman_id(void)
+{
+    return D_40218510;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0183_get_main_cameraman", is_main_cameraman_exist);
+int is_main_cameraman_exist(void)
+{
+    return ~D_40218510 != 0;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0183_get_main_cameraman", get_total_cameraman);
+int get_total_cameraman(void)
+{
+    return D_40218514;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0183_get_main_cameraman", get_max_cameraman);
+int get_max_cameraman(void)
+{
+    return 5;
+}
 
 void func_400EBD98(void) {
 }
