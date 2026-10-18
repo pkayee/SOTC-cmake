@@ -44,8 +44,54 @@ void SetPlayerStatusDispSw(s32 arg0)
     }
 }
 
+/* NEARMISS-STUB startGaugeMaxEffect */
+#if 0 /* NEARMISS 60.67% cat=regalloc sub=- | float consts regalloc swapped (gcGlobal lwc1 wants f0, 0.5 wants f4); store order differs | attempts=1 */
+extern u8 gcGlobalVar[];
+typedef struct GaugeMaxEffectWork {
+    s32 unk0;
+    f32 unk4;
+    f32 unk8;
+    f32 unkC;
+    f32 unk10;
+} GaugeMaxEffectWork;
+
+extern GaugeMaxEffectWork D_402182B0;
+
+void startGaugeMaxEffect(void)
+{
+    func_400CA080(4);
+    D_402182B0.unk4 = 0.6f;
+    D_402182B0.unk10 = *(f32 *)(gcGlobalVar + 0x178);
+    D_402182B0.unk0 = 1;
+    D_402182B0.unk8 = 0.5f;
+}
+#endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0152_bosslifebar_script", startGaugeMaxEffect);
 
+/* NEARMISS-STUB startGaugeMaxAddEffect */
+#if 0 /* NEARMISS 60.67% cat=regalloc sub=- | float consts regalloc swapped (gcGlobal lwc1 wants f0, 0.5 wants f4); stores/ld ra scheduled differently | attempts=1 */
+extern u8 gcGlobalVar[];
+
+typedef struct GaugeMaxAddEffectWork {
+    s32 unk0;
+    f32 unk4;
+    f32 unk8;
+    f32 unkC;
+    f32 unk10;
+} GaugeMaxAddEffectWork;
+
+extern GaugeMaxAddEffectWork D_402182B0;
+
+void startGaugeMaxAddEffect(void)
+{
+    func_400CA080(4);
+    D_402182B0.unk4 = 0.6f;
+    D_402182B0.unk10 = *(f32 *)(gcGlobalVar + 0x178);
+    D_402182B0.unk0 = 1;
+    D_402182B0.unk8 = 0.5f;
+    return;
+}
+#endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0152_bosslifebar_script", startGaugeMaxAddEffect);
 
 extern u8 gcGlobalVar[];
@@ -104,6 +150,16 @@ void setgrip(f32 arg0)
     return;
 }
 
+/* NEARMISS-STUB playerlifebar_effect */
+#if 0 /* NEARMISS 80.0% cat=branch-layout sub=- | ld ra restore scheduled right after jal, target puts it after lui/addiu | attempts=1 */
+extern s32 D_40131C98;
+
+void playerlifebar_effect(void)
+{
+    func_400CA080(4);
+    D_40131C98 = 1;
+}
+#endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0152_bosslifebar_script", playerlifebar_effect);
 
 extern s32 D_40131C98;
@@ -213,9 +269,23 @@ void PlayerSprStatusEnd(void)
     D_40131CC4 = 0;
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0152_bosslifebar_script", BossSprStatusBegin);
+extern s32 D_40131CC8;
+extern s32 ScriptSpriteMenuObjDef_SPRITE_BOSS_LIFE_LAYOUT;
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0152_bosslifebar_script", BossSprStatusEnd);
+void BossSprStatusBegin(void)
+{
+    if (D_40131CC8 != 0) {
+        return;
+    }
+    D_40131CC8 = 1;
+    _SCRStartSpriteMenuAnim(ScriptSpriteMenuObjDef_SPRITE_BOSS_LIFE_LAYOUT, 0, 0, 0, &D_40131CC8, 0);
+}
+
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0152_bosslifebar_script", BossSprStatusEnd);
+void BossSprStatusEnd(void)
+{
+    D_40131CC8 = 0;
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0152_bosslifebar_script", func_400CE298);
 
