@@ -2,8 +2,8 @@
 
 extern s32 D_00135A58[];
 
-s32 _sceMcCoreAuthentication(void);
-s32 _sceMcCoreCheckNewCard(void);
+s32 _sceMcCoreAuthentication(s32);
+s32 _sceMcCoreCheckNewCard(s32);
 s32 _sceMcCoreGetCardSpec(void);
 s32 _sceMcpReadUserClustOnCache(void);
 s32 _sceMcpWriteUserClustOnCache(void);
@@ -94,7 +94,25 @@ s32 MemcpyD(s32 *obj, u8 *dst, s32 off, void *src, s32 n)
     return 0;
 }
 #endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", MemcpyD);
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", MemcpyD);
+void *memcpy(void *dst, const void *src, u32 n);
+
+s32 MemcpyD(s32 *obj, u8 *dst, s32 off, void *src, s32 n)
+{
+    s32 rem = obj[12] - off * 4;
+
+    if (src == NULL)
+    {
+        return 0;
+    }
+    if (n < 0 || rem < n)
+    {
+        return -0x21F;
+    }
+    memcpy(dst + off * 4, src, n);
+    return 0;
+}
+
 
 void *memcpy(void *dst, const void *src, u32 n);
 
@@ -118,7 +136,23 @@ s32 MemcpyS(s32 *obj, u8 *dst, u8 *src, s32 off, s32 n)
     return 0;
 }
 #endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", MemcpyS);
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", MemcpyS);
+s32 MemcpyS(s32 *obj, u8 *dst, u8 *src, s32 off, s32 n)
+{
+    s32 rem = obj[12] - off * 4;
+
+    if (dst == NULL)
+    {
+        return 0;
+    }
+    if (n < 0 || rem < n)
+    {
+        return -0x21F;
+    }
+    memcpy(dst, src + off * 4, n);
+    return 0;
+}
+
 
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", StrcpyD);
 u32 strlen(char *);
@@ -1433,7 +1467,23 @@ s32 func_0011BC48(char *name)
 #endif
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_0011BC48);
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_0011BCB8);
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_0011BCB8);
+s32 func_0011BCB8(s32 path)
+{
+    char *s = (char *)path;
+
+    while (*s != 0)
+    {
+        char c = *s;
+        if (c == 0x3F || c == 0x2A || c < 0x20)
+        {
+            return 0;
+        }
+        s++;
+    }
+    return 1;
+}
+
 
 /* NEARMISS-STUB func_0011BD10 */
 #if 0 /* NEARMISS 85.8% cat=branch-layout sub=- | target shares one v0=0 return block (beqz to it from the strcmp DF0 test), fills bnez delay slot with addiu v0,1 and hoists strcpy a1=s0 into the strlen beqz de | attempts=1 */
@@ -1480,26 +1530,133 @@ INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_0011BDC8);
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_0011BF48);
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_0011C068);
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_0011C068);
+s32 func_0011C068(char *s)
+{
+    s32 n = 0;
+
+    while (*s != 0)
+    {
+        if (*s == 0x2F)
+        {
+            n++;
+        }
+        s++;
+    }
+    return n;
+}
+
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_0011C0B0);
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", _sceMcFatInit);
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", _sceMcFatInit);
+typedef struct
+{
+    s32 unk000[0x100];
+    s32 unk400[0x100];
+    s32 unk800;
+    s32 unk804;
+    char unk808[0x80];
+    s32 unk888;
+    s32 unk88C;
+    s32 unk890;
+    s32 unk894;
+} McFatPort;
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", _sceMcFatInit2);
+typedef struct
+{
+    char c[2];
+} Str2;
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_0011C300);
+extern McFatPort D_0015E0C8[];
+extern char D_00135738[];
+extern char D_00138E08[];
+s32 _sceMcpReadClust(s32, s32, s32, s32);
+s32 _sceMcpWriteClust(s32, s32, s32, s32);
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_0011C420);
+s32 _sceMcFatInit(void)
+{
+    s32 i;
+
+    for (i = 0; i < 2; i++)
+    {
+        D_0015E0C8[i].unk800 = -1;
+        D_0015E0C8[i].unk804 = -1;
+        D_0015E0C8[i].unk894 = 0;
+        D_0015E0C8[i].unk888 = 1;
+        D_0015E0C8[i].unk88C = 0;
+        D_0015E0C8[i].unk890 = 0;
+        *(Str2 *)D_0015E0C8[i].unk808 = *(Str2 *)D_00138E08;
+    }
+    return 1;
+}
+
+
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", _sceMcFatInit2);
+s32 _sceMcFatInit2(s32 port)
+{
+    D_0015E0C8[port].unk800 = -1;
+    D_0015E0C8[port].unk804 = -1;
+    D_0015E0C8[port].unk894 = 0;
+    D_0015E0C8[port].unk888 = 1;
+    D_0015E0C8[port].unk88C = 0;
+    D_0015E0C8[port].unk890 = 0;
+    *(Str2 *)D_0015E0C8[port].unk808 = *(Str2 *)D_00138E08;
+    return 1;
+}
+
+
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_0011C300);
+s32 func_0011C300(s32 port, s32 idx, s32 *err)
+{
+    char *mp = D_00135738 + port * 0x184;
+    s32 hi = idx / 0x10000;
+    s32 lo = idx / 0x100 - hi * 0x100;
+    s32 val;
+
+    if (D_0015E0C8[port].unk804 != hi)
+    {
+        if (_sceMcpReadClust(port, (s32)D_0015E0C8[port].unk000, *(s32 *)(mp + (hi << 2) + 0x50), 1) == 0)
+        {
+            *err = 0x8101006F;
+            return 0;
+        }
+        D_0015E0C8[port].unk804 = hi;
+    }
+    val = D_0015E0C8[port].unk000[lo];
+    if (val < 0)
+    {
+        *err = 0x81019001;
+        return 0;
+    }
+    *err = 0;
+    return val;
+}
+
+
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_0011C420);
+s32 func_0011C420(s32 port)
+{
+    if (D_0015E0C8[port].unk800 > 0 && D_0015E0C8[port].unk894 == 1)
+    {
+        if (_sceMcpWriteClust(port, (s32)D_0015E0C8[port].unk400, D_0015E0C8[port].unk800, 1) == 0)
+        {
+            return 0;
+        }
+    }
+    D_0015E0C8[port].unk894 = 0;
+    return 1;
+}
+
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_0011C4B0);
 
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_0011C5C8);
-s32 func_0011C4B0(s32, s32, s32, s32);
+s32 func_0011C4B0(s32, s32, s32 *);
 
 s32 func_0011C5C8(s32 a0, s32 a1, s32 *a2, s32 a3)
 {
-    s32 ret = func_0011C4B0(a0, a1, (s32)a2, a3);
+    s32 ret = func_0011C4B0(a0, a1, a2);
     if (ret == 0x7FFFFFFF)
     {
         *a2 = 0x81019002;
@@ -1534,7 +1691,30 @@ INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_0011C678);
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_0011C7A8);
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_0011C8D8);
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_0011C8D8);
+s32 func_0011C8D8(s32 port, s32 *err)
+{
+    char *mp = D_00135738 + port * 0x184;
+    s32 n = 0;
+    s32 i;
+    u32 v;
+
+    *err = 0;
+    for (i = D_0015E0C8[port].unk890; i < *(s32 *)(mp + 0x170); i++)
+    {
+        v = func_0011C4B0(port, i, err);
+        if (*err != 0)
+        {
+            return 0;
+        }
+        if ((v & 0x80000000) == 0)
+        {
+            n++;
+        }
+    }
+    return n;
+}
+
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_0011C9B0);
 
@@ -1601,7 +1781,38 @@ s32 func_0011D9E0(s32 a0)
     return 0;
 }
 #endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_0011D9E0);
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_0011D9E0);
+s32 _sceMcCoreGetConnection(s32);
+s32 _sceMcpCheckNewCard(s32);
+s32 _sceMcpAuthentication(s32);
+s32 _sceMcCoreWriteBack(s32);
+
+s32 func_0011D9E0(s32 a0)
+{
+    if (_sceMcCoreGetConnection(a0) == 0)
+    {
+        return 0x81010013;
+    }
+    if (_sceMcpCheckNewCard(a0) == 0)
+    {
+        return 0x81019003;
+    }
+    if (D_0015E0C8[a0].unk888 == 1)
+    {
+        return 0x81019003;
+    }
+    if (D_0015E0C8[a0].unk88C == 0)
+    {
+        return 0x8101002F;
+    }
+    if (_sceMcpAuthentication(a0) == 0)
+    {
+        return 0x81010013;
+    }
+    _sceMcCoreWriteBack(a0);
+    return 0;
+}
+
 
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_0011DA88);
 s32 func_0011C0B0(s32, s32, s32, s32);
@@ -1689,23 +1900,71 @@ s32 _sceMcFatGetEntSpace(s32 a0, s32 a1)
     return ret != 0 ? ret : r;
 }
 #endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", _sceMcFatGetEntSpace);
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", _sceMcFatGetEntSpace);
+s32 func_0011DD60(s32, s32, void *, s32, s32);
+s32 func_0011E358(s32, s32, s32, s32 *);
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", _sceMcpInit);
+s32 _sceMcFatGetEntSpace(s32 a0, s32 a1)
+{
+    u8 dir[0x200];
+    s32 buf[0x20];
+    s32 ret;
+    s32 r;
+    extern s32 func_0011DA88();
+
+    ret = func_0011D9E0(a0);
+    if (ret != 0)
+    {
+        return ret;
+    }
+    ret = func_0011DA88(a0, a1, buf);
+    if (ret != 0)
+    {
+        return ret;
+    }
+    ret = func_0011DD60(a0, buf, dir, 0, 0);
+    if (ret != 0x81010011)
+    {
+        return ret;
+    }
+    if ((*(u16 *)dir & 0x20) == 0)
+    {
+        return 0x81010014;
+    }
+    r = func_0011E358(a0, *(s32 *)(dir + 0x10), *(s32 *)(dir + 4), &ret);
+    return ret != 0 ? ret : r;
+}
+
+
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", _sceMcpInit);
+extern char D_0015F600[];
+
+s32 _sceMcpInit(void)
+{
+    s32 i;
+
+    for (i = 0; i < 2; i++)
+    {
+        *(s32 *)(D_0015F600 + i * 0x2010) = -1;
+        *(s32 *)(D_0015F600 + i * 0x2010 + 0xC) = 0;
+    }
+    return 1;
+}
+
 
 s32 _sceMcpGetCardSpec(void)
 {
     return _sceMcCoreGetCardSpec();
 }
 
-s32 _sceMcpCheckNewCard(void)
+s32 _sceMcpCheckNewCard(s32 a0)
 {
-    return _sceMcCoreCheckNewCard();
+    return _sceMcCoreCheckNewCard(a0);
 }
 
-s32 _sceMcpAuthentication(void)
+s32 _sceMcpAuthentication(s32 a0)
 {
-    return _sceMcCoreAuthentication();
+    return _sceMcCoreAuthentication(a0);
 }
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", _sceMcpReadSysInfo);
@@ -1765,7 +2024,23 @@ s32 _sceMcpFlushCache(s32 a0)
     return ret;
 }
 #endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", _sceMcpFlushCache);
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", _sceMcpFlushCache);
+s32 _sceMcpWriteClust(s32, s32, s32, s32);
+
+s32 _sceMcpFlushCache(s32 a0)
+{
+    s32 ret = 1;
+    s32 off = a0 * 0x2010;
+
+    if (*(s32 *)(D_0015F600 + off) != -1)
+    {
+        ret = _sceMcpWriteClust(a0, (s32)(D_0015F600 + off + 0x10), *(s32 *)(D_0015F600 + off), *(s32 *)(D_0015F600 + off + 0xC));
+        *(s32 *)(D_0015F600 + off) = -1;
+        *(s32 *)(D_0015F600 + off + 0xC) = 0;
+    }
+    return ret;
+}
+
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", _sceMcpWriteUserClustOnCache);
 
@@ -1942,7 +2217,21 @@ s32 _sceMcCoreGetConnection(s32 a0)
     return sceDbcGetConnection(D_00163E48[a0].unk04) != 3;
 }
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_00121FC0);
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_00121FC0);
+s32 func_00121FC0(void)
+{
+    s32 i;
+
+    for (i = 0; i < 2; i++)
+    {
+        if (D_00163E48[i].unk00 == 0)
+        {
+            return i;
+        }
+    }
+    return -1;
+}
+
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", _sceMcCoreCreateSocket);
 
@@ -1971,7 +2260,21 @@ s32 _sceMcCoreDeleteSocket(s32 a0)
     return 1;
 }
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", _sceMcCoreChangeSocketTypeDbc2Mc);
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", _sceMcCoreChangeSocketTypeDbc2Mc);
+s32 _sceMcCoreChangeSocketTypeDbc2Mc(s32 sock)
+{
+    s32 i;
+
+    for (i = 0; i < 2; i++)
+    {
+        if (D_00163E48[i].unk00 != 0 && D_00163E48[i].unk04 == sock)
+        {
+            return i;
+        }
+    }
+    return -1;
+}
+
 
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", _sceMcCoreChangeSocketTypeMc2Dbc);
 s32 _sceMcCoreChangeSocketTypeMc2Dbc(s32 port)
