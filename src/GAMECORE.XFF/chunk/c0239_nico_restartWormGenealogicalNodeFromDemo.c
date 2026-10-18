@@ -88,7 +88,7 @@ typedef struct {
 extern unsigned char *_isysCreateObj(void *, int, int, int, void *, int);
 extern void isysSetObjImmediateDeleteFunc(void *, void (*)(void));
 extern void func_4012FE60(void);
-extern char func_4012FE78[];
+extern void func_4012FE78(void);
 
 static inline ScriptDesc *setupDesc(int *desc)
 {
@@ -112,9 +112,17 @@ unsigned char *createEventScriptObj(void *parent, int extra, int *desc)
     return o;
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0239_nico_restartWormGenealogicalNodeFromDemo", func_4012FE60);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0239_nico_restartWormGenealogicalNodeFromDemo", func_4012FE60);
+void func_4012FE60(void)
+{
+    flushScriptObjImmediate();
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0239_nico_restartWormGenealogicalNodeFromDemo", func_4012FE78);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0239_nico_restartWormGenealogicalNodeFromDemo", func_4012FE78);
+void func_4012FE78(void)
+{
+    flushScriptObj();
+}
 
 void SCRFuncSoundSetDepth(void) {
 }
@@ -253,4 +261,19 @@ void updateSScriptSystem(void *a)
     }
 }
 
+/* NEARMISS-STUB difftime */
+#if 0 /* NEARMISS 73.78% cat=call-abi sub=- | gcc sibcalls dpsub (j dpsub); target jal dpsub then frame restore | attempts=1 */
+extern double __floatdidf(s64 value);
+extern double dpsub();
+
+double difftime(s64 time1, s64 time0)
+{
+    double d1 = __floatdidf(time1);
+    double d0 = __floatdidf(time0);
+
+    double r = dpsub(d1, d0);
+
+    return r;
+}
+#endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0239_nico_restartWormGenealogicalNodeFromDemo", difftime);
