@@ -6,11 +6,24 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0142_AddCollisionDBCallBack", G
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0142_AddCollisionDBCallBack", AddCollisionDB);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0142_AddCollisionDBCallBack", GetCollisionDBCurrentPointOnLastPlane);
+extern int func_400AB528();
+
+int GetCollisionDBCurrentPointOnLastPlane(int a, int b, int c)
+{
+    return func_400AB528(a, b, c, 0);
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0142_AddCollisionDBCallBack", GetCollisionDBVertexPoint);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0142_AddCollisionDBCallBack", GetCollisionDBRegion);
+extern void func_400BBDE8(void *, float *);
+
+void GetCollisionDBRegion(void *db, float *out, float base)
+{
+    float t[4];
+
+    func_400BBDE8(db, t);
+    *out = base + t[0];
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0142_AddCollisionDBCallBack", GetCollisionDBPositionWithST);
 

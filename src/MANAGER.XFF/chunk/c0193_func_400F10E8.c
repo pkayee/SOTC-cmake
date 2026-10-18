@@ -12,7 +12,12 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0193_func_400F10E8", func_400F1
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0193_func_400F10E8", func_400F13C8);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0193_func_400F10E8", getSheetDebugNoLoadMode);
+extern unsigned char D_4012E32C[];
+
+void *getSheetDebugNoLoadMode(void)
+{
+    return D_4012E32C;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0193_func_400F10E8", func_400F14E0);
 
@@ -26,15 +31,30 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0193_func_400F10E8", sheetExecC
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0193_func_400F10E8", getDebPcWinSw);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0193_func_400F10E8", GetDebPcWinSw);
+extern int D_4012E348;
+
+int GetDebPcWinSw(void)
+{
+    return D_4012E348;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0193_func_400F10E8", getDebPcWinType);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0193_func_400F10E8", GetDebPcWinType);
+extern int D_4012E34C;
+
+int GetDebPcWinType(void)
+{
+    return D_4012E34C;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0193_func_400F10E8", getDebPcWinCategory);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0193_func_400F10E8", GetDebPcWinCategory);
+extern int D_4012E350;
+
+int GetDebPcWinCategory(void)
+{
+    return D_4012E350;
+}
 
 void toggleDebPcWinWindow(void) {
 }
