@@ -6,12 +6,39 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0238_func_4012EE60", nico_calc
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0238_func_4012EE60", nico_calcWormGenealogicalNodeDownNext);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0238_func_4012EE60", getWormIKWork);
+extern void *GetSCRCharaAIWorkPtr(void *);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0238_func_4012EE60", setWormIKBoundDynamics);
+void *getWormIKWork(void *actor)
+{
+    return (void *)(((int)GetSCRCharaAIWorkPtr(actor) + 0x4193) & ~0xF);
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0238_func_4012EE60", setWormIKNodeLimit);
+void setWormIKBoundDynamics(char *p, float f1, float f2, float f3)
+{
+    *(float *)(p + 0x1260) = f1;
+    *(float *)(p + 0x1264) = f2;
+    *(float *)(p + 0x1268) = f3;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0238_func_4012EE60", setWormIKBankInterpSec);
+void setWormIKNodeLimit(char *w, float limit)
+{
+    int i;
+    char *p = w + 0x9F0;
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0238_func_4012EE60", coliJudgeNotWater);
+    for (i = 31; i >= 0; i--) {
+        *(float *)p = limit;
+        p -= 0x50;
+    }
+}
+
+void setWormIKBankInterpSec(void *arg0, float fparg0)
+{
+    (*(float *)((char *)(arg0) + 0x126C)) = fparg0;
+}
+
+s64 *GetCollisionDBAttributeAdr(void);
+
+s32 coliJudgeNotWater(void)
+{
+    return (*GetCollisionDBAttributeAdr() & 0x7C00) != 0x4400;
+}
