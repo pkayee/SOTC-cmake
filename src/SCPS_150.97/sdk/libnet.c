@@ -50,7 +50,29 @@ extern s32 D_00168080[];
 extern s32 D_00135A5C[];
 char *strcpy(char *, const char *);
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", CallRpc);
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", CallRpc);
+extern const char D_00138BC0[];
+extern const char D_00138BF8[];
+s32 sceSifMCallRpc(void *, u32, u32, void *, s32, void *, s32, void *, void *);
+s32 scePrintf();
+
+s32 CallRpc(void *cd, s32 cmd, void *buf, s32 ssize, s32 rsize)
+{
+    s32 s0;
+    s32 s1;
+    s32 s2;
+
+    s1 = (ssize + 0x3F) & ~0x3F;
+    s2 = (rsize + 0x3F) & ~0x3F;
+    s0 = *(s32 *)((u8 *)cd + 0x30);
+    if (s0 < s1 || s0 < s2)
+    {
+        scePrintf(D_00138BC0);
+        scePrintf(D_00138BF8, cmd, s1, s2, s0);
+        return -0x21F;
+    }
+    return sceSifMCallRpc(cd, cmd, 0, buf, s1, buf, s2, 0, 0);
+}
 
 /* NEARMISS-STUB MemcpyD */
 #if 0 /* NEARMISS 74.0% cat=regalloc sub=- | dst/off<<2 CSE into v1; target dst in v1 | attempts=1 */
@@ -130,12 +152,127 @@ s32 StrcpyS(char *dst, char *src, s32 n)
     return 0;
 }
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceInetPoll);
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceInetPoll);
+s32 MemcpyD(s32 *, u8 *, s32, void *, s32);
+s32 MemcpyS(s32 *, u8 *, u8 *, s32, s32);
 
+s32 sceInetPoll(void *cd, void *net_buf, void *dst, s32 n, s32 flags)
+{
+    s32 ret;
+
+    ((s32 *)net_buf)[0] = n;
+    ((s32 *)net_buf)[1] = flags;
+    ret = MemcpyD(cd, net_buf, 2, dst, n << 3);
+    if (ret < 0)
+    {
+        return ret;
+    }
+    ret = CallRpc(cd, 0x14, net_buf, (n << 3) + 8, (n << 3) | 4);
+    if (ret < 0)
+    {
+        return -0x21E;
+    }
+    ret = MemcpyS(cd, dst, net_buf, 2, n << 3);
+    if (ret >= 0)
+    {
+        ret = ((s32 *)net_buf)[0];
+    }
+    return ret;
+}
+
+/* NEARMISS-STUB sceInetName2Address */
+#if 0 /* NEARMISS 95.6% cat=no-c-form sub=- | frame 0x90 and 8th arg a7 read back from its home slot (0x88 sp): the function is variadic-style (7 named args + unnamed a7 spilled by sd); cc29 has no va_arg s | attempts=1 */
+s32 sceInetName2Address(void *cd, s32 *obj, s32 flags, void *dst, char *src, s32 a5, s32 a6, s32 a7)
+{
+    s32 ret;
+
+    obj[1] = a5;
+    obj[2] = a6;
+    obj[0] = flags;
+    obj[3] = 0;
+    if (flags & 0x80)
+    {
+        obj[3] = a7;
+    }
+    ret = StrcpyD(cd, (char *)obj, 5, src);
+    if (ret < 0)
+    {
+        return ret;
+    }
+    obj[4] = ret;
+    ret = CallRpc(cd, 6, obj, ret + 0x14, 0x14);
+    if (ret < 0)
+    {
+        return -0x21E;
+    }
+    ret = MemcpyS(cd, dst, obj, 1, 0x10);
+    if (ret >= 0)
+    {
+        ret = obj[0];
+    }
+    return ret;
+}
+#endif
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceInetName2Address);
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceInetAddress2String);
+s32 MemcpyD(s32 *, u8 *, s32, void *, s32);
 
+s32 sceInetAddress2String(void *cd, s32 *net_buf, char *str, s32 n, void *addr)
+{
+    s32 ret;
+
+    net_buf[0] = n;
+    ret = MemcpyD(cd, net_buf, 1, addr, 0x10);
+    if (ret < 0)
+    {
+        return ret;
+    }
+    ret = CallRpc(cd, 7, net_buf, 0x14, n + 0x14);
+    if (ret < 0)
+    {
+        return -0x21E;
+    }
+    ret = StrcpyS(str, (char *)net_buf, 5);
+    if (ret >= 0)
+    {
+        ret = net_buf[0];
+    }
+    return ret;
+}
+
+/* NEARMISS-STUB sceInetAddress2Name */
+#if 0 /* NEARMISS 99.94% cat=stack-frame sub=- | only diff is frame size: target sp frame 0xA0 (stack arg at 0xA0), ours 0x60; 0x40 bytes of the target frame are not used by any visible sp access (no local fou | attempts=1 */
+s32 sceInetAddress2Name(void *cd, s32 *obj, s32 flags, char *dst, s32 a4, void *src, s32 a6, s32 a7, s32 a8)
+{
+    s32 ret;
+
+    obj[0] = flags;
+    obj[1] = a4;
+    obj[2] = a6;
+    obj[3] = a7;
+    ret = MemcpyD(cd, obj, 4, src, 0x10);
+    if (ret < 0)
+    {
+        return ret;
+    }
+    obj[8] = 0;
+    if (flags & 0x80)
+    {
+        obj[8] = a8;
+    }
+    ret = CallRpc(cd, 0x12, obj, 0x24, a4 + 0x20);
+    if (ret < 0)
+    {
+        return -0x21E;
+    }
+    ret = StrcpyS(dst, (char *)obj, 8);
+    if (ret >= 0)
+    {
+        ret = obj[0];
+    }
+    return ret;
+}
+#endif
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceInetAddress2Name);
 
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceInetCreate);
@@ -189,11 +326,78 @@ s32 sceInetClose(void *cd, s32 *net_buf, s32 a2, s32 a3)
     return net_buf[0];
 }
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceInetRecv);
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceInetRecv);
+s32 sceInetRecv(void *cd, s32 *obj, s32 a2, void *dst, s32 a4, s32 *a5, s32 a6)
+{
+    s32 ret;
+
+    obj[0] = a2;
+    if (a5 != NULL)
+    {
+        obj[1] = *a5;
+    }
+    else
+    {
+        obj[1] = 0;
+    }
+    obj[3] = a6;
+    obj[2] = a4;
+    ret = CallRpc(cd, 4, obj, 0x10, a4 + 8);
+    if (ret < 0)
+    {
+        return -0x21E;
+    }
+    ret = obj[0];
+    if (ret < 0)
+    {
+        return ret;
+    }
+    if (a5 != NULL)
+    {
+        *a5 = obj[1];
+    }
+    ret = MemcpyS(cd, dst, obj, 2, obj[0]);
+    if (ret >= 0)
+    {
+        ret = obj[0];
+    }
+    return ret;
+}
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceInetRecvFrom);
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceInetSend);
+s32 sceInetSend(void *cd, s32 *net_buf, s32 a2, void *a3, s32 a4, s32 *a5, s32 a6)
+{
+    s32 ret;
+
+    net_buf[0] = a2;
+    if (a5 != NULL)
+    {
+        net_buf[1] = *a5;
+    }
+    else
+    {
+        net_buf[1] = 0;
+    }
+    net_buf[2] = a4;
+    net_buf[3] = a6;
+    ret = MemcpyD(cd, net_buf, 4, a3, a4);
+    if (ret < 0)
+    {
+        return ret;
+    }
+    ret = CallRpc(cd, 5, net_buf, a4 + 0x10, 8);
+    if (ret < 0)
+    {
+        return -0x21E;
+    }
+    if (a5 == NULL)
+    {
+        return net_buf[0];
+    }
+    *a5 = net_buf[1];
+    return net_buf[0];
+}
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceInetSendTo);
 
@@ -212,7 +416,33 @@ s32 sceInetAbort(void *cd, s32 *net_buf, s32 a2, s32 a3)
     return net_buf[0];
 }
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceInetControl);
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceInetControl);
+s32 MemcpyS(s32 *, u8 *, u8 *, s32, s32);
+
+s32 sceInetControl(void *cd, void *net_buf, s32 a2, s32 a3, void *a4, s32 a5)
+{
+    s32 ret;
+
+    ((s32 *)net_buf)[0] = a2;
+    ((s32 *)net_buf)[1] = a3;
+    ((s32 *)net_buf)[2] = a5;
+    ret = MemcpyD(cd, net_buf, 3, a4, a5);
+    if (ret < 0)
+    {
+        return ret;
+    }
+    ret = CallRpc(cd, 0x13, net_buf, a5 + 0xC, a5 + 0xC);
+    if (ret < 0)
+    {
+        return -0x21E;
+    }
+    ret = MemcpyS(cd, a4, net_buf, 3, a5);
+    if (ret >= 0)
+    {
+        ret = ((s32 *)net_buf)[0];
+    }
+    return ret;
+}
 
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceInetGetInterfaceList);
 s32 MemcpyS(s32 *, u8 *, u8 *, s32, s32);
@@ -239,9 +469,56 @@ s32 sceInetGetInterfaceList(void *cd, s32 *net_buf, u8 *dst, s32 n)
     return net_buf[0];
 }
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceInetInterfaceControl);
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceInetInterfaceControl);
+s32 sceInetInterfaceControl(void *cd, void *net_buf, s32 a2, s32 a3, void *a4, s32 a5)
+{
+    s32 ret;
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceInetGetRoutingTable);
+    ((s32 *)net_buf)[0] = a2;
+    ((s32 *)net_buf)[1] = a3;
+    ((s32 *)net_buf)[2] = a5;
+    ret = MemcpyD(cd, net_buf, 3, a4, a5);
+    if (ret < 0)
+    {
+        return ret;
+    }
+    ret = CallRpc(cd, 0x9, net_buf, a5 + 0xC, a5 + 0xC);
+    if (ret < 0)
+    {
+        return -0x21E;
+    }
+    ret = MemcpyS(cd, a4, net_buf, 3, a5);
+    if (ret >= 0)
+    {
+        ret = ((s32 *)net_buf)[0];
+    }
+    return ret;
+}
+
+s32 MemcpyS(s32 *, u8 *, u8 *, s32, s32);
+
+s32 sceInetGetRoutingTable(void *cd, s32 *net_buf, void *dst, s32 n)
+{
+    s32 ret;
+
+    net_buf[0] = n;
+    ret = CallRpc(cd, 0xA, net_buf, 4, n * 0x48 | 4);
+    if (ret < 0)
+    {
+        return -0x21E;
+    }
+    ret = net_buf[0];
+    if (ret < 0)
+    {
+        return ret;
+    }
+    ret = MemcpyS(cd, dst, (u8 *)net_buf, 1, ret * 0x48);
+    if (ret >= 0)
+    {
+        ret = net_buf[0];
+    }
+    return ret;
+}
 
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceInetGetNameServers);
 s32 MemcpyS(s32 *, u8 *, u8 *, s32, s32);
@@ -382,33 +659,31 @@ s32 sceInetCtlGetState(void *cd, s32 *buf, s32 a2, s32 *p)
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceLibnetInitialize);
 
-/* NEARMISS-STUB sceLibnetTerminate */
-#if 0 /* NEARMISS 24.5% cat=no-c-form sub=- | target is a busy-wait with four literal nops in the spin body (addiu/nop x4/bne/nop) that gcc 2.9 cannot emit from C; also retry-loop shape differs | attempts=1 */
-s32 sceSifMUnBindRpc(void *, s32);
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceLibnetTerminate);
+s32 sceSifMUnBindRpc(void *cd, s32 mode);
 
 s32 sceLibnetTerminate(void *cd)
 {
-    s32 ret;
+    s32 r;
     s32 i;
 
-    for (;;)
+    while (1)
     {
-        ret = sceSifMUnBindRpc(cd, 0);
-        if (ret < 0)
+        r = sceSifMUnBindRpc(cd, 0);
+        if (r < 0)
         {
             return -0x21C;
         }
-        if (ret == 1)
+        if (r == 1)
         {
-            return 0;
+            break;
         }
         for (i = 0x10000; i != -1; i--)
         {
         }
     }
+    return 0;
 }
-#endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceLibnetTerminate);
 
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceLibnetRegisterHandler);
 s32 sceLibnetRegisterHandler(void *cd, s32 *net_buf)
@@ -481,7 +756,29 @@ s32 func_00119748(void *a0, void *a1, s32 a2, void *a3)
     return sceInetInterfaceControl(a0, a1, a2, 9, a3, 0x10);
 }
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_00119770);
+s32 func_00119668(s32, s32, s32);
+
+s32 func_00119770(void *cd, void *net_buf, s32 *if_id, s32 n, void *addr, s32 flags)
+{
+    s32 ret;
+    s32 sentinel = -1;
+
+    ret = func_00119668(cd, net_buf, if_id);
+    if (ret < 0)
+    {
+        ret = func_00119648(cd, net_buf, if_id, n);
+        if (ret < 0)
+        {
+            return ret;
+        }
+    }
+    ret = func_00119748(cd, net_buf, *if_id, addr);
+    if (sentinel < ret)
+    {
+        ret = 0;
+    }
+    return ret;
+}
 
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_00119808);
 s32 func_00119808(void *cd, void *net_buf, s32 *if_id, s32 n, void *addr, s32 flags)
@@ -570,6 +867,40 @@ void sceSifMExitRpc(void)
     sceSifRemoveRebootNotifyHandler(0x80000014);
 }
 
+/* NEARMISS-STUB func_00119AF8 */
+#if 0 /* NEARMISS 97.6% cat=cse-hoist sub=ee-gcc2.9-991111 | 97.6%: missing addiu v1,zero,1 (li of const 1 for id on the id==1 path); gcc2.9 reuses the a1=1 register and drops the li. Variants: cond n==0 gives bnez 2x wor | attempts=1 */
+s32 *func_00119AF8(s32 *obj)
+{
+    s32 *elem;
+    s32 i;
+    s32 id;
+    s32 n;
+
+    DIntr();
+    elem = (s32 *)obj[1];
+    for (i = 0; i < obj[2]; i++, elem += 16)
+    {
+        if ((elem[4] & 1) == 0)
+        {
+            elem[4] = (i << 16) | 5;
+            n = obj[0];
+            id = n + 1;
+            obj[0] = id;
+            if (id == 1)
+            {
+                obj[0] = n + 2;
+                id = 1;
+            }
+            elem[5] = (s32)elem;
+            elem[6] = id;
+            EIntr();
+            return elem;
+        }
+    }
+    EIntr();
+    return 0;
+}
+#endif
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_00119AF8);
 
 /* NEARMISS-STUB func_00119BA0 */
@@ -654,7 +985,36 @@ s32 sceMc2DeleteSocket(s32 a0)
     return _sceMcCoreDeleteSocket(ret) != 0 ? 0 : 0x81018002;
 }
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceMc2SearchSocket);
+s32 sceDbcSearchPortSpecific(s32 *);
+extern s32 D_00151FAC;
+s32 WaitSema(s32);
+s32 SignalSema(s32);
+
+s32 sceMc2SearchSocket(s32 a0, s32 a1)
+{
+    s32 buf[12];
+    s32 ret;
+
+    if (D_00135730[0] == 0)
+    {
+        return 0x81018001;
+    }
+    if (D_00151A84[0] != 0)
+    {
+        return 0x81010010;
+    }
+    WaitSema(D_00151FAC);
+    buf[2] = a0;
+    buf[3] = a1;
+    ret = sceDbcSearchPortSpecific(buf);
+    if (ret < 0)
+    {
+        SignalSema(D_00151FAC);
+        return 0x81018002;
+    }
+    SignalSema(D_00151FAC);
+    return ret;
+}
 
 s32 sceMc2ChangeThreadPriority(s32 prio)
 {
@@ -676,15 +1036,123 @@ s32 sceMc2iChangeThreadPriority(s32 prio)
     return 0;
 }
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceMc2FormatAsync);
+extern s32 D_00151A80[];
+extern s32 D_00151FA4;
+extern s32 D_00151FAC;
+s32 WaitSema(s32);
+s32 SignalSema(s32);
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceMc2UnformatAsync);
+s32 sceMc2FormatAsync(s32 a0)
+{
+    s32 *ctl;
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceMc2GetInfoAsync);
+    if (D_00135730[0] == 0)
+    {
+        return 0x81018001;
+    }
+    a0 = _sceMcCoreChangeSocketTypeDbc2Mc(a0);
+    if (a0 < 0)
+    {
+        return 0x81018002;
+    }
+    WaitSema(D_00151FAC);
+    ctl = D_00151A80;
+    if (ctl[1] != 0)
+    {
+        SignalSema(D_00151FAC);
+        return 0x81010010;
+    }
+    ctl[0] = a0;
+    ctl[1] = 3;
+    SignalSema(D_00151FA4);
+    SignalSema(D_00151FAC);
+    return 0;
+}
+
+s32 sceMc2UnformatAsync(s32 a0)
+{
+    s32 *ctl;
+
+    if (D_00135730[0] == 0)
+    {
+        return 0x81018001;
+    }
+    a0 = _sceMcCoreChangeSocketTypeDbc2Mc(a0);
+    if (a0 < 0)
+    {
+        return 0x81018002;
+    }
+    WaitSema(D_00151FAC);
+    ctl = D_00151A80;
+    if (ctl[1] != 0)
+    {
+        SignalSema(D_00151FAC);
+        return 0x81010010;
+    }
+    ctl[0] = a0;
+    ctl[1] = 4;
+    SignalSema(D_00151FA4);
+    SignalSema(D_00151FAC);
+    return 0;
+}
+
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceMc2GetInfoAsync);
+s32 sceMc2GetInfoAsync(s32 a0, void *a1)
+{
+    s32 *ctl;
+
+    if (D_00135730[0] == 0)
+    {
+        return 0x81018001;
+    }
+    a0 = _sceMcCoreChangeSocketTypeDbc2Mc(a0);
+    if (a0 < 0)
+    {
+        return 0x81018002;
+    }
+    WaitSema(D_00151FAC);
+    ctl = D_00151A80;
+    if (ctl[1] != 0)
+    {
+        SignalSema(D_00151FAC);
+        return 0x81010010;
+    }
+    D_00151A80[0] = a0;
+    ctl[1] = 2;
+    ctl[3] = (s32)a1;
+    SignalSema(D_00151FA4);
+    SignalSema(D_00151FAC);
+    return 0;
+}
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceMc2SearchFileAsync);
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceMc2GetDirAllAsync);
+s32 sceMc2GetDirAllAsync(s32 a0)
+{
+    s32 *ctl;
+
+    if (D_00135730[0] == 0)
+    {
+        return 0x81018001;
+    }
+    a0 = _sceMcCoreChangeSocketTypeDbc2Mc(a0);
+    if (a0 < 0)
+    {
+        return 0x81018002;
+    }
+    WaitSema(D_00151FAC);
+    ctl = D_00151A80;
+    if (ctl[1] != 0)
+    {
+        SignalSema(D_00151FAC);
+        return 0x81010010;
+    }
+    ctl[0] = a0;
+    ctl[1] = 0x64;
+    SignalSema(D_00151FA4);
+    SignalSema(D_00151FAC);
+    return 0;
+}
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceMc2ReadFileAsync);
 
@@ -708,6 +1176,45 @@ INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceMc2GetEntSpaceAsync);
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_0011B558);
 
+/* NEARMISS-STUB func_0011B770 */
+#if 0 /* NEARMISS 75.6% cat=regalloc sub=ee-gcc2.9-991111 | pointer locals: gcc2.9 gives the status ptr s0 and result ptr s2 and the ctl ptr s1; target keeps status=s1, result=s0, ctl=s2 (a0 mode, a1 status, a2 result).  | attempts=1 */
+extern s32 D_00151A80[];
+extern s32 D_00151FA8;
+s32 WaitSema(s32);
+s32 PollSema(s32);
+
+s32 func_0011B770(s32 a0, s32 a1, s32 a2)
+{
+    s32 *ctl = D_00151A80;
+
+    if (ctl[1] == 0)
+    {
+        return -1;
+    }
+    if (a1 != 0)
+    {
+        *(s32 *)a1 = ctl[1];
+    }
+    if (a0 == 0)
+    {
+        WaitSema(D_00151FA8);
+    }
+    else if (PollSema(D_00151FA8) < 0)
+    {
+        return 0;
+    }
+    if (a2 != 0)
+    {
+        *(s32 *)a2 = ctl[2];
+    }
+    if (a1 != 0)
+    {
+        *(s32 *)a1 = ctl[1];
+    }
+    ctl[1] = 0;
+    return 1;
+}
+#endif
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_0011B770);
 
 s32 sceMc2CheckAsync(s32 a0, s32 a1)
@@ -919,6 +1426,45 @@ INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_0011BC48);
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_0011BCB8);
 
+/* NEARMISS-STUB func_0011BD10 */
+#if 0 /* NEARMISS 85.8% cat=branch-layout sub=- | target shares one v0=0 return block (beqz to it from the strcmp DF0 test), fills bnez delay slot with addiu v0,1 and hoists strcpy a1=s0 into the strlen beqz de | attempts=1 */
+extern const char D_00138DF0[];
+extern const char D_00138DF8[];
+char *strchr(char *, s32);
+char *strrchr(char *, s32);
+s32 strcmp(const char *, const char *);
+
+s32 func_0011BD10(char *path)
+{
+    char buf[0x20];
+
+    if (strchr(path, 0x2F) != NULL)
+    {
+        if (strlen(strrchr(path, 0x2F) + 1) >= 0x20)
+        {
+            return 0;
+        }
+        strcpy(buf, strrchr(path, 0x2F) + 1);
+    }
+    else
+    {
+        if (strlen(path) >= 0x20)
+        {
+            return 0;
+        }
+        strcpy(buf, path);
+    }
+    if (strcmp(buf, D_00138DF0) == 0)
+    {
+        return 0;
+    }
+    if (strcmp(buf, D_00138DF8) == 0)
+    {
+        return 0;
+    }
+    return 1;
+}
+#endif
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_0011BD10);
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_0011BDC8);
@@ -1011,6 +1557,41 @@ INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", _sceMcFatFormat);
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", _sceMcFatUnFormat);
 
+/* NEARMISS-STUB func_0011D9E0 */
+#if 0 /* NEARMISS 95.6% cat=struct-layout sub=ee-gcc2.9-991111 | table D_0015E0C8 stride 0x898, fields +0x888/+0x88C: gcc2.9 folds +0x888 into %hi/%lo(D+0x888) and swaps addu operands; target keeps lui/addiu of D and addu a2, | attempts=1 */
+/* best 95.6% variant A: needs neighbour sigs _sceMcpCheckNewCard(s32 a0) and _sceMcpAuthentication(s32 a0) (were (void)) */
+extern s32 D_0015E0C8[];
+s32 _sceMcCoreGetConnection(s32);
+s32 _sceMcpCheckNewCard(s32);
+s32 _sceMcpAuthentication(s32);
+s32 _sceMcCoreWriteBack(s32);
+
+s32 func_0011D9E0(s32 a0)
+{
+    if (_sceMcCoreGetConnection(a0) == 0)
+    {
+        return 0x81010013;
+    }
+    if (_sceMcpCheckNewCard(a0) == 0)
+    {
+        return 0x81019003;
+    }
+    if (*(s32 *)((u8 *)D_0015E0C8 + a0 * 0x898 + 0x888) == 1)
+    {
+        return 0x81019003;
+    }
+    if (*(s32 *)((u8 *)D_0015E0C8 + a0 * 0x898 + 0x88C) == 0)
+    {
+        return 0x8101002F;
+    }
+    if (_sceMcpAuthentication(a0) == 0)
+    {
+        return 0x81010013;
+    }
+    _sceMcCoreWriteBack(a0);
+    return 0;
+}
+#endif
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_0011D9E0);
 
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_0011DA88);
@@ -1064,6 +1645,41 @@ INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", _sceMcFatSetAttr);
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", _sceMcFatRename);
 
+/* NEARMISS-STUB _sceMcFatGetEntSpace */
+#if 0 /* NEARMISS 96.9% cat=call-abi sub=- | target calls func_0011DA88 with 3 args (a3 left as-is); callee is defined with 4 params so the prototype forbids the 3-arg call, best uses a 0 4th arg (addiu a3 | attempts=1 */
+s32 func_0011DD60(s32, s32, void *, s32, s32);
+s32 func_0011E358(s32, s32, s32, s32 *);
+
+s32 _sceMcFatGetEntSpace(s32 a0, s32 a1)
+{
+    u8 dir[0x200];
+    s32 buf[0x20];
+    s32 ret;
+    s32 r;
+
+    ret = func_0011D9E0(a0);
+    if (ret != 0)
+    {
+        return ret;
+    }
+    ret = func_0011DA88(a0, a1, buf, 0);
+    if (ret != 0)
+    {
+        return ret;
+    }
+    ret = func_0011DD60(a0, buf, dir, 0, 0);
+    if (ret != 0x81010011)
+    {
+        return ret;
+    }
+    if ((*(u16 *)dir & 0x20) == 0)
+    {
+        return 0x81010014;
+    }
+    r = func_0011E358(a0, *(s32 *)(dir + 0x10), *(s32 *)(dir + 4), &ret);
+    return ret != 0 ? ret : r;
+}
+#endif
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", _sceMcFatGetEntSpace);
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", _sceMcpInit);
@@ -1326,7 +1942,35 @@ INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", _sceMcCoreChangeSocketTyp
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", _sceMcCoreChangeSocketTypeMc2Dbc);
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceNetcnfifSetup);
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceNetcnfifSetup);
+s32 sceNetcnfifSetup(void)
+{
+    s32 i;
+
+    if (D_00135A5C[0] != 0)
+    {
+        return 0;
+    }
+    while (1)
+    {
+        if (sceSifBindRpc(D_00168040, 0x80001101, 1) < 0)
+        {
+            return -1;
+        }
+        while (sceSifCheckStatRpc(D_00168040) != 0)
+        {
+        }
+        if (D_00168040[9] != 0)
+        {
+            break;
+        }
+        for (i = 0x10000; i != -1; i--)
+        {
+        }
+    }
+    D_00135A5C[0] = 1;
+    return 0;
+}
 
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceNetcnfifInit);
 s32 sceNetcnfifInit(void)
@@ -1401,7 +2045,19 @@ s32 sceNetcnfifGetList(char *a0, s32 a1, s32 a2, s32 a3)
     return sce_call_rpc(D_00168040, buf, 1);
 }
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceNetcnfifLoadEntry);
+s32 sceNetcnfifLoadEntry(char *a0, s32 a1, char *a2, s32 a3)
+{
+    s32 *buf;
+
+    sceNetcnfifInit();
+    buf = D_00168080;
+    strcpy((char *)buf + 0x10, a0);
+    buf[2] = a1;
+    strcpy((char *)buf + 0x110, a2);
+    buf[1] = D_00135A58[0];
+    buf[3] = a3;
+    return sce_call_rpc(D_00168040, buf, 2);
+}
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceNetcnfifLoadEntryAuto);
 
@@ -1419,7 +2075,19 @@ s32 sceNetcnfifAddEntry(char *a0, s32 a1, char *a2)
     return sce_call_rpc(D_00168040, buf, 3);
 }
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceNetcnfifEditEntry);
+s32 sceNetcnfifEditEntry(char *a0, s32 a1, char *a2, char *a3)
+{
+    s32 *buf;
+
+    sceNetcnfifInit();
+    buf = D_00168080;
+    strcpy((char *)buf + 0x10, a0);
+    buf[2] = a1;
+    strcpy((char *)buf + 0x110, a2);
+    strcpy((char *)buf + 0x210, a3);
+    buf[1] = D_00135A58[0];
+    return sce_call_rpc(D_00168040, buf, 4);
+}
 
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceNetcnfifDeleteEntry);
 s32 sceNetcnfifDeleteEntry(char *a0, s32 a1, char *a2)
@@ -1556,6 +2224,56 @@ void func_00123090(void)
     sceSifRpcLoop(D_0016A0D8);
 }
 
+/* NEARMISS-STUB sce_create_callback_thread */
+#if 0 /* NEARMISS 72.36% cat=no-c-form sub=- | reads live $gp for ThreadParam.gpReg (no C form without asm; attempt uses NULL placeholder); ldl/ldr 16-byte copy and entry/stack store order already match; fun | attempts=1 */
+struct Blk16
+{
+    char b[16];
+};
+struct ThreadParam
+{
+    s32 status;
+    void (*entry)(void *);
+    void *stack;
+    s32 stackSize;
+    void *gpReg;
+    s32 initPriority;
+    s32 currentPriority;
+    u32 attr;
+    u32 option;
+};
+extern s32 D_0016A080[];
+extern s32 D_00138ED0[];
+void func_00123090(void);
+s32 CreateThread(void *);
+s32 StartThread(s32, void *);
+s32 DeleteThread(s32);
+
+s32 sce_create_callback_thread(void *a0, void *a1, s32 a2, s32 a3)
+{
+    struct ThreadParam tp;
+    s32 tid;
+
+    tp.entry = (void (*)(void *))func_00123090;
+    tp.stack = a1;
+    tp.stackSize = a2;
+    tp.gpReg = NULL;
+    tp.initPriority = a3;
+    tp.option = (u32)D_00138ED0;
+    tid = CreateThread(&tp);
+    if (tid <= 0)
+    {
+        return -1;
+    }
+    *(struct Blk16 *)D_0016A080 = *(struct Blk16 *)a0;
+    if (StartThread(tid, NULL) >= 0)
+    {
+        return tid;
+    }
+    DeleteThread(tid);
+    return -1;
+}
+#endif
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sce_create_callback_thread);
 
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sce_delete_callback_thread);
@@ -1668,4 +2386,32 @@ s32 sce_call_rpc(void *a0, void *a1, s32 a2)
     return sceSifCallRpc(a0, a2, 1, a1, 0x1000, a1, 0x1000, (void *)func_00123280, (void *)id);
 }
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sce_sync);
+s32 PollSema(s32);
+
+s32 sce_sync(s32 mode)
+{
+    s32 ret = 1;
+
+    if (((volatile s32 *)D_00135A60)[0] < 0)
+    {
+        return -1;
+    }
+    switch (mode)
+    {
+    case 0:
+        WaitSema(((volatile s32 *)D_00135A60)[0]);
+        ret = 0;
+        func_00123308();
+        break;
+    case 1:
+        if (PollSema(((volatile s32 *)D_00135A60)[0]) != -1)
+        {
+            ret = 0;
+            func_00123308();
+        }
+        break;
+    default:
+        return -0x65;
+    }
+    return ret;
+}
