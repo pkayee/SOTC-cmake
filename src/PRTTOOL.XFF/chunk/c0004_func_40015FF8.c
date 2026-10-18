@@ -27,6 +27,23 @@ extern float D_400198DC;
 
 extern void func_40014578(int);
 
+extern int D_4002B9D8;
+
+typedef struct {
+    char *name;
+    int unk4;
+    int symIdx;
+} ParticleTexEntry;
+extern ParticleTexEntry g_ainParticleTextureStore[];
+extern u8 padManagerData[];
+extern char D_4002B8B0[];
+extern int is_proper_particle_texture_id(int);
+extern char *GetSymbolByIndex(int, int);
+extern int strcmp(const char *, const char *);
+extern void isysInitGroup(void *);
+extern void isysAddGroupWithLinkParam(int, void *, int, int);
+extern void texTool(char *, int, void *);
+
 void func_40015FF8(void) {
     if (D_400193CC == 0) {
         D_400193D0 = D_400198E0;
@@ -326,139 +343,673 @@ char *func_400166B8(void) {
     return p + 0x38;
 }
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_400166E8);
+char *func_400166E8(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + 0x3C;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40016718);
+char *func_40016718(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + 0x24;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40016748);
+char *func_40016748(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + 0x54;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40016778);
+char *func_40016778(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + 0x5C;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_400167A8);
+char *func_400167A8(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + 0x58;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_400167D8);
+char *func_400167D8(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + 0xA0;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40016808);
+char *func_40016808(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + 0xA4;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40016838);
+char *func_40016838(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + 0xA8;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40016868);
+char *func_40016868(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + 0x68;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40016898);
+char *func_40016898(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + 0x9C;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_400168C8);
+char *func_400168C8(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + 0xAC;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_400168F8);
+char *func_400168F8(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + 0xC0;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40016928);
+char *func_40016928(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + 0x94;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40016958);
+char *func_40016958(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + 0x98;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40016988);
+char *func_40016988(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + 0xD4;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_400169B8);
+int *func_400169B8(void) {
+    return &D_4002B9D8;
+}
 
 void func_400169C8(void) {
 }
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_400169D0);
+void func_400169D0(u8 *param_1) {
+    ParticleTexEntry *e;
+    char *b;
+    if ((*(s32 *)(padManagerData + 8) & 0x20) && (b = D_4002B910, is_proper_particle_texture_id(*(int *)(b + 0xC8)) == 1)) {
+        e = &g_ainParticleTextureStore[*(int *)(b + 0xC8)];
+        if (strcmp(e->name, GetSymbolByIndex(e->symIdx, 0)) == 0) {
+            isysInitGroup(D_4002B8B0);
+            isysAddGroupWithLinkParam(e->symIdx, D_4002B8B0, 0, 0);
+            texTool(e->name, *(int *)(param_1 + 0x94), D_4002B8B0);
+        }
+    }
+    return;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40016A98);
+char *func_40016A98(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + 0x6C;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40016AC8);
+char *func_40016AC8(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + 0x70;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40016AF8);
+char *func_40016AF8(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + 0x74;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40016B28);
+char *func_40016B28(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + 0x78;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40016B58);
+char *func_40016B58(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + 0x7C;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40016B88);
+char *func_40016B88(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + 0x90;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40016BB8);
+char *func_40016BB8(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + 0x80;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40016BE8);
+char *func_40016BE8(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + 0x84;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40016C18);
+char *func_40016C18(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + 0x88;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40016C48);
+char *func_40016C48(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + 0x8C;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40016C78);
+char *func_40016C78(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + 0x48;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40016CA8);
+char *func_40016CA8(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + 0x4C;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40016CD8);
+char *func_40016CD8(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + 0xB0;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40016D08);
+char *func_40016D08(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + 0xB4;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40016D38);
+char *func_40016D38(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + 0xB8;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40016D68);
+char *func_40016D68(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + 0x1C;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40016D98);
+char *func_40016D98(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + 0xD0;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40016DC8);
+char *func_40016DC8(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + D_400193D0 * 0x1bc + 0xC4;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40016E18);
+char *func_40016E18(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + D_400193D0 * 0x1bc + 0xDC;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40016E68);
+char *func_40016E68(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + D_400193D0 * 0x1bc + 0xE0;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40016EB8);
+char *func_40016EB8(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + D_400193D0 * 0x1bc + 0xCC;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40016F08);
+char *func_40016F08(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + D_400193D0 * 0x1bc + 0xD8;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40016F58);
+char *func_40016F58(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + D_400193D0 * 0x1bc + 0xE4;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40016FA8);
+char *func_40016FA8(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + D_400193D0 * 0x1bc + 0xE8;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40016FF8);
+char *func_40016FF8(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + D_400193D0 * 0x1bc + 0x1D8;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40017048);
+char *func_40017048(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + D_400193D0 * 0x1bc + 0x1DC;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40017098);
+char *func_40017098(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + D_400193D0 * 0x1bc + 0xEC;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_400170E8);
+char *func_400170E8(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + D_400193D0 * 0x1bc + 0xF0;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40017138);
+char *func_40017138(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + D_400193D0 * 0x1bc + 0xF4;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40017188);
+char *func_40017188(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + D_400193D0 * 0x1bc + 0xF8;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_400171D8);
+char *func_400171D8(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + D_400193D0 * 0x1bc + 0xFC;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40017228);
+char *func_40017228(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + D_400193D0 * 0x1bc + 0x100;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40017278);
+char *func_40017278(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + D_400193D0 * 0x1bc + 0x104;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_400172C8);
+char *func_400172C8(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + D_400193D0 * 0x1bc + 0x108;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40017318);
+char *func_40017318(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + D_400193D0 * 0x1bc + 0x254;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40017368);
+char *func_40017368(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + D_400193D0 * 0x1bc + 0x258;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_400173B8);
+char *func_400173B8(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + D_400193D0 * 0x1bc + 0x25C;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40017408);
+char *func_40017408(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + D_400193D0 * 0x1bc + 0x10C;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40017458);
+char *func_40017458(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + D_400193D0 * 0x1bc + 0x110;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_400174A8);
+char *func_400174A8(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + D_400193D0 * 0x1bc + 0x248;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_400174F8);
+char *func_400174F8(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + D_400193D0 * 0x1bc + 0x114;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40017548);
+char *func_40017548(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + D_400193D0 * 0x1bc + 0x24C;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40017598);
+char *func_40017598(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + D_400193D0 * 0x1bc + 0x118;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_400175E8);
+char *func_400175E8(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + D_400193D0 * 0x1bc + 0x11C;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40017638);
+char *func_40017638(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + D_400193D0 * 0x1bc + 0x120;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40017688);
+char *func_40017688(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + D_400193D0 * 0x1bc + 0x124;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_400176D8);
+char *func_400176D8(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + D_400193D0 * 0x1bc + 0x128;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40017728);
+char *func_40017728(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + D_400193D0 * 0x1bc + 0x12C;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40017778);
+char *func_40017778(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + D_400193D0 * 0x1bc + 0x260;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_400177C8);
+char *func_400177C8(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + D_400193D0 * 0x1bc + 0x264;
+}
