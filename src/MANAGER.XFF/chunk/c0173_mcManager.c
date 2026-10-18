@@ -1,10 +1,23 @@
 #include "common.h"
 
+extern char D_40134288[];
+
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0173_mcManager", mcManager);
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0173_mcManager", mcWrite);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0173_mcManager", mcRead);
+void mcRead(u8 *m, s32 buf, s32 n)
+{
+    s32 v;
+
+    v = *(s32 *)(m + 0x30) + n;
+    *(s32 *)(m + 0x30) = v;
+    if (*(s32 *)(m + 0x28) < v) {
+        LoaderSysPrintf(D_40134288);
+    }
+    iosMcReadFile(*(s32 *)(m + 0x20), *(s32 *)(m + 0x24), m, buf, *(s32 *)(m + 0x2c), n);
+    *(s32 *)(m + 0x2c) = *(s32 *)(m + 0x2c) + n;
+}
 
 extern int D_401B1744;
 
