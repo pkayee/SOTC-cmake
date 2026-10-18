@@ -186,7 +186,31 @@ nonzero:
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0126_AI_GetAccelB3XYZ", AI_GetSideSignalFromDirLev);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0126_AI_GetAccelB3XYZ", AI_GetRandomCircleOfsXZ);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0126_AI_GetAccelB3XYZ", AI_GetRandomCircleOfsXZ);
+
+extern float iosGetRandom(void);
+extern float iosGetTableCos(short);
+extern float iosGetTableSin(short);
+
+void AI_GetRandomCircleOfsXZ(float *out, float min, float max)
+{
+    float a;
+    float r;
+    short ang;
+    float sn;
+    float cs;
+
+    a = iosGetRandom() * 2.0f * 3.1415926f;
+    r = min + (max - min) * iosGetRandom();
+    ang = (int)(a * 32768.0f / 3.1415926f);
+
+    sn = iosGetTableSin(ang);
+    out[1] = 0.0f;
+    out[0] = sn * r;
+    cs = iosGetTableCos(ang);
+    out[3] = 0.0f;
+    out[2] = cs * r;
+}
 
 extern float iosGetRandom(void);
 extern float iosGetTableCos(short);

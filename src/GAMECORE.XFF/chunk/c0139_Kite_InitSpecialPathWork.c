@@ -19,6 +19,19 @@ int Kite_CmpPathPoint(char *a, char *b)
     return 0;
 }
 
+/* NEARMISS-STUB Kite_InitKitePathPoint */
+#if 0 /* NEARMISS 0.0% cat=vu0-mmi sub=- | first insn sqc2 vf0 store (0,0,0,1) has no C form; C gives sw x4 | attempts=1 */
+void Kite_InitKitePathPoint(int *p)
+{
+    p[0] = 0;
+    p[1] = 0;
+    p[2] = 0;
+    p[3] = 0x3F800000;
+    p[5] = 0;
+    p[6] = -1;
+    p[4] = -1;
+}
+#endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0139_Kite_InitSpecialPathWork", Kite_InitKitePathPoint);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0139_Kite_InitSpecialPathWork", AI_UpdateLeaderPathWork);

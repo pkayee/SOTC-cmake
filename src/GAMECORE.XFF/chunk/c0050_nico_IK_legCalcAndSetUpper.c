@@ -8,7 +8,29 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0050_nico_IK_legCalcAndSetUppe
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0050_nico_IK_legCalcAndSetUpper", nico_neckFitToParentInvDirIK);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0050_nico_IK_legCalcAndSetUpper", character_ikcolattrfilter);
+u64 *GetCollisionDBAttributeAdr(void *surface);
+
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0050_nico_IK_legCalcAndSetUpper", character_ikcolattrfilter);
+s32 character_ikcolattrfilter(void *surface)
+{
+    u64 attribute = *GetCollisionDBAttributeAdr(surface);
+    u64 material = attribute & 0x7C000000UL;
+    u64 flags = attribute & (0xF800UL << 20);
+    u64 mode = attribute & (0xF000UL << 30);
+
+    if (material == 0x30000000UL || material == 0x04000000UL || material == 0x64000000UL ||
+        material == 0x68000000UL || material == 0x6C000000UL)
+    {
+        return 0;
+    }
+    if (material == 0x24000000UL || flags == (0x8000UL << 20) || flags == (0x8000UL << 18) ||
+        flags == (0xB800UL << 20) || flags == (0xC000UL << 18) || flags == (0xA000UL << 19) ||
+        flags == (0xE000UL << 18) || flags == (0xA000UL << 18) || mode == (0x8000UL << 28))
+    {
+        return 0;
+    }
+    return 1;
+}
 
 extern int GetCharacterClassInitParamNbOptionNodes();
 

@@ -249,7 +249,15 @@ void SCRRockReset(void *character)
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0069_init_expression", func_40064BF8);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0069_init_expression", func_40064C20);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0069_init_expression", func_40064C20);
+
+void func_40064C20(void *character)
+{
+    void *temp_v0;
+
+    temp_v0 = GetScrLwsOriClass(character);
+    (*(int *)((char *)(*(int *)((char *)(temp_v0) + 0x1158)) + 0x10)) = 0;
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0069_init_expression", func_40064C48);
 

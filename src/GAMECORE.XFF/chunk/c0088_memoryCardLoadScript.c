@@ -50,7 +50,7 @@ extern void SCRReleaseBossWork(void);
 extern void SetScriptCharacterObjReleaseCallBackFunc(void *, void (*)(void), int);
 extern char *GetScriptClass(void *);
 extern void initScriptDataSystem(void *, int);
-extern void func_4007AE38(void);
+void func_4007AE38(s32 *a0);
 
 void nico_BossMinotaurStart(void)
 {
@@ -76,7 +76,28 @@ void nico_BossMinotaurStart(void)
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0088_memoryCardLoadScript", SCRFuncMinoBCanossaWallBreak);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0088_memoryCardLoadScript", func_4007AE38);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0088_memoryCardLoadScript", func_4007AE38);
+extern void updateScriptDataSystem(void *chara);
+extern void SCRExecBossPreProcess(s32 a0);
+extern void SCRExecBossPostProcess(s32 a0);
+extern void scrRunM(s32 n);
+
+void func_4007AE38(s32 *a0)
+{
+    void *thread;
+
+    isysGetThisSubThread();
+    for (;;)
+    {
+        thread = isysGetThisSubThread();
+        SCRExecBossPreProcess(*a0);
+        CharaCtrlResetAllScriptCtrlStatus(thread);
+        updateScriptDataSystem(thread);
+        isysGetThisSubThread();
+        SCRExecBossPostProcess(*a0);
+        scrRunM(1);
+    }
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0088_memoryCardLoadScript", SCRFuncMinoBSetTemporaryTarget);
 

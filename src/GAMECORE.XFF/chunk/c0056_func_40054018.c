@@ -8,7 +8,29 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0056_func_40054018", nico_leoB
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0056_func_40054018", func_40054AD8);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0056_func_40054018", func_40054B00);
+extern void *isysGetThisSubThread(void);
+void SCRExecBossPreProcess(s32 a0);
+void CharaCtrlResetAllScriptCtrlStatus(void *chara);
+void updateScriptDataSystem(void *chara);
+void SCRExecBossPostProcess(s32 a0);
+void scrRunM(s32 n);
+
+void func_40054B00(s32 *a0)
+{
+    void *thread;
+
+    isysGetThisSubThread();
+    for (;;)
+    {
+        thread = isysGetThisSubThread();
+        SCRExecBossPreProcess(*a0);
+        CharaCtrlResetAllScriptCtrlStatus(thread);
+        updateScriptDataSystem(thread);
+        isysGetThisSubThread();
+        SCRExecBossPostProcess(*a0);
+        scrRunM(1);
+    }
+}
 
 extern void *GetSCRCharaAIWorkPtr(void *);
 extern void setEventLineAttr(void *, int, int);

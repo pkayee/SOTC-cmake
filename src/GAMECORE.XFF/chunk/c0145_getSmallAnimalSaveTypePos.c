@@ -125,7 +125,19 @@ char *getNearInterestSmallAnimal(void *a, void *b)
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0145_getSmallAnimalSaveTypePos", func_400C49A0);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0145_getSmallAnimalSaveTypePos", func_400C4A98);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0145_getSmallAnimalSaveTypePos", func_400C4A98);
+extern void func_400C2A98(void *);
+
+void func_400C4A98(void *arg0)
+{
+    int i = 0x13;
+    char *p = (char *)arg0 + 0x250;
+    do {
+        i--;
+        func_400C2A98(p);
+        p += 0x60;
+    } while (i >= 0);
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0145_getSmallAnimalSaveTypePos", func_400C4AE0);
 

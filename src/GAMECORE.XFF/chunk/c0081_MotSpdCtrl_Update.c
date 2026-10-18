@@ -70,7 +70,15 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0081_MotSpdCtrl_Update", ColCo
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0081_MotSpdCtrl_Update", ColCont2_Release);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0081_MotSpdCtrl_Update", ColCont2_IsColStatus);
+int ColCont2_IsColStatus(long *p, long mask, long value)
+{
+    if (value != -1) {
+        if ((*p & mask) == value)
+            return 1;
+    } else if (*p & mask)
+        return 1;
+    return 0;
+}
 
 s32 ColCont2_IsParentObj(void *arg0, s32 arg1)
 {

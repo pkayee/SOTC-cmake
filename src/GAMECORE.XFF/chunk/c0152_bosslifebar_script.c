@@ -106,7 +106,16 @@ void setgrip(f32 arg0)
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0152_bosslifebar_script", playerlifebar_effect);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0152_bosslifebar_script", player_life_anim);
+extern s32 D_40131C98;
+extern void setSpriteMenuAnimParam(u8 *spriteMenu, s32 a1, s32 a2, s32 a3, f32 f12);
+
+void player_life_anim(s32 *arg0)
+{
+    if (D_40131C98 != 0) {
+        return setSpriteMenuAnimParam((u8 *)arg0[2], 2, 0, 1, 0.0f);
+    }
+    return;
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0152_bosslifebar_script", spriteselweapon);
 

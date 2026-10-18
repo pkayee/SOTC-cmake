@@ -28,8 +28,10 @@ extern void setExecGazeIKWork(void *, int);
 extern void setGoingAngleGazeIKWork(void *, float);
 extern void SetScriptObjDeleteCallBackFunc(void *, void (*)(void), void *);
 extern void isysJumpSubThread(void (*)(void), void *);
-extern void func_400A6A98(void);
+extern void func_400A6A98(void *);
 extern void func_400A6110(void);
+extern int GetSCRCharaAIWorkPtr();
+extern void deleteUserPathWork(void *);
 
 void nico_shamanStart(void)
 {
@@ -73,6 +75,10 @@ void nico_shamanStart(void)
     isysJumpSubThread(func_400A6110, w);
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0123_nico_shamanStart", func_400A6A98);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0123_nico_shamanStart", func_400A6A98);
+void func_400A6A98(void *actor)
+{
+    deleteUserPathWork(((char *)GetSCRCharaAIWorkPtr(actor)) + 0x10);
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0123_nico_shamanStart", nico_sheathScript);
