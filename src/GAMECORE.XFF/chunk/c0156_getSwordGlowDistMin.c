@@ -1,14 +1,40 @@
 #include "common.h"
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0156_getSwordGlowDistMin", getSwordGlowDistMin);
+extern s32 D_40131E04;
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0156_getSwordGlowDistMin", getSwordGlowDistMax);
+s32 *getSwordGlowDistMin(void)
+{
+    return &D_40131E04;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0156_getSwordGlowDistMin", getCollisionGlowSpeed);
+extern s32 D_40131E08;
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0156_getSwordGlowDistMin", getCollisionGlowTime);
+s32 *getSwordGlowDistMax(void)
+{
+    return &D_40131E08;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0156_getSwordGlowDistMin", getCollisionPosOffset);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0156_getSwordGlowDistMin", getCollisionGlowSpeed);
+extern s32 D_40131E18;
+
+s32 *getCollisionGlowSpeed(void)
+{
+    return &D_40131E18;
+}
+
+extern s32 D_40131E1C;
+
+s32 *getCollisionGlowTime(void)
+{
+    return &D_40131E1C;
+}
+
+extern s32 D_40131E20;
+
+s32 *getCollisionPosOffset(void)
+{
+    return &D_40131E20;
+}
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0156_getSwordGlowDistMin", func_400D2A58);
 void func_400D2A58(u8* work)
@@ -16,7 +42,11 @@ void func_400D2A58(u8* work)
     *(s32*)work = 0;
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0156_getSwordGlowDistMin", func_400D2A60);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0156_getSwordGlowDistMin", func_400D2A60);
+s32 func_400D2A60(s32 a, s32 b)
+{
+    return a != b;
+}
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0156_getSwordGlowDistMin", func_400D2A70);
 u64 *GetCollisionDBAttributeAdr(void *surface);
