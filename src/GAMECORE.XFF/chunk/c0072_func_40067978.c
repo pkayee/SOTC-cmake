@@ -1,8 +1,30 @@
 #include "common.h"
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0072_func_40067978", func_40067978);
+extern s32 D_401317B8;
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0072_func_40067978", func_400679C0);
+extern char *SkelFocusDef_Guard_A_LeftHand;
+extern u8 IdentityQuaternion[];
+extern u8 ZeroPoint[];
+extern void SetGeometryPointerNodePosState(void *, void *, s32, void *, void *);
+extern void ParentLayoutObj(void *, void *);
+
+void func_40067978(s32 a, s32 b, u32 flags, s32 kind) {
+    if (flags & 1) {
+        switch (kind) {
+        case 0: D_401317B8 = 1; break;
+        case 1: D_401317B8 = 2; break;
+        }
+    }
+}
+
+void func_400679C0(s32 a, s32 b, u32 flags, s32 kind) {
+    if (flags & 1) {
+        switch (kind) {
+        case 1: D_401317B8 = 6; break;
+        case 0: D_401317B8 = 7; break;
+        }
+    }
+}
 
 extern char rootPtn[];
 extern void *isysGetThisSubThread(void);
@@ -89,7 +111,11 @@ void SCRGuardSwordPickup(void *character)
     RequestCharacterMotionShiftFunc(character, &func_40067D38);
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0072_func_40067978", func_40067D38);
+void func_40067D38(void *character) {
+    char buf[64];
+    SetGeometryPointerNodePosState(buf, character, *(s32 *)(SkelFocusDef_Guard_A_LeftHand + 8), IdentityQuaternion, ZeroPoint);
+    ParentLayoutObj(*(void **)(GameObject_END_SWORD + 8), buf);
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0072_func_40067978", guardMainCommon);
 
