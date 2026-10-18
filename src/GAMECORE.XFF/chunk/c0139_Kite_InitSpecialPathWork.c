@@ -13,14 +13,9 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0139_Kite_InitSpecialPathWork"
 
 int Kite_CmpPathPoint(char *a, char *b)
 {
-    if (*(int *)(a + 0x18) != *(int *)(b + 0x18)) {
-        goto no;
+    if (*(int *)(a + 0x18) == *(int *)(b + 0x18) && *(int *)(a + 0x10) == *(int *)(b + 0x10)) {
+        return 1;
     }
-    if (*(int *)(a + 0x10) != *(int *)(b + 0x10)) {
-        goto no;
-    }
-    return 1;
-no:
     return 0;
 }
 

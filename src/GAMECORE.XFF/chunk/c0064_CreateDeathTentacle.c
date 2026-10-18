@@ -71,7 +71,7 @@ union DischargeVector {
     float f[4];
 };
 
-extern int getSpecialEffectObjWork(void *effect);
+extern char *getSpecialEffectObjWork();
 
 void setDischargeParam(void *effect, union DischargeVector *vector, float first, float second)
 {
@@ -96,7 +96,7 @@ extern int isysRequestDeleteObj();
 
 int dischargeTerm(void)
 {
-    return isysRequestDeleteObj(*(int *)(((char *(*)())getSpecialEffectObjWork)() + 0x10));
+    return isysRequestDeleteObj(*(int *)(getSpecialEffectObjWork() + 0x10));
 }
 
 extern char rootPtn[];
