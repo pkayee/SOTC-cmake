@@ -8,6 +8,19 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0157_ExchangeLWQuaternion", Get
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0157_ExchangeLWQuaternion", GetTargetLocalDir);
 
+/* NEARMISS-STUB CopyQuatPos */
+#if 0 /* NEARMISS 27.27% cat=stack-frame sub=- | dead local copy: all loads and stores dropped, no frame; target keeps 4 stores in 0x40 frame | attempts=1 */
+void CopyQuatPos(u64 *src)
+{
+    u64 dst[4];
+    u64 pad[4];
+
+    dst[0] = src[0];
+    dst[1] = src[1];
+    dst[2] = src[2];
+    dst[3] = src[3];
+}
+#endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0157_ExchangeLWQuaternion", CopyQuatPos);
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0157_ExchangeLWQuaternion", GetPlaneDistance);
