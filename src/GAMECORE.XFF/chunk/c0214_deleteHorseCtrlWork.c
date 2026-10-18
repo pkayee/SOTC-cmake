@@ -36,22 +36,19 @@ void setFreezeHorseCtrlWork(void *arg0, int arg1)
 }
 
 /* NEARMISS-STUB func_40111B78 */
-#if 0 /* NEARMISS 98.3% cat=regalloc sub=- | lui/addiu swapped v0/v1 and 0x38=1 store scheduled before 0x30 | attempts=1 */
+#if 0 /* NEARMISS 98.75% cat=regalloc sub=- | full 5040-perm store sweep: best order 40,D0,34,38,30,AC,3C schedules exactly; only v0/v1 swapped (ours li v0,1 / lui v1 hi, target lui v0 / li v1,1); local one | attempts=2 */
 extern float D_40137728;
 extern s32 _resetBaseMoveWork(s32 arg0, void *arg1);
 void func_40111BC8(void *arg0);
 
 void func_40111B78(s32 arg0, void *arg1)
 {
-    float f;
-
     _resetBaseMoveWork(arg0, arg1);
-    f = D_40137728;
-    (*(float *)((char *)(arg1) + 0x40)) = f;
-    (*(int *)((char *)(arg1) + 0x30)) = 1;
+    (*(float *)((char *)(arg1) + 0x40)) = D_40137728;
     (*(int *)((char *)(arg1) + 0xD0)) = 0;
     (*(int *)((char *)(arg1) + 0x34)) = 0;
     (*(int *)((char *)(arg1) + 0x38)) = 1;
+    (*(int *)((char *)(arg1) + 0x30)) = 1;
     (*(int *)((char *)(arg1) + 0xAC)) = 0;
     (*(int *)((char *)(arg1) + 0x3C)) = 0;
     func_40111BC8(arg1);

@@ -187,21 +187,22 @@ void ExecCharaGeometryPostprocess(u8 *obj)
     }
 }
 
-/* NEARMISS-STUB GetCharacterClassInitParamNbNodes */
-#if 0 /* NEARMISS 96.88% cat=regalloc sub=- | p in v0/0x20 load in v1 swapped vs target | attempts=1 */
-
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0059_getClothGeometry", GetCharacterClassInitParamNbNodes);
 s32 GetCharacterClassInitParamNbNodes(u8 *obj)
 {
     u8 *p = *(u8 **)(obj + 0x84);
+    s32 n;
 
     if (p != NULL)
     {
-        return *(s32 *)(*(u8 **)(p + 0x20) + 4);
+        n = *(s32 *)(*(u8 **)(p + 0x20) + 4);
     }
-    return *(s32 *)(obj + 4);
+    else
+    {
+        n = *(s32 *)(obj + 4);
+    }
+    return n;
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0059_getClothGeometry", GetCharacterClassInitParamNbNodes);
 
 s32 GetCharacterClassInitParamNbOptionNodes(u8 *obj)
 {

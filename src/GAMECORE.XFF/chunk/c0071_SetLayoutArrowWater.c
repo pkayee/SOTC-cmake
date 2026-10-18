@@ -54,28 +54,20 @@ void EnableArrowWater(s32 param)
     return;
 }
 
-/* NEARMISS-STUB EndArrowWater */
-#if 0 /* NEARMISS 99.4% cat=struct-layout sub=- | loop ptr base+8 kept in v0 then addiu v1,v1,8 vs folded into lui/addiu %lo | attempts=1 */
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0071_SetLayoutArrowWater", EndArrowWater);
 void EndArrowWater(s32 param)
 {
-    s32 i = 0;
-    s32 *p;
-    p = D_40203690;
-    p += 2;
-    do {
-        if (p[0] == param) {
-            p[-2] = 0;
-            p[0] = 0;
-            p[1] = 0;
+    s32 i;
+
+    for (i = 0; i < 0x19; i++) {
+        if (D_40203690[i * 4 + 2] == param) {
+            D_40203690[i * 4] = 0;
+            D_40203690[i * 4 + 2] = 0;
+            D_40203690[i * 4 + 3] = 0;
             return;
         }
-        i++;
-        p += 4;
-    } while (i < 0x19);
-    return;
+    }
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0071_SetLayoutArrowWater", EndArrowWater);
 
 extern s32 D_40203690[];
 
@@ -98,27 +90,21 @@ s32 CheckStartArrowWater(s32 idx)
     return 0;
 }
 
-/* NEARMISS-STUB UpdateArrowWater */
-#if 0 /* NEARMISS 98.89% cat=regalloc sub=- | lui order differs: target loads D_40203690 hi first, ours gcGlobalVar; regs p/g/i swapped | attempts=1 */
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0071_SetLayoutArrowWater", UpdateArrowWater);
+typedef struct { u8 pad[0x190]; f32 frameTime; } GcGlobalArrow;
 extern u8 gcGlobalVar[];
 
 void UpdateArrowWater(void)
 {
-    u8 *g = gcGlobalVar;
-    s32 *p = D_40203690;
-    s32 i = 0x18;
-    do {
-        p[1] = p[0];
-        if (p[0] != 0) {
-            *(f32 *)&p[3] = *(f32 *)&p[3] + *(f32 *)(g + 0x190);
+    s32 i;
+
+    for (i = 0; i < 0x19; i++) {
+        D_40203690[i * 4 + 1] = D_40203690[i * 4];
+        if (D_40203690[i * 4] != 0) {
+            *(f32 *)&D_40203690[i * 4 + 3] = *(f32 *)&D_40203690[i * 4 + 3] + ((GcGlobalArrow *)gcGlobalVar)->frameTime;
         }
-        i--;
-        p += 4;
-    } while (i >= 0);
-    return;
+    }
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0071_SetLayoutArrowWater", UpdateArrowWater);
 
 int getArrowWaterSize(char *a)
 {

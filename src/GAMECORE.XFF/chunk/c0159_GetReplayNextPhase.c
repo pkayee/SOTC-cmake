@@ -149,23 +149,19 @@ void func_400D5D48(void)
     }
 }
 
-/* NEARMISS-STUB func_400D5DC0 */
-#if 0 /* NEARMISS 99.6129% cat=regalloc sub=- | li/reg order: target loads 7 into a1 early, 1 into a0 late; ours swaps; store order matches | attempts=1 */
 extern s32 D_40131EAC;
 extern s32 ScriptSpriteMenuObjDef_SPRITE_REPLAY_MODE_OVER_ALERT;
 
 void func_400D5DC0(void)
 {
-    g_Replay.flags &= ~0x40;
     g_Replay.c = 1;
     g_Replay.b = 7;
+    g_Replay.flags &= ~0x40;
     if (D_40131EAC != 0) {
         D_40131EAC = 0;
         _SCRStartSpriteMenuAnim(ScriptSpriteMenuObjDef_SPRITE_REPLAY_MODE_OVER_ALERT, 0, 0, &D_40131EAC, 0, 0);
     }
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0159_GetReplayNextPhase", func_400D5DC0);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0159_GetReplayNextPhase", func_400D5E40);
 

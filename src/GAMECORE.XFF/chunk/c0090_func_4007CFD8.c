@@ -78,7 +78,21 @@ s32 func_4007D240(void *surface)
     return 1;
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0090_func_4007CFD8", func_4007D330);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0090_func_4007CFD8", func_4007D330);
+s32 arrowFilter(void *surface);
+
+s32 func_4007D330(void *surface)
+{
+    if (arrowFilter(surface) != 0)
+    {
+        if ((s32)(*GetCollisionDBAttributeAdr(surface) & 1) == 0)
+        {
+            return 1;
+        }
+        return 0;
+    }
+    return 0;
+}
 
 void func_4007D378(void) {
     u8 *g;
