@@ -15,11 +15,23 @@ int adpcmLoadStsFile(void *f, int unused, int size)
     return 0;
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0185_adpcmLoadStsFile", func_400E90B8);
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0185_adpcmLoadStsFile", func_400E90B8);
+
+extern s32 D_4012E020;
+
+void func_400E90B8(void)
+{
+    D_4012E020 = 1;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0185_adpcmLoadStsFile", func_400E90C8);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0185_adpcmLoadStsFile", func_400E90D8);
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0185_adpcmLoadStsFile", func_400E90D8);
+
+void func_400E90D8(void)
+{
+    D_4012E020 = 2;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0185_adpcmLoadStsFile", func_400E90E8);
 

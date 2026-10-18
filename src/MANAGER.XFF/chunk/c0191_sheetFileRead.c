@@ -42,7 +42,7 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0191_sheetFileRead", sheetFileL
 extern void sheetFsLoadRootSegment(void (*cb)(int a, int b), int);
 extern int D_401B53AC;
 extern int D_401B53B0;
-extern void func_400EE808(int a, int b);
+extern int func_400EE808(int a, int b, int c, int d);
 
 void sheetFileLoadRootSegment(int arg0, int arg1)
 {
@@ -97,11 +97,28 @@ int sheetfileInit(int a, int b, int c, int d)
     return sheetFsInit(a, b, c, d);
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0191_sheetFileRead", func_400EE7F0);
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0191_sheetFileRead", func_400EE7F0);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0191_sheetFileRead", func_400EE808);
+extern int func_400EDBC8();
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0191_sheetFileRead", func_400EE820);
+int func_400EE7F0(int a, int b, int c, int d)
+{
+    return func_400EDBC8(a, 1, c, d);
+}
+
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0191_sheetFileRead", func_400EE808);
+
+int func_400EE808(int a, int b, int c, int d)
+{
+    return func_400EDBC8(a, 1, c, d);
+}
+
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0191_sheetFileRead", func_400EE820);
+
+void func_400EE820(int a, int b)
+{
+    func_400EDBC8(a, 0);
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0191_sheetFileRead", func_400EE838);
 

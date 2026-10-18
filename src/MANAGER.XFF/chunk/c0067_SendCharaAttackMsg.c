@@ -72,7 +72,60 @@ int SendCharaAddMotionSyncStartMsg(void *actor, int arg)
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0067_SendCharaAttackMsg", SendCharaNodeParentSetMsg);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0067_SendCharaAttackMsg", func_40063078);
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0067_SendCharaAttackMsg", func_40063078);
+extern s32 DldSysUndefSymbol;
+extern void InitAnimationClass();
+extern void ResetAnimeFrameTableInfo(void *, s32, s32);
+
+void func_40063078(s32 obj, u8 *arg)
+{
+    u8 *q;
+    u8 *q2;
+    u32 word;
+    s32 *p;
+    s32 a;
+    s32 b;
+
+    InitAnimationClass(obj + 4);
+    q = arg + 0x48;
+    word = *(u32 *)q;
+    if ((word & 0x3FFFF) != 0)
+    {
+        p = *(s32 **)(q - (word & 0x3FFFF));
+    }
+    else
+    {
+        p = 0;
+    }
+    if (p != 0 && (s32)p != DldSysUndefSymbol)
+    {
+        a = p[4] + ((word >> 18) & 0xFFF) * ((s32 *)p[2])[3];
+    }
+    else
+    {
+        a = 0;
+    }
+    q2 = arg + 0x4C;
+    word = *(u32 *)q2;
+    if ((word & 0x3FFFF) != 0)
+    {
+        p = *(s32 **)(q2 - (word & 0x3FFFF));
+    }
+    else
+    {
+        p = 0;
+    }
+    if (p != 0 && (s32)p != DldSysUndefSymbol)
+    {
+        b = p[4] + ((word >> 18) & 0xFFF) * ((s32 *)p[2])[3];
+    }
+    else
+    {
+        b = 0;
+    }
+    ResetAnimeFrameTableInfo((void *)(obj + 0x34), a, b);
+    *(s32 *)(obj + 0x44) = 0;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0067_SendCharaAttackMsg", func_40063180);
 

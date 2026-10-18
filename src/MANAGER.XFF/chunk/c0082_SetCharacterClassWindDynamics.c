@@ -14,7 +14,17 @@ void charrootdyn_resetEdgeUpperPlaneInfoFlag(void *arg0)
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0082_SetCharacterClassWindDynamics", charrootdyn_setVColFindFlag);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0082_SetCharacterClassWindDynamics", charrootdyn_resetHColFindFlag);
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0082_SetCharacterClassWindDynamics", charrootdyn_resetHColFindFlag);
+
+extern void DeleteTwoWayLink(void *);
+
+void charrootdyn_resetHColFindFlag(char *p)
+{
+    if (*(int *)(p + 0xED0) != 0) {
+        *(int *)(p + 0xED0) = 0;
+        DeleteTwoWayLink(p + 0xF20);
+    }
+}
 
 extern void DeleteTwoWayLink(void *);
 
@@ -34,7 +44,14 @@ void charrootdyn_resetVColEdgeFindFlag(char *p)
     }
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0082_SetCharacterClassWindDynamics", charrootdyn_resetChainFindStatus);
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0082_SetCharacterClassWindDynamics", charrootdyn_resetChainFindStatus);
+void charrootdyn_resetChainFindStatus(char *p)
+{
+    if (*(int *)(p + 0xD14) != 0) {
+        *(int *)(p + 0xD14) = 0;
+        DeleteTwoWayLink(p + 0xD60);
+    }
+}
 
 void charrootdyn_resetkeepcolhitstatus(void *arg0)
 {
