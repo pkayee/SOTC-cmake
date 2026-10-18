@@ -35,17 +35,99 @@ void *getDamageEnableTargetLayoutClass(void *object)
     return found;
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0201__SetMultiCastLetterReceiverInfo", func_400F86C0);
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0201__SetMultiCastLetterReceiverInfo", func_400F86C0);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0201__SetMultiCastLetterReceiverInfo", GetDamageDefByName);
+s32 func_400F86C0(void *object)
+{
+    u8 *layout = GetScriptLayoutClass(object);
+
+    if (layout == NULL) {
+        return 1;
+    }
+    return *(s32 *)(layout + 0x2D0) != 0;
+}
+
+extern s32 DldSysUndefSymbol;
+s32 strcmp(const char *, const char *);
+
+/* dld link word: bits 0..17 = byte distance back to a slot holding the target (or DldSysUndefSymbol),
+   bits 18..29 = element index */
+static inline u8 *dldRef(u32 *lp, s32 fld) {
+    u8 *slot;
+    u32 off = *lp & 0x3FFFF;
+
+    slot = off ? *(u8 **)((u8 *)lp - off) : NULL;
+    return (slot != NULL && slot != (u8 *)DldSysUndefSymbol) ? *(u8 **)(slot + fld) : NULL;
+}
+
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0201__SetMultiCastLetterReceiverInfo", GetDamageDefByName);
+u8 *GetDamageDefByName(u32 *lp, const char *name) {
+    s32 n;
+    u8 *p;
+    s32 cnt = (s32)dldRef(lp, 0xC);
+
+    p = dldRef(lp, 0x10);
+    n = cnt - 1;
+    for (; n != -1; n--, p += 0x2C) {
+        if (strcmp(*(const char **)p, name) == 0) {
+            return p;
+        }
+    }
+    return NULL;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0201__SetMultiCastLetterReceiverInfo", GetAttributeRelationEffectDefByName);
 
+/* NEARMISS-STUB GetAnimationEffectDefByName */
+#if 0 /* NEARMISS 93.33% cat=regalloc sub=- | extra cnt copy to s1 and nop; loop guard order differs | attempts=1 */
+u8 *GetAnimationEffectDefByName(u32 *lp, const char *name) {
+    u8 *p;
+    s32 cnt = (s32)dldRef(lp, 0xC);
+
+    p = dldRef(lp, 0x10);
+    for (; cnt != 0; cnt--, p += 0x8) {
+        if (strcmp(*(const char **)(p + 0x4), name) == 0) {
+            return p;
+        }
+    }
+    return NULL;
+}
+#endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0201__SetMultiCastLetterReceiverInfo", GetAnimationEffectDefByName);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0201__SetMultiCastLetterReceiverInfo", GetCollisionDetectEffectWaterOnlyDefByName);
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0201__SetMultiCastLetterReceiverInfo", GetCollisionDetectEffectWaterOnlyDefByName);
+u8 *GetCollisionDetectEffectWaterOnlyDefByName(u32 *lp, const char *name) {
+    s32 i;
+    u8 *p;
+    s32 cnt = (s32)dldRef(lp, 0xC);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0201__SetMultiCastLetterReceiverInfo", GetAnimationFogDefByName);
+    if (cnt != 0) {
+        p = dldRef(lp, 0x10);
+        for (i = 0; i < cnt; i++, p += 0x8) {
+            if (strcmp(*(const char **)(p + 0x4), name) == 0) {
+                return p;
+            }
+        }
+    }
+    return NULL;
+}
+
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0201__SetMultiCastLetterReceiverInfo", GetAnimationFogDefByName);
+u8 *GetAnimationFogDefByName(u32 *lp, const char *name) {
+    s32 i;
+    u8 *p;
+    s32 cnt = (s32)dldRef(lp, 0xC);
+
+    if (cnt != 0) {
+        p = dldRef(lp, 0x10);
+        for (i = 0; i < cnt; i++, p += 0x8) {
+            if (strcmp(*(const char **)p, name) == 0) {
+                return p;
+            }
+        }
+    }
+    return NULL;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0201__SetMultiCastLetterReceiverInfo", func_400F8C58);
 

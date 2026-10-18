@@ -22,9 +22,18 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0128_DeleteScriptSpriteMenuObj"
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0128_DeleteScriptSpriteMenuObj", func_400A6AF8);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0128_DeleteScriptSpriteMenuObj", FlushScriptSpriteMenuObj);
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0128_DeleteScriptSpriteMenuObj", FlushScriptSpriteMenuObj);
+s32 FlushScriptSpriteMenuObj(void) {
+    return 0;
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0128_DeleteScriptSpriteMenuObj", func_400A6B98);
+void flushScriptObjImmediate();
+
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0128_DeleteScriptSpriteMenuObj", func_400A6B98);
+void func_400A6B98(void)
+{
+    flushScriptObjImmediate();
+}
 
 extern int D_4012B2A8;
 extern int MenuControlButtonContext_control_america;
@@ -88,7 +97,11 @@ void ExecScriptSpriteObj(void) {
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0128_DeleteScriptSpriteMenuObj", func_400A7260);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0128_DeleteScriptSpriteMenuObj", func_400A7360);
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0128_DeleteScriptSpriteMenuObj", func_400A7360);
+void func_400A7360(void)
+{
+    flushScriptObjImmediate();
+}
 
 char *GetSubLinkClass(unsigned char *p)
 {
