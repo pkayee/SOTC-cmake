@@ -32,6 +32,14 @@ INCLUDE_ASM("asm/MAPTOOL.XFF/nonmatchings/chunk/c0001_CreateMapWindow", func_400
 
 INCLUDE_ASM("asm/MAPTOOL.XFF/nonmatchings/chunk/c0001_CreateMapWindow", func_400146F8);
 
-INCLUDE_ASM("asm/MAPTOOL.XFF/nonmatchings/chunk/c0001_CreateMapWindow", func_40014738);
+//INCLUDE_ASM("asm/MAPTOOL.XFF/nonmatchings/chunk/c0001_CreateMapWindow", func_40014738);
+extern s32 D_40014870;
+extern s32 D_400148C8;
+
+void func_40014738(void)
+{
+    D_40014870 = 0;
+    D_400148C8 = 0;
+}
 
 INCLUDE_ASM("asm/MAPTOOL.XFF/nonmatchings/chunk/c0001_CreateMapWindow", func_40014750);

@@ -2,6 +2,13 @@
 
 s32 iosWaitDMA(void);
 
+/* NEARMISS-STUB iosSrpWaitDMA */
+#if 0 /* NEARMISS 83.33% cat=no-c-form sub=- | sync instruction has no C form; plain tail call scores 83.3 without it | attempts=1 */
+s32 iosSrpWaitDMA(void)
+{
+    return iosWaitDMA();
+}
+#endif
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/srp", iosSrpWaitDMA);
 
 /* NEARMISS-STUB iosMemToSprDmaAdrCopy */
