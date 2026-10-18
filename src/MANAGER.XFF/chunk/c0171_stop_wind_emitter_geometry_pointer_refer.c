@@ -1,20 +1,81 @@
 #include "common.h"
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0171_stop_wind_emitter_geometry_pointer_refer", stop_wind_emitter_geometry_pointer_reference);
+extern int *D_401AD640[];
+extern char D_4012BA68[];
+extern char D_401AD780[];
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0171_stop_wind_emitter_geometry_pointer_refer", stop_wind_emitter_callback);
+typedef struct {
+    int a;
+    int b;
+    int c;
+    int d;
+    int e;
+    void *data;
+} WindEffectData;
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0171_stop_wind_emitter_geometry_pointer_refer", end_wind_emitter);
+static inline int is_valid_emitter_id(unsigned int i)
+{
+    return i < 80;
+}
+
+int stop_wind_emitter_geometry_pointer_reference(unsigned int i)
+{
+    int *e = is_valid_emitter_id(i) == 1 ? D_401AD640[i] : 0;
+    if (e != 0) {
+        e[2] = 0;
+        if (e[0] == 2)
+            e[64] = 0;
+        return 1;
+    }
+    return 0;
+}
+
+int stop_wind_emitter_callback(unsigned int i)
+{
+    char *e = is_valid_emitter_id(i) == 1 ? (char *)D_401AD640[i] : 0;
+    if (e != 0) {
+        *(int *)(e + 0xF0) = 0;
+        return 1;
+    }
+    return 0;
+}
+
+int end_wind_emitter(unsigned int i)
+{
+    char *e = is_valid_emitter_id(i) == 1 ? (char *)D_401AD640[i] : 0;
+    if (e != 0) {
+        *(int *)(e + 0xA0) = 0;
+        return 1;
+    }
+    return 0;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0171_stop_wind_emitter_geometry_pointer_refer", GetWindVector);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0171_stop_wind_emitter_geometry_pointer_refer", constructor_wind_effect_data);
+void constructor_wind_effect_data(WindEffectData *w)
+{
+    w->a = 0;
+    w->b = 0;
+    w->c = 0;
+    w->d = 0;
+    w->e = 0;
+    w->data = D_4012BA68;
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0171_stop_wind_emitter_geometry_pointer_refer", is_ambient_directional_wind_emitter);
+int is_ambient_directional_wind_emitter(void *arg0)
+{
+    return (*(int *)((char *)((*(void **)((char *)(arg0) + 4))) + 4)) == 0;
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0171_stop_wind_emitter_geometry_pointer_refer", get_wind_emitter_direct);
+int get_wind_emitter_direct(int i)
+{
+    return ((int *)D_401AD640)[i];
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0171_stop_wind_emitter_geometry_pointer_refer", get_wind_effect_data_direct);
+int get_wind_effect_data_direct(int i)
+{
+    return ((int *)D_401AD780)[i];
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0171_stop_wind_emitter_geometry_pointer_refer", func_400D8598);
 
