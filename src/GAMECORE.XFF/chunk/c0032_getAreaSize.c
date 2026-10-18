@@ -59,9 +59,47 @@ void getStageNormalizePosition(float *pos, float *outX, float *outZ)
 
 extern u8 gcGlobalVar[];
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0032_getAreaSize", getCameraPosOnMap);
+typedef union {
+    s32 i;
+    float f;
+} Word;
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0032_getAreaSize", getSeamlessStageCenter);
+typedef struct {
+    char pad0[0x28];
+    Word columns;
+    Word rows;
+    char pad30[0x20];
+    float width;
+    float depth;
+} StageMap;
+
+void getCameraPosOnMap(float *x, float *z)
+{
+    StageMap *map = (StageMap *)D_40130F88;
+    float *cam = (float *)(gcGlobalVar + 0x340);
+
+    *x = -cam[0] * map->columns.i / map->width;
+    *z = -cam[2] * map->rows.i / map->depth;
+}
+
+typedef struct {
+    char pad[0x40];
+    float sx;
+    float sz;
+    char pad2[8];
+    float ox;
+    float oz;
+} StageGrid;
+
+void getSeamlessStageCenter(float *out, float *pos)
+{
+    StageGrid *grid = (StageGrid *)D_40130F88;
+    int ix = (-pos[0] - grid->ox) / grid->sx;
+    int iz = (-pos[2] - grid->oz) / grid->sz;
+
+    out[0] = -((float)ix * grid->sx + grid->sx * 0.5f + grid->ox);
+    out[2] = -((float)iz * grid->sz + grid->sz * 0.5f + grid->oz);
+}
 
 u8 *getSeamlessStageEnv(void)
 {
@@ -84,11 +122,49 @@ s32 GetLoadAreaGroupData(void)
 extern s32 rootPtn;
 void *iosMallocAlign(void *, s32, s32);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0032_getAreaSize", CreateLoadAreaGroupData);
+u8 *CreateLoadAreaGroupData(void)
+{
+    u8 *g = iosMallocAlign(&rootPtn, 0x24, 0x10);
+
+    *(s32 *)(g + 0x1C) = 0;
+    *(s32 *)(g + 0x4) = -1;
+    *(s32 *)(g + 0x8) = -1;
+    *(s32 *)(g + 0xC) = 0;
+    *(s32 *)(g + 0x10) = 0;
+    *(s32 *)(g + 0x20) = D_40130F58;
+    D_40130F58 = (s32)g;
+    return g;
+}
 
 void iosFree(void *p);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0032_getAreaSize", DeleteLoadAreaGroupData);
+typedef struct Grp {
+    char pad[0x20];
+    struct Grp *next;
+} Grp;
+
+void DeleteLoadAreaGroupData(Grp *g)
+{
+    Grp **h = (Grp **)&D_40130F58;
+    Grp *p = *h;
+
+    if (p == g)
+    {
+        *h = g->next;
+        iosFree(g);
+        return;
+    }
+    while (p != NULL)
+    {
+        if (p->next == g)
+        {
+            p->next = g->next;
+            iosFree(g);
+            break;
+        }
+        p = p->next;
+    }
+}
 
 extern s32 D_40130F74;
 
@@ -183,14 +259,73 @@ void PauseSeamlessStageManager(s32 param_1)
     }
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0032_getAreaSize", UnloadAllSeamlessStageObject);
+extern void func_400399A0(void);
+extern void *createScriptObj(void (*)(void), void *, int, int, int, int, int, int);
+extern int **isysGroupForFirst(void *, int);
+extern int **isysGroupForNext(void *, int);
+extern void isysGroupForExit(void *, int);
+extern void isysSleepSubThread(void);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0032_getAreaSize", getChipNo);
+void UnloadAllSeamlessStageObject(int arg)
+{
+    int req[2];
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0032_getAreaSize", getPosOnMap);
+    if (D_40130F90 == 0)
+        return;
+    req[1] = arg;
+    req[0] = 1;
+    createScriptObj(func_400399A0, req, *(int *)(gcGlobalVar + 0x308), 0x4000, 0, 1, 0, 0);
+    for (;;) {
+        int **g;
+        int n = 0;
+        int *last = 0;
+
+        for (g = isysGroupForFirst(&D_40130FF4, 0); g != 0; g = isysGroupForNext(g, 0)) {
+            last = *g;
+            n++;
+        }
+        if (last != 0)
+            isysGroupForExit(last, 0);
+        if (n == 0 && req[0] == 0)
+            break;
+        isysSleepSubThread();
+    }
+}
+
+typedef struct {
+    char pad[0x48];
+    int width;
+    int height;
+} MapSize;
+
+int getChipNo(int x, int y)
+{
+    if (x < 0 || x >= ((MapSize *)D_40130F88)->width || y < 0 || y >= ((MapSize *)D_40130F88)->height)
+        return -1;
+    return y * ((MapSize *)D_40130F88)->width + x;
+}
+
+void getPosOnMap(const float *position, float *x, float *z)
+{
+    StageMap *map = (StageMap *)D_40130F88;
+
+    *x = (-position[0] * (float)map->columns.i) / map->width;
+    *z = (-position[2] * (float)map->rows.i) / map->depth;
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0032_getAreaSize", getStageIDWithOffset);
 
 extern u8 *D_40130F90;
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0032_getAreaSize", getStageStatByChipNo);
+typedef struct {
+    s32 a;
+    s32 b;
+    s32 stat[4];
+} ChipStat;
+
+int getStageStatByChipNo(int chip, int k)
+{
+    if (chip != -1)
+        return ((ChipStat *)D_40130F90)[chip].stat[k] & 0xF;
+    return 7;
+}
