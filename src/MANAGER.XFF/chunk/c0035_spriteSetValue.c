@@ -31,9 +31,8 @@ void spriteSetTextureCoordinateST(char *p, float s, float t, float ds, float dt)
     *(float *)(p + 0x2C) = t + dt;
 }
 
-/* NEARMISS-STUB spriteSetTextureCoordinateSTFromUV */
-#if 0 /* NEARMISS 99.51% cat=regalloc sub=- | REA READY drop-in scored 99.51 in-TU (apply_ready) | attempts=1 */
-/* MANAGER c0035: texture size from p->tex(+0x0)->+0x20->+0x1C (log2 w at bits16-19, log2 h at 20-23); UV (+0.5 texel) -> ST */
+/* MANAGER c0035: texture size from p->tex(+0x0)->+0x20->+0x1C (log2 w at bits16-19, log2 h at 20-23); UV (+0.5 texel) -> ST.
+ * Use (u + du) * iw inline (named du = u + du temp gives swapped add.s operands). */
 void spriteSetTextureCoordinateSTFromUV(char *p, float u, float v, float du, float dv)
 {
     u32 sz = *(u32 *)(*(char **)(*(char **)p + 0x20) + 0x1C);
@@ -43,16 +42,12 @@ void spriteSetTextureCoordinateSTFromUV(char *p, float u, float v, float du, flo
     float ih = 1.0f / h;
     u += 0.5f;
     v += 0.5f;
-    du = du + u;
-    dv = dv + v;
     *(u64 *)(p + 0x68) |= 0x10;
     *(float *)(p + 0x20) = u * iw;
-    *(float *)(p + 0x28) = du * iw;
+    *(float *)(p + 0x28) = (u + du) * iw;
     *(float *)(p + 0x24) = v * ih;
-    *(float *)(p + 0x2C) = dv * ih;
+    *(float *)(p + 0x2C) = (v + dv) * ih;
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0035_spriteSetValue", spriteSetTextureCoordinateSTFromUV);
 
 /* MANAGER c0035: UV rect as ints at +0x10..+0x1C, raw size floats at +0x40/+0x44, flags +0x68 &= ~0x10 (order from 5040-perm search) */
 void spriteSetTextureCoordinateUV(char *p, float u, float v, float du, float dv)
@@ -85,19 +80,21 @@ void spriteSetRotation(void *arg0, float fparg0)
     (*(float *)((char *)(arg0) + 0x4C)) = fparg0;
 }
 
-/* NEARMISS-STUB spriteSetBlendMode */
-#if 0 /* NEARMISS 48.28% cat=regalloc sub=- | REA READY drop-in scored 48.28 in-TU (apply_ready) | attempts=1 */
-/* MANAGER c0035: +0x60 = a; flags u64 at +0x68: bits0-1 = b, bits2-3 = c (u32 args zero-extended: dsll32/dsrl32) */
+/* MANAGER c0035: +0x60 = a; flags u64 at +0x68: bits0-1 = b, bits2-3 = c (u32 args widened to u64: dsll32/dsrl32).
+ * The `t = (cc & 3) << 2` temp BEFORE the flag ops fixed the dsrl32 a3 scheduling (88.9 -> 100). */
 void spriteSetBlendMode(char *p, s32 a, u32 b, u32 c)
 {
+    u64 bb = b;
+    u64 cc = c;
     u64 f = *(u64 *)(p + 0x68);
-    f = (f & ~3) | (b & 3);
-    f = (f & ~0xC) | ((c & 3) << 2);
+    u64 t = (cc & 3) << 2;
+    f &= ~3;
+    f |= bb & 3;
+    f &= ~0xC;
+    f |= t;
     *(s32 *)(p + 0x60) = a;
     *(u64 *)(p + 0x68) = f;
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0035_spriteSetValue", spriteSetBlendMode);
 
 //INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0035_spriteSetValue", spriteSetIdentifier);
 void spriteSetIdentifier(u8 *sprite, s32 id)

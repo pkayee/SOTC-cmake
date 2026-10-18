@@ -2,6 +2,13 @@
 
 u64 *GetCollisionDBAttributeAdr(void *surface);
 
+/* GAMECORE c0045 PROVEN 100. arrow obj +0x94 = layout id; GetLayoutClass then tail call (non-void-less void wrapper, no return statement). */
+extern void UpdateLayoutClassPastGeometry();
+
+/* GAMECORE c0045 PROVEN 100. 0x50-byte stack surface buffer; clip, copy into dst, return 1/0. */
+extern s32 ClipCollisionVariableXZSurface();
+extern void CopyGeometryPointer();
+
 s32 arrowFilter(void *surface)
 {
     u64 attribute = *GetCollisionDBAttributeAdr(surface);
@@ -88,15 +95,32 @@ int getArrowObjParent(void *parent)
     return n;
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0045_arrowFilter", func_40048B50);
+/* GAMECORE c0045 PROVEN 100. arrow obj: set flag halfword +0xAA = 1. */
+void func_40048B50(u8 *p)
+{
+    *(s16 *)(p + 0xAA) = 1;
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0045_arrowFilter", func_40048B60);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0045_arrowFilter", func_40048C50);
+void func_40048C50(u8 *p)
+{
+    UpdateLayoutClassPastGeometry(GetLayoutClass(*(void **)(p + 0x94)));
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0045_arrowFilter", func_40048C70);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0045_arrowFilter", func_40048D08);
+s32 func_40048D08(void *dst)
+{
+    u8 buf[0x50];
+
+    if (ClipCollisionVariableXZSurface(buf) != 0)
+    {
+        CopyGeometryPointer(dst, buf);
+        return 1;
+    }
+    return 0;
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0045_arrowFilter", func_40048D48);
 

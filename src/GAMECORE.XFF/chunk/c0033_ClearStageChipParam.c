@@ -22,6 +22,28 @@ typedef struct
 extern StageMap D_40130F88;
 extern void iosFree(int);
 
+/* GAMECORE c0033 PROVEN 100. Stage-tex worker thread: sheetMgrStageTexLoad(D_40130F94, p[0], p[1], status[4]); poll status with (u32)(st[0]-0xDEAF) > 1 and isysSleepSubThread; then iosFree(p). iosFree is declared iosFree(int) in this TU. */
+extern s32 D_40130F94;
+extern void sheetMgrStageTexLoad();
+extern void isysSleepSubThread();
+
+/* GAMECORE c0033 PROVEN 100. Stage-tex worker thread: sheetMgrStageTexUnload(D_40130F94, p[0], p[1], status[4]); poll status with (u32)(st[0]-0xDEAF) > 1 and isysSleepSubThread; then iosFree(p). iosFree is declared iosFree(int) in this TU. */
+extern s32 D_40130F94;
+extern void sheetMgrStageTexUnload();
+
+/* GAMECORE c0033 PROVEN 100. Walks the D_4013101C list (next at +0x18), per live node calls func_40034A00(n[2],n[0],n[1]) and scrRun every p[1] nodes (signed % with trap); then *p = 0. */
+extern int func_40033BD0(void *);
+extern void func_40034A00(int, int, int);
+extern void *D_4013101C;
+extern void scrRun();
+
+/* GAMECORE c0033 PROVEN 100. Slow-object group teardown. KEY: the cleared flag word and the callback arg are accessed through union {u64 q; s32 w;} so gcc cannot hoist lw 0x1c(g) above the ld/and/sd (plain u64 and s32 pointers: 90 percent). Clears bit 0x10 of the 64-bit word at layout+0x144 ptr +0x280. */
+extern int GetLayoutClass();
+extern void _isysDeleteGroup();
+extern void iosMallocSetExecGarbageCallback();
+extern void isysRequestDeleteObj();
+typedef union { u64 q; s32 w; } UQ;
+
 void ClearStageChipParam(int x, int y, int v)
 {
     StageMap *m = &D_40130F88;
@@ -51,9 +73,29 @@ void getStageChipIDFloat(const float *position, float *x, float *z)
     *z = (-position[2] - view->offset_z) / view->scale_z;
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0033_ClearStageChipParam", func_40039560);
+void func_40039560(s32 *p)
+{
+    s32 st[4];
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0033_ClearStageChipParam", func_400395E8);
+    sheetMgrStageTexLoad(D_40130F94, p[0], p[1], st);
+    while ((u32)(st[0] - 0xDEAF) > 1)
+    {
+        isysSleepSubThread();
+    }
+    iosFree((int)p);
+}
+
+void func_400395E8(s32 *p)
+{
+    s32 st[4];
+
+    sheetMgrStageTexUnload(D_40130F94, p[0], p[1], st);
+    while ((u32)(st[0] - 0xDEAF) > 1)
+    {
+        isysSleepSubThread();
+    }
+    iosFree((int)p);
+}
 
 extern char D_40130FF4[];
 extern int *isysGroupForFirst(void *, int);
@@ -122,7 +164,23 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0033_ClearStageChipParam", unl
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0033_ClearStageChipParam", WaitUnloadSeamlessStageObject);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0033_ClearStageChipParam", func_400399A0);
+void func_400399A0(s32 *p)
+{
+    s32 *n;
+    s32 cnt = 0;
+
+    for (n = D_4013101C; n != 0; n = (s32 *)n[6])
+    {
+        if (func_40033BD0(n) != 0)
+        {
+            cnt++;
+            func_40034A00(n[2], n[0], n[1]);
+            if (cnt % p[1] == 0)
+                scrRun();
+        }
+    }
+    *p = 0;
+}
 
 typedef struct
 {
@@ -171,7 +229,17 @@ void deleteStageAlignParam(void)
     }
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0033_ClearStageChipParam", func_40039AD0);
+void func_40039AD0(void *obj)
+{
+    s32 c = GetLayoutClass();
+    s32 g = **(s32 **)(c + 0x144);
+
+    _isysDeleteGroup(g, D_40130FF4, 0);
+    ((UQ *)(*(s32 *)(c + 0x144) + 0x280))->q &= ~0x10ULL;
+    iosMallocSetExecGarbageCallback(((UQ *)(g + 0x1C))->w, -1, 0);
+    isysRequestDeleteObj(g);
+    isysRequestDeleteObj(obj);
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0033_ClearStageChipParam", initSlowObject);
 

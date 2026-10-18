@@ -4,6 +4,14 @@ extern void constructor_double_spring_interp_cntrl(void *, float);
 extern void GAMEUTIL_constructor_col_plane_info_filter(void *);
 extern void func_400E1C58(void *);
 
+/* GAMECORE c0173: forwards to the water-surface collision check with the riding obj of (a3+0x240) and flag 1 (tail call). Arg types unsure. */
+extern void *CAM_get_target_riding_obj(void *);
+extern int player_collision_check_direct_water_surface_plus(void *, void *, void *, void *, void *, int);
+
+/* GAMECORE c0173: camera distance scale: 1.0, 2.0 when the target rides a horse, +0.5 when mode == 1. */
+extern void *CAM_get_target_obj(void *);
+extern void *GAMEUTIL_get_riding_horse_object(void *);
+
 void CAM_reset_slope_cntrl(char *c)
 {
     constructor_double_spring_interp_cntrl(c, 0.0001f);
@@ -38,11 +46,41 @@ f32 func_400E2940(void)
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0173_CAM_reset_slope_cntrl", func_400E2980);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0173_CAM_reset_slope_cntrl", func_400E29E0);
+int func_400E29E0(void *a, void *b, void *c, char *d, void *e)
+{
+    return player_collision_check_direct_water_surface_plus(a, b, c, e, CAM_get_target_riding_obj(d + 0x240), 1);
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0173_CAM_reset_slope_cntrl", func_400E2A48);
+/* GAMECORE c0173: max(a - b, 0) * c (f12,f13,f14) */
+float func_400E2A48(float a, float b, float c)
+{
+    float d = a - b;
+    if (d < 0.0f) {
+        d = 0.0f;
+    }
+    return c * d;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0173_CAM_reset_slope_cntrl", func_400E2A68);
+/* GAMECORE c0173: snap b to the grid of step c anchored by a (round-half-down of a/c), then wrap (b - t)/c.
+ * the `float r = b; if (c != 0) body; return r;` form matches (early `return b` form = 98.3, f2/f1 regalloc swap). */
+float func_400E2A68(float a, float b, float c)
+{
+    float r = b;
+    float q;
+    int i;
+    float t;
+    if (c != 0.0f) {
+        q = a / c;
+        i = (int)q;
+        if (q - (float)i <= 0.5f) {
+            t = c * (float)i;
+        } else {
+            t = c * (float)(i + 1);
+        }
+        r = t + (float)(int)((b - t) / c) * c;
+    }
+    return r;
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0173_CAM_reset_slope_cntrl", doit_camera_target_approach);
 
@@ -112,6 +150,16 @@ int get_status_camera_target_approach(int a, int b, int c, int d)
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0173_CAM_reset_slope_cntrl", func_400E2FD8);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0173_CAM_reset_slope_cntrl", func_400E3108);
+float func_400E3108(void *c, int mode)
+{
+    float r = 1.0f;
+    if (GAMEUTIL_get_riding_horse_object(CAM_get_target_obj(c)) != 0) {
+        r = 2.0f;
+    }
+    if (mode == 1) {
+        r += 0.5f;
+    }
+    return r;
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0173_CAM_reset_slope_cntrl", doit_camera_target_lost_angle);
