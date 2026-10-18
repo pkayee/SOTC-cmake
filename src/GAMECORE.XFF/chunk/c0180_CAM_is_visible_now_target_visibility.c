@@ -10,23 +10,45 @@ s32 CAM_is_return_cam_posi_target_visibility(void *param)
     return *(s32*)((u8*)param + 0x130);
 }
 
-/* NEARMISS-STUB CAM_init_camera_warp_cntrl */
-#if 0 /* NEARMISS 99.86% cat=sched sub=- | float store order: compiler emits swc1 0x14 before sw 0xC; expected ld ra between sw a1 and swc1 0x18 | attempts=1 */
+void CAM_reset_camera_warp_cntrl(void *param);
+
 void CAM_init_camera_warp_cntrl(void *param, s32 a1, s32 a2, s32 a3)
 {
     *(s32*)((u8*)param + 0x0) = a1;
-    *(f32*)((u8*)param + 0x18) = 0x1.657182p-4f;
+    *(f32*)((u8*)param + 0x14) = 0x1.657182p-4f;
     *(s32*)((u8*)param + 0xC) = a2;
     *(s32*)((u8*)param + 0x1C) = a3;
-    *(f32*)((u8*)param + 0x14) = 0x1.657182p-4f;
+    *(f32*)((u8*)param + 0x18) = 0x1.657182p-4f;
     CAM_reset_camera_warp_cntrl(param);
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0180_CAM_is_visible_now_target_visibility", CAM_init_camera_warp_cntrl);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0180_CAM_is_visible_now_target_visibility", CAM_reset_camera_warp_cntrl);
+extern const f32 D_40137220;
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0180_CAM_is_visible_now_target_visibility", CAM_doit_camera_warp_cntrl);
+void CAM_reset_camera_warp_cntrl(void *param)
+{
+    *(s32*)((u8*)param + 0x4) = 0;
+    *(s32*)((u8*)param + 0x8) = 0;
+    *(s32*)((u8*)param + 0x10) = 0;
+    *(s32*)((u8*)param + 0x20) = 0;
+    *(s32*)((u8*)param + 0x24) = 0;
+    *(s32*)((u8*)param + 0x28) = 0;
+    *(s32*)((u8*)param + 0x2C) = 0;
+    *(f32*)((u8*)param + 0x30) = *(f32*)((u8*)param + 0x34) = *(f32*)((u8*)param + 0x38) = D_40137220;
+    *(f32*)((u8*)param + 0x3C) = 1.0f;
+}
+
+void func_400EA298(void *, void *);
+void func_400EA350(void *, void *, float);
+void func_400EA3B8(void *, void *, float, float, float);
+void func_400EA4A8(void *, void *, float, float);
+
+void CAM_doit_camera_warp_cntrl(void *a, void *b, float p, float q, float r, float t)
+{
+    func_400EA298(a, b);
+    func_400EA350(a, b, t);
+    func_400EA3B8(a, b, p, q, t);
+    func_400EA4A8(a, b, r, t);
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0180_CAM_is_visible_now_target_visibility", CAM_act_warp_camera_warp_cntrl);
 
@@ -67,7 +89,15 @@ void CAM_reset_obstacle_avoid_cntrl(s32 *param)
     param[4] = 0;
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0180_CAM_is_visible_now_target_visibility", CAM_is_need_obstacle_avoid_ofst);
+int get_game_camera_cur_mode(void);
+
+int CAM_is_need_obstacle_avoid_ofst(char *p)
+{
+    int mode = get_game_camera_cur_mode();
+    if (mode == 1 && *(int *)(*(char **)(p + 0x2D24) + 0xA8) == mode && *(int *)(p + 0x2BA8) == *(int *)(*(char **)(p + 0x2D24) + 0xA8))
+        return 1;
+    return 0;
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0180_CAM_is_visible_now_target_visibility", CAM_act_avoid_rot_obstacle_avoid_cntrl);
 
@@ -76,8 +106,6 @@ s32 CAM_is_use_obstacle_target_ofst_interp_coe(f32 a, f32 b)
     return a < b;
 }
 
-/* NEARMISS-STUB CAM_constructor_base_look_at */
-#if 0 /* NEARMISS 86.25% cat=float-ops sub=- | zero float stores emitted as sw $zero not mtc1+swc1; store order of lq/sq vs swc1 differs | attempts=1 */
 extern u128 ZeroPoint;
 extern u128 ZeroVector;
 
@@ -87,21 +115,60 @@ void CAM_constructor_base_look_at(void *param)
     *(u128*)((u8*)param + 0x10) = ZeroPoint;
     *(u128*)((u8*)param + 0x20) = ZeroVector;
     *(u128*)((u8*)param + 0x30) = ZeroVector;
-    *(f32*)((u8*)param + 0x40) = 0.0f;
-    *(f32*)((u8*)param + 0x44) = 0.0f;
+    *(f32*)((u8*)param + 0x40) = *(f32*)((u8*)param + 0x44) = 0.0f;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0180_CAM_is_visible_now_target_visibility", CAM_constructor_base_look_at);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0180_CAM_is_visible_now_target_visibility", CAM_doit_base_look_at);
+int is_reset_or_lws_movie_or_cutout_game_camera(void *);
+void func_400E6D98(void *, void *, int, float);
+void func_400EA690(void *, void *, void *);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0180_CAM_is_visible_now_target_visibility", CAM_constructor_look_at_spring);
+void CAM_doit_base_look_at(void *a, void *b, void *cam, void *d, float t)
+{
+    func_400E6D98(a, b, is_reset_or_lws_movie_or_cutout_game_camera(cam), t);
+    func_400EA690(a, b, d);
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0180_CAM_is_visible_now_target_visibility", CAM_doit_look_at_spring);
+typedef struct { f32 f[4]; } __attribute__((aligned(8))) V4;
+extern V4 D_40137210;
+void constructor_double_spring_interp_cntrl3D(char *, float, float);
+void reset_double_spring_interp_cntrl3D(char *, V4 *);
+
+void CAM_constructor_look_at_spring(char *c)
+{
+    V4 v = D_40137210;
+    constructor_double_spring_interp_cntrl3D(c, 0x1.0624DCp-10f, 0.0f);
+    constructor_double_spring_interp_cntrl3D(c + 0x40, 0x1.0624DCp-10f, 0.0f);
+    reset_double_spring_interp_cntrl3D(c + 0x40, &v);
+}
+
+void func_400EA790(void *, int *, int, int, float);
+void func_400EA848(void *, int *, int, float);
+
+void CAM_doit_look_at_spring(void *a, int *b, void *c, float f)
+{
+    int r = is_reset_or_lws_movie_or_cutout_game_camera(c);
+    func_400EA790(a, b, *b, r, f);
+    func_400EA848(a, b, r, f);
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0180_CAM_is_visible_now_target_visibility", CAM_reset_mode_ratio_follow_rot);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0180_CAM_is_visible_now_target_visibility", CAM_doit_follow_rot);
+extern float func_400EA9A8(char *, float);
+extern float func_400EA9C8(char *, void *, float);
+extern float func_400EA9F0(char *, void *, float);
+extern float func_400EAA20(void *, void *);
+extern void func_400E70B0(char *, void *, float);
+extern void func_400E7220(char *, void *, void *, float);
+
+void CAM_doit_follow_rot(char *c, void *b, void *d, float t)
+{
+    *(float *)(c + 0x1A0) = func_400EA9A8(c, t);
+    *(float *)(c + 0x1A4) = func_400EA9C8(c, d, t);
+    *(float *)(c + 0x1A8) = func_400EA9F0(c, b, t);
+    *(float *)(c + 0x1AC) = func_400EAA20(b, d);
+    func_400E70B0(c, b, t);
+    func_400E7220(c, b, d, t);
+}
 
 f32 func_400E9498(f32 a, f32 b)
 {
