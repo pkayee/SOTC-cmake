@@ -262,22 +262,23 @@ static inline int is_boss(void *actor)
     return boss_get_character_type(actor) == 4;
 }
 
-/* Reading p through a pointer (found by the permuter) keeps the inlined null
-   check inside the loop, as in the original. */
-int GAMEUTIL_is_boss_obj(void *actor, int parents)
+/* NEARMISS-STUB GAMEUTIL_is_boss_obj */
+#if 0 /* NEARMISS 80.9% cat=regalloc sub=- | rule-13 reject: 100 only with permuter alias void **pp=&p (null check kept in loop); plain form 80.85 | attempts=3 */
+s32 GAMEUTIL_is_boss_obj(s32 obj, s32 recursive)
 {
-    void *p;
-
-    if (parents == 0)
-        return is_boss(actor);
-    for (p = actor; p != 0; p = GAMEUTIL_get_parent_object(p)) {
-        void **pp = &p;
-
-        if (boss_get_character_type(*pp) == 4)
+    if (recursive == 0) {
+        return GetObjKind(obj) == 4;
+    }
+    while (obj != 0) {
+        if (GetObjKind(obj) == 4) {
             return 1;
+        }
+        obj = GAMEUTIL_get_parent_object(obj);
     }
     return 0;
 }
+#endif
+INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0007_GAMEUTIL_get_weapon_release_position_of_", GAMEUTIL_is_boss_obj);
 
 s32 GAMEUTIL_get_parent_collision_attribute(u64 *attr, void *obj);
 

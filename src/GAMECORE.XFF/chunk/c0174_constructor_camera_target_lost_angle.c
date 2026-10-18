@@ -5,12 +5,9 @@ extern u128 ZeroPoint;
 
 void constructor_camera_target_lost_angle(void *param)
 {
-    f32 zero = 0.0f;
-
     *(s32*)((u8*)param + 0x0) = 0;
     *(u128*)((u8*)param + 0x10) = ZUnitVector;
-    *(f32*)((u8*)param + 0x24) = zero;
-    *(f32*)((u8*)param + 0x20) = zero;
+    *(f32*)((u8*)param + 0x20) = *(f32*)((u8*)param + 0x24) = 0.0f;
     *(u128*)((u8*)param + 0x30) = ZeroPoint;
 }
 
