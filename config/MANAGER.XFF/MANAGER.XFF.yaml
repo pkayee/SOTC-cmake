@@ -252,14 +252,14 @@ segments:
         - [ 0xed158, c, chunk/c0206_func_400FD158 ]
         - [ 0xede40, c, chunk/c0207_playPss ]
         - [ 0xef368, c, chunk/c0208_srand ]
-        - [ 0xf0160, c, chunk/c0209_sceMpegInit ]
-        - [ 0xf1228, c, chunk/c0210__sceMpegFlush ]
-        - [ 0xf1e30, c, chunk/c0211_func_40101E30 ]
-        - [ 0xf4450, c, chunk/c0212_sceMpegDemuxPssRing ]
-        - [ 0xf5dc8, c, chunk/c0213__sceMpegPictureData0 ]
-        - [ 0xf6e58, c, chunk/c0214__sceMpegMbAddressIncrement ]
-        - [ 0xf8688, c, chunk/c0215__sceMpegSliceA0 ]
-        - [ 0xf9638, c, chunk/c0216__sceMpegNextHeader ]
+        - [ 0xf0160, c, chunk/c0209_sceMpegInit, "-O2 cc=ee-gcc2.9-991111" ]
+        - [ 0xf1228, c, chunk/c0210__sceMpegFlush, "-O2 cc=ee-gcc2.9-991111" ]
+        - [ 0xf1e30, c, chunk/c0211_func_40101E30, "-O2 cc=ee-gcc2.9-991111" ]
+        - [ 0xf4450, c, chunk/c0212_sceMpegDemuxPssRing, "-O2 cc=ee-gcc2.9-991111" ]
+        - [ 0xf5dc8, c, chunk/c0213__sceMpegPictureData0, "-O2 cc=ee-gcc2.9-991111" ]
+        - [ 0xf6e58, c, chunk/c0214__sceMpegMbAddressIncrement, "-O2 cc=ee-gcc2.9-991111" ]
+        - [ 0xf8688, c, chunk/c0215__sceMpegSliceA0, "-O2 cc=ee-gcc2.9-991111" ]
+        - [ 0xf9638, c, chunk/c0216__sceMpegNextHeader, "-O2 cc=ee-gcc2.9-991111" ]
         - { type: bss, vram: 0x401aa940, name: bss, size: 0x1b300 }
     - name: vutext
       type: textbin
