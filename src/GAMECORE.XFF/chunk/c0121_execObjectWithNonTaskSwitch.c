@@ -108,15 +108,17 @@ int AddDefaultAIGroup(int a, int b, int c, int d)
     return isysAddGroupWithLinkParam(a, (int)D_40216E08, 0, 0);
 }
 
-/* NEARMISS-STUB initdefaultaitask */
-#if 0 /* NEARMISS 99.0% cat=rodata-const sub=- | in-TU: hi16 reloc carries D_40135D48+0xcf0 addend in exp, ours also on lo16 | attempts=1 */
-void *initdefaultaitask(void)
+extern char D_40135D48[];
+extern char rootPtn[];
+extern void isysInitGroup();
+extern s32 gcCreateScriptObj();
+void func_400A58C0();
+
+s32 initdefaultaitask(void)
 {
     isysInitGroup(D_40216E08);
-    return gcCreateScriptObj(func_400A58C0, 0, rootPtn, 0x1000, 0, 4, D_40135D48 + 0xcf0);
+    return gcCreateScriptObj(func_400A58C0, 0, rootPtn, 0x1000, 0, 4, D_40135D48);
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0121_execObjectWithNonTaskSwitch", initdefaultaitask);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0121_execObjectWithNonTaskSwitch", _initstage);
 

@@ -230,20 +230,14 @@ void setAttainRangeStruct(u8* work, u64* src)
     *(u64*)(work + 0x3D8) = src[3];
 }
 
-/* NEARMISS-STUB setTmpBasePos */
-#if 0 /* NEARMISS 90.36% cat=regalloc sub=- | regalloc | attempts=1 */
-u8* GetLayoutClass(void* chara);
-
+typedef union { u128 q; f32 f[4]; } TmpQVec;
 void setTmpBasePos(u8* work, u8* dst)
 {
     u8* layout = GetLayoutClass(work);
-    s32 neg = -1;
-    u128* src = *(u128**)(layout + 0x134);
-    *(u128*)(dst + 0x50) = *src;
-    *(s32*)(dst + 0x40) = neg;
+    u128 pos = (*(TmpQVec**)(layout + 0x134))->q;
+    *(s32*)(dst + 0x40) = -1;
+    ((TmpQVec*)(dst + 0x50))->q = pos;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0198_delISysPathObj", setTmpBasePos);
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0198_delISysPathObj", setCreateTempAttain);
 void setCreateTempAttain(u8* work, s32 value)
@@ -251,13 +245,11 @@ void setCreateTempAttain(u8* work, s32 value)
     *(s32*)(work + 0x3F4) = value;
 }
 
-/* NEARMISS-STUB setAttainmentPos */
-#if 0 /* NEARMISS 91.5% cat=sched sub=- | sched (store order) | attempts=1 */
 void DeleteTwoWayLink();
 
-void setAttainmentPos(u8* work, u128* pos)
+void setAttainmentPos(u8* work, TmpQVec* pos)
 {
-    *(u128*)(work + 0x60) = *pos;
+    ((TmpQVec*)(work + 0x60))->q = pos->q;
     *(s32*)(work + 0x90) = 1;
     *(f32*)(work + 0x6C) = 1.0f;
     if (*(s32*)(work + 0xA4) != 0)
@@ -265,25 +257,20 @@ void setAttainmentPos(u8* work, u128* pos)
         *(s32*)(work + 0xA4) = 0;
         DeleteTwoWayLink(work + 0x98);
     }
-    *(s32*)(work + 0xAC) = 0;
     *(s32*)(work + 0x94) = 0;
     *(s32*)(work + 0x3F0) = 0;
     *(s32*)(work + 0xA8) = 0;
+    *(s32*)(work + 0xAC) = 0;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0198_delISysPathObj", setAttainmentPos);
+
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0198_delISysPathObj", setAttainmentObj);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0198_delISysPathObj", setAttainmentPosAndDirPos);
 
-/* NEARMISS-STUB setAttainmentPosAndDir */
-#if 0 /* NEARMISS 80.7% cat=sched sub=- | sched | attempts=1 */
-void DeleteTwoWayLink();
-
-void setAttainmentPosAndDir(u8* work, u128* pos, u128* dir)
+void setAttainmentPosAndDir(u8* work, TmpQVec* pos, TmpQVec* dir)
 {
-    *(u128*)(work + 0x60) = *pos;
+    ((TmpQVec*)(work + 0x60))->q = pos->q;
     *(s32*)(work + 0x90) = 1;
     *(f32*)(work + 0x6C) = 1.0f;
     if (*(s32*)(work + 0xA4) != 0)
@@ -295,20 +282,14 @@ void setAttainmentPosAndDir(u8* work, u128* pos, u128* dir)
     *(s32*)(work + 0x94) = 0;
     *(s32*)(work + 0x3F0) = 0;
     *(s32*)(work + 0xAC) = 0;
-    *(u128*)(work + 0xC0) = *(u128*)(work + 0xB0);
+    ((TmpQVec*)(work + 0xC0))->q = ((TmpQVec*)(work + 0xB0))->q;
+    ((TmpQVec*)(work + 0xB0))->q = dir->q;
     *(s32*)(work + 0xA8) = 1;
-    *(u128*)(work + 0xB0) = *dir;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0198_delISysPathObj", setAttainmentPosAndDir);
 
-/* NEARMISS-STUB setAttainmentPosAndDirAndLock */
-#if 0 /* NEARMISS 78.3% cat=sched sub=- | sched | attempts=1 */
-void DeleteTwoWayLink();
-
-void setAttainmentPosAndDirAndLock(u8* work, u128* pos, u128* dir)
+void setAttainmentPosAndDirAndLock(u8* work, TmpQVec* pos, TmpQVec* dir)
 {
-    *(u128*)(work + 0x60) = *pos;
+    ((TmpQVec*)(work + 0x60))->q = pos->q;
     *(s32*)(work + 0x90) = 1;
     *(f32*)(work + 0x6C) = 1.0f;
     if (*(s32*)(work + 0xA4) != 0)
@@ -320,13 +301,12 @@ void setAttainmentPosAndDirAndLock(u8* work, u128* pos, u128* dir)
     *(s32*)(work + 0xAC) = 0;
     *(s32*)(work + 0x94) = 0;
     *(s32*)(work + 0x3F0) = 0;
-    *(u128*)(work + 0xC0) = *(u128*)(work + 0xB0);
+    ((TmpQVec*)(work + 0xC0))->q = ((TmpQVec*)(work + 0xB0))->q;
+    ((TmpQVec*)(work + 0xB0))->q = dir->q;
+    *(s32*)(work + 0xA8) = 1;
     *(s32*)(work + 0xAC) = 1;
-    *(s32*)(work + 0xA8) = 1;
-    *(u128*)(work + 0xB0) = *dir;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0198_delISysPathObj", setAttainmentPosAndDirAndLock);
+
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0198_delISysPathObj", setAttainmentObjAndDir);
 

@@ -375,22 +375,15 @@ void SCRFuncBuddhaMissileInit(void *actor)
 }
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0054_getBossPartsLifeRatio", SCRFuncBuddhaMissileMain);
-/* NEARMISS-STUB SCRFuncBuddhaMissileInit2 */
-#if 0 /* NEARMISS 100.0% cat=cse-hoist sub=- | in-TU: 100 only with dummy alias src=&D_401333F0; plain forms 71.4% (load not hoisted above stores). REVIEW rule13 | attempts=1 */
-extern f32 D_401333F0;
+extern const f32 D_401333F0;
 
 void SCRFuncBuddhaMissileInit2(void *actor)
 {
     char *w = (char *)GetSCRCharaAIWorkPtr(actor);
-    float *speed = (float *)(w + 0x4194);
-    float *src;
-
     *(int *)(w + 0x419C) = 1;
-    *speed = *(src = &D_401333F0);
+    *(float *)(w + 0x4194) = D_401333F0;
     *(int *)(w + 0x4198) = 0;
     *(int *)(w + 0x41A0) = 0;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0054_getBossPartsLifeRatio", SCRFuncBuddhaMissileInit2);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0054_getBossPartsLifeRatio", SCRFuncBuddhaMissileMain2);

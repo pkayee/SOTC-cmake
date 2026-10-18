@@ -4,7 +4,7 @@ extern s32 D_4012AF14;
 extern s32 D_4012AF18;
 
 void *GetCharacterClass(void *obj);
-void ForceAcceptMotion(void *obj);
+void ForceAcceptMotion();
 void InitAnimationClass(void *anim, void *param);
 void ResetCharacterClassAnimeFrameTableInfo(void *obj);
 
@@ -167,16 +167,13 @@ void RequestCharacterClassWindForceMove(void *obj)
     *(s8 *)((u8 *)obj + 0xC15) = 1;
 }
 
-/* NEARMISS-STUB ResetCharacterClassMotionShiftInfo */
-#if 0 /* NEARMISS 97.7% cat=regalloc sub=- | s0/s1 swapped (a1 vs obj) | attempts=1 */
 void ResetCharacterClassMotionShiftInfo(void *obj, void *param)
 {
-    ForceAcceptMotion(obj);
+    /* the original calls it with no argument: the asm never reloads a0 before this jal */
+    ForceAcceptMotion();
     InitAnimationClass((u8 *)obj + 0x1C0, param);
     ResetCharacterClassAnimeFrameTableInfo(obj);
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0071_OptimizeMotionOrient", ResetCharacterClassMotionShiftInfo);
 
 s32 CallMotShiftCallBackElemLeaveFunc(void *list, s32 id, void *ctx);
 

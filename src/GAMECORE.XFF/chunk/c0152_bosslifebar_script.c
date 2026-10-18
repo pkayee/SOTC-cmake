@@ -48,8 +48,6 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0152_bosslifebar_script", star
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0152_bosslifebar_script", startGaugeMaxAddEffect);
 
-/* NEARMISS-STUB startAttackEffect */
-#if 0 /* NEARMISS 99.0% cat=sched sub=- | in-TU: store order differs (target C,0,8,10,4; ours 4,0,C,10,8) | attempts=1 */
 extern u8 gcGlobalVar[];
 
 typedef struct StartAttackEffectWork {
@@ -65,13 +63,12 @@ extern StartAttackEffectWork D_402182C8;
 void startAttackEffect(f32 arg0)
 {
     D_402182C8.unk0 = 1;
-    D_402182C8.unkC = arg0;
+    D_402182C8.unk4 = 0.5f;
     D_402182C8.unk8 = 0.5f;
     D_402182C8.unk10 = *(f32 *)(gcGlobalVar + 0x178);
-    D_402182C8.unk4 = 0.5f;
+    D_402182C8.unkC = arg0;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0152_bosslifebar_script", startAttackEffect);
+
 
 extern u8 gcGlobalVar[];
 extern s32 D_40131C54;
