@@ -14,7 +14,23 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0081_ResetCharacterObjGeoDynami
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0081_ResetCharacterObjGeoDynamics", charrootdyn_findLocalYGeometryPoint);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0081_ResetCharacterObjGeoDynamics", charrootdyn_findGlobalYGeometryPoint);
+typedef union
+{
+    s128 q;
+    float f[4];
+    int i[4];
+} Vec4;
+
+extern void ClipCollisionFinder(void *, Vec4 *, Vec4 *);
+
+void charrootdyn_findGlobalYGeometryPoint(void *a, void *unused, Vec4 *p, float y)
+{
+    Vec4 t;
+
+    t.q = p->q;
+    t.f[1] += y;
+    ClipCollisionFinder(a, p, &t);
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0081_ResetCharacterObjGeoDynamics", charrootdyn_checkIYplane4D);
 

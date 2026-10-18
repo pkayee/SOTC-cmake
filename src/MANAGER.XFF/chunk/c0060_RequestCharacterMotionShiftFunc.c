@@ -48,22 +48,19 @@ void GetCharacterClassNodeQuaternionPos(s32 *param_1, s32 *param_2, s32 param_3,
 }
 #endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0060_RequestCharacterMotionShiftFunc", GetCharacterClassNodeQuaternionPos);
-/* NEARMISS-STUB CalcCharacterClassBaseGeo */
-#if 0 /* NEARMISS 99.55% cat=regalloc sub=- | const 1 in v1 not v0 at sb 0x523 | attempts=2 */
+extern void GetMotionMatrix(s32, s32, s32, s32, u8 *, u8 *);
 
 s32 CalcCharacterClassBaseGeo(u8 *obj)
 {
-    s8 n = *(s8 *)(obj + 0x523);
+    s32 r = *(s8 *)(obj + 0x523);
 
-    if (n == 0)
+    if (r == 0)
     {
         GetMotionMatrix(*(s32 *)(obj + 0x340), *(s32 *)(obj + 0x344), *(s32 *)(obj + 0x354), *(s32 *)(obj + 0x33C), obj + 0x40, obj + 0x90);
-        *(s8 *)(obj + 0x523) = 1;
+        obj[0x523] = 1;
     }
-    return n;
+    return r;
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0060_RequestCharacterMotionShiftFunc", CalcCharacterClassBaseGeo);
 
 
 

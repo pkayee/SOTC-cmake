@@ -8,7 +8,18 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0178_func_400E0058", func_400E0
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0178_func_400E0058", createSheetMenu);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0178_func_400E0058", cursorLockParamMenu);
+void cursorLockParamMenu(void *arg0, int arg1) {
+    void *temp_a0;
+    void *temp_a1;
+
+    if (arg0 != NULL) {
+        temp_a0 = (*(void **)((char *)(arg0) + 0x2C));
+        if (temp_a0 != NULL) {
+            temp_a1 = (*(void **)((char *)(temp_a0) + 4));
+            (*(long *)((char *)(temp_a1) + 0x1B8)) = (long) (((*(long *)((char *)(temp_a1) + 0x1B8)) & ~0x80) | ((arg1 & 1) << 7));
+        }
+    }
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0178_func_400E0058", createYesNoDialog);
 
