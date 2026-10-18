@@ -8,13 +8,34 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0239_nico_restartWormGenealogi
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0239_nico_restartWormGenealogicalNodeFromDemo", nico_calcWormGenealogicalNodeDownTail);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0239_nico_restartWormGenealogicalNodeFromDemo", nico_calcWormGenealogicalNodeDownNextLast);
+extern void nico_calcWormGenealogicalNodeDownNext();
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0239_nico_restartWormGenealogicalNodeFromDemo", getEventScriptClass);
+void nico_calcWormGenealogicalNodeDownNextLast(void)
+{
+    nico_calcWormGenealogicalNodeDownNext();
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0239_nico_restartWormGenealogicalNodeFromDemo", flushEventScriptObjImmediate);
+char *getEventScriptClass(unsigned char *p)
+{
+    if (p[0x8] != 0x20) {
+        return 0;
+    }
+    return (char *)p + 0x20;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0239_nico_restartWormGenealogicalNodeFromDemo", flushEventScriptObj);
+extern int flushScriptObjImmediate();
+
+int flushEventScriptObjImmediate(int a, int b, int c, int d)
+{
+    return flushScriptObjImmediate(a, b, c, d);
+}
+
+extern int flushScriptObj();
+
+int flushEventScriptObj(int a, int b, int c, int d)
+{
+    return flushScriptObj(a, b, c, d);
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0239_nico_restartWormGenealogicalNodeFromDemo", initEventScriptObj);
 
@@ -36,17 +57,48 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0239_nico_restartWormGenealogi
 void SCRFuncSoundSetDepth(void) {
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0239_nico_restartWormGenealogicalNodeFromDemo", SCRFuncActiveDemoStandby);
+extern int DldSysUndefSymbol;
+extern void activeDemoStandby(char *);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0239_nico_restartWormGenealogicalNodeFromDemo", SCRFuncActiveDemoCancel);
+void SCRFuncActiveDemoStandby(void *a, int b, int c, int d, int e, int g, unsigned int *h)
+{
+    unsigned int v = *h;
+    int off = v & 0x3FFFF;
+    char *t = off != 0 ? *(char **)((char *)h - off) : 0;
+    activeDemoStandby((t != 0 && t != (char *)DldSysUndefSymbol) ? *(char **)(t + 0x10) + ((v >> 18) & 0xFFF) * *(int *)(*(char **)(t + 8) + 0xC) : 0);
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0239_nico_restartWormGenealogicalNodeFromDemo", SCRFuncActiveDemoStart);
+extern void activeDemoCancel(char *);
+
+void SCRFuncActiveDemoCancel(void *a, int b, int c, int d, int e, int g, unsigned int *h)
+{
+    unsigned int v = *h;
+    int off = v & 0x3FFFF;
+    char *t = off != 0 ? *(char **)((char *)h - off) : 0;
+    activeDemoCancel((t != 0 && t != (char *)DldSysUndefSymbol) ? *(char **)(t + 0x10) + ((v >> 18) & 0xFFF) * *(int *)(*(char **)(t + 8) + 0xC) : 0);
+}
+
+extern int DldSysUndefSymbol;
+extern void activeDemoStart(char *);
+
+void SCRFuncActiveDemoStart(void *a, int b, int c, int d, int e, int g, unsigned int *h)
+{
+    unsigned int v = *h;
+    int off = v & 0x3FFFF;
+    char *t = off != 0 ? *(char **)((char *)h - off) : 0;
+    activeDemoStart((t != 0 && t != (char *)DldSysUndefSymbol) ? *(char **)(t + 0x10) + ((v >> 18) & 0xFFF) * *(int *)(*(char **)(t + 8) + 0xC) : 0);
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0239_nico_restartWormGenealogicalNodeFromDemo", SCRFuncSoundPlay);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0239_nico_restartWormGenealogicalNodeFromDemo", func_40130070);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0239_nico_restartWormGenealogicalNodeFromDemo", SCRConditionSoundSignal);
+extern int bgmScriptRecvSoundSignal();
+
+int SCRConditionSoundSignal(int a, int b, int c, int d)
+{
+    return bgmScriptRecvSoundSignal(b, b, c, d);
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0239_nico_restartWormGenealogicalNodeFromDemo", SCRSoundConditionPlayerParentColAttr);
 
@@ -58,7 +110,12 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0239_nico_restartWormGenealogi
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0239_nico_restartWormGenealogicalNodeFromDemo", getSScriptWork);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0239_nico_restartWormGenealogicalNodeFromDemo", initSScriptSystem);
+extern int scrRunM();
+
+int initSScriptSystem(int a, int b, int c, int d)
+{
+    return scrRunM(1, b, c, d);
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0239_nico_restartWormGenealogicalNodeFromDemo", updateSScriptSystem);
 
