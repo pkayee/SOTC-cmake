@@ -22,11 +22,11 @@ int sceVibGetProfile(int port, u8 *profile)
     cmd |= 0x30000;
     cmd &= ~(u64)0xFF000000;
     ret = sceDbcReceiveData(port, cmd | 0x1000000, buf, profile);
-    if (ret < 0)
+    if (ret >= 0)
     {
-        return ret;
+        ret = *(volatile s32 *)buf;
     }
-    return buf[0];
+    return ret;
 }
 
 /* NEARMISS-STUB sceVibSetActParam */

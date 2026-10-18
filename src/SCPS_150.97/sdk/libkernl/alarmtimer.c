@@ -198,8 +198,6 @@ s32 iSetTimerAlarm(u32 ulClock, u32 (*cbHandler)(s32, u32, u32, void *, void *),
 #endif
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/alarmtimer", iSetTimerAlarm);
 
-/* NEARMISS-STUB ReleaseTimerAlarm */
-#if 0 /* NEARMISS 90.24% cat=volatile-alias sub=- | needs the banned qualifier: plain form re-uses the condition load of field4 for the FreeTimerCounter arg (target reloads lw a0,4(s1)); also target keeps a dupli | attempts=3 */
 s32 ReleaseTimerAlarm(s32 id)
 {
     AlarmNode *node;
@@ -208,7 +206,7 @@ s32 ReleaseTimerAlarm(s32 id)
 
     node = (AlarmNode *)((((u32)id) >> 8) << 4);
     intr = DIntr();
-    if (id < 0 || ((id ^ node->field4) & 0xFF) != 0)
+    if (id < 0 || ((id ^ ((volatile AlarmNode *)node)->field4) & 0xFF) != 0)
     {
         if (intr != 0)
         {
@@ -216,23 +214,18 @@ s32 ReleaseTimerAlarm(s32 id)
         }
         return 0x80008002;
     }
-    FreeTimerCounter(*(s32 *)((u8 *)node + 4));
+    FreeTimerCounter(((volatile AlarmNode *)node)->field4);
     head = (AlarmNode *)D_0014AE00[0];
     D_0014AE00[0] = (s32)node;
     node->next = (s32)head;
-    node->field4 = 0;
+    ((volatile AlarmNode *)node)->field4 = 0;
     if (intr != 0)
     {
         EIntr();
-        return 0;
     }
     return 0;
 }
-#endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/alarmtimer", ReleaseTimerAlarm);
 
-/* NEARMISS-STUB iReleaseTimerAlarm */
-#if 0 /* NEARMISS 89.5% cat=volatile-alias sub=- | needs the banned qualifier: plain form CSEs the field4 load from the condition into the iFreeTimerCounter arg (target reloads lw a0,4(s0)); recomputing node fro | attempts=3 */
 s32 iReleaseTimerAlarm(s32 id)
 {
     AlarmNode *node;
@@ -240,11 +233,11 @@ s32 iReleaseTimerAlarm(s32 id)
     s32 ret;
 
     node = (AlarmNode *)((((u32)id) >> 8) << 4);
-    if (id < 0 || ((id ^ node->field4) & 0xFF) != 0)
+    if (id < 0 || ((id ^ ((volatile AlarmNode *)node)->field4) & 0xFF) != 0)
     {
         return 0x80008002;
     }
-    ret = iFreeTimerCounter(node->field4);
+    ret = iFreeTimerCounter(((volatile AlarmNode *)node)->field4);
     if (ret == 0)
     {
         head = D_0014AE00[0];
@@ -254,8 +247,6 @@ s32 iReleaseTimerAlarm(s32 id)
     }
     return ret;
 }
-#endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/alarmtimer", iReleaseTimerAlarm);
 
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/alarmtimer", sceSifInitRebootNotify);
 
