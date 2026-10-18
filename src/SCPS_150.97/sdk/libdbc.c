@@ -38,6 +38,15 @@ extern s32 D_0014EC40[];
 
 typedef struct
 {
+    s32 a0;
+    s32 a1;
+    s32 len;
+    u8 data[0x80];
+    s32 result;
+} DbcRecvPkt;
+
+typedef struct
+{
     s32 unk[16];
 } SceDbcTable;
 
@@ -203,12 +212,27 @@ s32 sceDbcSetWorkAddr(s32 addr)
 }
 
 /* NEARMISS-STUB sceDbcCreateSocket */
-#if 0 /* NEARMISS 87.8% cat=stack-frame sub=- | frame 0x60 vs 0x70, s4 missing | attempts=1 */
-s32 sceDbcCreateSocket(s32 *arg, s32 a1, s32 a2)
+#if 0 /* NEARMISS 99.09% cat=regalloc sub=store-order | sched: target lw arg[0] before lui a3 and sw arg[0] to D_0014EB80 before sw a1 0x28; ours hoists lui, sinks store | attempts=4 */
+/* typed socket packet + separate result local + store order w1,w0,a1,a2: 87.8 -> 99.09; left: arg w0/w1 load-store interleave. */
+typedef struct
+{
+    s32 w[5];
+    u8 name[16];
+} DbcSocketArg;
+
+typedef struct
+{
+    s32 w[5];
+    u8 name[16];
+    s32 result;
+    s32 a1;
+    s32 a2;
+} DbcSocketPkt;
+
+s32 sceDbcCreateSocket(DbcSocketArg *arg, s32 a1, s32 a2)
 {
     s32 i;
-    u8 *src;
-    u8 *dst;
+    DbcSocketPkt *pkt;
     s32 result;
 
     if (D_00133B28[0] == 0)
@@ -216,18 +240,17 @@ s32 sceDbcCreateSocket(s32 *arg, s32 a1, s32 a2)
         return 0;
     }
     WaitSema(D_00150F40[0]);
-    D_0014EB80[0] = arg[0];
-    D_0014EB80[10] = a1;
-    D_0014EB80[11] = a2;
-    D_0014EB80[1] = arg[1];
-    D_0014EB80[2] = arg[2];
-    D_0014EB80[3] = arg[3];
-    D_0014EB80[4] = arg[4];
-    src = (u8 *)arg + 0x14;
-    dst = (u8 *)D_0014EB80 + 0x14;
+    pkt = (DbcSocketPkt *)D_0014EB80;
+    pkt->w[1] = arg->w[1];
+    pkt->a1 = a1;
+    pkt->w[0] = arg->w[0];
+    pkt->a2 = a2;
+    pkt->w[2] = arg->w[2];
+    pkt->w[3] = arg->w[3];
+    pkt->w[4] = arg->w[4];
     for (i = 0; i < 16; i++)
     {
-        dst[i] = src[i];
+        pkt->name[i] = arg->name[i];
     }
     if (sceSifCallRpc(D_0014EA80, 0x80001301, 0, D_0014EB80, 0x90, D_0014EB80, 0x90, NULL, NULL) < 0)
     {
@@ -235,7 +258,7 @@ s32 sceDbcCreateSocket(s32 *arg, s32 a1, s32 a2)
         SignalSema(D_00150F40[0]);
         return 0;
     }
-    result = D_0014EB80[9];
+    result = pkt->result;
     SignalSema(D_00150F40[0]);
     return result;
 }
@@ -393,25 +416,22 @@ s32 sceDbcSearchPortSpecific(s32 *arg)
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libdbc", sceDbcSRData);
 
-/* NEARMISS-STUB sceDbcSendData */
-#if 0 /* NEARMISS 94.8% cat=regalloc sub=- | s-reg alloc: buf/len/lui s5, frame 0x80 vs 0x70 | attempts=1 */
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libdbc", sceDbcSendData);
 s32 sceDbcSendData(s32 arg0, s32 arg1, s32 *len, u8 *data)
 {
-    s32 *buf;
-    u8 *dst;
+    DbcRecvPkt *pkt;
     s32 i;
     s32 ret;
     s32 result;
 
     WaitSema(D_00150F40[0]);
-    buf = D_0014EB80;
-    buf[0] = arg0;
-    buf[1] = arg1;
-    buf[2] = *len;
-    dst = (u8 *)buf + 0xC;
+    pkt = (DbcRecvPkt *)D_0014EB80;
+    pkt->a0 = arg0;
+    pkt->a1 = arg1;
+    pkt->len = *len;
     for (i = 0; i < *len; i++)
     {
-        dst[i] = data[i];
+        pkt->data[i] = data[i];
     }
     ret = sceSifCallRpc(D_0014EA80, 0x80001319, 0, D_0014EB80, 0x90, D_0014EB80, 0x90, NULL, NULL);
     if (ret < 0)
@@ -420,23 +440,37 @@ s32 sceDbcSendData(s32 arg0, s32 arg1, s32 *len, u8 *data)
         SignalSema(D_00150F40[0]);
         return 0;
     }
-    result = buf[35];
+    result = pkt->result;
     if (result >= 0)
     {
-        *len = buf[2];
+        *len = pkt->len;
+        result = pkt->result;
     }
     SignalSema(D_00150F40[0]);
     return result;
 }
-#endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libdbc", sceDbcSendData);
 
-/* NEARMISS-STUB sceDbcSendData2 */
-#if 0 /* NEARMISS 78.95% cat=regalloc sub=- | reg mapping, idx reload after check call, 2-arg sceCdDelayThread | attempts=1 */
+
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libdbc", sceDbcSendData2);
+typedef struct
+{
+    s32 a0;
+    s32 a1;
+    s32 len;
+    u8 data[0x80];
+    s32 result;
+    u8 pad[0xC0 - 0x90];
+} DbcSlotPkt;
+
+typedef struct
+{
+    u8 b[0x28];
+} DbcRpcClient;
+
 s32 sceDbcSendData2(s32 arg0, s32 arg1, s32 *len, u8 *data)
 {
     s32 i;
-    s32 *slot;
+    DbcSlotPkt *slot;
     s32 ret;
 
     if (*len > 0x80)
@@ -450,39 +484,46 @@ s32 sceDbcSendData2(s32 arg0, s32 arg1, s32 *len, u8 *data)
     {
         D_00133B2C[0] = 0;
     }
-    slot = (s32 *)((u8 *)D_00150D00 + D_00133B2C[0] * 0xC0);
-    slot[0] = arg0;
-    slot[1] = arg1;
-    slot[2] = *len;
+    slot = &((DbcSlotPkt *)D_00150D00)[D_00133B2C[0]];
+    slot->a0 = arg0;
+    slot->a1 = arg1;
+    slot->len = *len;
     for (i = 0; i < *len; i++)
     {
-        ((u8 *)slot + 0xC)[i] = data[i];
+        slot->data[i] = data[i];
     }
-    if (sceSifCheckStatRpc((u8 *)D_0014EAF8 + D_00133B2C[0] * 0x28) == 1)
+    if (sceSifCheckStatRpc(&((DbcRpcClient *)D_0014EAF8)[D_00133B2C[0]]) == 1)
     {
         sceCdDelayThread(D_001388B8);
         SignalSema(D_00150F40[0]);
         return 0;
     }
-    ret = sceSifCallRpc((u8 *)D_0014EAF8 + D_00133B2C[0] * 0x28, D_00133B2C[0], 1, slot, 0x90, slot, 0x90, NULL, NULL);
-    if (ret >= 0)
+    ret = sceSifCallRpc(&((DbcRpcClient *)D_0014EAF8)[D_00133B2C[0]], D_00133B2C[0], 1, &((DbcSlotPkt *)D_00150D00)[D_00133B2C[0]], 0x90, &((DbcSlotPkt *)D_00150D00)[D_00133B2C[0]], 0x90, NULL, NULL);
+    if (ret < 0)
     {
+        sceCdDelayThread(D_001388D8);
         SignalSema(D_00150F40[0]);
-        return 1;
+        return 0;
     }
-    sceCdDelayThread(D_001388D8);
     SignalSema(D_00150F40[0]);
-    return 0;
+    return 1;
 }
-#endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libdbc", sceDbcSendData2);
 
-/* NEARMISS-STUB sceDbcSendData3 */
-#if 0 /* NEARMISS 95.5% cat=regalloc sub=- | lui v0 vs a3 for buf store, return layout | attempts=1 */
+
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libdbc", sceDbcSendData3);
+typedef struct
+{
+    s32 a0;
+    s32 a1;
+    s32 len;
+    u8 data[0x2080];
+    s32 result;
+} DbcBigPkt;
+
 s32 sceDbcSendData3(s32 arg0, s32 arg1, s32 *len, u8 *data, void *arg4)
 {
     s32 i;
-    s32 *buf;
+    DbcBigPkt *pkt;
     s32 ret;
 
     if (*len > 0x2080)
@@ -497,15 +538,15 @@ s32 sceDbcSendData3(s32 arg0, s32 arg1, s32 *len, u8 *data, void *arg4)
         SignalSema(D_00150F40[0]);
         return 0;
     }
-    buf = D_0014EC40;
-    buf[0] = arg0;
-    buf[1] = arg1;
-    buf[2] = *len;
+    pkt = (DbcBigPkt *)D_0014EC40;
+    pkt->a0 = arg0;
+    pkt->a1 = arg1;
+    pkt->len = *len;
     for (i = 0; i < *len; i++)
     {
-        ((u8 *)buf + 0xC)[i] = data[i];
+        pkt->data[i] = data[i];
     }
-    ret = sceSifCallRpc(D_0014EAD0, 0x8000131C, 1, buf, 0x2090, buf, 0x2090, arg4, NULL);
+    ret = sceSifCallRpc(D_0014EAD0, 0x8000131C, 1, D_0014EC40, 0x2090, D_0014EC40, 0x2090, arg4, NULL);
     if (ret < 0)
     {
         SignalSema(D_00150F40[0]);
@@ -514,20 +555,20 @@ s32 sceDbcSendData3(s32 arg0, s32 arg1, s32 *len, u8 *data, void *arg4)
     SignalSema(D_00150F40[0]);
     return 1;
 }
-#endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libdbc", sceDbcSendData3);
 
-/* NEARMISS-STUB sceDbcReceiveData */
-#if 0 /* NEARMISS 96.97% cat=regalloc sub=- | copy loop address form (src ptr+i) | attempts=1 */
+
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libdbc", sceDbcReceiveData);
 s32 sceDbcReceiveData(s32 arg0, s32 arg1, s32 *len, u8 *data)
 {
     s32 i;
     s32 *buf;
+    DbcRecvPkt *pkt;
     s32 ret;
     s32 result;
 
     WaitSema(D_00150F40[0]);
     buf = D_0014EB80;
+    pkt = (DbcRecvPkt *)D_0014EB80;
     buf[0] = arg0;
     buf[1] = arg1;
     buf[2] = *len;
@@ -542,14 +583,13 @@ s32 sceDbcReceiveData(s32 arg0, s32 arg1, s32 *len, u8 *data)
     if (result >= 0)
     {
         *len = buf[2];
-        for (i = 0; i < buf[2]; i++)
+        for (i = 0; i < pkt->len; i++)
         {
-            data[i] = ((u8 *)buf + 0xC)[i];
+            data[i] = pkt->data[i];
         }
         result = buf[35];
     }
     SignalSema(D_00150F40[0]);
     return result;
 }
-#endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libdbc", sceDbcReceiveData);
+
