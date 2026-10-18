@@ -43,7 +43,7 @@ extern char D_40046948[];
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/memory", func_40013160);
 void func_40015F58(void);
 
-#define DMA_REG(a) (*(volatile u32 *)(a))
+#define DMA_REG(a) (*(u32 *)(a))
 
 void func_40013160(void *arg0, void *arg1, u32 arg2)
 {

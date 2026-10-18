@@ -69,7 +69,7 @@ void iosPadTickProc(void)
         for (j = 0; j < 16; j++)
         {
             mask = 1 << j;
-            if (*(volatile u32 *)&d->pressed & mask)
+            if (*(u32 *)&d->pressed & mask)
             {
                 d->timer[j] = now + 0.4f;
             }

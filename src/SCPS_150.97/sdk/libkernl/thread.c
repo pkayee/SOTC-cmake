@@ -216,8 +216,8 @@ INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/thread", _DelayThreadHand
 /* best for sioPutc: 68.79% (ee-gcc2.9-991111). Target materialises 0x1000F130/F180 with lui+ori into v1 and loops with 3 nops after andi; ours folds the address into lw/sb offsets (lui 0x1001 + -0xed0). Variants with 0x..U and address-in-variable did not change it. */
 s32 sioPutc(s32 c)
 {
-    volatile s32 *stat = (volatile s32 *)0x1000F130;
-    volatile u8 *data = (volatile u8 *)0x1000F180;
+    s32 *stat = (s32 *)0x1000F130;
+    u8 *data = (u8 *)0x1000F180;
 
     while (*stat & 0x8000)
         ;

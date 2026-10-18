@@ -419,7 +419,7 @@ void initLwsOriDefSeg(DefSeg *seg) {
 }
 
 /* NEARMISS-STUB deleteLwsOriDefSeg */
-#if 0 /* NEARMISS 97.31% cat=volatile-alias sub=- | 100 only with `*(volatile u32 *)lp` in dldRef (two link-word loads); volatile is not used (human, 2026-10-18) | attempts=1 */
+#if 0 /* NEARMISS 97.31% cat=-alias sub=- | 100 only with `*(u32 *)lp` in dldRef (two link-word loads); is not used (human, 2026-10-18) | attempts=1 */
 void deleteLwsOriDefSeg(DefSeg *seg) {
     s32 n = seg->count;
     u8 *p = seg->arr;

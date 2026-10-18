@@ -6,7 +6,7 @@
 extern s32 D_00145AC0[];
 
 /* NEARMISS-STUB sceSifInitRpc */
-#if 0 /* NEARMISS 86.9% cat=regalloc sub=- | tail j sceSifSetReg fixed (early return + void proto); rest: lui/addiu base-reg order and a2v/a3v/q store scheduling differ; volatile q 82.7, volatile q[0] also | attempts=2 */
+#if 0 /* NEARMISS 86.9% cat=regalloc sub=- | tail j sceSifSetReg fixed (early return + void proto); rest: lui/addiu base-reg order and a2v/a3v/q store scheduling differ; q 82.7, q[0] also | attempts=2 */
 extern s32 D_00132388[];
 extern s32 D_001442C0[];
 extern s32 D_00144AC0[];

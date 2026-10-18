@@ -490,13 +490,13 @@ void func_400EBA40(void) {
 }
 
 /* NEARMISS-STUB func_400EBA48 */
-#if 0 /* NEARMISS 100.0% cat=no-c-form sub=volatile-dead-copy | scores 100 only with volatile u128 locals that force dead 16-byte copies: a codegen trick, not original-looking C; human ruling: not accepted | attempts=1 */
+#if 0 /* NEARMISS 100.0% cat=no-c-form sub=-dead-copy | scores 100 only with u128 locals that force dead 16-byte copies: a codegen trick, not original-looking C; human ruling: not accepted | attempts=1 */
 void func_400EBA48(f32 value, u8 *cam)
 {
     s32 obj = *(s32 *)cam;
-    u128 volatile pos = *(u128 *)get_camera_position(obj);
-    u128 volatile dir = *(u128 *)get_camera_direction(obj);
-    u128 volatile up = *(u128 *)get_camera_up_direction(obj);
+    u128 pos = *(u128 *)get_camera_position(obj);
+    u128 dir = *(u128 *)get_camera_direction(obj);
+    u128 up = *(u128 *)get_camera_up_direction(obj);
 
     doit_game_camera(cam + 0x20, cam, value);
 }

@@ -153,8 +153,8 @@ void constructor_expression_change(ExpressionChange *self)
 }
 
 /* NEARMISS-STUB add_element_expression_change */
-#if 0 /* NEARMISS 100.0% cat=volatile-alias sub=- | 100 only with volatile list ptr and volatile casts on every store (rule 13 REVIEW) | attempts=1 */
-void add_element_expression_change(volatile int *list, int type, int time, int flag, float start, float end, float speed)
+#if 0 /* NEARMISS 100.0% cat=-alias sub=- | 100 only with list ptr and casts on every store (rule 13 REVIEW) | attempts=1 */
+void add_element_expression_change(int *list, int type, int time, int flag, float start, float end, float speed)
 {
     int count;
     void *base;
@@ -164,12 +164,12 @@ void add_element_expression_change(volatile int *list, int type, int time, int f
     base = (void *)((count * 0x18) + (int)list);
     if (count < 5) {
         element = base + 4;
-        (*(volatile int *)((char *)(element) + 0x14)) = flag;
-        (*(volatile int *)((char *)(base) + 4)) = type;
-        (*(volatile float *)((char *)(element) + 4)) = start;
-        (*(volatile float *)((char *)(element) + 8)) = end;
-        (*(volatile int *)((char *)(element) + 0xC)) = time;
-        (*(volatile float *)((char *)(element) + 0x10)) = speed;
+        (*(int *)((char *)(element) + 0x14)) = flag;
+        (*(int *)((char *)(base) + 4)) = type;
+        (*(float *)((char *)(element) + 4)) = start;
+        (*(float *)((char *)(element) + 8)) = end;
+        (*(int *)((char *)(element) + 0xC)) = time;
+        (*(float *)((char *)(element) + 0x10)) = speed;
         *list += 1;
     }
 }
