@@ -1,29 +1,43 @@
 #include "common.h"
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/alarmtimer", _InitAlarm);
-
-/* NEARMISS-STUB func_00111850 */
-#if 0 /* NEARMISS 76.9% cat=branch-layout sub=- | ret!=0 path: target reloads ra in zero path (dup epilogue); store order head/next/field4 and addiu -1 placement differ | attempts=1 */
 typedef struct AlarmNode
 {
-    struct AlarmNode *next;
+    s32 next;
     s32 field4;
     s32 (*handler)(s32, s32, s32, void *);
     void *arg;
 } AlarmNode;
 
-extern AlarmNode *D_0014AE00[];
+extern s32 D_0014AE00[];
+s32 iFreeTimerCounter(s32 id);
+int DIntr(void);
+int EIntr(void);
+s32 FreeTimerCounter(s32 id);
+
+INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/alarmtimer", _InitAlarm);
+
+/* NEARMISS-STUB func_00111850 */
+#if 0 /* NEARMISS 95.17% cat=delay-slot-epilogue sub=- | s32 next / s32 D_0014AE00[] typing sets addiu/lw order (76.9->95.2); target keeps an explicit ld ra in the zero path (dup epilogue), ours folds it into the bnez delay slot; ret=-1 variable form 82.6 | attempts=6 */
+typedef struct AlarmNode
+{
+    s32 next;
+    s32 field4;
+    s32 (*handler)(s32, s32, s32, void *);
+    void *arg;
+} AlarmNode;
+
+extern s32 D_0014AE00[];
 
 s32 func_00111850(s32 a0, s32 a1, s32 a2, AlarmNode *a3)
 {
-    AlarmNode *head;
+    s32 head;
     s32 ret;
 
     ret = a3->handler(((u32)a3 << 4) | (a0 & 0xFE) | 1, a1, a2, a3->arg);
     if (ret == 0)
     {
         head = D_0014AE00[0];
-        D_0014AE00[0] = a3;
+        D_0014AE00[0] = (s32)a3;
         a3->next = head;
         a3->field4 = 0;
         return -1;
@@ -32,6 +46,7 @@ s32 func_00111850(s32 a0, s32 a1, s32 a2, AlarmNode *a3)
 }
 #endif
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/alarmtimer", func_00111850);
+
 
 /* NEARMISS-STUB SetTimerAlarm */
 #if 0 /* NEARMISS 97.8% cat=branch-layout sub=inline-pop-helper | inline AllocAlarmNode pop helper: 89.5->97.8 | attempts=2 */
@@ -183,68 +198,55 @@ s32 iSetTimerAlarm(u32 ulClock, u32 (*cbHandler)(s32, u32, u32, void *, void *),
 #endif
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/alarmtimer", iSetTimerAlarm);
 
-/* NEARMISS-STUB ReleaseTimerAlarm */
-#if 0 /* NEARMISS 34.9% cat=regalloc sub=- | DIntr result and id held across call; saved-reg order s0/s1/s2 and node computed after DIntr differ | attempts=1 */
 s32 ReleaseTimerAlarm(s32 id)
 {
     AlarmNode *node;
     AlarmNode *head;
     s32 intr;
-    s32 ret;
 
-    intr = DIntr();
     node = (AlarmNode *)((((u32)id) >> 8) << 4);
-    if (id >= 0 && ((id ^ node->field4) & 0xFF) == 0)
+    intr = DIntr();
+    if (id < 0 || ((id ^ ((volatile AlarmNode *)node)->field4) & 0xFF) != 0)
     {
-        FreeTimerCounter(node->field4);
-        head = D_0014AE00[0];
-        D_0014AE00[0] = node;
-        node->next = head;
-        node->field4 = 0;
-        ret = 0;
+        if (intr != 0)
+        {
+            EIntr();
+        }
+        return 0x80008002;
     }
-    else
-    {
-        ret = 0x80008002;
-    }
+    FreeTimerCounter(((volatile AlarmNode *)node)->field4);
+    head = (AlarmNode *)D_0014AE00[0];
+    D_0014AE00[0] = (s32)node;
+    node->next = (s32)head;
+    ((volatile AlarmNode *)node)->field4 = 0;
     if (intr != 0)
     {
         EIntr();
     }
-    return ret;
+    return 0;
 }
-#endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/alarmtimer", ReleaseTimerAlarm);
 
-/* NEARMISS-STUB iReleaseTimerAlarm */
-#if 0 /* NEARMISS 62.3% cat=branch-layout sub=- | target reloads node->field4 for FreeTimerCounter arg (no CSE) and uses bnez shape; prologue order differs | attempts=1 */
 s32 iReleaseTimerAlarm(s32 id)
 {
     AlarmNode *node;
-    AlarmNode *head;
+    s32 head;
     s32 ret;
 
-    if (id < 0)
-    {
-        return 0x80008002;
-    }
     node = (AlarmNode *)((((u32)id) >> 8) << 4);
-    if (((id ^ node->field4) & 0xFF) != 0)
+    if (id < 0 || ((id ^ ((volatile AlarmNode *)node)->field4) & 0xFF) != 0)
     {
         return 0x80008002;
     }
-    ret = iFreeTimerCounter(node->field4);
+    ret = iFreeTimerCounter(((volatile AlarmNode *)node)->field4);
     if (ret == 0)
     {
         head = D_0014AE00[0];
-        D_0014AE00[0] = node;
+        D_0014AE00[0] = (s32)node;
         node->next = head;
         node->field4 = 0;
     }
     return ret;
 }
-#endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/alarmtimer", iReleaseTimerAlarm);
 
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/alarmtimer", sceSifInitRebootNotify);
 
