@@ -83,11 +83,29 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0171_stop_wind_emitter_geometry
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0171_stop_wind_emitter_geometry_pointer_refer", func_400D8638);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0171_stop_wind_emitter_geometry_pointer_refer", func_400D8688);
+extern int func_400D8A78();
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0171_stop_wind_emitter_geometry_pointer_refer", func_400D86A0);
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0171_stop_wind_emitter_geometry_pointer_refer", func_400D8688);
+int func_400D8688(int a, int b, int c, int d)
+{
+    return func_400D8A78(a, 0, c, d);
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0171_stop_wind_emitter_geometry_pointer_refer", func_400D86B8);
+extern int func_400D7650();
+
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0171_stop_wind_emitter_geometry_pointer_refer", func_400D86A0);
+int func_400D86A0(int a, int b, int c, int d)
+{
+    return func_400D7650(a, 0, c, d);
+}
+
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0171_stop_wind_emitter_geometry_pointer_refer", func_400D86B8);
+extern int func_400D8BD0();
+
+int func_400D86B8(int a)
+{
+    return func_400D8BD0(a, 0);
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0171_stop_wind_emitter_geometry_pointer_refer", func_400D86D0);
 

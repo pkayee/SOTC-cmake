@@ -1,6 +1,10 @@
 #include "common.h"
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0035_spriteSetValue", spriteSetValue);
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0035_spriteSetValue", spriteSetValue);
+void spriteSetValue(u8 *sprite, s32 value)
+{
+    *(s32 *)(sprite + 0x4) = value;
+}
 
 extern int iosFree();
 
@@ -38,14 +42,22 @@ void spriteSetRotation(void *arg0, float fparg0)
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0035_spriteSetValue", spriteSetBlendMode);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0035_spriteSetValue", spriteSetIdentifier);
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0035_spriteSetValue", spriteSetIdentifier);
+void spriteSetIdentifier(u8 *sprite, s32 id)
+{
+    *(s32 *)(sprite + 0x8) = id;
+}
 
 void spriteSetFade(void *arg0, float fparg0)
 {
     (*(float *)((char *)(arg0) + 0x64)) = fparg0;
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0035_spriteSetValue", spriteSetPriority);
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0035_spriteSetValue", spriteSetPriority);
+void spriteSetPriority(u8 *sprite, s32 value)
+{
+    *(s32 *)(sprite + 0x5C) = value;
+}
 
 extern unsigned char D_4012A670[];
 

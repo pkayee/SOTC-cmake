@@ -2,7 +2,11 @@
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0209_sceMpegInit", sceMpegInit);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0209_sceMpegInit", sceMpegDelete);
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0209_sceMpegInit", sceMpegDelete);
+s32 sceMpegDelete(u8* mp)
+{
+    return 1;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0209_sceMpegInit", sceMpegAddBs);
 
@@ -16,11 +20,21 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0209_sceMpegInit", sceMpegReset
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0209_sceMpegInit", sceMpegIsEnd);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0209_sceMpegInit", sceMpegIsRefBuffEmpty);
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0209_sceMpegInit", sceMpegIsRefBuffEmpty);
+int sceMpegIsRefBuffEmpty(void *arg0)
+{
+    return (*(int *)((char *)((*(void **)((char *)(arg0) + 0x40))) + 4)) == 0;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0209_sceMpegInit", sceMpegSetDecodeMode);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0209_sceMpegInit", sceMpegGetDecodeMode);
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0209_sceMpegInit", sceMpegGetDecodeMode);
+void sceMpegGetDecodeMode(void *arg0, void *arg1, void *arg2, void *arg3)
+{
+    (*(int *)((char *)(arg1) + 0)) = (int) (*(int *)((char *)((*(void **)((char *)(arg0) + 0x40))) + 0xA8));
+    (*(int *)((char *)(arg2) + 0)) = (int) (*(int *)((char *)((*(void **)((char *)(arg0) + 0x40))) + 0xAC));
+    (*(int *)((char *)(arg3) + 0)) = (int) (*(int *)((char *)((*(void **)((char *)(arg0) + 0x40))) + 0xB0));
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0209_sceMpegInit", sceMpegAddCallback);
 
@@ -58,7 +72,14 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0209_sceMpegInit", _sceMpegSetP
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0209_sceMpegInit", func_401006D8);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0209_sceMpegInit", _sceMpegAlalcInit);
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0209_sceMpegInit", _sceMpegAlalcInit);
+void _sceMpegAlalcInit(s32 *m, s32 a1, s32 a2)
+{
+    m[0] = a1;
+    m[1] = a2;
+    m[2] = a1;
+    m[3] = a1;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0209_sceMpegInit", _sceMpegAlalcSetDynamic);
 
