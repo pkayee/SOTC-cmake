@@ -12,22 +12,51 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0145_IsWaterSurfaceExistAround"
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0145_IsWaterSurfaceExistAround", GetCollisionDBEdgeVertexPoint3);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0145_IsWaterSurfaceExistAround", CopyCollisionEdgePointer);
+void CopyCollisionEdgePointer(void *arg0, void *arg1)
+{
+    (*(int *)((char *)(arg0) + 0)) = (int) (*(int *)((char *)(arg1) + 0));
+    (*(int *)((char *)(arg0) + 4)) = (int) (*(int *)((char *)(arg1) + 4));
+    (*(int *)((char *)(arg0) + 8)) = (int) (*(int *)((char *)(arg1) + 8));
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0145_IsWaterSurfaceExistAround", CopyCollisionEdge);
+void CopyCollisionEdge(void *arg0, void *arg1)
+{
+    (*(int *)((char *)(arg0) + 0)) = (int) (*(int *)((char *)(arg1) + 0));
+    (*(int *)((char *)(arg0) + 4)) = (int) (*(int *)((char *)(arg1) + 4));
+    (*(int *)((char *)(arg0) + 8)) = (int) (*(int *)((char *)(arg1) + 8));
+    (*(int *)((char *)(arg0) + 0xC)) = (int) (*(int *)((char *)(arg1) + 0xC));
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0145_IsWaterSurfaceExistAround", GetCollisionEdgePositionWithS);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0145_IsWaterSurfaceExistAround", MakeCollisionEdgePointer);
+void MakeCollisionEdgePointer(char *pa0, char *pa1, int xa2)
+{
+    *(int *)(pa0 + 0x0) = *(int *)(pa1 + 0x0);
+    *(int *)(pa0 + 0x4) = *(int *)(pa1 + 0x4);
+    *(int *)(pa0 + 0x8) = xa2;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0145_IsWaterSurfaceExistAround", GetCollisionVariableXZSurfPosition);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0145_IsWaterSurfaceExistAround", IsClusterCollision);
+int IsClusterCollision(void *arg0)
+{
+    return (*(int *)((char *)(arg0) + 4)) >= 2;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0145_IsWaterSurfaceExistAround", MakeGeometryPointerCollisionInfo);
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0145_IsWaterSurfaceExistAround", MakeGeometryPointerCollisionEdgeInfo);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0145_IsWaterSurfaceExistAround", GetGeometryPointerCollisionSurfSTPosition);
+int CheckLegalCollisionGP(char *gp);
+
+int GetGeometryPointerCollisionSurfSTPosition(float *arg0, float *arg1, void *arg2)
+{
+    if (CheckLegalCollisionGP(arg2) != 0) {
+        *arg0 = (*(float *)((char *)(arg2) + 8));
+        *arg1 = (*(float *)((char *)(arg2) + 0xC));
+        return 0;
+    }
+    return -1;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0145_IsWaterSurfaceExistAround", GetCollisionDBOneObjCallBack);
