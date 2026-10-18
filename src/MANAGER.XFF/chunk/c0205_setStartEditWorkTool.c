@@ -94,31 +94,28 @@ u8* getPointData(u8* arg0, s32 arg1)
     return temp;
 }
 
-/* NEARMISS-STUB getConnectLineArray */
-#if 0 /* NEARMISS 88.0% cat=branch-layout sub=- | in-TU: target branch-around temp=NULL (bnez, daddu in delay), ours movz | attempts=1 */
+static inline u8* getConnectLinePoint(u8* t, s32 i)
+{
+    if (t == NULL || i < 0 || (u32)i >= *(u32*)t)
+    {
+        return NULL;
+    }
+    return t + i * 48 + 0x10;
+}
+
 u8* getConnectLineArray(u8* arg0, s32 arg1)
 {
-    u8* temp = NULL;
+    u8* p = getConnectLinePoint(arg0, arg1);
 
-    if (arg0 != NULL && arg1 >= 0)
+    if (p != NULL)
     {
-        temp = arg0 + arg1 * 48 + 0x10;
-        if ((u32)arg1 >= *(u32*)arg0)
+        if (*(s32*)(p + 0x10) != 0)
         {
-            temp = NULL;
-        }
-    }
-    if (temp != NULL)
-    {
-        if (*(s32*)(temp + 0x10) != 0)
-        {
-            return arg0 + *(s32*)(temp + 0x14);
+            return arg0 + *(s32*)(p + 0x14);
         }
     }
     return NULL;
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0205_setStartEditWorkTool", getConnectLineArray);
 
 u8* getLineData(u8* arg0, s32 arg1)
 {

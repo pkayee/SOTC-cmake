@@ -14,7 +14,7 @@ void iosFree(void *p);
 extern f32 D_4012E36C;
 extern f32 D_4012E370;
 extern s32 D_4012E374;
-f32 func_400F5E40(s32 height, f32 angle);
+f32 func_400F5E40(f32 angle, s32 height);
 void func_400F5EC8(CamScreen *s, f32 v);
 void func_400F5FD0(CamScreen *s, f32 v);
 void func_400F5F80(CamScreen *s);
@@ -181,8 +181,6 @@ CamScreen *func_400F5808(CamScreen *s)
     return NULL;
 }
 
-/* NEARMISS-STUB create_clip_screen */
-#if 0 /* NEARMISS 99.88% cat=call-abi sub=- | only reloc symbol names of 4 callees differ | attempts=1 */
 CamScreen *create_clip_screen(s32 heap, s32 w, s32 h, f32 angle)
 {
     CamScreen *s;
@@ -198,8 +196,6 @@ CamScreen *create_clip_screen(s32 heap, s32 w, s32 h, f32 angle)
     update_clip_screen(s);
     return s;
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0198_add_object_animation_camera_region", create_clip_screen);
 
 void check_free_clip_screen(void **buf)
 {
@@ -280,14 +276,10 @@ f32 get_view_angle(CamScreen *s)
     return s->viewAngle;
 }
 
-/* NEARMISS-STUB get_dist_from_eye_to_screen */
-#if 0 /* NEARMISS 61.88% cat=stack-frame sub=- | target is frameless-looking tail call with sd ra/ld ra frame then j func_400F5E40; C gives frameless j | attempts=1 */
 f32 get_dist_from_eye_to_screen(CamScreen *s)
 {
-    return func_400F5E40(s->height, s->viewAngle);
+    return func_400F5E40(s->viewAngle, s->height);
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0198_add_object_animation_camera_region", get_dist_from_eye_to_screen);
 
 f32 get_near_clip_z_clip_screen(void)
 {
@@ -338,19 +330,15 @@ void create_original_clip_matrix(f32 fov, f32 aspect, f32 nearZ, f32 farZ, u8 *m
 #endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0198_add_object_animation_camera_region", create_original_clip_matrix);
 
-/* NEARMISS-STUB update_clip_screen */
-#if 0 /* NEARMISS 81.0% cat=sched sub=- | in-TU: arg load order lw/lwc1 around jal func_400F5E40 | attempts=2 */
 void update_clip_screen(CamScreen *s)
 {
     f32 angle;
 
-    angle = func_400F5E40(s->height, s->viewAngle);
+    angle = func_400F5E40(s->viewAngle, s->height);
     func_400F5EC8(s, angle);
     func_400F5F80(s);
     func_400F5FD0(s, angle);
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0198_add_object_animation_camera_region", update_clip_screen);
 
 f32 iosGetTanf(f32 x);
 void iosUnitMatrix(u8 *m);
@@ -381,7 +369,7 @@ s32 *get_screen_size_scale_screen_matrix(void)
 
 f32 iosGetTanf(f32 x);
 
-f32 func_400F5E40(s32 height, f32 angle)
+f32 func_400F5E40(f32 angle, s32 height)
 {
     f32 tanv = iosGetTanf(angle * 0.5f * 3.1415926f / 180.0f);
 
