@@ -2,13 +2,44 @@
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0192_sheetMgrInit", sheetMgrInit);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0192_sheetMgrInit", sheetWait);
+extern int D_4012E334;
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0192_sheetMgrInit", sheetIdToName);
+void iosSleepThread();
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0192_sheetMgrInit", sheetHeaderObjSearchSheetId);
+void sheetWait(void)
+{
+    D_4012E334 = 1;
+    iosSleepThread();
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0192_sheetMgrInit", sheetMgrSheetHeaderSearchSheetDataObj);
+extern char **D_4012E330;
+
+int sheetIdToName(int i)
+{
+    return **(int **)(D_4012E330[i] + 0x38);
+}
+
+int sheetHeaderObjSearchSheetId(int i)
+{
+    return (int)D_4012E330[i];
+}
+
+typedef struct SheetDataObj {
+    char pad0[0x38];
+    int *header;
+    char pad3C[0x18];
+    struct SheetDataObj *next;
+} SheetDataObj;
+
+SheetDataObj *sheetMgrSheetHeaderSearchSheetDataObj(char *mgr, int id)
+{
+    SheetDataObj *obj = *(SheetDataObj **)(mgr + 0x40);
+
+    while (obj != 0 && id != obj->header[1]) {
+        obj = obj->next;
+    }
+    return obj;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0192_sheetMgrInit", sheetMgrSearchSheetDataObj);
 

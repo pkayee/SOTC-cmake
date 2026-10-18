@@ -1,6 +1,11 @@
 #include "common.h"
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0009_getBgAntiLevel", getBgAntiLevel);
+extern unsigned char D_40124798[];
+
+void *getBgAntiLevel(void)
+{
+    return D_40124798;
+}
 
 void bgInit(void) {
 }
