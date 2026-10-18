@@ -11,7 +11,7 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0071_SetLayoutArrowWater", arr
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0071_SetLayoutArrowWater", arrowWaterMain);
 
 /* NEARMISS-STUB getFallenLeafSize */
-#if 0 /* NEARMISS 83.0% cat=regalloc sub=- | target keeps 0x160 in reg before beqz; ours folds it, beqzl | attempts=1 */
+#if 0 /* NEARMISS 88.41% cat=cse-hoist sub=- | size=0x160; if/else size += n<<7 (88.4); target keeps 0x160 in a1 set in the beqz slot and adds after the cross-jumped tail; every form folds 0x160 into addiu ( | attempts=2 */
 int getFallenLeafSize(char *a)
 {
     unsigned int *h = (unsigned int *)(a + 0x1C);
@@ -19,17 +19,13 @@ int getFallenLeafSize(char *a)
     int off = v & 0x3FFFF;
     char *t = off != 0 ? *(char **)((char *)h - off) : 0;
     char *p = (t != 0 && t != (char *)DldSysUndefSymbol) ? *(char **)(t + 0x10) + ((v >> 18) & 0xFFF) * *(int *)(*(char **)(t + 8) + 0xC) : 0;
-    int n;
-    int base = 0x160;
+    int size = 0x160;
+
     if (*(int *)(a + 0x30) != 0)
-    {
-        n = *(int *)(a + 0x3C);
-    }
+        size += *(int *)(a + 0x3C) << 7;
     else
-    {
-        n = *(int *)(a + 0x28) * *(int *)(a + 0x2C);
-    }
-    return (n << 7) + base + (*(int *)(p + 8) << 6);
+        size += (*(int *)(a + 0x28) * *(int *)(a + 0x2C)) << 7;
+    return size + (*(int *)(p + 8) << 6);
 }
 #endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0071_SetLayoutArrowWater", getFallenLeafSize);

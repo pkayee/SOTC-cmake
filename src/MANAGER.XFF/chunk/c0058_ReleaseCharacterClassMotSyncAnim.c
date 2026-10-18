@@ -55,7 +55,7 @@ void ReleaseCharacterClassMotSyncAnim(u8 *obj)
 }
 
 /* NEARMISS-STUB FlushCharacterObjImmediate */
-#if 0 /* NEARMISS 96.41% cat=regalloc sub=- | cc in s2 vs s1; early obj+0x90 hoist and extra lbu reload in target | attempts=1 */
+#if 0 /* NEARMISS 98.0% cat=regalloc sub=- | separate c2=chrClass(obj) for the loop fixes cc=s1 and the s5 hoist (96.4->98.0); left: obj s2 vs s3 and target reloads cur->type (lbu) for the 2nd chrClass(cur | attempts=2 */
 void DeleteAllTwoWayLink();
 void FlushCollisionFinder();
 void ChangeCharacterObjControlTarget();
@@ -79,6 +79,7 @@ void FlushCharacterObjImmediate(u8 *obj)
     u8 *last;
     u32 *pos;
     s32 i;
+    u8 *c2;
 
     if (*(u8 **)(cc + 0x940) != obj)
     {
@@ -120,10 +121,10 @@ void FlushCharacterObjImmediate(u8 *obj)
     FlushCollisionFinder(cc + 0xD90);
     ReleaseCharacterClassMotSyncAnim(obj);
 
-    cc = chrClass(obj);
-    for (i = 0; i < *(s32 *)(cc + 0x3EC); i++)
+    c2 = chrClass(obj);
+    for (i = 0; i < *(s32 *)(c2 + 0x3EC); i++)
     {
-        grp = *(u8 **)(cc + 0x308) + i * 0x80;
+        grp = *(u8 **)(c2 + 0x308) + i * 0x80;
         node = isysGroupForFirst(grp, 0);
         last = NULL;
         if (node != NULL)

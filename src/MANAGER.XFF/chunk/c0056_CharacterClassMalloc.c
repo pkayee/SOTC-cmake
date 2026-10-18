@@ -107,8 +107,29 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0056_CharacterClassMalloc", Get
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0056_CharacterClassMalloc", GetCharacterClassOptionNodeGeo);
 
-/* NEARMISS-STUB SetCharacterObjDemoMotionMode */
-#if 0 /* NEARMISS 97.69% cat=sched sub=- | one addiu (lp2) scheduled before lui/ori 0x3FFFF mask | attempts=1 */
+extern u128 ZeroPoint;
+extern u128 IdentityQuaternion;
+extern s32 DldSysUndefSymbol;
+
+static inline u8 *dldElemW(u32 *lp, u32 w)
+{
+    u8 *slot;
+    u32 off = w & 0x3FFFF;
+
+    slot = off ? *(u8 **)((u8 *)lp - off) : NULL;
+    return (slot != NULL && slot != (u8 *)DldSysUndefSymbol)
+               ? *(u8 **)(slot + 0x10) + ((w >> 18) & 0xFFF) * *(s32 *)(*(u8 **)(slot + 8) + 0xC)
+               : NULL;
+}
+
+static inline s32 dldCountW(u32 *lp, u32 w)
+{
+    u8 *slot;
+    u32 off = w & 0x3FFFF;
+
+    slot = off ? *(u8 **)((u8 *)lp - off) : NULL;
+    return (slot != NULL && slot != (u8 *)DldSysUndefSymbol) ? *(s32 *)(slot + 0xC) : 0;
+}
 u32 *SetDemoMotionOrientInfo(u8 *info);
 void ReleaseCharacterClassMotSyncAnim(u8 *obj);
 void entrySyncAnim(f32 f, u8 *a, u8 *obj, u8 *elem, s32 n);
@@ -128,7 +149,6 @@ s32 SetCharacterObjDemoMotionMode(u8 *obj, f32 f)
     u32 w1;
     u32 w2;
     u8 *elem;
-    s32 n;
     u8 *e2;
     u8 *gaze;
     s32 cnt;
@@ -142,28 +162,26 @@ s32 SetCharacterObjDemoMotionMode(u8 *obj, f32 f)
         if (lp != NULL)
         {
             w1 = *lp;
-            elem = dldElem(lp, w1);
+            elem = dldElemW(lp, w1);
             if (elem != NULL)
             {
                 entrySyncAnim(0.0f, s2 + 0xD02, obj, elem, -1);
             }
             ResetCharacterClassMotionShiftInfo(f, s2, elem);
 
+            gaze = *(u8 **)(s2 + 0x330);
             lp2 = (u32 *)(*(u8 **)(s2 + 0x1098) + 0x134);
             w2 = *lp2;
-            gaze = *(u8 **)(s2 + 0x330);
-            cnt = dldCount(lp2, w2);
+            cnt = dldCountW(lp2, w2);
             if (cnt != 0)
             {
-                e2 = dldElem(lp2, w2);
-                n = cnt - 1;
-                do
+                e2 = dldElemW(lp2, w2);
+                while (cnt-- != 0)
                 {
                     InitGazeAddChannelDef(gaze, e2);
                     gaze += 0x10;
                     e2 += 0x14;
-                    n--;
-                } while (n != -1);
+                }
             }
 
             FinishCharacterObjAllAdditionMotion(obj);
@@ -197,5 +215,3 @@ s32 SetCharacterObjDemoMotionMode(u8 *obj, f32 f)
 
     return 0;
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0056_CharacterClassMalloc", SetCharacterObjDemoMotionMode);
