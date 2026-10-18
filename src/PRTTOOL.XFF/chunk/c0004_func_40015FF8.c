@@ -1,50 +1,330 @@
 #include "common.h"
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40015FF8);
+//INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40015FF8);
+extern int D_400193CC;
+extern int D_400193D0;
+extern int D_400198E0;
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40016030);
+extern int D_400193C4;
+extern char D_4002B910[];
+extern char D_4002BF08[];
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40016040);
+extern float D_400198C4;
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40016050);
+extern float D_400198C8;
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40016080);
+extern float D_400198CC;
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_400160E0);
+extern float D_400198D0;
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40016140);
+extern void func_400141C8(int);
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_400161A0);
+extern float D_400198D4;
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40016200);
+extern float D_400198D8;
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40016268);
+extern float D_400198DC;
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_400162D0);
+extern void func_40014578(int);
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40016338);
+void func_40015FF8(void) {
+    if (D_400193CC == 0) {
+        D_400193D0 = D_400198E0;
+    } else {
+        D_400198E0 = D_400193D0;
+    }
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_400163A0);
+//INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40016030);
+extern int D_400193D4;
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40016400);
+int *func_40016030(void) {
+    return &D_400193D4;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40016460);
+//INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40016040);
+extern int D_400193D8;
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_400164C0);
+int *func_40016040(void) {
+    return &D_400193D8;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40016528);
+char *func_40016050(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + 0x8;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40016590);
+char *func_40016080(void) {
+    char *p;
+    float *q = &D_400198C4;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    *q = *(float *)(p + 0xC);
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + 0xC;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_400165F8);
+char *func_400160E0(void) {
+    char *p;
+    float *q = &D_400198C8;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    *q = *(float *)(p + 0x10);
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + 0x10;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40016628);
+char *func_40016140(void) {
+    char *p;
+    float *q = &D_400198CC;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    *q = *(float *)(p + 0x14);
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + 0x14;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40016658);
+char *func_400161A0(void) {
+    char *p;
+    float *q = &D_400198D0;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    *q = *(float *)(p + 0x18);
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + 0x18;
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_40016688);
+void func_40016200(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    if (D_400198C4 < *(float *)(p + 0xC)) {
+        func_400141C8(1);
+    } else {
+        func_400141C8(0);
+    }
+}
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_400166B8);
+void func_40016268(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    if (D_400198C8 < *(float *)(p + 0x10)) {
+        func_400141C8(1);
+    } else {
+        func_400141C8(0);
+    }
+}
+
+void func_400162D0(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    if (D_400198CC < *(float *)(p + 0x14)) {
+        func_400141C8(1);
+    } else {
+        func_400141C8(0);
+    }
+}
+
+void func_40016338(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    if (D_400198D0 < *(float *)(p + 0x18)) {
+        func_400141C8(1);
+    } else {
+        func_400141C8(0);
+    }
+}
+
+char *func_400163A0(void) {
+    char *p;
+    float *q = &D_400198D4;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    *q = *(float *)(p + 0x28);
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + 0x28;
+}
+
+char *func_40016400(void) {
+    char *p;
+    float *q = &D_400198D8;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    *q = *(float *)(p + 0x2C);
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + 0x2C;
+}
+
+char *func_40016460(void) {
+    char *p;
+    float *q = &D_400198DC;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    *q = *(float *)(p + 0x30);
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + 0x30;
+}
+
+void func_400164C0(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    if (D_400198D4 < *(float *)(p + 0x28)) {
+        func_40014578(1);
+    } else {
+        func_40014578(0);
+    }
+}
+
+void func_40016528(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    if (D_400198D8 < *(float *)(p + 0x2C)) {
+        func_40014578(1);
+    } else {
+        func_40014578(0);
+    }
+}
+
+void func_40016590(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    if (D_400198DC < *(float *)(p + 0x30)) {
+        func_40014578(1);
+    } else {
+        func_40014578(0);
+    }
+}
+
+char *func_400165F8(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + 0x34;
+}
+
+char *func_40016628(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + 0x50;
+}
+
+char *func_40016658(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + 0x40;
+}
+
+char *func_40016688(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + 0x44;
+}
+
+char *func_400166B8(void) {
+    char *p;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    return p + 0x38;
+}
 
 INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0004_func_40015FF8", func_400166E8);
 
