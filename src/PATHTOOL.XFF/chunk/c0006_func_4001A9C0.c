@@ -59,7 +59,62 @@ extern void *D_4002DF94;
 extern s32 D_4002F008[];
 u8 *getGoalPointData();
 
-INCLUDE_ASM("asm/PATHTOOL.XFF/nonmatchings/chunk/c0006_func_4001A9C0", func_4001A9C0);
+extern char rootPtn[];
+extern char D_40020680[];
+extern float D_400201B0[];
+extern s32 SH_SmallAnimalTypeDEFAULT[];
+void *iosMallocAlign(void *, s32, s32);
+void *memcpy(void *dst, const void *src, u32 n);
+void createParamMenu();
+void cursorLockParamMenu();
+void func_4001D4C0();
+
+void func_400180D0();
+void func_40017728();
+void func_40018E78();
+
+extern char D_4001E7D8[];
+extern float D_4001E458[];
+void func_4001B8C0();
+
+extern u32 D_4002E0A8;
+extern float D_4001E828[];
+
+s32 DEBUG_is_locking_debug_camera();
+void DebugGlobalMoveWith2ndController();
+
+extern float D_4001EEA8[];
+
+void func_40018550();
+
+extern float D_4001F1F0[];
+
+void func_4001A9C0(u8 *self) {
+    if (*(s32 *)(padManagerData + 8) & 0x20) {
+        u32 *t = (u32 *)D_4002DF80.f38;
+        if (t != 0) {
+            void *q;
+            D_400201B0[7] = (float)*t;
+            D_400201B0[7] = D_400201B0[7] - 1.0f;
+            if (D_400201B0[7] < 0.0f) {
+                D_400201B0[7] = 0.0f;
+            }
+            if (D_4002DF80.f3c == 0) {
+                q = iosMallocAlign(rootPtn, ((u32 *)D_4002DF80.f38)[1], 0x10);
+                memcpy(q, (void *)D_4002DF80.f38, ((u32 *)D_4002DF80.f38)[1]);
+                func_4001D4C0(q);
+            }
+        }
+        D_400201B0[63] = (float)(SH_SmallAnimalTypeDEFAULT[3] - 1);
+        *(s32 *)&D_400201B0[67] = SH_SmallAnimalTypeDEFAULT[4];
+        {
+            union { s32 w; float f; } *u = (void *)(self + 0x94);
+            createParamMenu(D_40020680, u->w);
+        }
+        cursorLockParamMenu(D_40020680, 1);
+    }
+    return;
+}
 
 INCLUDE_ASM("asm/PATHTOOL.XFF/nonmatchings/chunk/c0006_func_4001A9C0", func_4001AB18);
 
@@ -131,9 +186,41 @@ void func_4001B418(void) {
     }
 }
 
-INCLUDE_ASM("asm/PATHTOOL.XFF/nonmatchings/chunk/c0006_func_4001A9C0", func_4001B448);
+void func_4001B448(s32 a) {
+    switch (D_4002DF80.mode) {
+    case 3:
+        func_40017728(a);
+        break;
+    case 4:
+        func_400180D0(a);
+        break;
+    case 5:
+        func_40018E78(a);
+        break;
+    }
+    D_4002DF80.mode = -1;
+}
 
-INCLUDE_ASM("asm/PATHTOOL.XFF/nonmatchings/chunk/c0006_func_4001A9C0", func_4001B4E0);
+void func_4001B4E0(u8 *self) {
+    if (*(s32 *)(padManagerData + 8) & 0x20) {
+        if (D_4002DF80.pts != 0) {
+            void *q;
+            D_4001E458[7] = (float)*D_4002DF80.pts;
+            D_4001E458[7] = D_4001E458[7] - 1.0f;
+            if (D_4001E458[7] < 0.0f) {
+                D_4001E458[7] = 0.0f;
+            }
+            if (D_4002DF80.ptsOwn == 0) {
+                q = iosMallocAlign(rootPtn, D_4002DF80.pts[1], 0x10);
+                memcpy(q, D_4002DF80.pts, D_4002DF80.pts[1]);
+                func_4001B8C0(q);
+            }
+        }
+        createParamMenu(D_4001E7D8, *(s32 *)(self + 0x94));
+        cursorLockParamMenu(D_4001E7D8, 1);
+    }
+    return;
+}
 
 INCLUDE_ASM("asm/PATHTOOL.XFF/nonmatchings/chunk/c0006_func_4001A9C0", func_4001B5F8);
 
@@ -167,7 +254,23 @@ void func_4001B738(void) {
     }
 }
 
-INCLUDE_ASM("asm/PATHTOOL.XFF/nonmatchings/chunk/c0006_func_4001A9C0", func_4001B790);
+void func_4001B790(u32 *p) {
+    u32 *g = (u32 *)&D_4002DF80;
+    if (D_4002DF80.ptsBufOwn != 0) {
+        iosFree((void *)g[1]);
+    }
+    g[1] = (u32)p;
+    D_4002DF80.ptsBufOwn = 1;
+    if (*p <= D_4002E0A8) {
+        D_4002E0A8 = *p - 1;
+    }
+    func_40010618(0, 0);
+    D_4001E828[7] = (float)*(u32 *)g[1];
+    D_4001E828[7] = D_4001E828[7] - 1.0f;
+    if (D_4001E828[7] < 0.0f) {
+        D_4001E828[7] = 0.0f;
+    }
+}
 
 void func_4001B878(void) {
     if (D_4002DF80.ptsBufOwn != 0) {
@@ -178,7 +281,21 @@ void func_4001B878(void) {
     func_40010618(0, 0);
 }
 
-INCLUDE_ASM("asm/PATHTOOL.XFF/nonmatchings/chunk/c0006_func_4001A9C0", func_4001B8C0);
+void func_4001B8C0(u32 *p) {
+    if (D_4002DF80.ptsOwn != 0) {
+        iosFree(D_4002DF80.pts);
+    }
+    *(u32 *)&D_4002DF80.pts = (u32)p;
+    D_4002DF80.ptsOwn = 1;
+    if (*p <= D_4002E090[0].w) {
+        D_4002E090[0].w = *p - 1;
+    }
+    D_4001E458[7] = (float)*D_4002DF80.pts;
+    D_4001E458[7] = D_4001E458[7] - 1.0f;
+    if (D_4001E458[7] < 0.0f) {
+        D_4001E458[7] = 0.0f;
+    }
+}
 
 void func_4001B998(void) {
     if (D_4002DF80.ptsOwn != 0) {
@@ -213,7 +330,20 @@ void func_4001BA98(void)
     return;
 }
 
-INCLUDE_ASM("asm/PATHTOOL.XFF/nonmatchings/chunk/c0006_func_4001A9C0", func_4001BAC8);
+void func_4001BAC8(void) {
+    u8 *p;
+    if (D_4002DF80.lines != 0) {
+        p = getRootPointData(D_4002DF80.lines, D_4002F000[0]);
+        *(s32 *)&D_4002DF80.cur = (s32)p;
+        D_4002F000[1] = *(s32 *)(p + 0x10);
+        func_40011780(*(s32 *)((u8 *)&D_4002DF80 + 0xD0));
+    } else {
+        D_4002DF80.cur = 0;
+    }
+    if (DEBUG_is_locking_debug_camera() != 0 && D_4002DF80.cur != 0) {
+        DebugGlobalMoveWith2ndController(D_4002DF80.cur, D_4002DF80.cur);
+    }
+}
 
 INCLUDE_ASM("asm/PATHTOOL.XFF/nonmatchings/chunk/c0006_func_4001A9C0", func_4001BB70);
 
@@ -225,9 +355,40 @@ void func_4001BBF8(void) {
     }
 }
 
-INCLUDE_ASM("asm/PATHTOOL.XFF/nonmatchings/chunk/c0006_func_4001A9C0", func_4001BC40);
+void func_4001BC40(void) {
+    u8 *p;
+    if (D_4002DF80.lines != 0) {
+        p = getRootPointData(D_4002DF80.lines, D_4002F000[0]);
+        *(s32 *)&D_4002DF80.cur = (s32)p;
+        D_4002F000[1] = *(s32 *)(p + 0x10);
+        func_40011780(*(s32 *)((u8 *)&D_4002DF80 + 0xD0));
+    } else {
+        D_4002DF80.cur = 0;
+    }
+    if (DEBUG_is_locking_debug_camera() != 0 && D_4002DF80.cur != 0) {
+        DebugGlobalMoveWith2ndController(D_4002DF80.cur, D_4002DF80.cur);
+    }
+    if (*(s32 *)(padManagerData + 8) & 0x20) {
+        func_40011780(1);
+    }
+}
 
-INCLUDE_ASM("asm/PATHTOOL.XFF/nonmatchings/chunk/c0006_func_4001A9C0", func_4001BD08);
+void func_4001BD08(u32 *p) {
+    u32 *g = (u32 *)&D_4002DF80;
+    if (D_4002DF80.linesOwn != 0) {
+        iosFree((void *)g[4]);
+    }
+    g[4] = (u32)p;
+    D_4002DF80.linesOwn = 1;
+    if (*p <= D_4002F000[0]) {
+        D_4002F000[0] = *p - 1;
+    }
+    D_4001EEA8[7] = (float)*(u32 *)g[4];
+    D_4001EEA8[7] = D_4001EEA8[7] - 1.0f;
+    if (D_4001EEA8[7] < 0.0f) {
+        D_4001EEA8[7] = 0.0f;
+    }
+}
 
 void func_4001BDE0(void) {
     if (D_4002DF80.linesOwn != 0) {
@@ -249,11 +410,44 @@ void func_4001BE20(void)
     return;
 }
 
-INCLUDE_ASM("asm/PATHTOOL.XFF/nonmatchings/chunk/c0006_func_4001A9C0", func_4001BE50);
+void func_4001BE50(void) {
+    u8 *p;
+    if (D_4002DF80.goals != 0) {
+        union { s32 w; s16 h; } *u;
+        p = getGoalPointData(D_4002DF80.goals, D_4002F008[0]);
+        *(s32 *)&D_4002DF80.cur = (s32)p;
+        u = (void *)(p + 0x10);
+        D_4002F008[1] = u->h;
+        func_40011780(*(s32 *)((u8 *)&D_4002DF80 + 0xD0));
+    } else {
+        D_4002DF80.cur = 0;
+    }
+    if (DEBUG_is_locking_debug_camera() != 0 && D_4002DF80.cur != 0) {
+        DebugGlobalMoveWith2ndController(D_4002DF80.cur, D_4002DF80.cur);
+    }
+}
 
 INCLUDE_ASM("asm/PATHTOOL.XFF/nonmatchings/chunk/c0006_func_4001A9C0", func_4001BEF8);
 
-INCLUDE_ASM("asm/PATHTOOL.XFF/nonmatchings/chunk/c0006_func_4001A9C0", func_4001BFC8);
+void func_4001BFC8(void) {
+    u8 *p;
+    if (D_4002DF80.goals != 0) {
+        union { s32 w; s16 h; } *u;
+        p = getGoalPointData(D_4002DF80.goals, D_4002F008[0]);
+        *(s32 *)&D_4002DF80.cur = (s32)p;
+        u = (void *)(p + 0x10);
+        D_4002F008[1] = u->h;
+        func_40011780(*(s32 *)((u8 *)&D_4002DF80 + 0xD0));
+    } else {
+        D_4002DF80.cur = 0;
+    }
+    if (DEBUG_is_locking_debug_camera() != 0 && D_4002DF80.cur != 0) {
+        DebugGlobalMoveWith2ndController(D_4002DF80.cur, D_4002DF80.cur);
+    }
+    if (*(s32 *)(padManagerData + 8) & 0x20) {
+        func_40018550(D_4002F008[0]);
+    }
+}
 
 void func_4001C090(void) {
     u8 *p;
@@ -263,6 +457,39 @@ void func_4001C090(void) {
     }
 }
 
-INCLUDE_ASM("asm/PATHTOOL.XFF/nonmatchings/chunk/c0006_func_4001A9C0", func_4001C0D8);
+void func_4001C0D8(void) {
+    u8 *p;
+    if (D_4002DF80.goals != 0) {
+        union { s32 w; s16 h; } *u;
+        p = getGoalPointData(D_4002DF80.goals, D_4002F008[0]);
+        *(s32 *)&D_4002DF80.cur = (s32)p;
+        u = (void *)(p + 0x10);
+        D_4002F008[1] = u->h;
+        func_40011780(*(s32 *)((u8 *)&D_4002DF80 + 0xD0));
+    } else {
+        D_4002DF80.cur = 0;
+    }
+    if (DEBUG_is_locking_debug_camera() != 0 && D_4002DF80.cur != 0) {
+        DebugGlobalMoveWith2ndController(D_4002DF80.cur, D_4002DF80.cur);
+    }
+    if (*(s32 *)(padManagerData + 8) & 0x20) {
+        func_40011780(1);
+    }
+}
 
-INCLUDE_ASM("asm/PATHTOOL.XFF/nonmatchings/chunk/c0006_func_4001A9C0", func_4001C1A0);
+void func_4001C1A0(u32 *p) {
+    u32 *g = (u32 *)&D_4002DF80;
+    if (D_4002DF80.f20 != 0) {
+        iosFree((void *)g[5]);
+    }
+    g[5] = (u32)p;
+    D_4002DF80.f20 = 1;
+    if (*p <= D_4002F008[0]) {
+        D_4002F008[0] = *p - 1;
+    }
+    D_4001F1F0[7] = (float)*(u32 *)g[5];
+    D_4001F1F0[7] = D_4001F1F0[7] - 1.0f;
+    if (D_4001F1F0[7] < 0.0f) {
+        D_4001F1F0[7] = 0.0f;
+    }
+}
