@@ -81,23 +81,17 @@ void addPlayerHp(f32 val)
 #endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0028_getPlayerHp", addPlayerHp);
 
-/* NEARMISS-STUB _getPlayerHpRatio */
-#if 0 /* NEARMISS 99.62% cat=float-ops sub=- | see kK48 batch note | attempts=1 */
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0028_getPlayerHp", _getPlayerHpRatio);
 f32 _getPlayerHpRatio(void)
 {
     return getPlayerHp() / getPlayerMaxHp();
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0028_getPlayerHp", _getPlayerHpRatio);
 
-/* NEARMISS-STUB getPlayerHpRatio */
-#if 0 /* NEARMISS 99.69% cat=float-ops sub=- | see kK48 batch note | attempts=1 */
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0028_getPlayerHp", getPlayerHpRatio);
 f32 getPlayerHpRatio(void)
 {
     return (getPlayerHp() / getPlayerMaxHp()) * 100.0f;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0028_getPlayerHp", getPlayerHpRatio);
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0028_getPlayerHp", getPlayerMaxHp);
 f32 getPlayerMaxHp(void)

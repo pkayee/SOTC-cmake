@@ -1324,7 +1324,18 @@ u32 GetSymbolByIndex(ModObj *arg0, s32 idx)
     return (u32)h->symTabStr + h->symTab[idx + h->sectNrE].nameOffs;
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", isysRelocateModuleObj);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", isysRelocateModuleObj);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", isysRelocateModuleObj);
+void isysRelocateModuleObj(ModObj *obj)
+{
+    if (obj->flags & 0x20000000)
+    {
+        func_40019A00(obj, 0);
+        return;
+    }
+    func_40019A00(obj, 1);
+    obj->flags |= 0x20000000;
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", isysGetXffWorkSize);
 s32 isysGetXffWorkSize(ModHdr *h)

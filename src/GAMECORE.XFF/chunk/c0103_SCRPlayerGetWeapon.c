@@ -9,7 +9,40 @@ extern s32 D_40131B48;
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0103_SCRPlayerGetWeapon", SCRPlayerGetWeapon);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0103_SCRPlayerGetWeapon", SCRPlayerLostWeapon);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0103_SCRPlayerGetWeapon", SCRPlayerLostWeapon);
+extern u8 gcGlobalVar[];
+s32 SCRGetFirstObj();
+s32 setIsWeapon(s32 weapon, s32 flag);
+void func_4008C660(s32 obj, s32 val);
+
+extern u8 gcGlobalVar[];
+s32 SCRGetFirstObj();
+s32 setIsWeapon(s32 weapon, s32 flag);
+void func_4008C660(s32 obj, s32 val);
+
+extern u8 gcGlobalVar[];
+s32 SCRGetFirstObj();
+s32 setIsWeapon(s32 weapon, s32 flag);
+void func_4008C660(s32 obj, s32 val);
+
+void SCRPlayerLostWeapon(s32 arg)
+{
+    u8 *GetSCRCharaAIWorkPtr();
+    s32 obj = SCRGetFirstObj(gcGlobalVar + 0x2B0);
+    u8 *work;
+    s32 r;
+
+    if (obj != 0)
+    {
+        work = GetSCRCharaAIWorkPtr(obj);
+        r = setIsWeapon(arg, 0);
+        *(s32 *)(work + 0x70) = r;
+        if (r != arg && r != -1)
+        {
+            func_4008C660(obj, -1);
+        }
+    }
+}
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0103_SCRPlayerGetWeapon", nico_playerGetSightOn);
 s32 GAMEUTIL_is_player_obj(s32 chr);
@@ -403,7 +436,24 @@ void nico_hydePlayer(s32 a0, s32 a1)
     }
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0103_SCRPlayerGetWeapon", playerWeaponChangeIconMax);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0103_SCRPlayerGetWeapon", playerWeaponChangeIconMax);
+extern u8 gcGlobalVar[];
+s32 SCRGetFirstObj();
+
+extern u8 gcGlobalVar[];
+s32 SCRGetFirstObj();
+
+void playerWeaponChangeIconMax(void)
+{
+    s32 obj = SCRGetFirstObj(gcGlobalVar + 0x2B0);
+
+    if (obj != 0)
+    {
+        u8 *GetSCRCharaAIWorkPtr();
+        u8 *work = GetSCRCharaAIWorkPtr(obj);
+        *(s32 *)(work + 0x80) = 1;
+    }
+}
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0103_SCRPlayerGetWeapon", nico_playerCheckNippingWithHorseAndWall);
 s32 nico_playerCheckNippingWithHorseAndWall(s32 obj)
