@@ -4,19 +4,69 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0066_effectSetDamageWork", eff
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0066_effectSetDamageWork", effect_blood_init);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0066_effectSetDamageWork", effect_blood_free);
+extern void iosFree(void *);
+
+void effect_blood_free(void *allocation)
+{
+    iosFree(allocation);
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0066_effectSetDamageWork", effect_blood_frame);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0066_effectSetDamageWork", effect_blood_set);
+extern u8 D_40203290[];
+extern float D_401315D0;
+extern u8 *GetCharacterClass(void *chara);
+extern s32 *GetDamageClass(void *obj);
+extern void GetGeometryPointerPosition(float *, void *);
+extern void func_4005FAF8(void *, u8 *, s32, float *, s32, s32, float, float);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0066_effectSetDamageWork", createBossBloodParamMenu);
+void effect_blood_set(void *obj, void *target, float scale)
+{
+    char *c = GetCharacterClass(obj);
+    float pos[4] __attribute__((aligned(16)));
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0066_effectSetDamageWork", getEffectBloodWorkSize);
+    if (*GetDamageClass(obj) == 3) {
+        int **m;
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0066_effectSetDamageWork", getWeakPointEffectIntensity);
+        GetGeometryPointerPosition(pos, D_40203290);
+        m = *(int ***)(c + 0x144);
+        func_4005FAF8(target, c, *(int *)((char *)m[0] + 0x20), pos, *(int *)((char *)m[3] + 0x104),
+                      *(short *)(c + 0x1B4), D_401315D0, scale);
+    }
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0066_effectSetDamageWork", getTriggerPointEffectIntensity);
+extern int D_40131770[];
+extern void createParamMenu(void *, int);
+
+void createBossBloodParamMenu(void)
+{
+    if (D_40131770[12] == 0)
+        createParamMenu(D_40131770, 0);
+}
+
+int getEffectBloodWorkSize(int arg0)
+{
+    return (arg0 * 0x30) + 0x33;
+}
+
+typedef struct
+{
+    float v;
+    u8 pad[0x74];
+} WeakPointEffect;
+
+extern WeakPointEffect D_402032E4[];
+
+float getWeakPointEffectIntensity(int i)
+{
+    return D_402032E4[i].v;
+}
+
+float getTriggerPointEffectIntensity(int index)
+{
+    index += 3;
+    return D_402032E4[index].v;
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0066_effectSetDamageWork", boot_weakpoint_effect);
 
@@ -30,11 +80,27 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0066_effectSetDamageWork", end
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0066_effectSetDamageWork", effect_death);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0066_effectSetDamageWork", effectClearDamageWork);
+extern int D_40203288;
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0066_effectSetDamageWork", effectGetDamageWork);
+void effectClearDamageWork(void)
+{
+    D_40203288 = 0;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0066_effectSetDamageWork", getBloodEffectEnableFlag);
+extern unsigned char D_40202FE0[];
+
+int effectGetDamageWork(void **arg0)
+{
+    *arg0 = D_40202FE0;
+    return (*(int *)((char *)(D_40202FE0) + 0x2A8));
+}
+
+extern unsigned char D_401315F4[];
+
+void *getBloodEffectEnableFlag(void)
+{
+    return D_401315F4;
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0066_effectSetDamageWork", func_40061720);
 
@@ -48,11 +114,26 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0066_effectSetDamageWork", fun
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0066_effectSetDamageWork", func_40061770);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0066_effectSetDamageWork", getWeakGlowSpeed);
+extern unsigned char D_401317A4[];
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0066_effectSetDamageWork", getWeakGlowTime);
+void *getWeakGlowSpeed(void)
+{
+    return D_401317A4;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0066_effectSetDamageWork", getTrigGlowTime);
+extern unsigned char D_401317A8[];
+
+void *getWeakGlowTime(void)
+{
+    return D_401317A8;
+}
+
+extern unsigned char D_401317AC[];
+
+void *getTrigGlowTime(void)
+{
+    return D_401317AC;
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0066_effectSetDamageWork", func_400617B0);
 
