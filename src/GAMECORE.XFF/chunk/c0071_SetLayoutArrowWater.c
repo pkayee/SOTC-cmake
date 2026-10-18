@@ -10,10 +10,71 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0071_SetLayoutArrowWater", arr
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0071_SetLayoutArrowWater", arrowWaterMain);
 
+/* NEARMISS-STUB getFallenLeafSize */
+#if 0 /* NEARMISS 83.0% cat=regalloc sub=- | target keeps 0x160 in reg before beqz; ours folds it, beqzl | attempts=1 */
+int getFallenLeafSize(char *a)
+{
+    unsigned int *h = (unsigned int *)(a + 0x1C);
+    unsigned int v = *h;
+    int off = v & 0x3FFFF;
+    char *t = off != 0 ? *(char **)((char *)h - off) : 0;
+    char *p = (t != 0 && t != (char *)DldSysUndefSymbol) ? *(char **)(t + 0x10) + ((v >> 18) & 0xFFF) * *(int *)(*(char **)(t + 8) + 0xC) : 0;
+    int n;
+    int base = 0x160;
+    if (*(int *)(a + 0x30) != 0)
+    {
+        n = *(int *)(a + 0x3C);
+    }
+    else
+    {
+        n = *(int *)(a + 0x28) * *(int *)(a + 0x2C);
+    }
+    return (n << 7) + base + (*(int *)(p + 8) << 6);
+}
+#endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0071_SetLayoutArrowWater", getFallenLeafSize);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0071_SetLayoutArrowWater", EnableArrowWater);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0071_SetLayoutArrowWater", EnableArrowWater);
+extern s32 D_40203690[];
 
+void EnableArrowWater(s32 param)
+{
+    s32 i = 0;
+    s32 *p = D_40203690;
+    do {
+        if (p[0] == 0) {
+            p[0] = 1;
+            p[2] = param;
+            p[3] = 0;
+            return;
+        }
+        i++;
+        p += 4;
+    } while (i < 0x19);
+    return;
+}
+
+/* NEARMISS-STUB EndArrowWater */
+#if 0 /* NEARMISS 99.4% cat=struct-layout sub=- | loop ptr base+8 kept in v0 then addiu v1,v1,8 vs folded into lui/addiu %lo | attempts=1 */
+void EndArrowWater(s32 param)
+{
+    s32 i = 0;
+    s32 *p;
+    p = D_40203690;
+    p += 2;
+    do {
+        if (p[0] == param) {
+            p[-2] = 0;
+            p[0] = 0;
+            p[1] = 0;
+            return;
+        }
+        i++;
+        p += 4;
+    } while (i < 0x19);
+    return;
+}
+#endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0071_SetLayoutArrowWater", EndArrowWater);
 
 extern s32 D_40203690[];
@@ -24,8 +85,39 @@ s32 CheckEnableArrowWater(s32 idx)
     return D_40203690[idx * 4];
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0071_SetLayoutArrowWater", CheckStartArrowWater);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0071_SetLayoutArrowWater", CheckStartArrowWater);
+s32 CheckStartArrowWater(s32 idx)
+{
+    if (D_40203690[idx * 4] != 0)
+    {
+        if (*(D_40203690 + idx * 4 + 1) == 0)
+        {
+            return 1;
+        }
+    }
+    return 0;
+}
 
+/* NEARMISS-STUB UpdateArrowWater */
+#if 0 /* NEARMISS 98.89% cat=regalloc sub=- | lui order differs: target loads D_40203690 hi first, ours gcGlobalVar; regs p/g/i swapped | attempts=1 */
+extern u8 gcGlobalVar[];
+
+void UpdateArrowWater(void)
+{
+    u8 *g = gcGlobalVar;
+    s32 *p = D_40203690;
+    s32 i = 0x18;
+    do {
+        p[1] = p[0];
+        if (p[0] != 0) {
+            *(f32 *)&p[3] = *(f32 *)&p[3] + *(f32 *)(g + 0x190);
+        }
+        i--;
+        p += 4;
+    } while (i >= 0);
+    return;
+}
+#endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0071_SetLayoutArrowWater", UpdateArrowWater);
 
 int getArrowWaterSize(char *a)

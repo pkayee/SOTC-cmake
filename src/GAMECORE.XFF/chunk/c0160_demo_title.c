@@ -6,15 +6,76 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0160_demo_title", func_400D665
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0160_demo_title", titlemenu);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0160_demo_title", title_newfile);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0160_demo_title", title_newfile);
+extern s32 D_40131EB0;
+extern s32 ScrIntrDef_GAME_NEWSTART;
+void setGameHardMode(s32 v);
+void scriptIntrSignal();
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0160_demo_title", title_newfile_hard);
+void title_newfile(void)
+{
+    D_40131EB0 = 0;
+    setGameHardMode(0);
+    scriptIntrSignal(ScrIntrDef_GAME_NEWSTART);
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0160_demo_title", title_loadfile);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0160_demo_title", title_newfile_hard);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0160_demo_title", title_options);
+void title_newfile_hard(void)
+{
+    D_40131EB0 = 0;
+    setGameHardMode(1);
+    scriptIntrSignal(ScrIntrDef_GAME_NEWSTART);
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0160_demo_title", func_400D6B80);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0160_demo_title", title_loadfile);
+extern s32 D_40131EB4;
+extern s32 opflowCompareOptionData(void);
+extern void func_400D6B80(s32 param_1);
+void bootMemoryCardLoadScriptNoBlock(s32 a, void *b);
+
+void title_loadfile(void)
+{
+    D_40131EB4 = 1;
+    bootMemoryCardLoadScriptNoBlock((s32)func_400D6B80, (void *)opflowCompareOptionData);
+}
+
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0160_demo_title", title_options);
+extern void PauseGame(s32 a);
+extern void OptionMenuStart(s32 *a);
+extern void scrRun(void);
+extern void ReleaseGame(s32 a);
+
+void title_options(void)
+{
+    s32 sel;
+
+    PauseGame(1);
+    sel = 0;
+    OptionMenuStart(&sel);
+    while (sel == 0)
+    {
+        scrRun();
+    }
+    ReleaseGame(1);
+}
+
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0160_demo_title", func_400D6B80);
+extern s32 D_40131EB8;
+extern s32 ScrIntrDef_GAME_LOADSTART;
+
+void func_400D6B80(s32 param_1)
+{
+    if (param_1 != 0)
+    {
+        D_40131EB8 = 1;
+        D_40131EB0 = 0;
+        scriptIntrSignal(ScrIntrDef_GAME_LOADSTART);
+        return;
+    }
+    D_40131EB4 = 0;
+    return;
+}
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0160_demo_title", nico_tortoiseBossStart);
 extern char rootPtn[];
