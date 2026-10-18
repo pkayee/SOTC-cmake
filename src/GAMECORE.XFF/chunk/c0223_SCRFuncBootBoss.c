@@ -65,7 +65,7 @@ u8 *GetCharacterClass(void *chara);
 void *getSCRDataCtrlWork();
 void updateAttackWaistIKWork(void *chara, void *ik);
 
-int SCRFuncSetAttakIKPosForMotionCheck(void *a, s32 b, s32 c, s32 d, s32 e, s32 f, u32 *h)
+void SCRFuncSetAttakIKPosForMotionCheck(void *a, s32 b, s32 c, s32 d, s32 e, s32 f, u32 *h)
 {
     u8 *m = GetCharacterClass(a) + 0x1C0;
     u8 *w = getSCRDataCtrlWork(a);
@@ -75,6 +75,7 @@ int SCRFuncSetAttakIKPosForMotionCheck(void *a, s32 b, s32 c, s32 d, s32 e, s32 
     {
         updateAttackWaistIKWork(a, *(void **)(*(u8 **)(w + 0x405C) + 0x134));
     }
+    return;
 }
 
 void *getSCRDataCtrlWork(void);

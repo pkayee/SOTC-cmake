@@ -163,24 +163,14 @@ typedef struct {
     float filterBaseDist;
 } CameraModeCommonData;
 
-/* NEARMISS-STUB get_mode_common_data_filter_base_dist_to_look_at */
-#if 0 /* NEARMISS 99.6% cat=stack-frame sub=- | in-TU: frame -0x40 vs exp -0x50 (16 B extra local only a dummy gives) | attempts=1 */
-
-typedef float sceVu0FMATRIX[4][4] __attribute__((aligned(16)));
-
-typedef struct {
-    char pad0[0x170];
-    float filterBaseDist;
-} CameraModeCommonData;
-
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0193_func_400FA400", get_mode_common_data_filter_base_dist_to_look_at);
 float get_mode_common_data_filter_base_dist_to_look_at(CameraModeCommonData **mode)
 {
-    sceVu0FMATRIX unused;
+    sceVu0FMATRIX m;
+    float v[4];
 
     return (*mode)->filterBaseDist;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0193_func_400FA400", get_mode_common_data_filter_base_dist_to_look_at);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0193_func_400FA400", func_400FAFA0);
 
