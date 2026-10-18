@@ -1,6 +1,16 @@
 #include "common.h"
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0080_ResetCharacterClassPositionMemoryInfo", ResetCharacterClassPositionMemoryInfo);
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0080_ResetCharacterClassPositionMemoryInfo", ResetCharacterClassPositionMemoryInfo);
+
+extern void DeleteTwoWayLink(void *);
+
+void ResetCharacterClassPositionMemoryInfo(char *p)
+{
+    if (*(int *)(p + 0xFC0) != 0) {
+        *(int *)(p + 0xFC0) = 0;
+        DeleteTwoWayLink(p + 0xFC4);
+    }
+}
 
 extern int func_40074EA8();
 extern int ClipCollisionFinderCallBack();

@@ -40,7 +40,12 @@ int is_doing_motion_ik_interest(void *arg0)
     return (*(int *)((char *)(arg0) + 4));
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0052_doit_motion_ik_interest", func_40050A10);
+void func_40050A10(char *p)
+{
+    *(int *)(p + 0x88) = 0;
+    *(int *)(p + 0x84) = 0;
+    *(int *)(p + 0x80) = 0;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0052_doit_motion_ik_interest", func_40050A20);
 

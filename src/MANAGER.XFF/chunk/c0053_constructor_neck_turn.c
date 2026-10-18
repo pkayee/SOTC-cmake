@@ -182,4 +182,31 @@ char *GetAnimationDefClass(u8 *p)
     return (char *)p + 0x1C;
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0053_constructor_neck_turn", getAnimationDefByName);
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0053_constructor_neck_turn", getAnimationDefByName);
+extern s32 DldSysUndefSymbol;
+s32 strcmp(const char *, const char *);
+
+/* dld link word: bits 0..17 = byte distance back to a slot holding the target (or DldSysUndefSymbol) */
+static inline u8 *dldRef(u32 *lp, s32 fld) {
+    u8 *slot;
+    u32 off = *lp & 0x3FFFF;
+
+    slot = off ? *(u8 **)((u8 *)lp - off) : NULL;
+    return (slot != NULL && slot != (u8 *)DldSysUndefSymbol) ? *(u8 **)(slot + fld) : NULL;
+}
+
+u8 *getAnimationDefByName(u32 *lp, const char *name)
+{
+    s32 n;
+    u8 *p;
+    s32 cnt = (s32)dldRef(lp, 0xC);
+
+    p = dldRef(lp, 0x10);
+    n = cnt - 1;
+    for (; n != -1; n--, p += 0x74) {
+        if (strcmp(*(const char **)p, name) == 0) {
+            return p;
+        }
+    }
+    return NULL;
+}

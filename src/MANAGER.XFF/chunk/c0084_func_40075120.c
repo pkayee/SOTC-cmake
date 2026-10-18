@@ -2,7 +2,14 @@
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0084_func_40075120", func_40075120);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0084_func_40075120", motrootdyn_startchainhang);
+extern void ParentLayoutObj(s64 a0, u8 *a1);
+
+void motrootdyn_startchainhang(s64 a0, u8 *a1)
+{
+    if (*(s32 *)(a1 + 0xD14) != 0) {
+        return ParentLayoutObj(a0, a1 + 0xD20);
+    }
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0084_func_40075120", chainhang);
 

@@ -88,11 +88,25 @@ int RequestDeleteWindowObj(int a, int b, int c, int d)
     return isysRequestDeleteObj(a, b, c, d);
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0183_windowDeleteControl", func_400E7BE8);
+extern void flushScriptObj();
+
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0183_windowDeleteControl", func_400E7BE8);
+void func_400E7BE8(void)
+{
+    flushScriptObj();
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0183_windowDeleteControl", func_400E7C00);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0183_windowDeleteControl", func_400E7C58);
+//INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0183_windowDeleteControl", func_400E7C58);
+void windowDelete(int);
+void flushScriptObjImmediate(void *);
+
+void func_400E7C58(void *p)
+{
+    windowDelete(*(int *)((char *)p + 0xB4));
+    flushScriptObjImmediate(p);
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0183_windowDeleteControl", func_400E7C88);
 
