@@ -55,7 +55,7 @@ extern u8 *SkelFocusDef_LEO_TAIL_A;
 void func_40075428(s32 *a0);
 extern s32 rootPtn;
 extern s32 DldSysUndefSymbol;
-u8 *GetLayoutClass(void);
+u8 *GetLayoutClass();
 void bootMemoryCardSaveScriptNoBlock(void *p);
 s32 SCRGetSizeOfBossWork(void *thread);
 void *iosCreatePartition(void *parent, s32 size);
@@ -448,65 +448,31 @@ void nico_mammothAllTexEnd(void)
 #endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0085_nico_leoBossStart", nico_mammothAllTexEnd);
 
-/* NEARMISS-STUB mc_save_scr_begin */
-#if 0 /* NEARMISS 82.3% cat=regalloc sub=- | DLD link word/slot regs swapped, lay=NULL hoisted | attempts=1 */
-void mc_save_scr_begin(void *a0)
+static inline char *dldResolve(unsigned int *h)
 {
-    u8 *lay;
-    u32 *lp;
-    u8 *elem;
-    u8 *slot;
-    u8 *res;
-    u32 w;
-    u32 off;
+    unsigned int v = *h;
+    int off = v & 0x3FFFF;
+    int *t = 0;
 
-    if (a0 == NULL)
-    {
-        lay = NULL;
-    }
-    else
-    {
-        lay = GetLayoutClass();
-        lay = *(u8 **)(lay + 0x1A4);
-    }
-    if (lay != NULL)
-    {
-        lp = (u32 *)(lay + 0x10);
-        w = *lp;
-        off = w & 0x3FFFF;
-        slot = NULL;
-        if (off != 0)
-        {
-            slot = *(u8 **)((u8 *)lp - off);
-        }
-        if (slot != NULL && slot != (u8 *)DldSysUndefSymbol)
-        {
-            elem = *(u8 **)(slot + 0x10) + ((w >> 18) & 0xFFF) * *(s32 *)(*(u8 **)(slot + 8) + 0xC);
-        }
-        else
-        {
-            elem = NULL;
-        }
-        off = *(volatile u32 *)elem & 0x3FFFF;
-        slot = NULL;
-        if (off != 0)
-        {
-            slot = *(u8 **)(elem - off);
-        }
-        if (slot != NULL && slot != (u8 *)DldSysUndefSymbol)
-        {
-            res = *(u8 **)(slot + 0x10) + ((*(volatile u32 *)elem >> 18) & 0xFFF) * *(s32 *)(*(u8 **)(slot + 8) + 0xC);
-        }
-        else
-        {
-            res = NULL;
-        }
-    }
-    else
-    {
-        res = NULL;
-    }
-    bootMemoryCardSaveScriptNoBlock(res);
+    if (off != 0)
+        t = *(int **)((char *)h - off);
+    return (t != 0 && t != (int *)DldSysUndefSymbol) ? (char *)t[4] + ((v >> 18) & 0xFFF) * ((int *)t[2])[3] : 0;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0085_nico_leoBossStart", mc_save_scr_begin);
+
+static inline char *dldResolveRe(unsigned int *h)
+{
+    int off = *h & 0x3FFFF;
+    int *t = off != 0 ? *(int **)((char *)h - off) : 0;
+
+    return (t != 0 && t != (int *)DldSysUndefSymbol) ? (char *)t[4] + ((*h >> 18) & 0xFFF) * ((int *)t[2])[3] : 0;
+}
+
+void mc_save_scr_begin(void *obj)
+{
+    char *g = obj != 0 ? *(char **)(GetLayoutClass(obj) + 0x1A4) : 0;
+    char *p = 0;
+
+    if (g != 0)
+        p = dldResolveRe((unsigned int *)dldResolve((unsigned int *)(g + 0x10)));
+    bootMemoryCardSaveScriptNoBlock(p);
+}

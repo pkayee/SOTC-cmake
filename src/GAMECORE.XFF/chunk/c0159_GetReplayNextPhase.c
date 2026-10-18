@@ -1,6 +1,21 @@
 #include "common.h"
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0159_GetReplayNextPhase", GetReplayNextPhase);
+extern int D_40131E64;
+
+int GetReplayNextPhase(void)
+{
+    switch (D_40131E64) {
+    case 8:
+        return 1;
+    case 9:
+        return 2;
+    case 11:
+        return 3;
+    case 13:
+        return 4;
+    }
+    return 0;
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0159_GetReplayNextPhase", ReplayGameOverScriptBegin);
 
@@ -10,7 +25,16 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0159_GetReplayNextPhase", func
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0159_GetReplayNextPhase", func_400D5620);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0159_GetReplayNextPhase", CloseTimeAttackMenu);
+typedef struct { char pad[0xC]; int flags; } TimeAttack;
+extern TimeAttack g_TimeAttack;
+
+void CloseTimeAttackMenu(int a)
+{
+    if (a == 1)
+        g_TimeAttack.flags |= 0xFE;
+    else
+        g_TimeAttack.flags |= a;
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0159_GetReplayNextPhase", func_400D56D8);
 

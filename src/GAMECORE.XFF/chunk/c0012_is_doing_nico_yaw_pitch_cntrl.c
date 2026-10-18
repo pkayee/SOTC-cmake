@@ -22,7 +22,7 @@ void update_offset_yaw_pitch_another_factor_nico_yaw_pitch_cntrl(f32 a, f32 b, u
 f32 func_40024298(f32 a, f32 b, f32 c);
 
 /* NEARMISS-STUB update_base_yaw_nico_yaw_pitch_cntrl */
-#if 0 /* NEARMISS 91.0% cat=regalloc sub=- | same as update_base_pitch: target copies v into f13 before mtc1 zero/bne, ours in the bne delay slot; early-zero return variant scores 73.6 | attempts=1 */
+#if 0 /* NEARMISS 91.0% cat=regalloc sub=- | in-TU: target copies v into f13 before mtc1 zero/bne, ours in delay slot; param-order and truthy-if variants no better | attempts=2 */
 f32 update_base_yaw_nico_yaw_pitch_cntrl(f32 v, u8 *p)
 {
     f32 base;
@@ -42,7 +42,7 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0012_is_doing_nico_yaw_pitch_c
 f32 func_40024218(f32 a, f32 b, f32 c);
 
 /* NEARMISS-STUB update_base_pitch_nico_yaw_pitch_cntrl */
-#if 0 /* NEARMISS 91.0% cat=regalloc sub=- | target copies v into f13 before the mtc1 zero/bne (ours copies in the bne delay slot); target keeps a0=p in the bne delay slot; tail jal layout otherwise identi | attempts=1 */
+#if 0 /* NEARMISS 91.0% cat=regalloc sub=- | in-TU: target copies v into f13 before is_enable bne, keeps v in f20 across call; ours copies in delay slot; same as yaw | attempts=2 */
 f32 update_base_pitch_nico_yaw_pitch_cntrl(f32 v, u8 *p)
 {
     f32 base;
