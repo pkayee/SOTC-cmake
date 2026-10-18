@@ -6,7 +6,11 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0202_func_401033B0", func_4010
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0202_func_401033B0", func_40103628);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0202_func_401033B0", func_40103678);
+void func_40103678(char *p)
+{
+    *(int *)(p + 0x3c78) = -1;
+    *(int *)(p + 0x3c7c) = -1;
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0202_func_401033B0", func_40103688);
 

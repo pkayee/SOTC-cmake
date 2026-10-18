@@ -110,6 +110,19 @@ float calcMoveTurnAngle2(char *p, float a)
     return calcMoveAngle(0, a, *(float *)(p + 0xA8), *(float *)(**(char ***)(p + 0x1C) + 0x78), D_40137588);
 }
 
+/* NEARMISS-STUB calcProgRotRatioForMove2 */
+#if 0 /* NEARMISS 83.33% cat=call-abi sub=- | float param slot/a0 copy to v0 (daddu) and load order differ from target | attempts=1 */
+extern u8 gcGlobalVar[];
+float calcProgRotRatio(f32 unused, void *obj, f32 a, f32 b, f32 c, f32 d);
+
+void calcProgRotRatioForMove2(char *obj, f32 unused)
+{
+    char *p = **(char ***)(obj + 0x1C);
+
+    calcProgRotRatio(unused, obj, *(f32 *)(obj + 0xA4), *(f32 *)(gcGlobalVar + 0x190), *(f32 *)(obj + 0xA8),
+                     *(f32 *)(p + 0x78));
+}
+#endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0204__setExecBaseMoveWork", calcProgRotRatioForMove2);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0204__setExecBaseMoveWork", adjustCurveAngleForCollision);

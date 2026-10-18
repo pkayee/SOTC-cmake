@@ -306,6 +306,24 @@ s32 SCRConditionControlModeCheck(void *a, s32 b, s32 c, s32 d, s32 e, s32 f, s32
     return dldResolve(h2) == *(u8 **)(GetCharacterClass((void *)o[2]) + 0x740);
 }
 
+/* NEARMISS-STUB SCRConditionGameFlagCheckByGameObj */
+#if 0 /* NEARMISS 81.625% cat=branch-layout sub=- | target calls dldResolve fallthrough with beqz to shared epilogue; ours bnezl to out-of-line call block | attempts=1 */
+s32 gStatGobjDispGflagChk(u8 *obj);
+
+s32 SCRConditionGameFlagCheckByGameObj(void *a, s32 b, s32 c, s32 d, s32 e, s32 f, s32 g, s32 *h1)
+{
+    s32 *o = dldObj(h1);
+
+    if (o != 0 && o[2] != 0)
+    {
+        if (dldResolve((u32 *)(o + 4)) != 0)
+        {
+            return gStatGobjDispGflagChk(dldResolve((u32 *)(o + 4)));
+        }
+    }
+    return 0;
+}
+#endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0228_SCRConditionInstantaneousPlayerInSight", SCRConditionGameFlagCheckByGameObj);
 
 s32 SCRConditionGameFlagCheck(s32 a0, s32 a1)

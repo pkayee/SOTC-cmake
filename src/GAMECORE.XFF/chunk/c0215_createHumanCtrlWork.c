@@ -39,7 +39,16 @@ void setDashHumanCtrlWork(void *arg0, s32 arg1)
     *(s32 *)((u8 *)arg0 + 0x30) = arg1;
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0215_createHumanCtrlWork", func_40112AF0);
+extern void _resetBaseMoveWork(void *);
+extern void func_40112B20();
+
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0215_createHumanCtrlWork", func_40112AF0);
+void func_40112AF0(void *w, void *ctrl)
+{
+    _resetBaseMoveWork(w);
+    *(s32 *)((u8 *)ctrl + 0x30) = 0;
+    func_40112B20(ctrl);
+}
 
 void func_40112B20(void) {
 }
