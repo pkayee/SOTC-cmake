@@ -157,7 +157,27 @@ f32 *reset_double_spring_interp_cntrl3D(f32 *c, f32 *src)
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0008_GAMEUTIL_set_param_extend_interp_ratio_c", doit_double_spring_interp_cntrl3D);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0008_GAMEUTIL_set_param_extend_interp_ratio_c", is_reach_src_value_double_spring_interp_cntrl3D);
+s32 is_reach_src_value_double_spring_interp_cntrl3D(void *control, f32 *target)
+{
+    char *state = control;
+    s32 *mode = (s32 *)(state + 0x14);
+    f32 *value = (f32 *)(state + 0x30);
+    s32 i = 0;
+    s32 reached = 1;
+
+    do {
+        f32 a = *value++;
+        f32 b = *target++;
+        s32 m = *mode++;
+        f32 difference = GAMEUTIL_get_difference_value(m, a, b);
+
+        if (!GAMEUTIL_is_nearly_equal_zero(difference, *(f32 *)(state + 0x10) * 3.0f)) {
+            reached = 0;
+            break;
+        }
+    } while (++i < 3);
+    return reached;
+}
 
 void constructor_aim_angle_interp_cntrl(s32 *c, s32 v) {
     c[0] = v;
