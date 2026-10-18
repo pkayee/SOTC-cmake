@@ -1,5 +1,9 @@
 #include "common.h"
 
+/* GAMECORE c0208 func_4010AEC8: reset block of float/int fields; PROVEN 100. The Ghidra store order is NOT the source order:
+ * 16-thread permutation search found 13 of 5040 orders that match; this is the plainest one. D_401375E4 is a rodata f32 (0x7fffffff bit pattern per Ghidra). */
+extern const f32 D_401375E4;
+
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0208_func_4010A6A8", func_4010A6A8);
 
 void deleteBirdCtrlWork(void) {
@@ -75,33 +79,26 @@ void func_4010AE58(char *arg0, char *arg1)
 #endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0208_func_4010A6A8", func_4010AE58);
 
-/* NEARMISS-STUB func_4010AEC8 */
-#if 0 /* NEARMISS 99.75% cat=sched sub=- | float stores 0x50/0x54/0x58 reordered by scheduler; target 58,50,54 | attempts=1 */
-extern const f32 D_401375E4;
-
-void func_4010AEC8(void *param)
+void func_4010AEC8(char *p)
 {
-    *(f32*)((u8*)param + 0x5C) = 1.0f;
-    *(s32*)((u8*)param + 0x40) = 0;
-    *(s32*)((u8*)param + 0x60) = 0;
-    *(s32*)((u8*)param + 0x44) = 0;
-    *(f32*)((u8*)param + 0x58) = D_401375E4;
-    *(f32*)((u8*)param + 0x50) = D_401375E4;
-    *(f32*)((u8*)param + 0x54) = D_401375E4;
+    *(s32 *)(p + 0x40) = 0;
+    *(s32 *)(p + 0x60) = 0;
+    *(s32 *)(p + 0x44) = 0;
+    *(f32 *)(p + 0x50) = D_401375E4;
+    *(f32 *)(p + 0x54) = D_401375E4;
+    *(f32 *)(p + 0x5C) = 1.0f;
+    *(f32 *)(p + 0x58) = D_401375E4;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0208_func_4010A6A8", func_4010AEC8);
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0208_func_4010A6A8", func_4010AEF8);
 
-/* NEARMISS-STUB func_4010AF60 */
-#if 0 /* NEARMISS 99.43% cat=regalloc sub=- | a1/a2 vs v0/v1 temporaries; load order and xor match | attempts=1 */
+/* GAMECORE c0208 func_4010AF60: (*p->x) == p->b->v; PROVEN 100. Declare the 0xCC pointer BEFORE the 0x1C one
+ * (a1/a2 regs + load order come out like the target; the other declaration order or a direct expression gives 94.4). */
 s32 func_4010AF60(char *p)
 {
+    u8 *a2 = *(u8 **)(p + 0xCC);
     s32 *a1 = *(s32 **)(p + 0x1C);
-    return *(s32 *)((u8 *)(*(s32 **)(p + 0xCC)) + 0xBC) == *a1;
+    return *a1 == *(s32 *)(a2 + 0xBC);
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0208_func_4010A6A8", func_4010AF60);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0208_func_4010A6A8", func_4010AF80);
 

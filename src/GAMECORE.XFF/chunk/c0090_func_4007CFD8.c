@@ -1,5 +1,10 @@
 #include "common.h"
 
+extern s32 D_40131960;
+extern s32 D_40131964;
+
+extern void scrRunM(s32);
+
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0090_func_4007CFD8", func_4007CFD8);
 
 typedef struct { s32 a, b, c, d, e, f, g, h, i, j, k, l, m, n, o; } MParam;
@@ -42,7 +47,12 @@ void SCRSetupMissile1(void *a, s32 b, s32 c, s32 d)
     }
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0090_func_4007CFD8", func_4007D210);
+s32 func_4007D210(s32 a) {
+    if (D_40131960 == a || D_40131964 == a) {
+        return 0;
+    }
+    return 1;
+}
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0090_func_4007CFD8", func_4007D240);
 u64 *GetCollisionDBAttributeAdr(void *surface);
@@ -70,7 +80,17 @@ s32 func_4007D240(void *surface)
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0090_func_4007CFD8", func_4007D330);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0090_func_4007CFD8", func_4007D378);
+void func_4007D378(void) {
+    u8 *g;
+    float t;
+    isysGetThisSubThread();
+    g = gcGlobalVar;
+    t = 0.0f;
+    do {
+        t += *(float *)(g + 0x180);
+        scrRunM(1);
+    } while (t < 5.0f);
+}
 
 void nico_missile1start(int arg)
 {
