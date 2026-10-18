@@ -79,19 +79,54 @@ void *getNBlurPlanes(void)
     return D_40124890;
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0014_skipBlur", getBlurIntensity);
+extern unsigned char D_40124894[];
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0014_skipBlur", getBlurZBase);
+void *getBlurIntensity(void)
+{
+    return D_40124894;
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0014_skipBlur", getBlurMinThreshold);
+extern unsigned char D_4012489C[];
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0014_skipBlur", getBlurMaxThreshold);
+void *getBlurZBase(void)
+{
+    return D_4012489C;
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0014_skipBlur", getBlurShutterSpeed);
+extern unsigned char D_401248A0[];
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0014_skipBlur", getBlurXYZRatio);
+void *getBlurMinThreshold(void)
+{
+    return D_401248A0;
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0014_skipBlur", getBlurCamMoveThreshold);
+extern unsigned char D_401248A4[];
+
+void *getBlurMaxThreshold(void)
+{
+    return D_401248A4;
+}
+
+extern unsigned char D_401248A8[];
+
+void *getBlurShutterSpeed(void)
+{
+    return D_401248A8;
+}
+
+extern unsigned char D_401248AC[];
+
+void *getBlurXYZRatio(void)
+{
+    return D_401248AC;
+}
+
+extern unsigned char D_401248B0[];
+
+void *getBlurCamMoveThreshold(void)
+{
+    return D_401248B0;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0014_skipBlur", getBankAngle);
 
