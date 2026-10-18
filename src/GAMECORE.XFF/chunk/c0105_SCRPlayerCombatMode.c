@@ -11,6 +11,7 @@ void player_setDangerEdgeOtherSidePlanePoint(void *chara, u8 *point);
 void player_setDangerEdgePoint(void *chara, u8 *point);
 void player_setHellDangerPoint(void *chara, u8 *point);
 void player_setEdgeHangPointGeometry(void *chara, u8 *point);
+void player_setGripHangPointGeometry(void *chara, u8 *point);
 void func_4008C7C8(void);
 void func_4008F430(void);
 void func_4008F478(void);
@@ -20,6 +21,11 @@ void func_4008F5F8(void);
 void func_4008F638(void);
 void func_4008F678(void);
 void func_4008F7E0(void);
+u8 *GetCharacterClass(void *chara);
+void nico_setHorseBridleDoubleShort(void *actor);
+void nico_setHorseBridleLeftLong(void *actor);
+void nico_setHorseBridleRightLong(void *actor);
+void nico_setHorseBridleDoubleLong(void *actor);
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0105_SCRPlayerCombatMode", SCRPlayerCombatMode);
 void SCRPlayerCombatMode(void *a0)
@@ -95,13 +101,41 @@ void nico_playeGripholdOff(void)
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0105_SCRPlayerCombatMode", nico_setPlayerHorseBridle);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0105_SCRPlayerCombatMode", nico_setPlayerHorseBridleDoubleShort);
+static inline void *getHorse(void *a)
+{
+    void *h = *(void **)(GetCharacterClass(a) + 0x940);
+    if (h != a && *(s16 *)(GetCharacterClass(h) + 0x360) == 3)
+        return h;
+    return 0;
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0105_SCRPlayerCombatMode", nico_setPlayerHorseBridleLeftLong);
+void nico_setPlayerHorseBridleDoubleShort(void *a)
+{
+    void *h = getHorse(a);
+    if (h != 0)
+        nico_setHorseBridleDoubleShort(h);
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0105_SCRPlayerCombatMode", nico_setPlayerHorseBridleRightLong);
+void nico_setPlayerHorseBridleLeftLong(void *a)
+{
+    void *h = getHorse(a);
+    if (h != 0)
+        nico_setHorseBridleLeftLong(h);
+}
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0105_SCRPlayerCombatMode", nico_setPlayerHorseBridleDoubleLong);
+void nico_setPlayerHorseBridleRightLong(void *a)
+{
+    void *h = getHorse(a);
+    if (h != 0)
+        nico_setHorseBridleRightLong(h);
+}
+
+void nico_setPlayerHorseBridleDoubleLong(void *a)
+{
+    void *h = getHorse(a);
+    if (h != 0)
+        nico_setHorseBridleDoubleLong(h);
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0105_SCRPlayerCombatMode", nico_ChangePlayerHorseRidingControlWithParentObj);
 
@@ -111,7 +145,18 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0105_SCRPlayerCombatMode", nic
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0105_SCRPlayerCombatMode", nico_ForceChangePlayerHorseRidingControl);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0105_SCRPlayerCombatMode", nico_ChangePlayerHorseRidingParentWithVCol);
+void *GetGeometryPointerObject(void *chara);
+void SendCharaNodeParentSetMsg(void *chara, void *parent, s32 flag);
+
+void nico_ChangePlayerHorseRidingParentWithVCol(void *o)
+{
+    u8 *c = GetCharacterClass(o);
+    if (*(s32 *)(c + 0xDB0) != 0)
+    {
+        SendCharaNodeParentSetMsg(o, GetGeometryPointerObject(c + 0xDD0), 0x10000);
+        c = 0;
+    }
+}
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0105_SCRPlayerCombatMode", nico_setPlayerEdgePoint);
 void nico_setPlayerEdgePoint(void *a0)
@@ -119,7 +164,10 @@ void nico_setPlayerEdgePoint(void *a0)
     player_setEdgeHangPointGeometry(a0, GetSCRCharaAIWorkPtr() + 0x1A40);
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0105_SCRPlayerCombatMode", nico_setPlayerGripPoint);
+void nico_setPlayerGripPoint(void *a0)
+{
+    player_setGripHangPointGeometry(a0, GetSCRCharaAIWorkPtr() + 0x1A40);
+}
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0105_SCRPlayerCombatMode", SetPlayerDangerEdgePoint);
 void SetPlayerDangerEdgePoint(void *a0)
@@ -133,7 +181,13 @@ void SetPlayerDangerEdgeOtherSidePlanePoint(void *a0)
     player_setDangerEdgeOtherSidePlanePoint(a0, GetSCRCharaAIWorkPtr() + 0x1B30);
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0105_SCRPlayerCombatMode", SetPlayerDangerEdgeOtherSidePlanePointWithInertiaRot);
+s32 SetInertiaRotInterpMode(void *obj);
+
+s32 SetPlayerDangerEdgeOtherSidePlanePointWithInertiaRot(void *a0)
+{
+    player_setDangerEdgeOtherSidePlanePoint(a0, GetSCRCharaAIWorkPtr() + 0x1B30);
+    return SetInertiaRotInterpMode(a0);
+}
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0105_SCRPlayerCombatMode", SetPlayerHellDangerPoint);
 void SetPlayerHellDangerPoint(void *a0)
