@@ -292,32 +292,6 @@ s32 SCRGetCollision(void *a0, u128 *a1, u128 *a2, s32 a3)
 #endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0058_SCRGetTargetObjXZDirOnMyCtrlGeo", SCRGetCollision);
 
-/* NEARMISS-STUB SCRGetCollisionCallBack */
-#if 0 /* NEARMISS 93.2% cat=sched sub=- | 1.0f store hoisted above sq; target in jal delay slot | attempts=1 */
-s32 ClipCollisionDirectCallBack();
-void CopyGeometryPointer();
-s32 SCRGetCollisionCallBack(void *a0, u128 *a1, u128 *a2, s32 a3, s32 a4, s32 a5)
-{
-    struct
-    {
-        u128 v1;
-        u128 v2;
-        u8 out[80];
-    } s;
-    s32 r;
-
-    s.v1 = *a1;
-    *(f32 *)((u8 *)&s.v1 + 12) = 1.0f;
-    s.v2 = *a2;
-    *(f32 *)((u8 *)&s.v2 + 12) = 1.0f;
-    r = ClipCollisionDirectCallBack(s.out, &s.v1, &s.v2, a3, 0, 0, 0, a4, a5);
-    if (r != 0 && a0 != NULL)
-    {
-        CopyGeometryPointer(a0, s.out);
-    }
-    return r;
-}
-#endif
 typedef int qword __attribute__((mode(TI)));
 
 typedef union {

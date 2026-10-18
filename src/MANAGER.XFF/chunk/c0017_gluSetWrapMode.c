@@ -295,9 +295,7 @@ void graphFrameInit(f32 dt) {
     }
 }
 
-/* NEARMISS-STUB graphFsEffectReset */
-#if 0 /* NEARMISS 95.15% cat=branch-layout sub=dfX8-branch | declared s32 (falls off end) to avoid sibcall j bossDeathEffectBegin; last diff = branch polarity on the D_40129DF8 test (target bnel v1 -> epilogue w/ ld s0 in | attempts=1 */
-s32 graphFsEffectReset(void) {
+void graphFsEffectReset(void) {
     if (D_40129C7C != 0) {
         effectSet();
         if (D_40129C78 != 0 && D_40129DF8 == 0) {
@@ -310,9 +308,8 @@ s32 graphFsEffectReset(void) {
             bossDeathEffectBegin(D_40129DF0);
         }
     }
+    return;
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0017_gluSetWrapMode", graphFsEffectReset);
 
 void graphInit(void) {
     s32 a;

@@ -172,7 +172,7 @@ u8 *func_400115D0(void) {
 //INCLUDE_ASM("asm/GRPTOOLS.XFF/nonmatchings/chunk/c0000_createLayerMenu", func_400115E0);
 void DebugDispFogColClass(void *p, s32 flag, f32 f);
 
-void func_400115E0(void) {
+void func_400115E0() {
     DebugDispFogColClass(*(u8 **)(D_40015818 + 0x98), 0, 3.0f);
 }
 
@@ -293,29 +293,25 @@ void func_40011748(void) {
 #endif
 INCLUDE_ASM("asm/GRPTOOLS.XFF/nonmatchings/chunk/c0000_createLayerMenu", func_40011748);
 
-/* NEARMISS-STUB func_400117A0 */
-#if 0 /* NEARMISS 76.38% cat=call-abi sub=- | target does a non-tail jal func_400115E0 then restores s0/s1/ra; ours tail-calls with j (sibcall) even with prototyped callee; ~9 insns of arg/reg order also di | attempts=1 */
-void func_40010C88(u8 *a0);
+void func_40010C88(u8 *a0, s32 a1);
 
-void func_400117A0(u8 *a0, u8 *a1)
+void func_400117A0(s32 a0, s32 a1)
 {
     u8 *p = D_40015818;
 
     if (*(s32 *)(p + 0xA0) != 0)
     {
-        u8 *x = *(u8 **)(a1 + 0x2C);
-        s32 idx;
+        u8 *s = (u8 *)a1;
+        u8 *v0 = *(u8 **)(s + 0x2C);
+        u8 *tbl = *(u8 **)(*(u8 **)(v0 + 0x4) + 0x3E8);
+        s32 val = ((s32 *)(*(u8 **)(p + 0x9C)))[*(s32 *)(tbl + 0x4)];
 
-        x = *(u8 **)(x + 0x4);
-        x = *(u8 **)(x + 0x3E8);
-        idx = *(s32 *)(x + 0x4);
-        *(s32 *)(p + 0x98) = *(s32 *)(*(u8 **)(p + 0x9C) + (idx << 2));
-        func_40010C88(p);
+        *(s32 *)(p + 0x98) = val;
+        func_40010C88(p, val);
         func_400115E0(a0, a1);
     }
+    return;
 }
-#endif
-INCLUDE_ASM("asm/GRPTOOLS.XFF/nonmatchings/chunk/c0000_createLayerMenu", func_400117A0);
 
 /* NEARMISS-STUB func_40011818 */
 #if 0 /* NEARMISS 99.41% cat=regalloc sub=- | lw/bnez value in a0 (ours) vs a2 (target); base/flag order otherwise matches, tail j matches | attempts=1 */
