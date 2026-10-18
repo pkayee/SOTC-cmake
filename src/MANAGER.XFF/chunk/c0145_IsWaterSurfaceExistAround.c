@@ -45,6 +45,18 @@ int IsClusterCollision(void *arg0)
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0145_IsWaterSurfaceExistAround", MakeGeometryPointerCollisionInfo);
 
+/* NEARMISS-STUB MakeGeometryPointerCollisionEdgeInfo */
+#if 0 /* NEARMISS 0.0% cat=sched sub=- | swc1 scheduled early; target stores float after 0x8 store | attempts=1 */
+void MakeGeometryPointerCollisionEdgeInfo(char *pa0, char *pa1, int xa2, float fa3)
+{
+    *(int *)(pa0 + 0x0) = *(int *)(pa1 + 0x0);
+    *(int *)(pa0 + 0x4) = *(int *)(pa1 + 0x4);
+    *(int *)(pa0 + 0x8) = *(int *)(pa1 + 0x8);
+    *(int *)(pa0 + 0x30) = 4;
+    *(int *)(pa0 + 0x10) = xa2;
+    *(float *)(pa0 + 0xC) = fa3;
+}
+#endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0145_IsWaterSurfaceExistAround", MakeGeometryPointerCollisionEdgeInfo);
 
 int CheckLegalCollisionGP(char *gp);
