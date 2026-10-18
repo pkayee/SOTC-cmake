@@ -366,7 +366,7 @@ s32 SCRConditionMyselfPartsDamaged(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4, s32 a
 }
 
 /* NEARMISS-STUB SCRConditionExecGazeToPlayer */
-#if 0 /* NEARMISS 95.62% cat=regalloc sub=- | bnel polarity, v0/v1/a0 choice | attempts=1 */
+#if 0 /* NEARMISS 95.62% cat=regalloc sub=- | cmpA/cmpB and slti result regs differ (target v0/v1, ours v1/a0); bnel shape not reproduced | attempts=2 */
 s32 SCRConditionExecGazeToPlayer(s32 a0)
 {
     u8 *gcw;
@@ -430,46 +430,22 @@ s32 SCRConditionLessPlayerGrip(f32 a0)
 }
 
 /* NEARMISS-STUB SCRConditionBossCheck */
-#if 0 /* NEARMISS 38.55% cat=regalloc sub=- | DLD link a7, call/schedule shape | attempts=1 */
-s32 SCRConditionBossCheck(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4, s32 a5, s32 a6, u32 *a7)
+#if 0 /* NEARMISS 87.89% cat=branch-layout sub=- | target bnezl to out-of-line compare, load in delay slot; ours beqzl return-0 inline | attempts=2 */
+s32 SCRConditionBossCheck(void *a, s32 b, s32 c, s32 d, s32 e, s32 f, s32 g, u32 *h)
 {
     u8 *obj;
-    u32 off;
-    s32 slot;
-    u8 *e;
-    extern s32 DldSysUndefSymbol;
+    s32 *o;
 
     obj = SCRGetFirstObj(gcGlobalVar + 0x2B8);
-    off = *a7 & 0x3FFFF;
-    if (off == 0)
+    o = dldObj((s32 *)h);
+    if (obj != 0)
     {
-        slot = 0;
+        if (o != 0)
+        {
+            return o[2] == (s32)obj;
+        }
     }
-    else
-    {
-        slot = *(s32 *)((u8 *)a7 - off);
-    }
-    if (slot == 0)
-    {
-        e = NULL;
-    }
-    else if (slot == DldSysUndefSymbol)
-    {
-        e = NULL;
-    }
-    else
-    {
-        e = *(u8 **)(slot + 0x10);
-    }
-    if (obj == NULL)
-    {
-        return 0;
-    }
-    if (e == NULL)
-    {
-        return 0;
-    }
-    return *(u8 **)(e + 8) == obj;
+    return 0;
 }
 #endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0228_SCRConditionInstantaneousPlayerInSight", SCRConditionBossCheck);

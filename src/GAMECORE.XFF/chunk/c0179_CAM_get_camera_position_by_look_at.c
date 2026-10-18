@@ -174,7 +174,26 @@ s32 CAM_is_inside_of_region_aim_angle_rot(void *a0, void *a1, s32 *a2)
     return GAMEUTIL_is_inside_of_region_pitch(a0, a1, a2);
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0179_CAM_get_camera_position_by_look_at", CAM_constructor_target);
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0179_CAM_get_camera_position_by_look_at", CAM_constructor_target);
+void GAMEUTIL_reset_interp_value_cntrl(void *a0, f32 f12);
+void GAMEUTIL_init_record_info(void *a0, s32 a1, s32 a2, s32 a3, s32 a4);
+
+void CAM_constructor_target(u8 *a0, s32 a1)
+{
+    *(s32 *)(a0 + 0x4) = 0xFF676980;
+    *(s32 *)(a0 + 0x8) = 0xFF676980;
+    *(s32 *)(a0 + 0x0) = 0;
+    *(s32 *)(a0 + 0xC) = 0;
+    GAMEUTIL_constructor_interp_ratio_cntrl(a0 + 0x10);
+    *(s32 *)(a0 + 0x30) = 0;
+    *(s32 *)(a0 + 0x124) = 0;
+    *(s32 *)(a0 + 0x218) = 0;
+    *(u128 *)(a0 + 0x310) = ZeroVector;
+    *(u128 *)(a0 + 0x320) = ZeroVector;
+    GAMEUTIL_reset_interp_value_cntrl(a0 + 0x330, 0.0f);
+    *(s32 *)(a0 + 0x33C) = 0;
+    GAMEUTIL_init_record_info(a0 + 0x340, 4, 0x1E, a1, 0);
+}
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0179_CAM_get_camera_position_by_look_at", CAM_destructor_target);
 void CAM_destructor_target(u8 *a0)
@@ -258,8 +277,7 @@ u32 CAM_motion_kind_is_mode_lock_target(u8 *a0)
     return (u32)(*(u64 *)(a0 + 0x190) >> 37) & 1;
 }
 
-/* NEARMISS-STUB CAM_motion_kind_get_interest_dir_reset_attr_target */
-#if 0 /* NEARMISS 85.7% cat=regalloc sub=- | obj kept in v1 vs v0, v0=0 hoist | attempts=1 */
+//INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0179_CAM_get_camera_position_by_look_at", CAM_motion_kind_get_interest_dir_reset_attr_target);
 s32 CAM_motion_kind_get_interest_dir_reset_attr_target(u8 *a0)
 {
     u32 v = (u32)(*(u64 *)(a0 + 0x190) >> 39) & 3;
@@ -271,19 +289,16 @@ s32 CAM_motion_kind_get_interest_dir_reset_attr_target(u8 *a0)
         return v;
     }
     obj = *(void **)(a0 + 0x33C);
-    if (obj == NULL)
+    if (obj != NULL)
     {
-        return 0;
+        if (GAMEUTIL_get_motion_kind(obj) != NULL)
+        {
+            motion = GAMEUTIL_get_motion_kind(*(void **)(a0 + 0x33C));
+            return (*(u32 *)((u8 *)motion + 0x6C) >> 7) & 3;
+        }
     }
-    if (GAMEUTIL_get_motion_kind(obj) == NULL)
-    {
-        return 0;
-    }
-    motion = GAMEUTIL_get_motion_kind(*(void **)(a0 + 0x33C));
-    return (*(u32 *)((u8 *)motion + 0x6C) >> 7) & 3;
+    return 0;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0179_CAM_get_camera_position_by_look_at", CAM_motion_kind_get_interest_dir_reset_attr_target);
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0179_CAM_get_camera_position_by_look_at", CAM_set_target_display_flag);
 void CAM_set_target_display_flag(u8 *a0, s32 a1)
@@ -322,25 +337,83 @@ void *CAM_get_ground_contact_obj(u8 *a0)
     return *(void **)a0;
 }
 
+/* NEARMISS-STUB CAM_is_target_float */
+#if 0 /* NEARMISS 78.97% cat=branch-layout sub=- | inner clamp if becomes bnel not beqz+b; return-1 bounces via extra branch | attempts=1 */
+u8 *GAMEUTIL_get_data_record_info(u8 *r, s32 idx);
+
+s32 CAM_is_target_float(u8 *a0, s32 a1)
+{
+    s32 i;
+    s32 n;
+    s32 next;
+    u8 *p;
+
+    n = a1;
+    if (0 < n)
+    {
+        if (*(s32 *)(a0 + 0x34C) < n)
+        {
+            n = *(s32 *)(a0 + 0x34C);
+        }
+    }
+    else
+    {
+        n = *(s32 *)(a0 + 0x34C);
+    }
+    i = 0;
+    if (0 < n)
+    {
+        do
+        {
+            next = i + 1;
+            p = GAMEUTIL_get_data_record_info(a0 + 0x340, i);
+            if (*(s32 *)p == 1)
+            {
+                return 1;
+            }
+            i = next;
+        } while (next < n);
+    }
+    return 0;
+}
+#endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0179_CAM_get_camera_position_by_look_at", CAM_is_target_float);
 
 /* NEARMISS-STUB CAM_is_target_fast_moving */
-#if 0 /* NEARMISS 39.8% cat=branch-layout sub=- | horse status branch structure and bit extract | attempts=1 */
-s32 CAM_is_target_fast_moving(u8 *a0)
+#if 0 /* NEARMISS 86.32% cat=branch-layout sub=- | movn for ret/ early-return shape differs; target has branch-based status clamp | attempts=2 */
+u64 CAM_is_target_fast_moving(u8 *a0)
 {
-    void *obj = *(void **)(a0 + 0x33C);
-    s32 status = 0;
+    u32 status;
+    void *target;
+    void *obj;
+    u64 ret;
 
-    if (obj == NULL)
+    obj = *(void **)(a0 + 0x33C);
+    if (obj != NULL)
     {
-        obj = *(void **)a0;
+        target = obj;
     }
-    if (GAMEUTIL_is_horse_obj(obj) == 1)
+    else
     {
-        GAMEUTIL_get_horse_move_status(&status, obj);
-        return status >= 3 && status < 5;
+        target = *(void **)a0;
     }
-    return (u32)(*(u64 *)(a0 + 0x190) >> 36) & 1;
+    if (GAMEUTIL_is_horse_obj(target) == 1)
+    {
+        status = 0;
+        GAMEUTIL_get_horse_move_status((s32 *)&status, target);
+        if (status >= 5)
+        {
+            return 0;
+        }
+        ret = 1;
+        if (status < 3)
+        {
+            return 0;
+        }
+        return ret;
+    }
+    ret = (*(u64 *)(a0 + 0x190) >> 36) & 1;
+    return ret;
 }
 #endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0179_CAM_get_camera_position_by_look_at", CAM_is_target_fast_moving);
