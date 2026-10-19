@@ -226,8 +226,6 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0059_getClothGeometry", GetChar
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0059_getClothGeometry", GetCharacterClassControlDirection);
 
-/* NEARMISS-STUB GetCharacterClassIKNodeBooleanInfo */
-#if 0 /* NEARMISS 88.98% cat=branch-layout sub=- | a2 kept in s3 across calls; -1 early-return shape | attempts=1 */
 s32 GetMotionVersion();
 s32 GetMotionOptionNodePhysicalId();
 void GetMotionOptionNodeBooleanInfoFloatFrame(f32 a, f32 b, u8 *obj, u8 *node, s32 id);
@@ -255,11 +253,7 @@ s32 GetCharacterClassIKNodeBooleanInfo(u8 *obj, u8 *cc, s32 a2)
     {
         return -1;
     }
-    if (*ver < 1)
-    {
-        return -1;
-    }
-    if (GetMotionVersion(node) < 5)
+    if (*ver < 1 || GetMotionVersion(node) < 5)
     {
         return -1;
     }
@@ -271,8 +265,6 @@ s32 GetCharacterClassIKNodeBooleanInfo(u8 *obj, u8 *cc, s32 a2)
     GetMotionOptionNodeBooleanInfoFloatFrame(*(f32 *)(ik + 8), *(f32 *)(ik + 0xC), obj, node, id);
     return 0;
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0059_getClothGeometry", GetCharacterClassIKNodeBooleanInfo);
 
 typedef union
 {
@@ -320,19 +312,15 @@ void ResetCharacterClassCtrlRelationInfos(u8 *a)
     isysDeleteGroupAllObj(a + 0x103C);
 }
 
-/* NEARMISS-STUB ResetCharacterClassFallDownInfo */
-#if 0 /* NEARMISS 75.0% cat=sched sub=- | target loads 0x134 pointer before sw 0x50C | attempts=1 */
-
+typedef union { u128 q; f32 f[4]; } FdV059;
 void ResetCharacterClassFallDownInfo(u8 *a)
 {
     a[0x359] = 0;
     a[0x358] = 0;
     a[0x1007] = 0;
-    *(u128 *)(a + 0x1010) = *(u128 *)*(u8 **)(a + 0x134);
     *(u32 *)(a + 0x50C) = 0;
+    ((FdV059 *)(a + 0x1010))->q = (*(FdV059 **)(a + 0x134))->q;
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0059_getClothGeometry", ResetCharacterClassFallDownInfo);
 
 //INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0059_getClothGeometry", ResetCharacterClassIKInfo);
 void ResetCharacterClassIKInfo(u8 *a)
