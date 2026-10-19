@@ -1,7 +1,67 @@
 #include "common.h"
 
+typedef struct
+{
+    s32 name;
+    s32 flag;
+    char pad[0x14];
+} Weapon;
+
+typedef struct
+{
+    char pad[0x10];
+    Weapon *list;
+} WeaponList;
+
+extern s32 DldSysUndefSymbol;
+extern WeaponList SH_WeaponListDEFAULT;
+
+extern int D_40131F50;
+extern int D_40131F54;
+extern void CancelSwordEffect();
+extern void setWeaponSpriteStatus(int, int);
+s32 _omakeSelectFlagChk(s32);
+
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0164_SCRSetupWeaponPlayer", SCRSetupWeaponPlayer);
 
+/* NEARMISS-STUB setIsWeapon */
+#if 0 /* NEARMISS 99.5% cat=regalloc sub=- | d2 r105: force path = setSelectWeapon body, else loop for(;;){if(++i>=10)i=1; if(i==w)break; if(chk(tab[i].flag))break;} then if(i==w){D50=-1;set(-1,D54);} else | attempts=1 */
+s32 setIsWeapon(s32 w, s32 force)
+{
+    WeaponList *l = DldSysUndefSymbol != (s32)&SH_WeaponListDEFAULT ? &SH_WeaponListDEFAULT : 0;
+    Weapon *tab = l->list;
+    s32 i;
+
+    if (force) {
+        int old;
+        CancelSwordEffect();
+        old = D_40131F50;
+        D_40131F50 = w;
+        D_40131F54 = old;
+        setWeaponSpriteStatus(w, old);
+    } else if (w == D_40131F50) {
+        i = w;
+        for (;;) {
+            if (++i >= 10)
+                i = 1;
+            if (i == w)
+                break;
+            if (_omakeSelectFlagChk(tab[i].flag))
+                break;
+        }
+        if (i == w) {
+            D_40131F50 = -1;
+            setWeaponSpriteStatus(-1, D_40131F54);
+        } else {
+            CancelSwordEffect();
+            D_40131F54 = D_40131F50;
+            D_40131F50 = i;
+            setWeaponSpriteStatus(i, D_40131F54);
+        }
+    }
+    return D_40131F50;
+}
+#endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0164_SCRSetupWeaponPlayer", setIsWeapon);
 
 extern u8 gcGlobalVar[];
@@ -46,21 +106,6 @@ int getSelectWeapon(void)
     return D_40131F50;
 }
 
-typedef struct
-{
-    s32 name;
-    s32 flag;
-    char pad[0x14];
-} Weapon;
-
-typedef struct
-{
-    char pad[0x10];
-    Weapon *list;
-} WeaponList;
-
-extern s32 DldSysUndefSymbol;
-extern WeaponList SH_WeaponListDEFAULT;
 
 s32 getWeaponName(s32 i)
 {
@@ -173,7 +218,49 @@ float GetWeaponRange(void)
     return 0.0f;
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0164_SCRSetupWeaponPlayer", func_400D9E98);
+extern void SCRExecBossPreProcess(s32);
+extern void SCRExecBossPostProcess(s32);
+extern void CharaCtrlResetAllScriptCtrlStatus(void *);
+extern void updateScriptDataSystem(void *);
+extern s32 *GetDamageClass(void *);
+extern s32 nico_GetCharacterAttackedGPAttr(void *, s32);
+extern void scrRunM(s32);
+extern float D_40136F90;
+
+void func_400D9E98(s32 *w)
+{
+    void *th = isysGetThisSubThread();
+    char *b = (char *)w;
+    u8 *g = gcGlobalVar;
+
+    while (1) {
+        void *t = isysGetThisSubThread();
+        s32 *d;
+
+        SCRExecBossPreProcess(w[0]);
+        CharaCtrlResetAllScriptCtrlStatus(t);
+        updateScriptDataSystem(t);
+        d = GetDamageClass(th);
+        if (d != 0 && d[0] == 3) {
+            if (nico_GetCharacterAttackedGPAttr(th, 0x3F0) == 0x160 || nico_GetCharacterAttackedGPAttr(th, 0x3F0) == 0x180
+                || nico_GetCharacterAttackedGPAttr(th, 0x3F0) == 0x170 || nico_GetCharacterAttackedGPAttr(th, 0x3F0) == 0x190) {
+                if (d[0x18] == 1 || d[0x18] == 3 || d[0x18] == 2 || d[0x18] == 4) {
+                    *(float *)(b + 0x41C4) = 0.0f;
+                    *(s32 *)(b + 0x41C0) += 1;
+                }
+            }
+        }
+        if (*(s32 *)(b + 0x41C0) > 0)
+            *(float *)(b + 0x41C4) += *(float *)(g + 0x180);
+        if (*(float *)(b + 0x41C8) < *(float *)(b + 0x41C4)) {
+            *(float *)(b + 0x41C4) = D_40136F90;
+            *(s32 *)(b + 0x41C0) = 0;
+        }
+        isysGetThisSubThread();
+        SCRExecBossPostProcess(w[0]);
+        scrRunM(1);
+    }
+}
 
 /* NEARMISS-STUB nico_yamori2Start */
 #if 0 /* NEARMISS 96.23% cat=sched sub=float-store-order | mammosBossStart shape; only the lui/lwc1 of D_40136F94 is scheduled one store later. 15 store orders + float-local placements tried | attempts=1 */
@@ -229,6 +316,39 @@ void nico_yamori2Start(void)
 #endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0164_SCRSetupWeaponPlayer", nico_yamori2Start);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0164_SCRSetupWeaponPlayer", func_400DA118);
+extern char *GetSCRCharaAIWorkPtr(void *);
+extern char *GetCharacterClass(void *);
+extern s32 equipmentInvisibilityCloak(void);
+extern char *getSCRDataCtrlWork(void *);
+extern s32 CheckPositionInsideOfJudgeVolumeObject(void *, void *, s32, void *);
+extern void GetVolumeClippedTargetPos(void *, void *, s32, void *);
+extern void func_400DAFA0(void *, void *, s32);
+extern s32 SkelFocusDef_BOSS_OPT_ATTACK;
+
+void func_400DA118(void *obj)
+{
+    char *ai = GetSCRCharaAIWorkPtr(obj);
+    void *pos = *(void **)(GetCharacterClass(obj) + 0x1064);
+    char buf[0x60];
+    float out[4];
+
+    if (equipmentInvisibilityCloak() == 0) {
+        if (CheckPositionInsideOfJudgeVolumeObject(buf, obj, *(s32 *)(ai + 0x41AC), pos) != 0) {
+            func_400DAFA0(obj, pos, SkelFocusDef_BOSS_OPT_ATTACK);
+        } else {
+            GetVolumeClippedTargetPos(out, obj, *(s32 *)(ai + 0x41AC), pos);
+            func_400DAFA0(obj, out, SkelFocusDef_BOSS_OPT_ATTACK);
+        }
+    } else {
+        char *p2 = getSCRDataCtrlWork(obj) + 0x4010;
+
+        if (CheckPositionInsideOfJudgeVolumeObject(buf, obj, *(s32 *)(ai + 0x41AC), p2) != 0) {
+            func_400DAFA0(obj, p2, SkelFocusDef_BOSS_OPT_ATTACK);
+        } else {
+            GetVolumeClippedTargetPos(out, obj, *(s32 *)(ai + 0x41AC), p2);
+            func_400DAFA0(obj, out, SkelFocusDef_BOSS_OPT_ATTACK);
+        }
+    }
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0164_SCRSetupWeaponPlayer", SCRFuncYamoriBSendFallKey);

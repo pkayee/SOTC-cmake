@@ -81,7 +81,52 @@ void timeAttackEndScript(void *param)
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0157_timeAttackEndScript", timeAttackOverBGScript);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0157_timeAttackEndScript", timeAttackOverAlertScript);
+extern char D_40136C30[];
+extern char D_40136BD0[];
+void func_400D5AC0(void);
+void func_400D55A8(void);
+
+static inline s32 timeAttackOverAlertDone(void *menu, struct TimeAttackView *t)
+{
+    switch (t->b) {
+    case 8:
+        SpriteMenuSetDispFlag(menu, SpriteMenuGetLayerNoByHash(menu, MakeStrHashValue(D_40136C30)), 0);
+        return 1;
+    case 4:
+        SpriteMenuSetDispFlag(menu, SpriteMenuGetLayerNoByHash(menu, MakeStrHashValue(D_40136C30)), 0);
+        t->elapsed = 0;
+        func_400D55A8();
+        return 1;
+    }
+    if (t->flags & 0x40) {
+        t->flags &= ~0x40;
+        SpriteMenuSetDispFlag(menu, SpriteMenuGetLayerNoByHash(menu, MakeStrHashValue(D_40136C30)), 0);
+        return 1;
+    }
+    return 0;
+}
+
+void timeAttackOverAlertScript(void *param)
+{
+    void *thread = isysGetThisSubThread();
+    u8 *cls = GetSpriteMenuClass(thread);
+    struct TimeAttackView *t = &g_TimeAttack;
+    u8 sp[16];
+
+    ScrSpriteParamSetup(sp, param);
+    SpriteMenuSetDispFlag(thread, SpriteMenuGetLayerNoByHash(thread, MakeStrHashValue(D_40136C30)), 1);
+    SpriteMenuSetLayer(thread, SpriteMenuGetLayerNoByHash(thread, MakeStrHashValue(D_40136C30)));
+    SpriteMenuSetSelectMenuId(thread, SpriteMenuGetMenuIdByHash(thread, MakeStrHashValue(D_40136C30), MakeStrHashValue(D_40136BD0)));
+    while (1) {
+        u8 *g = gcGlobalVar;
+        ((void (*)(f32, void *, s32, void (*)(void), struct TimeAttackView *))(*(void **)(cls + 0x28)))(*(f32 *)(g + 0x170), thread, 1, func_400D5AC0, t);
+        if (timeAttackOverAlertDone(thread, t) != 0)
+            break;
+        ((void (*)(void *))(*(void **)(cls + 0x2C)))(thread);
+        scrRun();
+    }
+    ScrSpriteParamEnd(sp, 1);
+}
 
 void timeAttackTimeScript(void *param)
 {
@@ -110,7 +155,53 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0157_timeAttackEndScript", Set
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0157_timeAttackEndScript", SelectOmakeItem);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0157_timeAttackEndScript", func_400D4038);
+extern char D_40136D18[];
+extern char D_40136D70[];
+extern char D_40136D80[];
+extern char D_40136D90[];
+extern char D_40136DA0[];
+extern char D_40136DB8[];
+extern char D_40136DD0[];
+extern s32 D_402184E0;
+extern s32 rootPtn;
+void st_pausemenu_load_omake_chara(s32 *p);
+void SelectOmakeItem(s32 menu, s32 id);
+s32 gcCreateScriptObj(void *fn, s32 *a1, void *a2, s32 a3, s32 a4, s32 a5, const char *a6);
+
+void func_400D4038(u8 *menu, s32 *obj, u32 flags, s32 id)
+{
+    s32 st;
+
+    if (obj[1] == 14) {
+        if (flags & 1) {
+            SelectOmakeItem((s32)menu, id);
+            return;
+        }
+        if (flags & 2) {
+            SpriteMenuSetDispFlag(menu, SpriteMenuGetLayerNoByHash(menu, MakeStrHashValue(D_40136D18)), 0);
+            SpriteMenuSetLayer(menu, SpriteMenuGetLayerNoByHash(menu, MakeStrHashValue(D_40136D70)));
+            SpriteMenuSetSelectMenuId(menu, SpriteMenuGetMenuIdByHash(menu, MakeStrHashValue(D_40136D70), MakeStrHashValue(D_40136D80)));
+            obj[1] = 15;
+            D_402184E0 = 0;
+            gcCreateScriptObj(st_pausemenu_load_omake_chara, &D_402184E0, &rootPtn, 0x1000, 0, 8, D_40136D90);
+            return;
+        }
+    } else {
+        if (flags & 1) {
+            if (id == SpriteMenuGetMenuIdByHash(menu, MakeStrHashValue(D_40136D70), MakeStrHashValue(D_40136DA0))) {
+                obj[1] = 9;
+            } else if (id == SpriteMenuGetMenuIdByHash(menu, MakeStrHashValue(D_40136D70), MakeStrHashValue(D_40136DB8))) {
+                obj[1] = 3;
+            } else if (id == SpriteMenuGetMenuIdByHash(menu, MakeStrHashValue(D_40136D70), MakeStrHashValue(D_40136DD0))) {
+                obj[1] = 4;
+            } else if (id == SpriteMenuGetMenuIdByHash(menu, MakeStrHashValue(D_40136D70), MakeStrHashValue(D_40136D80))) {
+                obj[1] = 14;
+            }
+        } else if (flags & 2) {
+            obj[1] = 9;
+        }
+    }
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0157_timeAttackEndScript", func_400D42A0);
 

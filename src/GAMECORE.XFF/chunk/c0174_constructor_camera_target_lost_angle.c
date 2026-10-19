@@ -73,16 +73,14 @@ int func_400E33F0(s32 *param)
     return 0;
 }
 
-/* NEARMISS-STUB func_400E3428 */
-#if 0 /* NEARMISS 98.79% cat=regalloc sub=- | d2 r103: u8 *p = cam + 0x60 base (Ghidra cam+0x90/0x94), nested kind 1 / else yaw&&pitch, 2deg 0.034906584f; only s0/s1 swap (target p->s0, w->s1); kind local,  | attempts=1 */
 extern f32 GAMEUTIL_get_difference_yaw_and_yaw(f32, f32);
 extern f32 GAMEUTIL_get_difference_pitch_and_pitch(f32, f32);
 
 int func_400E3428(s32 *w, u8 *cam)
 {
-    u8 *p = cam + 0x60;
-
     if (w[0] != 0) {
+        u8 *p = cam + 0x60;
+
         if (w[0] == 1) {
             if (GAMEUTIL_get_difference_yaw_and_yaw(*(f32 *)(p + 0x30), *(f32 *)&w[8]) <= 0.034906584f) {
                 return 1;
@@ -94,8 +92,6 @@ int func_400E3428(s32 *w, u8 *cam)
     }
     return 0;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0174_constructor_camera_target_lost_angle", func_400E3428);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0174_constructor_camera_target_lost_angle", func_400E34D8);
 
