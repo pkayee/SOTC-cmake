@@ -414,8 +414,6 @@ s32 SCRConditionLessPlayerGrip(f32 a0)
     return getPlayerGrip() <= a0;
 }
 
-/* NEARMISS-STUB SCRConditionBossCheck */
-#if 0 /* NEARMISS 87.89% cat=branch-layout sub=- | target bnezl to out-of-line compare, load in delay slot; ours beqzl return-0 inline | attempts=2 */
 s32 SCRConditionBossCheck(void *a, s32 b, s32 c, s32 d, s32 e, s32 f, s32 g, u32 *h)
 {
     u8 *obj;
@@ -423,17 +421,13 @@ s32 SCRConditionBossCheck(void *a, s32 b, s32 c, s32 d, s32 e, s32 f, s32 g, u32
 
     obj = SCRGetFirstObj(gcGlobalVar + 0x2B8);
     o = dldObj((s32 *)h);
-    if (obj != 0)
-    {
-        if (o != 0)
-        {
-            return o[2] == (s32)obj;
-        }
+    if (obj != 0 && o != 0) {
+        goto found;
     }
     return 0;
+found:
+    return o[2] == (s32)obj;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0228_SCRConditionInstantaneousPlayerInSight", SCRConditionBossCheck);
 
 s32 SCRConditionOverRandomVal(f32 a0)
 {
