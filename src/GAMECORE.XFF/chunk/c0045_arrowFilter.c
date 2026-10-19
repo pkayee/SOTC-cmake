@@ -70,7 +70,29 @@ void allArrowRelease(void)
     }
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0045_arrowFilter", arrowObjThrustParent);
+extern char *GetLayoutClass(void *);
+extern void *GetGeometryPointerObject(void *);
+
+int arrowObjThrustParent(void *parent)
+{
+    char *p = D_40202714;
+
+    while (p != 0) {
+        char *next = *(char **)(p + 0xC0);
+        char *c = GetLayoutClass(*(void **)(p + 0x94));
+
+        if (*(int *)(c + 0x124) != 0 && parent == GetGeometryPointerObject(c + 0xC0)) {
+            short t = *(short *)(p + 0xA0);
+
+            if (t == 2 || t == 5) {
+                *(float *)(p + 0x98) = 180.0f;
+                return 1;
+            }
+        }
+        p = next;
+    }
+    return 0;
+}
 
 extern char *GetLayoutClass(void *);
 extern void *GetGeometryPointerObject(void *);
@@ -122,7 +144,31 @@ s32 func_40048D08(void *dst)
     return 0;
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0045_arrowFilter", func_40048D48);
+void SetLayoutObjAccessSwitchThisObjOnly(void *, s32);
+
+void func_40048D48(u8 *w)
+{
+    s32 k;
+
+    *(s32 *)(w + 0x98) = 0;
+    SetLayoutObjAccessSwitchThisObjOnly(*(void **)(w + 0x94), 0);
+    switch (*(s32 *)(w + 0x4C)) {
+    case 0:
+    case 2:
+        *(s16 *)(w + 0xA0) = 1;
+        break;
+    case 1:
+        k = *(s32 *)(w + 0x48);
+        if (k == 4 || k == 6) {
+            *(s16 *)(w + 0xA0) = 2;
+        } else if (k == 7) {
+            *(s16 *)(w + 0xA0) = 4;
+        } else if (k == 5) {
+            *(s16 *)(w + 0xA0) = 5;
+        }
+        break;
+    }
+}
 
 /* NEARMISS-STUB nico_birdBossStart */
 #if 0 /* NEARMISS 87.0% cat=vu0-mmi sub=- | sqc2 vf0 zero store vs sd pair; callee func_400490F8 is asm | attempts=1 */
