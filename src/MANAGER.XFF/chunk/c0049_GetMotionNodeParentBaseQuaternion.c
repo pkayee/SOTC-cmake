@@ -13,7 +13,33 @@ unsigned int GetMotionNodeExistNodeAnimationData(void *arg0, int arg1) {
     return 1U;
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0049_GetMotionNodeParentBaseQuaternion", getAnimObjResource);
+extern s32 DldSysUndefSymbol;
+extern u8 D_40131D40[];
+void iosJumpRecoverPoint();
+
+static inline u8 *dldElem(u32 *lp)
+{
+    u32 v = *lp;
+    u32 off = v & 0x3FFFF;
+    u8 *slot = off ? *(u8 **)((u8 *)lp - off) : NULL;
+
+    if (slot != NULL && slot != (u8 *)DldSysUndefSymbol)
+    {
+        return *(u8 **)(slot + 0x10) + ((v >> 18) & 0xFFF) * *(s32 *)(*(u8 **)(slot + 8) + 0xC);
+    }
+    return NULL;
+}
+
+u8 *getAnimObjResource(u32 *lp)
+{
+    u8 *e = dldElem(lp);
+
+    if (*(s32 *)(e + 0xC) == 0)
+    {
+        iosJumpRecoverPoint(D_40131D40, *(s32 *)e);
+    }
+    return *(u8 **)(*(u8 **)(e + 0xC) + 0x20);
+}
 
 extern void GetMotionFloatFrameNoCaribration(void *, void *, int, float);
 
@@ -67,6 +93,41 @@ int IsFullFixFormat(int arg0)
     return (arg0 & 0xFFFFFF) == 0;
 }
 
+/* NEARMISS-STUB getPosPQSAnimIntFrame */
+#if 0 /* NEARMISS 75.53% cat=sched sub=- | branch layout solved (early returns, type!=0 / type!=2 nesting); left: the s16-dequant arm, target loads q[1]/q[2] and p[3]/p[5] after each out[] store (no hois | attempts=1 */
+void getPosPQSAnimIntFrame(f32 *out, u8 *a, s32 idx)
+{
+    f32 *p = *(f32 **)(a + 4);
+    u8 type = a[2];
+    s16 *q;
+    f32 *e;
+
+    if (p == NULL)
+    {
+        return;
+    }
+    out[3] = 1.0f;
+    if (type != 0)
+    {
+        if (type != 2)
+        {
+            e = p + idx * 3;
+            out[0] = e[0];
+            out[1] = e[1];
+            out[2] = e[2];
+            return;
+        }
+        q = *(s16 **)(p + 6) + idx * 3;
+        out[0] = q[0] * p[1] * 3.051851e-05f + p[0];
+        out[1] = q[1] * p[3] * 3.051851e-05f + p[2];
+        out[2] = q[2] * p[5] * 3.051851e-05f + p[4];
+        return;
+    }
+    out[0] = p[0];
+    out[1] = p[1];
+    out[2] = p[2];
+}
+#endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0049_GetMotionNodeParentBaseQuaternion", getPosPQSAnimIntFrame);
 
 void func_40043588();
@@ -113,7 +174,22 @@ int GetMotionResourceRotAngle(int kind)
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0049_GetMotionNodeParentBaseQuaternion", MultiGlobalQuaternionToRootSkeleton);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0049_GetMotionNodeParentBaseQuaternion", GetDissolveAnimation);
+s16 *GetAnimObjResource();
+
+f32 GetDissolveAnimation(s32 obj, s32 frame)
+{
+    s16 *r = GetAnimObjResource(obj);
+    f32 v = 0.0f;
+    s32 n;
+
+    if (r[0] >= 10 && *(u8 **)(r + 0x20) != NULL)
+    {
+        n = r[2] - 1;
+        frame = frame - n * (frame / n);
+        v = (*(u8 **)(r + 0x20))[frame] * 0.0039215684f;
+    }
+    return v;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0049_GetMotionNodeParentBaseQuaternion", GetMotionMatrixOfTargetFromRoot);
 

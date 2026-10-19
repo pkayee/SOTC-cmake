@@ -1,6 +1,36 @@
 #include "common.h"
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0067_SendCharaAttackMsg", SendCharaAttackMsg);
+u8 *GetLayoutClass();
+void *GetDamageClass();
+void SendDirectDamageLetter(s32, u8 *, s32, f32, s32);
+u8 *GetGeometryPointerObject();
+
+s32 SendCharaAttackMsg(f32 f, s32 from, u8 *obj, s32 a2, s32 a3)
+{
+    u8 *lc = GetLayoutClass(obj);
+    u8 *next;
+
+    if (GetDamageClass(obj) != NULL)
+    {
+        SendDirectDamageLetter(from, obj, a2, f, a3);
+    }
+    if (lc != NULL && *(s32 *)(lc + 0x124) != 0)
+    {
+        next = GetGeometryPointerObject(lc + 0xC0);
+        if (next != NULL)
+        {
+            switch (obj[8])
+            {
+            case 10:
+            case 11:
+            case 13:
+            case 0x16:
+                return SendCharaAttackMsg(f, from, next, a2, a3);
+            }
+        }
+    }
+    return 0;
+}
 
 typedef struct { int arg; char pad[0x4C]; int type; char pad2[0xC]; } CharaMsg;
 extern char *GetCharacterClass(void *);
@@ -70,7 +100,28 @@ int SendCharaAddMotionSyncStartMsg(void *actor, int arg)
     return 1;
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0067_SendCharaAttackMsg", SendCharaNodeParentSetMsg);
+extern u128 ZeroPoint;
+extern u128 IdentityQuaternion;
+void SetGeometryPointerNodePosState();
+void ForceParentLayoutObj();
+
+s32 SendCharaNodeParentSetMsg(void *obj, s32 node, s32 pos)
+{
+    u8 gp[0x60];
+    u8 *lc;
+
+    if (GetCharacterClass(obj) == NULL)
+    {
+        return 0;
+    }
+    *(s32 *)(gp + 0x50) = 4;
+    SetGeometryPointerNodePosState(gp, node, pos, &IdentityQuaternion, &ZeroPoint);
+    ForceParentLayoutObj(obj, gp);
+    lc = GetLayoutClass(obj);
+    *(u128 *)(lc + 0x70) = ZeroPoint;
+    *(u128 *)(lc + 0x60) = IdentityQuaternion;
+    return 1;
+}
 
 //INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0067_SendCharaAttackMsg", func_40063078);
 extern s32 DldSysUndefSymbol;
@@ -163,7 +214,60 @@ void ResetCharacterClassAnimeFrameTableInfo(s32 obj)
     }
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0067_SendCharaAttackMsg", func_40063898);
+#define CF(o) (*(f32 *)(c + (o)))
+
+void func_40063898(u8 *c, f32 dt)
+{
+    u8 *m;
+    f32 lo;
+    f32 hi;
+
+    if (*(s32 *)(c + 0xC10) == 0)
+    {
+        return;
+    }
+    if (*(s8 *)(c + 0x5D2) != 0)
+    {
+        m = c + 0x1C0;
+        lo = CF(0x5B8);
+        hi = CF(0x5B4);
+        switch (*(s32 *)(c + 0xC10))
+        {
+        case 1:
+            *(f32 *)(m + 0x1C) += (hi - lo) * dt / CF(0x5BC) * CF(0x5D4);
+            if (hi < *(f32 *)(m + 0x1C))
+            {
+                *(f32 *)(m + 0x1C) = hi;
+            }
+            break;
+        case -1:
+            *(f32 *)(m + 0x1C) -= (hi - lo) * dt / CF(0x5C0) * CF(0x5D4);
+            if (*(f32 *)(m + 0x1C) < lo)
+            {
+                *(f32 *)(m + 0x1C) = lo;
+            }
+            break;
+        case -2:
+            *(f32 *)(m + 0x1C) -= (hi - lo) * dt / CF(0x5C4) * CF(0x5D4);
+            if (*(f32 *)(m + 0x1C) < lo)
+            {
+                *(f32 *)(m + 0x1C) = lo;
+            }
+            break;
+        }
+        if (CF(0x5C8) >= *(f32 *)(m + 0x1C))
+        {
+            *(s8 *)(c + 0x5D0) = 1;
+        }
+        if (CF(0x5CC) <= *(f32 *)(m + 0x1C))
+        {
+            *(s8 *)(c + 0x5D1) = 1;
+        }
+    }
+    *(s32 *)(c + 0xC10) = 0;
+}
+
+#undef CF
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0067_SendCharaAttackMsg", func_400639B0);
 

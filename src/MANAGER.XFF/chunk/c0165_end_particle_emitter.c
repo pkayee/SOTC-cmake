@@ -38,7 +38,42 @@ s32 end_particle_emitter(s32 unused, s32 emitter_id, s32 flag)
     return 0;
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0165_end_particle_emitter", get_particle_effect_id_by_name);
+extern s32 DldSysUndefSymbol;
+s32 strcmp(const char *, const char *);
+
+typedef struct PtclEffect {
+    u8 pad0[0x24];
+    char *name;
+    u8 pad28[0x2C];
+} PtclEffect;
+
+static inline u8 *dldRef(u32 *lp, s32 fld)
+{
+    u8 *slot;
+    u32 off = *lp & 0x3FFFF;
+
+    slot = off ? *(u8 **)((u8 *)lp - off) : NULL;
+    return (slot != NULL && slot != (u8 *)DldSysUndefSymbol) ? *(u8 **)(slot + fld) : NULL;
+}
+
+PtclEffect *get_particle_effect_id_by_name(u32 *lp, char *name)
+{
+    PtclEffect *a;
+    s32 i;
+
+    if (lp != NULL)
+    {
+        a = (PtclEffect *)dldRef(lp, 0x10);
+        for (i = 0; i < (s32)dldRef(lp, 0xC); i++)
+        {
+            if (strcmp(a[i].name, name) == 0)
+            {
+                return &a[i];
+            }
+        }
+    }
+    return NULL;
+}
 
 s32 get_particle_effect_id_from_sheet(s32 sheet_id)
 {
@@ -207,6 +242,80 @@ s32 set_except_npe_file_data_to_particle_effect_lod(u8 *lod, s32 a1, s32 a2, s32
 #endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0165_end_particle_emitter", set_except_npe_file_data_to_particle_effect_lod);
 
+void get_polygon_scale_rotation_matrix();
+float get_radiate_range_coefficient(float x);
+
+typedef struct PtclEmit {
+    u8 pad0[0x18];
+    f32 f18;
+    u8 pad1C[0x1B8 - 0x1C];
+    f32 f1B8;
+} PtclEmit;
+
+typedef struct PtclLod {
+    u8 pad0[0x50];
+    f32 f50;
+    f32 f54;
+    u8 pad58[0x7C - 0x58];
+    s32 nx;
+    s32 ny;
+    u8 pad84[0xD0 - 0x84];
+    s32 count;
+    PtclEmit *emit;
+    u8 padD8[0x120 - 0xD8];
+    s32 n;
+    f32 f124;
+    f32 f128;
+    f32 f12C;
+    f32 f130;
+    f32 f134;
+} PtclLod;
+
+/* NEARMISS-STUB init_particle_effect_lod */
+#if 0 /* NEARMISS 95.68% cat=sched sub=- | PASSTHRU-ARG polygon call, struct PtclLod/PtclEmit, f50>f54 compare and loop solved; left: 1.0f store order (target 130,124,128,12C) and the loop swc1 f1B8 land | attempts=1 */
+void init_particle_effect_lod(void *lodv)
+{
+    PtclLod *lod = lodv;
+    s32 n;
+    s32 i;
+    PtclEmit *e;
+
+    if (lod != NULL)
+    {
+        get_polygon_scale_rotation_matrix(lod);
+        n = lod->nx * lod->ny;
+        lod->n = n;
+        if (n < 2)
+        {
+            lod->f130 = 1.0f;
+            lod->f124 = 1.0f;
+            lod->f128 = 1.0f;
+            lod->f12C = 1.0f;
+        }
+        else
+        {
+            lod->f128 = lod->nx;
+            lod->f124 = n;
+            lod->f12C = 1.0f / lod->nx;
+            lod->f130 = 1.0f / lod->ny;
+        }
+        if (lod->f50 > lod->f54)
+        {
+            lod->f134 = lod->f50;
+        }
+        else
+        {
+            lod->f134 = lod->f54;
+        }
+        lod->f134 *= 0.5f;
+        for (i = 0; i < lod->count; i++)
+        {
+            e = &lod->emit[i];
+            e->f1B8 = get_radiate_range_coefficient(e->f18);
+        }
+    }
+}
+#endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0165_end_particle_emitter", init_particle_effect_lod);
 
 s32 is_emitter_need_disp(void *e)
@@ -236,7 +345,81 @@ s32 recreate_particle_effects(void *arg0, s32 arg1)
     return temp_v0 != NULL;
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0165_end_particle_emitter", particleGWorkPut);
+typedef struct PtclNode {
+    u8 pad0[0xA8];
+    s32 next;
+} PtclNode;
+
+typedef struct PtclList {
+    s32 count;
+    s32 head;
+    s32 tail;
+} PtclList;
+
+extern PtclList D_401AD570;
+
+static inline s32 ptclListRemove(PtclList *l, PtclNode *n)
+{
+    PtclNode *p;
+    PtclNode *prev;
+
+    if (l->head != 0)
+    {
+        p = (PtclNode *)l->head;
+        prev = NULL;
+        do
+        {
+            if (p == n)
+            {
+                if (prev != NULL)
+                {
+                    prev->next = n->next;
+                }
+                if (l->head == (s32)n)
+                {
+                    l->head = n->next;
+                }
+                if (l->tail == (s32)n)
+                {
+                    l->tail = (s32)prev;
+                }
+                l->count--;
+                return 1;
+            }
+            prev = p;
+            p = (PtclNode *)p->next;
+        } while (p != NULL);
+    }
+    return 0;
+}
+
+static inline void ptclListAppend(PtclList *l, PtclNode *n)
+{
+    if (n != NULL)
+    {
+        if (l->tail != 0)
+        {
+            ((PtclNode *)l->tail)->next = (s32)n;
+        }
+        else
+        {
+            l->head = (s32)n;
+        }
+        n->next = 0;
+        l->tail = (s32)n;
+        l->count++;
+    }
+}
+
+s32 particleGWorkPut(PtclList *l, PtclNode *n)
+{
+    if (n != NULL && ptclListRemove(l, n) != 0)
+    {
+        ptclListAppend(&D_401AD570, n);
+        return 1;
+    }
+    return 0;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0165_end_particle_emitter", get_polygon_scale_rotation_matrix);
 
