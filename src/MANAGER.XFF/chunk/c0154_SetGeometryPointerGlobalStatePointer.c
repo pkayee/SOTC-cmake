@@ -181,7 +181,24 @@ int CheckLegalCollisionGP(char *gp)
     return 0;
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0154_SetGeometryPointerGlobalStatePointer", ExchangeGeometryPointerCollisionEdgeOtherSideInfo);
+typedef struct {
+    u64 d[8];
+} GpCopy;
+
+extern s32 GetCollisionEdgePointerOtherSideCollisionEdge(void *, void *);
+extern void MakeGeometryPointerCollisionEdgeInfo(void *, void *, s32, f32);
+
+s32 ExchangeGeometryPointerCollisionEdgeOtherSideInfo(GpCopy *dst, GpCopy *src)
+{
+    u8 edge[16];
+
+    if (GetCollisionEdgePointerOtherSideCollisionEdge(edge, src) != 0) {
+        MakeGeometryPointerCollisionEdgeInfo(dst, edge, *(s32 *)((u8 *)src + 0x10) == 0, *(f32 *)((u8 *)src + 0xC));
+        return 1;
+    }
+    *dst = *src;
+    return 0;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0154_SetGeometryPointerGlobalStatePointer", GetMultiLocalizeMatrix);
 

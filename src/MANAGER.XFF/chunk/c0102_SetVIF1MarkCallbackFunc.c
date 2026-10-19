@@ -112,7 +112,25 @@ void SetLayoutDisplayFlag(s32 flag)
     D_4012B020 = flag;
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0102_SetVIF1MarkCallbackFunc", func_4008A7E8);
+extern void *GetTwoWayLinkNext(void *);
+extern void *GetTwoWayLinkData(void *);
+extern void SetClothAccessSwitch(int, int);
+
+void func_4008A7E8(void *obj, int sw)
+{
+    char *l = GetLayoutClass(obj);
+    void *n;
+
+    if (l != 0) {
+        n = GetTwoWayLinkNext(l + 0x10C);
+        if (*(int *)(l + 0x180) != 0) {
+            SetClothAccessSwitch(*(int *)(l + 0x178), sw);
+        }
+        for (; n != 0; n = GetTwoWayLinkNext(n)) {
+            func_4008A7E8(GetTwoWayLinkData(n), sw);
+        }
+    }
+}
 
 extern f32 iosCalcFColorToBrightness(f32 *);
 
