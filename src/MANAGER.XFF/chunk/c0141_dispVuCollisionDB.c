@@ -2,7 +2,20 @@
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0141_dispVuCollisionDB", dispVuCollisionDB);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0141_dispVuCollisionDB", DebugDispManualEdgeCollisionFinder);
+void DebugDispManualEdgeCollisionDB(s32 *e, s32 a1, s32 a2);
+
+void DebugDispManualEdgeCollisionFinder(s32 *f, s32 a1, s32 a2) {
+    s32 i = 0;
+    s32 *e;
+
+    while (i < (f[1] < f[0] ? f[1] : f[0])) {
+        e = (s32 *)(i * 8 + f[2]);
+        i++;
+        if (*e != 0) {
+            DebugDispManualEdgeCollisionDB(e, a1, a2);
+        }
+    }
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0141_dispVuCollisionDB", _CalcCollisionMultiDepSurfBoundary);
 
