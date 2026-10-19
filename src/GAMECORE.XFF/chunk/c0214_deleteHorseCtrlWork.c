@@ -52,10 +52,8 @@ void func_40111B78(s32 arg0, void *arg1)
     func_40111BC8(arg1);
 }
 
-/* NEARMISS-STUB func_40111BC8 */
-#if 0 /* NEARMISS 80.0% cat=struct-layout sub=- | lwc1 f0 scheduled after lq 0x10 copy; store order 0x60/0xA8 differs; compiler reuses float addr | attempts=1 */
-extern f32 D_4013772C;
-extern f32 D_40137730;
+extern const f32 D_4013772C;
+extern const f32 D_40137730;
 extern u128 fltMaxVector;
 
 void func_40111BC8(void *arg0)
@@ -73,8 +71,6 @@ void func_40111BC8(void *arg0)
     *(s32 *)((char *)arg0 + 0xB4) = 0;
     *(u128 *)((char *)arg0 + 0xC0) = fltMaxVector;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0214_deleteHorseCtrlWork", func_40111BC8);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0214_deleteHorseCtrlWork", func_40111C08);
 

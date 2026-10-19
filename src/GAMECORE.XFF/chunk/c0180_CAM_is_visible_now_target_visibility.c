@@ -201,7 +201,21 @@ void func_400E94F0(void *param)
     *(s32*)((u8*)param + 0x4) = 0;
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0180_CAM_is_visible_now_target_visibility", func_400E94F8);
+s32 CAM_is_inside_of_region_aim_angle_rot(void *a0, void *a1, s32 *a2, f32 f0, f32 f1, f32 f2);
+void func_400E9628(int *p, int flag, float a, float b);
+s32 func_400E94F8(int *p, f32 a, f32 b, f32 c, f32 d)
+{
+    if (p[1] == 0) {
+        if (c - d < 0.034906582f) {
+            c = d + 0.034906582f;
+        }
+        if (CAM_is_inside_of_region_aim_angle_rot(0, 0, p, a, b, c) == 0) {
+            func_400E9628(p, 1, a, b);
+            return 1;
+        }
+    }
+    return 0;
+}
 
 float func_400E9590(float a, float b, float c, int *p)
 {

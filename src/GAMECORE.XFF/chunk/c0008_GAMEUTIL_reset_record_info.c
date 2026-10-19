@@ -188,8 +188,6 @@ s32 gamecore(void)
     return 0;
 }
 
-/* NEARMISS-STUB func_40020630 */
-#if 0 /* NEARMISS 97.27% cat=cse-hoist sub=- | gcGlobalVar base: target folds +0x274 into the reloc (lui/addiu %lo(gcGlobalVar+0x274)) and derives a2/a3 as a1-0x48/-0x44; gcc folds the constant pointer math  | attempts=1 */
 extern s32 rootPtn;
 extern s32 gcGlobalVar;
 extern s32 D_40130A50;
@@ -218,9 +216,7 @@ s32 func_40020630(s32 arg)
 
     w = getDrawScreenWidth();
     h = getDrawScreenHeight();
-    g = (u8 *)&gcGlobalVar;
-    z = g + 0x274;
-    cam = create_cameraman((s32)&rootPtn, 45.0f, (s32)z, (s32)(z - 0x48), (s32)(z - 0x44), (s32)(z - 0x44), w, h);
+    cam = create_cameraman((s32)&rootPtn, 45.0f, (s32)((u8 *)&gcGlobalVar + 0x274), (s32)((u8 *)&gcGlobalVar + 0x22C), (s32)((u8 *)&gcGlobalVar + 0x230), (s32)((u8 *)&gcGlobalVar + 0x230), w, h);
     gcCreateScriptObj(func_40021080, 0, &rootPtn, 0x3000, 0, arg, D_40132B78);
     init_cameraman_manager();
     clip = get_clip_screen(get_camera_obj(cam));
@@ -229,8 +225,6 @@ s32 func_40020630(s32 arg)
     update_clip_screen((void *)clip);
     return change_main_cameraman(employ_cameraman(cam));
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0008_GAMEUTIL_reset_record_info", func_40020630);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0008_GAMEUTIL_reset_record_info", func_40020730);
 

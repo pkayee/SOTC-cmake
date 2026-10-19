@@ -104,64 +104,35 @@ void *GAMEUTIL_get_riding_horse_object(void *chara)
     return NULL;
 }
 
-/* NEARMISS-STUB GAMEUTIL_is_horse_obj_contact_ground */
-#if 0 /* NEARMISS 74.8% cat=regalloc sub=- | two-stage class test: target keeps the ((obj != h) ? h : 0) select as a bne with delay-slot store, gcc emits xor+movn; second stage sentinel lui lands in v1 bef | attempts=1 */
-s32 GAMEUTIL_is_horse_obj_contact_ground(s32 *out, void *obj)
+static inline s32 getRidingHorse007(s32 obj)
 {
-    s32 found;
-    s32 ret;
-    s32 cls;
-    u8 *cc;
-    s32 h;
+    u8 *cc = GetCharacterClass((void *)obj);
 
-    found = 0;
-    ret = 0;
-    cc = GetCharacterClass(obj);
-    if (cc != NULL)
-    {
-        h = *(s32 *)(cc + 0x940);
-        if ((s32)obj != h)
-        {
-            found = h;
-        }
-        else
-        {
-            found = 0;
+    if (cc != 0) {
+        s32 h = *(s32 *)(cc + 0x940);
+        if (obj != h) {
+            return h;
         }
     }
-    if (found != 0)
-    {
+    return 0;
+}
+
+s32 GAMEUTIL_is_horse_obj_contact_ground(s32 *out, s32 obj)
+{
+    s32 ret = 0;
+    s32 horse = getRidingHorse007(obj);
+
+    if (horse != 0) {
+        ret = 1;
+    } else if ((GetObjKind(obj) ^ 3) == 0) {
+        horse = obj;
         ret = 1;
     }
-    else
-    {
-        cc = NULL;
-        if (obj != NULL)
-        {
-            cc = GetCharacterClass(obj);
-        }
-        if (cc != NULL)
-        {
-            cls = *(s16 *)(cc + 0x360);
-        }
-        else
-        {
-            cls = 0xFFF0BDC0;
-        }
-        if (cls == 3)
-        {
-            found = (s32)obj;
-            ret = 1;
-        }
-    }
-    if (out != NULL)
-    {
-        *out = found;
+    if (out != 0) {
+        *out = horse;
     }
     return ret;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0007_GAMEUTIL_get_weapon_release_position_of_", GAMEUTIL_is_horse_obj_contact_ground);
 
 extern s32 ControlMode_HORSE_WALK;
 extern s32 ControlMode_HORSE_TURN_WALK;

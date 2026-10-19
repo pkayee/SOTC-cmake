@@ -199,8 +199,6 @@ void func_40021300(void)
     D_40130A78 = (D_40130A78 == 0);
 }
 
-/* NEARMISS-STUB func_40021440 */
-#if 0 /* NEARMISS 95.96% cat=regalloc sub=dead-li-case | DEAD-LI-CASE fixed (switch D_40130A68 case0/case1/default like func_40021638): 94.27->95.96; left: s2 hi-part live across calls and f-reg order (f1/f2/f0) | attempts=2 */
 s64 iosGetTCount();
 f32 iosGetSecondFromTCount(u64 arg0);
 u64 __muldi3(u64 a, s64 b);
@@ -212,16 +210,12 @@ void func_40021440(void)
     f32 f;
 
     func_40021300();
-    switch (D_40130A68) {
-    case 0:
+    if (D_40130A68 == 0) {
         t = iosGetTCount();
-        break;
-    case 1:
+    } else if (D_40130A68 == 1) {
         t = D_40130A70;
-        break;
-    default:
+    } else {
         t = D_40130A70;
-        break;
     }
     g = (u8 *)&gcGlobalVar;
     *(s64 *)(g + 0x110) = *(s64 *)(g + 0x108);
@@ -229,8 +223,8 @@ void func_40021440(void)
     *(s64 *)(g + 0x150) = *(s64 *)(g + 0x148);
     *(s64 *)g = t;
     if (*(s32 *)(g + 0x1AC) != 0) {
-        *(u64 *)(g + 0x138) = ((u64)t << 8) >> 8;
         *(u64 *)(g + 0x128) = 0;
+        *(u64 *)(g + 0x138) = ((u64)t << 8) >> 8;
         r = __muldi3(((u64)t << 8) >> 8, (s32)(*(f32 *)(g + 0x1A0) * 256.0f));
         *(u64 *)(g + 0x148) = 0;
         *(u64 *)(g + 0x158) = r >> 8;
@@ -240,10 +234,10 @@ void func_40021440(void)
         *(u64 *)(g + 0x148) = (r >> 8) - *(u64 *)(g + 0x158);
     }
     g = (u8 *)&gcGlobalVar;
-    *(s64 *)(g + 0x108) = t - *(s64 *)(g + 0x118);
-    *(f32 *)(g + 0x17C) = *(f32 *)(g + 0x178);
-    *(f32 *)(g + 0x18C) = *(f32 *)(g + 0x188);
     *(f32 *)(g + 0x16C) = *(f32 *)(g + 0x168);
+    *(f32 *)(g + 0x17C) = *(f32 *)(g + 0x178);
+    *(s64 *)(g + 0x108) = t - *(s64 *)(g + 0x118);
+    *(f32 *)(g + 0x18C) = *(f32 *)(g + 0x188);
     *(f32 *)(g + 0x178) = iosGetSecondFromTCount(*(s64 *)(g + 0x128) + *(s64 *)(g + 0x140));
     *(f32 *)(g + 0x188) = iosGetSecondFromTCount(*(s64 *)(g + 0x148) + *(s64 *)(g + 0x160));
     *(f32 *)(g + 0x168) = iosGetSecondFromTCount(*(s64 *)(g + 0x108) + *(s64 *)(g + 0x120));
@@ -251,12 +245,10 @@ void func_40021440(void)
     *(f32 *)(g + 0x190) = iosGetSecondFromTCount(*(s64 *)(g + 0x148) - *(s64 *)(g + 0x150));
     f = iosGetSecondFromTCount(*(s64 *)(g + 0x108) - *(s64 *)(g + 0x110));
     *(f32 *)(g + 0x170) = f;
-    *(f32 *)(g + 0x174) = 1.0f / f;
     *(f32 *)(g + 0x184) = 1.0f / *(f32 *)(g + 0x180);
     *(f32 *)(g + 0x194) = 1.0f / *(f32 *)(g + 0x190);
+    *(f32 *)(g + 0x174) = 1.0f / f;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0009_func_40020F98", func_40021440);
 
 s64 iosGetTCount();
 f32 iosGetSecondFromTCount(u64 arg0);

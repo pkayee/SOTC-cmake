@@ -132,18 +132,18 @@ void initTailIKWork(int a, int b, char *p)
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0236_setRatioGazeIKWork", nico_calcTailGenealogicalNodeTail);
 
 /* NEARMISS-STUB ReflectIK_initWormDynamics */
-#if 0 /* NEARMISS 83.0% cat=branch-layout sub=- | float store hoisted to first; target has swc1 after lq a3, before jr | attempts=1 */
+#if 0 /* NEARMISS 97.75% cat=sched sub=- | d2 r88: 120-perm sweep; best source order d1,d3,d0,d2(ZeroVector),f gives target regs; left: target emits d2 (ZeroVector) copy second and d3 last, ours d3 secon | attempts=2 */
 extern u128 ZeroVector;
 
 void ReflectIK_initWormDynamics(void *dst, u128 *a, u128 *b, u128 *c, float f)
 {
     u128 *d = (u128 *)dst;
 
-    *(float *)((u8 *)dst + 0x40) = f;
     d[1] = *a;
-    d[2] = ZeroVector;
-    d[0] = *b;
     d[3] = *c;
+    d[0] = *b;
+    d[2] = ZeroVector;
+    *(float *)((u8 *)dst + 0x40) = f;
 }
 #endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0236_setRatioGazeIKWork", ReflectIK_initWormDynamics);
