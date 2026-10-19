@@ -519,6 +519,43 @@ void sheetMgrStageTexUnload(int a, int b, int c, int *done)
     SignalSema(D_401B53F4);
 }
 
+/* NEARMISS-STUB sheetMgrAdpcmIntLoad */
+#if 0 /* NEARMISS 99.17% cat=regalloc sub=param-a-priority | d2 r89: same root as sheetMgrDirectFileLoad: target gives param a (a0 -> a10) the first free s-reg (s2) after done; ours gives it the last (a0's copy is 1 insn  | attempts=1 */
+static inline void sheetPostAdpcmIntLoad192(int a, int b, int c, int d, int e, int f, int k, int *done) /* inline helper */
+{
+    SheetReq192 *r;
+    SheetReqList192 *q;
+
+    r = sheetGetReqEmpty192();
+    r->flags = r->flags & ~1;
+    r->type = 7;
+    r->a10 = a;
+    r->a14 = b;
+    r->a18 = c;
+    r->a1C = d;
+    r->a20 = e;
+    r->a24 = f;
+    q = &D_401B9000[k];
+    r->done = done;
+    if (done != 0)
+        *done = 0xdead;
+    r->next = 0;
+    if (q->tail != 0) {
+        q->tail->next = r;
+        q->tail = r;
+    } else {
+        q->tail = r;
+        q->head = r;
+    }
+}
+
+void sheetMgrAdpcmIntLoad(int a, int b, int c, int d, int e, int f, int *done)
+{
+    WaitSema(D_401B53F4);
+    sheetPostAdpcmIntLoad192(a, b, c, d, e, f, 0, done);
+    SignalSema(D_401B53F4);
+}
+#endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0192_sheetMgrInit", sheetMgrAdpcmIntLoad);
 
 /* NEARMISS-STUB sheetMgrDirectFileLoad */

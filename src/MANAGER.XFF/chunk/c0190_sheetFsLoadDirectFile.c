@@ -124,8 +124,6 @@ void sheetFsLoadRootSegment(void (*cb)(int, int))
     iosCdStStop();
 }
 
-/* NEARMISS-STUB sheetFsLoadSegmentIndex */
-#if 0 /* NEARMISS 97.79% cat=regalloc sub=- | d2 r84: tabB arm = typedef struct{int a,b;}P8; v &= 0x7FFF; off = ((P8 *)e->tabB + v)[sheetFsLanguageCode - 1].a; (96.58 -> 97.79). Left: tabB lands in v1 and l | attempts=1 */
 typedef struct { char c[6]; } Str6;
 typedef struct { char *name; int a; short *idx; int c; int d; int *tabA; int *tabB; } SegIdxDef;
 extern Str6 D_40134FF0;
@@ -173,15 +171,13 @@ found:
         if ((v & 0x8000) == 0) {
             off = e->tabA[v * 2];
         } else {
-            typedef struct { int a, b; } P8; v &= 0x7FFF; off = ((P8 *)e->tabB + v)[sheetFsLanguageCode - 1].a;
+            v &= 0x7FFF; off = (e->tabB + (sheetFsLanguageCode - 1) * 2)[v * 2];
         }
     }
     iosCdStStart(off);
     cb(0, 0);
     iosCdStStop();
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0190_sheetFsLoadDirectFile", sheetFsLoadSegmentIndex);
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0190_sheetFsLoadDirectFile", sheetFsLoadMap);
 
@@ -224,8 +220,93 @@ void sheetFsSetSpecialFs(int fs, int mode)
     iosCdSetMode(fs != 0 && mode != 0);
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0190_sheetFsLoadDirectFile", func_400ED988);
+typedef struct { int a, b; } SfsP8;
+typedef struct { signed char type; char pad[3]; short id; short pad2; union { int off; SfsP8 lang[1]; } u; } SfsEnt;
+typedef struct { int pad; int n; SfsEnt *ent; } SfsDefTab;
+extern int sheetFsLanguageCode;
+extern int memcmp();
 
+int func_400ED988(SfsDefTab *t, SfsEnt *k)
+{
+    int i;
+    SfsEnt *e = t->ent;
+
+    for (i = 0; i < t->n; i++, e++) {
+        signed char et = e->type;
+        signed char kt = k->type;
+        if (kt == et) {
+            switch (kt) {
+            case 0:
+            case 1:
+                if (k->id == e->id)
+                    goto found;
+                break;
+            case 3:
+            case 4:
+                if (k->id == e->id)
+                    goto lang;
+                break;
+            case 2:
+                k->id = 0;
+                if (memcmp(k, e, 8) == 0)
+                    goto found;
+                break;
+            }
+        }
+    }
+    return -1;
+found:
+    return e->u.off;
+lang:
+    return e->u.lang[sheetFsLanguageCode].a;
+}
+
+/* NEARMISS-STUB sheetFileUnloadCallBack */
+#if 0 /* NEARMISS 70.1% cat=cse-hoist sub=null-check-folded | d2 r89: loops/stores right; target keeps a real null test on &D_401B5398 AFTER the 5 ctx stores (bnez s0 -> iosJumpRecoverPoint(D_401350D8,name)) and builds the | attempts=1 */
+typedef struct { int d0; int d4; int d8; int dC; int d10; } UnloadCtx;
+typedef struct { int pad[3]; int stride; int pad2[2]; int nEnt; int *tab; } UnloadSegDef;
+typedef struct { int pad[2]; UnloadSegDef *def; int cnt; char *base; } UnloadSheet;
+typedef struct { int off; int b; void (*cb)(UnloadCtx *, int, int); } UnloadEnt;
+typedef struct { int name; int v; int arg; } UnloadItem;
+extern UnloadCtx D_401B5398;
+extern char D_401350D8[];
+extern void iosJumpRecoverPoint();
+
+void sheetFileUnloadCallBack(char *self)
+{
+    UnloadSheet *sh = *(UnloadSheet **)(self + 0x38);
+    UnloadSegDef *def = sh->def;
+    int i;
+    int j;
+    int cnt = sh->cnt;
+
+    for (i = 0; i < cnt; i++) {
+        char *base = sh->base + def->stride * i;
+
+        for (j = 0; j < def->nEnt; j++) {
+            UnloadEnt *e = (UnloadEnt *)((char *)def->tab + j * 12);
+
+            if (e->cb != 0) {
+                UnloadItem *it = (UnloadItem *)(base + e->off);
+
+                if (it->name != 0) {
+                    UnloadCtx *c = &D_401B5398;
+
+                    c->dC = e->off;
+                    c->d10 = it->v;
+                    c->d0 = 0;
+                    c->d4 = (int)sh;
+                    c->d8 = i;
+                    if (c == 0) {
+                        iosJumpRecoverPoint(D_401350D8, it->name);
+                    }
+                    e->cb(c, it->name, it->arg);
+                }
+            }
+        }
+    }
+}
+#endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0190_sheetFsLoadDirectFile", sheetFileUnloadCallBack);
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0190_sheetFsLoadDirectFile", func_400EDBC8);
