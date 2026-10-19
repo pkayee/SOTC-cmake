@@ -18,6 +18,30 @@ void playerlifebar_effect(f32 val);
 void startGaugeMaxAddEffect(f32 val);
 f32 gStatGetPlayerAccessoriesDamgeRaitoToPlayer(f32 val);
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0028_getPlayerHp", getPlayerHp);
+extern u8 D_40130F88[];
+extern u8 gcGlobalVar[];
+extern s32 rootPtn;
+extern void func_400395E8(void);
+extern void *iosMallocAlign(void *, s32, s32);
+extern void *createScriptObj(void (*)(void), void *, int, int, int, int, int, int);
+
+typedef union {
+    s32 i;
+    float f;
+} ChipCell;
+static inline int chipRound(float v)
+{
+    int i = (int)v;
+
+    if (v - (float)i < 0.5f) {
+        return i;
+    }
+    if (v < 0.0f) {
+        return i - 1;
+    }
+    return i + 1;
+}
+
 f32 getPlayerHp(void)
 {
     return D_40200F24;
@@ -239,7 +263,16 @@ void func_400339E0(void)
     D_40200F28 = 0.0f;
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0028_getPlayerHp", getStageChipID);
+/* getStageChipID(pos, outX, outZ): nearest-cell chip index of a world pos, env = D_40130F88 (+0x40/0x44 cell size, +0x50/0x54 origin) */
+void getStageChipID(float *pos, ChipCell *outX, ChipCell *outZ)
+{
+    u8 *env = D_40130F88;
+    int x = chipRound((-pos[0] - *(float *)(env + 0x50)) / *(float *)(env + 0x40));
+    u8 *env2 = D_40130F88;
+
+    outX->i = x;
+    outZ->i = chipRound((-pos[2] - *(float *)(env2 + 0x54)) / *(float *)(env2 + 0x44));
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0028_getPlayerHp", getStageAreaIndexByPos);
 
@@ -251,7 +284,18 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0028_getPlayerHp", func_40033E
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0028_getPlayerHp", func_400344F8);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0028_getPlayerHp", func_400347D0);
+/* func_400347D0(wx, wz): spawn a func_400395E8 worker for the area cell at world cell (wx, wz); env = D_40130F88 (+0x28/0x2C cell origin, +0x34 rows, +0x38/0x3C divisors); object = { x, -z } */
+void func_400347D0(s32 wx, s32 wz)
+{
+    u8 *env = D_40130F88;
+    s32 x = *(s32 *)(env + 0x28) + wx / *(s32 *)(env + 0x38);
+    s32 z = *(s32 *)(env + 0x2C) + (*(s32 *)(env + 0x34) - wz / *(s32 *)(env + 0x3C));
+    s32 *o = iosMallocAlign(&rootPtn, 0x20, 0x10);
+
+    o[0] = x;
+    o[1] = -z;
+    createScriptObj(func_400395E8, o, *(int *)(gcGlobalVar + 0x308), 0x1000, 0, 1, 0, 0);
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0028_getPlayerHp", func_40034880);
 
