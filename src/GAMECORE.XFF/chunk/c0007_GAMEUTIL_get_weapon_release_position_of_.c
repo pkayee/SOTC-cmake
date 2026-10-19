@@ -348,8 +348,6 @@ void GAMEUTIL_begin_move_angle(s32 *p)
     *p = 0;
 }
 
-/* NEARMISS-STUB GAMEUTIL_update_and_get_move_angle */
-#if 0 /* NEARMISS 94.0% cat=regalloc sub=- | float math and call shapes match; target loads p[3] into fv1 and p[5] into fv0 (swapped vs gcc), keeps the p1<0 test as c.lt+bc1tl (gcc emits c.le with bc1fl),  | attempts=1 */
 f32 GAMEUTIL_get_interp_value_ratio_pow(f32 a, f32 b, f32 c, f32 d);
 f32 GAMEUTIL_get_new_velocity(f32 a, f32 b, f32 c, f32 d, f32 e);
 f32 GAMEUTIL_get_velocity_by_diff_move(f32 a, f32 b, f32 c, f32 d, s32 e);
@@ -360,6 +358,7 @@ f32 GAMEUTIL_update_and_get_move_angle(f32 p1, f32 p2, f32 *p)
     f32 fabs;
     f32 v;
     f32 vel;
+    f32 d;
     f32 r;
 
     zero = 0.0f;
@@ -374,22 +373,18 @@ f32 GAMEUTIL_update_and_get_move_angle(f32 p1, f32 p2, f32 *p)
         v = GAMEUTIL_get_interp_value_ratio_pow(p[5], p[6], fabs / p[3], p[4]);
     }
     vel = GAMEUTIL_get_new_velocity(p[0], p[1], p[2], v, p2);
-    v = vel * p2;
+    d = vel * p2;
     p[0] = vel;
-    if (fabs <= v)
+    if (fabs <= d)
     {
         r = GAMEUTIL_get_velocity_by_diff_move(vel, zero, fabs, p2, 1);
         p[0] = r;
         return p1;
     }
-    else if (p1 < zero)
-    {
-        return -v;
-    }
-    return v;
+    if (zero <= p1)
+        return d;
+    return -d;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0007_GAMEUTIL_get_weapon_release_position_of_", GAMEUTIL_update_and_get_move_angle);
 
 f32 GAMEUTIL_get_cur_velocity_move_angle(f32 *p)
 {

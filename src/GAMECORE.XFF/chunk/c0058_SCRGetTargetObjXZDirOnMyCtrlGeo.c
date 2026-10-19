@@ -209,17 +209,19 @@ void _SCRStartLWS(void *o, int a, int b, int *done)
     ExecObjectAnimation(o, get_main_cameraman_camera_obj(), ((SCRStartLWSGVar *)&gcGlobalVar)->a, ((SCRStartLWSGVar *)&gcGlobalVar)->b);
 }
 
-/* NEARMISS-STUB SCRSetLWSGeometryWithNoParentChange */
-#if 0 /* NEARMISS 89.8% cat=regalloc sub=- | value load v1 before s0 copy | attempts=1 */
 void UpdateLayoutClassParentSimpleGeometry(u8 *layout);
 void UpdateLayoutClassSimpleGeometry(u8 *layout, f32 f);
 s32 SCRSetLWSGeometryWithNoParentChange(void *a0, u128 *a1, u128 *a2)
 {
+    union { u128 q; s32 w; u8 *p; } *f;
     u8 *layout = GetLayoutClass(a0);
 
-    *(u128 *)(*(u8 **)(layout + 0x134)) = *a1;
-    *(u128 *)(*(u8 **)(layout + 0x13C)) = *a2;
-    if (*(s32 *)(layout + 0x124) != 0)
+    f = (void *)(layout + 0x134);
+    *(u128 *)f->p = *a1;
+    f = (void *)(layout + 0x13C);
+    *(u128 *)f->p = *a2;
+    f = (void *)(layout + 0x124);
+    if (f->w != 0)
     {
         *(u128 *)(layout + 0x60) = *a2;
         *(u128 *)(layout + 0x70) = *a1;
@@ -228,32 +230,26 @@ s32 SCRSetLWSGeometryWithNoParentChange(void *a0, u128 *a1, u128 *a2)
     UpdateLayoutClassSimpleGeometry(layout, 0.0f);
     return 1;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0058_SCRGetTargetObjXZDirOnMyCtrlGeo", SCRSetLWSGeometryWithNoParentChange);
 
-/* NEARMISS-STUB SCRSetLWSGeometry */
-#if 0 /* NEARMISS 91.0% cat=regalloc sub=- | a0 copy delay slot / v1 load order | attempts=1 */
 void ForceParentLayoutObj();
 void UpdateLayoutClassParentSimpleGeometry(u8 *layout);
 void UpdateLayoutClassSimpleGeometry(u8 *layout, f32 f);
 s32 SCRSetLWSGeometry(void *a0, s32 a1, u128 *a2, u128 *a3)
 {
+    union { u128 q; s32 w; u8 *p; } *f;
     u8 *layout;
-    u8 *dst;
-    u128 q;
 
     if (a1 != 0)
     {
         ForceParentLayoutObj();
     }
     layout = GetLayoutClass(a0);
-    q = *a2;
-    dst = *(u8 **)(layout + 0x134);
-    *(u128 *)dst = q;
-    q = *a3;
-    dst = *(u8 **)(layout + 0x13C);
-    *(u128 *)dst = q;
-    if (*(s32 *)(layout + 0x124) != 0)
+    f = (void *)(layout + 0x134);
+    *(u128 *)f->p = *a2;
+    f = (void *)(layout + 0x13C);
+    *(u128 *)f->p = *a3;
+    f = (void *)(layout + 0x124);
+    if (f->w != 0)
     {
         *(u128 *)(layout + 0x60) = *a3;
         *(u128 *)(layout + 0x70) = *a2;
@@ -262,8 +258,6 @@ s32 SCRSetLWSGeometry(void *a0, s32 a1, u128 *a2, u128 *a3)
     UpdateLayoutClassSimpleGeometry(layout, 0.0f);
     return 1;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0058_SCRGetTargetObjXZDirOnMyCtrlGeo", SCRSetLWSGeometry);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0058_SCRGetTargetObjXZDirOnMyCtrlGeo", SCRSetLWSGeometryWithZY);
 

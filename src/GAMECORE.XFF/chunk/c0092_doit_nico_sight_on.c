@@ -6,28 +6,25 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0092_doit_nico_sight_on", func
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0092_doit_nico_sight_on", func_4007F860);
 
-/* NEARMISS-STUB get_object_local_merge_yaw_nico_sight_on */
-#if 0 /* NEARMISS 92.0% cat=cse-hoist sub=- | zero-stores for yaw/pitch emitted before the lw of p+4; target loads first and fills jal delay slot with yaw store | attempts=1 */
 extern void GAMEUTIL_get_local_directionZ(float *, int);
 extern void GAMEUTIL_get_yaw_pitch_by_direction(float *, float *, float *);
 extern float GAMEUTIL_get_move_radi_from_yaw1_to_yaw2(float, float);
 extern float GAMEUTIL_increase_yaw(int, float, float);
 
-void get_object_local_merge_yaw_nico_sight_on(char *p)
+float get_object_local_merge_yaw_nico_sight_on(char *p)
 {
+    union { s32 i; float f; } *u = (void *)(p + 4);
+    s32 arg = u->i;
     float dir[4];
     float yaw = 0.0f;
     float pitch = 0.0f;
     float radi;
 
-    GAMEUTIL_get_local_directionZ(dir, *(s32 *)(p + 4));
+    GAMEUTIL_get_local_directionZ(dir, arg);
     GAMEUTIL_get_yaw_pitch_by_direction(&yaw, &pitch, dir);
     radi = GAMEUTIL_get_move_radi_from_yaw1_to_yaw2(yaw, *(float *)(p + 0x280));
-    GAMEUTIL_increase_yaw(0, radi, *(float *)(p + 0x248));
-    return;
+    return GAMEUTIL_increase_yaw(0, radi, *(float *)(p + 0x248));
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0092_doit_nico_sight_on", get_object_local_merge_yaw_nico_sight_on);
 
 extern float GAMEUTIL_increase_yaw(int, float, float);
 extern float GAMEUTIL_increase_pitch(int, int, float, float, float, float);
