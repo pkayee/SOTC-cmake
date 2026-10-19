@@ -17,11 +17,95 @@ void InitAnimationClass();
 void CopyGeometryPointer();
 
 void *func_400F3FC8(s32);
-void boot_camera_lws_animation(s32, s32 *, f32, s32, s32, s32);
+s32 boot_camera_lws_animation(s32, s32 *, f32, s32, s32, s32);
 extern s32 D_401C1780[];
 extern s32 D_401C1728[];
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0195_boot_camera_lws_animation", boot_camera_lws_animation);
+/* READY MANAGER c0195 boot_camera_lws_animation: 100.0 (rea-mgr-c0195, 2026-10-19). Run _prelude_patch.py on the TU first: the TU declares it void, the target returns the slot index or -1 in v0. Key: type tests 2 and 3 are written (T ^ 2) == 0 (xori+bnezl; plain == 2 gives li+bnel 94.8), last two stores B0 then B4. */
+u8 *initAnimationObjResource(u8 *);
+void InitAnimationClassWithFrame(u8 *, s32, f32);
+void GetGeometryPointerPosition(u8 *, u8 *);
+
+/* READY MANAGER c0195 get_camera_lws_animation_parameter_by_name: 100.0 (rea-mgr-c0195, 2026-10-19). Array-index form a[i].name / &a[i] is the key: ptr-walk forms give 93.6 (p/e register swap). */
+extern s32 DldSysUndefSymbol;
+s32 strcmp(const char *, const char *);
+typedef struct CamLwsParam {
+    char *name;
+    u8 pad[0xC4];
+} CamLwsParam;
+static inline u8 *dldRef(u32 *lp, s32 fld)
+{
+    u8 *slot;
+    u32 off = *lp & 0x3FFFF;
+
+    slot = off ? *(u8 **)((u8 *)lp - off) : NULL;
+    return (slot != NULL && slot != (u8 *)DldSysUndefSymbol) ? *(u8 **)(slot + fld) : NULL;
+}
+
+s32 boot_camera_lws_animation(s32 av, s32 *gp, f32 frame, s32 cb, s32 arg, s32 boot)
+{
+    s32 i;
+    u8 *s;
+    u8 *r;
+    s32 isMain;
+    u8 *a = (u8 *)av;
+
+    if (a == NULL)
+    {
+        return -1;
+    }
+    isMain = ((*(u32 *)(a + 0x10) >> 3) & 7) == 0;
+    if (((*(u32 *)(a + 0x10) >> 3) & 7) == 0)
+    {
+        if (func_400F3FC8(0) != 0)
+        {
+            return -1;
+        }
+    }
+    if ((((*(u32 *)(a + 0x10) >> 3) & 7) ^ 2) == 0)
+    {
+        if (func_400F3FC8(2) != 0)
+        {
+            return -1;
+        }
+    }
+    if ((((*(u32 *)(a + 0x10) >> 3) & 7) ^ 3) == 0)
+    {
+        if (func_400F3FC8(3) != 0)
+        {
+            return -1;
+        }
+    }
+    s = (u8 *)D_401C16E0;
+    for (i = 0; i < 10; i++, s += 0xC0)
+    {
+        if (*(s32 *)s == 0)
+        {
+            if (isMain == 1)
+            {
+                D_4012E358 = isMain;
+            }
+            r = initAnimationObjResource(a + 4);
+            if (r != NULL)
+            {
+                *(u8 **)s = a;
+                InitAnimationClassWithFrame(s + 4, 0, frame);
+                *(s32 *)(s + 0x44) = *(s32 *)(r + 0x20);
+                CopyGeometryPointer(s + 0x50, gp);
+                *(s32 *)(s + 0x48) = 1;
+                GetGeometryPointerPosition(s + 0x90, s + 0x50);
+                *(s32 *)(s + 0xA0) = 1;
+                *(s32 *)(s + 0xA4) = cb;
+                *(s32 *)(s + 0xA8) = arg;
+                *(s32 *)(s + 0xAC) = boot;
+                *(s32 *)(s + 0xB0) = 0;
+                *(s32 *)(s + 0xB4) = 0;
+            }
+            return i;
+        }
+    }
+    return -1;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0195_boot_camera_lws_animation", disp_camera_lws_animation_debug_info);
 
@@ -172,41 +256,24 @@ void reset_main_type_camera_lws_animation_update_flag(void)
     D_4012E358 = 0;
 }
 
-/* NEARMISS-STUB get_camera_lws_animation_parameter_by_name */
-#if 0 /* NEARMISS 93.5% cat=sched sub=- | DLD cond: target uses if-chain for arr/count lookups and branch-likely beql on DldSysUndefSymbol; ours combined ternary; lui s6 hoist and extra s0/s2 pointer or | attempts=1 */
-static inline u8 *dldRef(u32 *lp, s32 fld)
+CamLwsParam *get_camera_lws_animation_parameter_by_name(u32 *lp, char *name)
 {
-    u8 *slot;
-    u32 off = *lp & 0x3FFFF;
-
-    slot = off ? *(u8 **)((u8 *)lp - off) : NULL;
-    return (slot != NULL && slot != (u8 *)DldSysUndefSymbol) ? *(u8 **)(slot + fld) : NULL;
-}
-
-u8 *get_camera_lws_animation_parameter_by_name(u32 *lp, char *name)
-{
-    u8 *e;
-    u8 *p;
+    CamLwsParam *a;
     s32 i;
 
-    if (lp == NULL)
+    if (lp != NULL)
     {
-        return NULL;
-    }
-    e = dldRef(lp, 0x10);
-    p = e;
-    for (i = 0; i < (s32)dldRef(lp, 0xC); i++, e += 0xC8)
-    {
-        if (strcmp(*(char **)p, name) == 0)
+        a = (CamLwsParam *)dldRef(lp, 0x10);
+        for (i = 0; i < (s32)dldRef(lp, 0xC); i++)
         {
-            return e;
+            if (strcmp(a[i].name, name) == 0)
+            {
+                return &a[i];
+            }
         }
-        p += 0xC8;
     }
     return NULL;
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0195_boot_camera_lws_animation", get_camera_lws_animation_parameter_by_name);
 
 s32 is_same_camera_lws_animation(u32 i, u8 *a)
 {
@@ -257,13 +324,12 @@ s32 stop_camera_lws_animation_callback(u32 i)
     return 0;
 }
 
-/* NEARMISS-STUB end_camera_lws_animation */
-#if 0 /* NEARMISS 99.96% cat=sched sub=reset-store-order | store order: target emits sw 0xB0 last in branch delay slot, ours hoists it first; lq/sq placement differs | attempts=2 */
+/* READY MANAGER c0195 end_camera_lws_animation: 100.0 via try-score (rea-mgr-c0195, 2026-10-19). Needs the TU-top decls CamLwsSlot, D_401C16E0, InitialGeometryPointer, ZeroPoint, InitAnimationClass, CopyGeometryPointer which the TU already has. */
 s32 end_camera_lws_animation(u32 i) {
     u8 *s;
 
     if (i < 10) {
-        s = (u8 *)D_401C16E0 + i * 0xC0;
+        s = (u8 *)&D_401C16E0[i];
         if (*(s32 *)(s + 0xA0) != 0) {
             void (*fn)(s32) = *(void (**)(s32))(s + 0xA4);
 
@@ -276,27 +342,25 @@ s32 end_camera_lws_animation(u32 i) {
         *(s32 *)(s + 0x44) = 0;
         *(s32 *)(s + 0x48) = 0;
         CopyGeometryPointer(s + 0x50, &InitialGeometryPointer);
+        *(u128 *)(s + 0x90) = ZeroPoint;
         *(s32 *)(s + 0xA0) = 0;
         *(s32 *)(s + 0xA4) = 0;
-        *(s32 *)(s + 0xB4) = 0;
-        *(u128 *)(s + 0x90) = ZeroPoint;
+        *(s32 *)(s + 0xA8) = 0;
         *(s32 *)(s + 0xAC) = 0;
         *(s32 *)(s + 0xB0) = 0;
-        *(s32 *)(s + 0xA8) = 0;
+        *(s32 *)(s + 0xB4) = 0;
         return 1;
     }
     return 0;
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0195_boot_camera_lws_animation", end_camera_lws_animation);
 
-/* NEARMISS-STUB end_camera_lws_animation_by_paramID */
-#if 0 /* NEARMISS 99.58% cat=sched sub=reset-store-order | lui/addiu register assignment swapped for D_401C16E0 vs ZeroPoint; store order of sw 0xA0/0xB4 differs | attempts=2 */
+/* READY MANAGER c0195 end_camera_lws_animation_by_paramID: 100.0 via try-score (rea-mgr-c0195, 2026-10-19). Needs the TU-top decls CamLwsSlot, D_401C16E0, InitialGeometryPointer, ZeroPoint, InitAnimationClass, CopyGeometryPointer which the TU already has. */
 s32 end_camera_lws_animation_by_paramID(s32 id) {
     s32 i;
-    u8 *s = (u8 *)D_401C16E0;
+    u8 *s;
 
-    for (i = 0; i < 10; i++, s += 0xC0) {
+    for (i = 0; i < 10; i++) {
+        s = (u8 *)&D_401C16E0[i];
         if (*(s32 *)s == id) {
             if (*(s32 *)(s + 0xA0) != 0) {
                 void (*fn)(s32) = *(void (**)(s32))(s + 0xA4);
@@ -310,28 +374,24 @@ s32 end_camera_lws_animation_by_paramID(s32 id) {
             *(s32 *)(s + 0x44) = 0;
             *(s32 *)(s + 0x48) = 0;
             CopyGeometryPointer(s + 0x50, &InitialGeometryPointer);
-            *(s32 *)(s + 0xB4) = 0;
             *(u128 *)(s + 0x90) = ZeroPoint;
+            *(s32 *)(s + 0xA0) = 0;
             *(s32 *)(s + 0xA4) = 0;
             *(s32 *)(s + 0xA8) = 0;
             *(s32 *)(s + 0xAC) = 0;
             *(s32 *)(s + 0xB0) = 0;
-            *(s32 *)(s + 0xA0) = 0;
+            *(s32 *)(s + 0xB4) = 0;
             return 1;
         }
     }
     return 0;
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0195_boot_camera_lws_animation", end_camera_lws_animation_by_paramID);
 
-/* NEARMISS-STUB init_camera_lws_animation_manager */
-#if 0 /* NEARMISS 99.49% cat=regalloc sub=reset-store-order | lui register swap: target loads D_401C16E0 into v1 and ZeroPoint into v0, ours the reverse | attempts=2 */
+/* READY MANAGER c0195 init_camera_lws_animation_manager: 100.0 via try-score (rea-mgr-c0195, 2026-10-19). Needs the TU-top decls CamLwsSlot, D_401C16E0, InitialGeometryPointer, ZeroPoint, InitAnimationClass, CopyGeometryPointer which the TU already has. */
 void init_camera_lws_animation_manager(void) {
     s32 i;
-    u8 *s = (u8 *)D_401C16E0;
-
-    for (i = 9; i >= 0; i--) {
+    for (i = 0; i < 10; i++) {
+        u8 *s = (u8 *)&D_401C16E0[i];
         *(s32 *)s = 0;
         InitAnimationClass(s + 4, 0);
         *(s32 *)(s + 0x44) = 0;
@@ -344,8 +404,5 @@ void init_camera_lws_animation_manager(void) {
         *(s32 *)(s + 0xAC) = 0;
         *(s32 *)(s + 0xB0) = 0;
         *(s32 *)(s + 0xB4) = 0;
-        s += 0xC0;
     }
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0195_boot_camera_lws_animation", init_camera_lws_animation_manager);
