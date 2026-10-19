@@ -13,6 +13,11 @@ typedef struct {
     void *data;
 } WindEffectData;
 
+extern void func_400D8598();
+extern void func_400D85E8();
+extern void func_400D8638();
+extern void iosFree(void *);
+
 static inline int is_valid_emitter_id(unsigned int i)
 {
     return i < 80;
@@ -77,11 +82,44 @@ int get_wind_effect_data_direct(int i)
     return ((int *)D_401AD780)[i];
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0171_stop_wind_emitter_geometry_pointer_refer", func_400D8598);
+void func_400D8598(char *e)
+{
+    void (*cb)(int);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0171_stop_wind_emitter_geometry_pointer_refer", func_400D85E8);
+    if (*(int *)(e + 0xF0) == 1) {
+        cb = *(void (**)(int))(e + 0xF4);
+        if (cb != 0)
+            cb(*(int *)(e + 0xF8));
+    }
+    *(int *)(e + 0xF4) = 0;
+    *(int *)(e + 0xF8) = 0;
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0171_stop_wind_emitter_geometry_pointer_refer", func_400D8638);
+void func_400D85E8(char *e)
+{
+    void (*cb)(int);
+
+    if (*(int *)(e + 0xF0) == 1) {
+        cb = *(void (**)(int))(e + 0xF4);
+        if (cb != 0)
+            cb(*(int *)(e + 0xF8));
+    }
+    *(int *)(e + 0xF4) = 0;
+    *(int *)(e + 0xF8) = 0;
+}
+
+void func_400D8638(char *e)
+{
+    void (*cb)(int);
+
+    if (*(int *)(e + 0xF0) == 1) {
+        cb = *(void (**)(int))(e + 0xF4);
+        if (cb != 0)
+            cb(*(int *)(e + 0xF8));
+    }
+    *(int *)(e + 0xF4) = 0;
+    *(int *)(e + 0xF8) = 0;
+}
 
 extern int func_400D8A78();
 
@@ -122,6 +160,47 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0171_stop_wind_emitter_geometry
 void add_wind_segment(void) {
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0171_stop_wind_emitter_geometry_pointer_refer", free_wind_segment);
+void free_wind_segment(char *seg)
+{
+    int n;
+    int i;
+    int j;
+    int key;
+    int base;
+    int **pp;
+    int **tab;
+    int *e;
+
+    if (seg != 0) {
+        n = *(int *)(seg + 0xC);
+        i = 0;
+        base = *(int *)(seg + 0x10);
+        if (0 < n) {
+            key = base;
+            tab = D_401AD640;
+            do {
+                pp = tab;
+                j = 0x4F;
+                do {
+                    e = *pp;
+                    if (e != 0 && e[1] == key) {
+                        if (e[0] == 0)
+                            func_400D8598(e);
+                        else if (e[0] == 1)
+                            func_400D85E8(e);
+                        else
+                            func_400D8638(e);
+                        iosFree(*pp);
+                        *pp = 0;
+                    }
+                    j--;
+                    pp++;
+                } while (j >= 0);
+                i++;
+                key += 0x18;
+            } while (i < n);
+        }
+    }
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0171_stop_wind_emitter_geometry_pointer_refer", FlushModifiedManagerCB);

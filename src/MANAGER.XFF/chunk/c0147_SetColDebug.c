@@ -2,6 +2,36 @@
 
 extern s32 D_4012B338;
 
+extern u8 *GetLayoutClass();
+typedef struct {
+    u8 pad0[8];
+    u8 flag8;
+    u8 pad9[0xB];
+    u8 *tbl14;
+    u8 pad18[0x3C];
+    s32 *ref54;
+    u8 pad58[0x38];
+} ColChunk;
+typedef struct {
+    u8 pad0[4];
+    s32 mode4;
+    ColChunk *chunks;
+    u8 pad0c[0xC];
+    u8 *ents18;
+    u8 pad1c[0x4];
+    u8 *obj20;
+    u8 pad24[0x10];
+    u8 *attr34;
+} ColSet;
+
+extern s128 YUnitVector;
+extern void *iosMallocAlign(void *, s32, s32);
+
+extern s32 func_400AB528();
+extern s32 func_400AECA0(void *, void *, void *, void *, void *, f32);
+extern s32 func_400AF438(void *, void *, void *, void *, void *, f32);
+typedef union { s128 q; s32 w[4]; } Q4;
+
 void SetColDebug(int arg0)
 {
     D_4012B338 = arg0;
@@ -21,7 +51,30 @@ s32 func_400BBE40(void)
     return (*temp_v0 & 0xF80000000) != 0x280000000;
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0147_SetColDebug", func_400BBE80);
+u32 func_400BBE80(s32 *ref)
+{
+    u32 w;
+    u32 chunk;
+    u32 id;
+    ColSet *cs;
+    ColChunk *c;
+    u32 x;
+
+    w = ref[1];
+    chunk = (w >> 24) & 0x7F;
+    id = w & 0xFFFFFF;
+    cs = *(ColSet **)(*(u8 **)(GetLayoutClass(ref[0]) + 0x184) + 0x20);
+    if (ref[1] < 0) {
+        c = &cs->chunks[chunk];
+        if (c->flag8 != 0) {
+            x = *(u16 *)(c->tbl14 + id * 20);
+        } else {
+            x = *(u32 *)(c->tbl14 + id * 52 + 0x30);
+        }
+        return x;
+    }
+    return *(u32 *)(*(s32 *)(cs->chunks[chunk].ref54 + id) * 64 + cs->ents18 + 0x3C);
+}
 
 //INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0147_SetColDebug", func_400BBF70);
 s32 func_400BBF70(f32 arg0, s32 arg1, s32 arg2, s32 arg3, f32 *arg4)
@@ -37,31 +90,40 @@ s32 func_400BBF90(s32 arg0, s32 arg1)
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0147_SetColDebug", func_400BBFA0);
 
-/* NEARMISS-STUB GetCollisionDBNextSurfLinkComp */
-#if 0 /* NEARMISS 87.4% cat=struct-layout sub=- | regalloc: s0/s1 swapped and a0 copied to v1; ours loads field into s0 | attempts=1 */
-extern u8 *GetLayoutClass(void *);
-
-void *GetCollisionDBNextSurfLinkComp(u32 *arg0)
+u8 *GetCollisionDBNextSurfLinkComp(s32 *ref)
 {
-    u8 *layout;
-    u8 *temp_v1;
-    u8 *temp_a1;
-    u32 s1;
-    u32 s0;
+    u32 w;
+    u32 chunk;
+    u32 id;
+    ColSet *cs;
+    ColChunk *c;
 
-    s1 = arg0[1];
-    s0 = s1 >> 24;
-    s1 &= 0xFFFFFF;
-    layout = GetLayoutClass((void *)arg0[0]);
-    s0 &= 0x7F;
-    temp_a1 = *(u8 **)(*(u8 **)(layout + 0x184) + 0x20);
-    temp_v1 = (u8 *)(*(u32 *)(temp_a1 + 0x8) + s0 * 0x90);
-    return (void *)(*(u32 *)(temp_v1 + 0x14) + s1 * 20 + 8);
+    w = ref[1];
+    chunk = (w >> 24) & 0x7F;
+    id = w & 0xFFFFFF;
+    cs = *(ColSet **)(*(u8 **)(GetLayoutClass(ref[0]) + 0x184) + 0x20);
+    c = &cs->chunks[chunk];
+    return c->tbl14 + id * 20 + 8;
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0147_SetColDebug", GetCollisionDBNextSurfLinkComp);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0147_SetColDebug", GetCollisionDBNextSurfLink);
+u8 *GetCollisionDBNextSurfLink(s32 *ref)
+{
+    u32 w;
+    u32 chunk;
+    u32 id;
+    ColSet *cs;
+
+    w = ref[1];
+    chunk = (w >> 24) & 0x7F;
+    id = w & 0xFFFFFF;
+    cs = *(ColSet **)(*(u8 **)(GetLayoutClass(ref[0]) + 0x184) + 0x20);
+    if (ref[1] < 0)
+    {
+        ColChunk *c = &cs->chunks[chunk];
+        return c->tbl14 + id * 52 + 0xC;
+    }
+    return cs->ents18 + *(s32 *)(cs->chunks[chunk].ref54 + id) * 64 + 0x18;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0147_SetColDebug", MakeCollisionPointCollisionInfo);
 
@@ -78,9 +140,48 @@ void MakeCollisionPointGlobalInfo(char *p, s128 *v)
     *(int *)(p + 0x30) = 0;
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0147_SetColDebug", func_400BC558);
+s32 func_400BC558(void *a, void *b, void *c, void *d, void *e, f32 f)
+{
+    Q4 w[2];
+    s32 r;
+    s32 res;
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0147_SetColDebug", func_400BC638);
+    func_400AB528(&w[0], e, c, 1);
+    w[1].q = ((Q4 *)d)->q;
+    r = func_400AECA0(a, b, &w[0], &w[1], e, f);
+    res = 0;
+    if (r == 1) {
+        w[1].q = ((Q4 *)((u8 *)a + 0x40))->q;
+        res = 1;
+    }
+    if (r == 0) {
+        if (func_400AF438(a, b, &w[0], &w[1], e, f)) {
+            res = 1;
+        }
+    }
+    return res;
+}
+
+s32 func_400BC638(void *a, void *b, void *c, void *d, void *e, f32 f)
+{
+    Q4 v;
+    s32 r;
+    s32 res;
+
+    v.q = ((Q4 *)d)->q;
+    r = func_400AECA0(a, b, c, &v, e, f);
+    res = 0;
+    if (r == 1) {
+        v.q = ((Q4 *)((u8 *)a + 0x40))->q;
+        res = 1;
+    }
+    if (r == 0) {
+        if (func_400AF438(a, b, c, &v, e, f)) {
+            res = 1;
+        }
+    }
+    return res;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0147_SetColDebug", GetCollisionDynamicsProjectionFloatPosition);
 
@@ -115,33 +216,26 @@ int GetCollisionEdgeLinkDBWorkSize(int arg0)
     return 0;
 }
 
-/* NEARMISS-STUB InitCollisionEdgeLinkDB */
-#if 0 /* NEARMISS 90.38461% cat=regalloc sub=- | hoisted v0=0 before branch; a0/v1 swapped for -1 and YUnitVector addr | attempts=1 */
-extern s128 YUnitVector;
-extern void *iosMallocAlign(void *, s32, s32);
-
 void *InitCollisionEdgeLinkDB(void *arg0, s32 arg1)
 {
-    u8 *temp_s0;
-    void *temp_v0;
+    u8 *p;
+    void *q;
 
-    if (arg1 == 0) {
-        return NULL;
+    if (arg1 != 0) {
+        p = iosMallocAlign(arg0, 0x30, 4);
+        q = iosMallocAlign(arg0, arg1 * 0x14, 4);
+        *(s32 *)(p + 0x14) = -1;
+        *(s32 *)(p + 0x18) = 0;
+        *(s32 *)(p + 0x1C) = 0;
+        *(u8 *)(p + 0x12) = 0;
+        *(s128 *)p = YUnitVector;
+        *(s32 *)(p + 0x20) = 0;
+        *(void **)(p + 0x24) = q;
+        *(s32 *)(p + 0x10) = arg1;
+        return p;
     }
-    temp_s0 = iosMallocAlign(arg0, 0x30, 4);
-    temp_v0 = iosMallocAlign(arg0, arg1 * 0x14, 4);
-    *(u8 *)(temp_s0 + 0x12) = 0;
-    *(s32 *)(temp_s0 + 0x18) = 0;
-    *(s32 *)(temp_s0 + 0x14) = -1;
-    *(s32 *)(temp_s0 + 0x1C) = 0;
-    *(s128 *)temp_s0 = YUnitVector;
-    *(s32 *)(temp_s0 + 0x10) = arg1;
-    *(s32 *)(temp_s0 + 0x20) = 0;
-    *(void **)(temp_s0 + 0x24) = temp_v0;
-    return temp_s0;
+    return NULL;
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0147_SetColDebug", InitCollisionEdgeLinkDB);
 
 void iosFree(void *);
 

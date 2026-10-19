@@ -95,21 +95,18 @@ void *malloc_from_fast_get_partition(s32 size, s32 unused, s32 fallback) {
 void entrymanager(void) {
 }
 
-/* NEARMISS-STUB initmanagerPartitionConf */
-#if 0 /* NEARMISS 93.75% cat=sched sub=prologue-save-order | body identical; only prologue save order (s1 vs s2 first, i=1 init and D_40124794 store placement) | attempts=1 */
+/* c0007 partition table conf: PartConf header (count at 0xC, ents at 0x10), PartEnt stride 0xC (size 4, handle 8) */
 void initmanagerPartitionConf(PartConf *cfg) {
-    PartEnt *e = cfg->ents;
+    PartEnt *e;
     s32 i = 1;
 
+    e = cfg->ents;
     D_40124794 = (s32)cfg;
     e->handle = (s32)&rootPtn;
-    for (; i < cfg->count; i++) {
-        e++;
+    for (e++; i < cfg->count; i++, e++) {
         e->handle = iosCreatePartition(&rootPtn, e->size);
     }
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0007_initmanager", initmanagerPartitionConf);
 
 void *getPartitionByName(char *name)
 {
@@ -134,46 +131,50 @@ void *getPartitionByName(char *name)
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0007_initmanager", GAMEUTIL_get_spring_interpolate_value3D_extend);
 
-/* NEARMISS-STUB GAMEUTIL_doit_interp_ratio_cntrl */
-#if 0 /* NEARMISS 53.66% cat=regalloc sub=- | no cause recorded | attempts=1 */
+/* c0007 interp ratio cntrl tick: InterpRatio act/maxZeroClip/one8/timer/ratio/start/step/one, TU typedef */
 f32 GAMEUTIL_doit_interp_ratio_cntrl(InterpRatio *c, f32 t) {
+    f32 timer;
     f32 ratio;
+    f32 sum;
 
     if (c->act == 1) {
-        if (0.0f < c->timer) {
+        timer = c->timer;
+        if (0.0f < timer) {
             c->one8 = 0;
         }
         if (0.0f <= t) {
+            c->timer = timer + t;
         } else {
-            t = t * c->one;
+            c->timer = timer + t * c->one;
         }
-        c->timer = c->timer + t;
+        timer = c->timer;
         if (c->maxZeroClip == 1) {
-            if (c->timer < 0.0f) {
+            if (timer < 0.0f) {
                 c->timer = 0.0f;
+                timer = 0.0f;
             }
-            if (c->start + c->step < c->timer) {
+            if (c->start + c->step < timer) {
                 c->timer = c->start + c->step;
+                timer = c->start + c->step;
             }
         }
-        if (c->timer <= c->start) {
+        sum = c->start + c->step;
+        if (timer <= c->start) {
             ratio = 0.0f;
-        } else if (c->start + c->step <= c->timer) {
+        } else if (sum <= timer) {
             ratio = 1.0f;
         } else {
-            ratio = (c->timer - c->start) / ((c->start + c->step) - c->start);
+            ratio = (timer - c->start) / (sum - c->start);
         }
         c->ratio = ratio;
         return ratio;
     } else {
         c->one8 = 1;
-        c->ratio = 1.0f;
         c->timer = 0.0f;
+        c->ratio = 1.0f;
         return 1.0f;
     }
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0007_initmanager", GAMEUTIL_doit_interp_ratio_cntrl);
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0007_initmanager", doit_double_spring_interp_cntrl);
 
