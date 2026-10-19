@@ -1,5 +1,11 @@
 #include "common.h"
 
+extern u8 gcGlobalVar[];
+s32 *getSeamlessStageHighModelDispDistDefault(void);
+s32 *getSeamlessStageMiddleModelDispDistDefault(void);
+void getStageChipID(void *g, s32 *x, s32 *y);
+void setLoadMode(s32 x, s32 y, s32 mode);
+
 INCLUDE_ASM("asm/MAPTOOL.XFF/nonmatchings/chunk/c0001_CreateMapWindow", CreateMapWindow);
 
 //INCLUDE_ASM("asm/MAPTOOL.XFF/nonmatchings/chunk/c0001_CreateMapWindow", func_40013F90);
@@ -31,9 +37,79 @@ void func_40013FE0(void)
     setLoadMode(p[1], p[2], 2);
 }
 
-INCLUDE_ASM("asm/MAPTOOL.XFF/nonmatchings/chunk/c0001_CreateMapWindow", func_40014008);
+void func_40014008(void)
+{
+    s32 *hi;
+    s32 *mid;
+    s32 x;
+    s32 y;
+    s32 r;
+    s32 x0;
+    s32 x1;
+    s32 y0;
+    s32 y1;
+    s32 i;
+    hi = getSeamlessStageHighModelDispDistDefault();
+    mid = getSeamlessStageMiddleModelDispDistDefault();
+    if (*mid < 3) {
+        r = *hi + *mid;
+        getStageChipID(gcGlobalVar + 0x340, &x, &y);
+        x0 = (x - r) - 1;
+        x1 = (x - r) + r * 2;
+        y1 = (y - r) + r * 2;
+        y0 = (y - r) - 1;
+        for (i = x0; i <= x1; i++) {
+            setLoadMode(i, y0, 2);
+        }
+        for (i = x0; i <= x1; i++) {
+            setLoadMode(i, y1, 2);
+        }
+        for (i = y0; i <= y1; i++) {
+            setLoadMode(x0, i, 2);
+        }
+        for (i = y0; i <= y1; i++) {
+            setLoadMode(x1, i, 2);
+        }
+        *mid = *mid + 1;
+    }
+}
 
-INCLUDE_ASM("asm/MAPTOOL.XFF/nonmatchings/chunk/c0001_CreateMapWindow", func_40014180);
+void func_40014180(void)
+{
+    s32 *hi;
+    s32 *mid;
+    s32 x;
+    s32 y;
+    s32 r;
+    s32 x0;
+    s32 x1;
+    s32 y0;
+    s32 y1;
+    s32 i;
+    hi = getSeamlessStageHighModelDispDistDefault();
+    mid = getSeamlessStageMiddleModelDispDistDefault();
+    if (*mid > 0) {
+        *mid = *mid - 1;
+        r = *hi + *mid;
+        getStageChipID(gcGlobalVar + 0x340, &x, &y);
+        x0 = (x - r) - 1;
+        x1 = (x - r) + r * 2;
+        y1 = (y - r) + r * 2;
+        y0 = (y - r) - 1;
+        for (i = x0; i <= x1; i++) {
+            setLoadMode(i, y0, 0);
+        }
+        for (i = x0; i <= x1; i++) {
+            setLoadMode(i, y1, 0);
+        }
+        for (i = y0; i <= y1; i++) {
+            setLoadMode(x0, i, 0);
+        }
+        for (i = y0; i <= y1; i++) {
+            setLoadMode(x1, i, 0);
+        }
+    }
+}
 
 void setLoadMode(s32, s32, s32);
 
