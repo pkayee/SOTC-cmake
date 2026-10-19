@@ -7,6 +7,20 @@ extern int IosGetMergeDataFileName();
 extern void iosCdStInit(int);
 extern void func_400EC808();
 
+typedef struct {
+    int offset;
+    int size;
+} FileEntry;
+
+extern FileEntry *D_401B538C;
+
+extern int D_401B534C;
+
+typedef struct { char *name; int a, b; } SpecialFs;
+typedef struct { int n; SpecialFs *tab; } SpecialFsTab;
+extern SpecialFsTab D_401B5390;
+extern int strcmp(const char *, const char *);
+
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0190_sheetFsLoadDirectFile", sheetFsLoadDirectFile);
 
 void sheetFsInit(void)
@@ -39,7 +53,17 @@ int sheetFsDecStageTexSegIndex(int i)
     return --D_401B5348[i].idx;
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0190_sheetFsLoadDirectFile", sheetFsExistTexSegIndexCallBack);
+void sheetFsExistTexSegIndexCallBack(void (*cb)(int))
+{
+    int i;
+
+    for (i = 0; i < D_401B534C; i++) {
+        if (D_401B5348[i].idx != 0) {
+            cb(i);
+            D_401B5348[i].idx = 0;
+        }
+    }
+}
 
 void sheetFsSetStageTexSegTexSegDef(int arg0, int arg1)
 {
@@ -101,19 +125,24 @@ void sheetFsLoadAdpcmInt(int a, int i, int off, int buf, int size)
     iosIopRead(*t + off, buf, size);
 }
 
-typedef struct {
-    int offset;
-    int size;
-} FileEntry;
-
-extern FileEntry *D_401B538C;
-
 int sheetFsGetDirectFileSize(int i)
 {
     return *(int *)((char *)D_401B538C + (i << 3) + 4);
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0190_sheetFsLoadDirectFile", sheetFsSrhSpecialFs);
+SpecialFs *sheetFsSrhSpecialFs(char *name)
+{
+    int i;
+
+    for (i = 0; i < D_401B5390.n; i++) {
+        SpecialFs *e = &D_401B5390.tab[i];
+
+        if (strcmp(e->name, name) == 0) {
+            return e;
+        }
+    }
+    return 0;
+}
 
 extern int D_4012E324;
 extern void iosCdSetMode(int mode);
