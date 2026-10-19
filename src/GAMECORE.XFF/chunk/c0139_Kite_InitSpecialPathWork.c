@@ -4,6 +4,43 @@ extern int AI_InitAnimalLayout();
 extern int AI_SetAnimalLayout();
 extern void Kite_InitKitePathWork();
 
+/* func_400BB738: motion-kind not-in-list check. owner+0x20C = dld sheet, row word at +0x18 -> list table; return 0 if the current motion kind is in the list. dld helpers as c0112 */
+extern s32 DldSysUndefSymbol;
+extern s32 AI_GetCurMotionKind();
+/* func_400BB8C0: control-mode not-in-list check. owner+0x20C = dld sheet, row word at +0x18 -> list table; return 0 if the current control mode is in the list. dld helpers as c0112 */
+extern s32 DldSysUndefSymbol;
+extern s32 AI_GetCurControlMode();
+
+/* func_400BBD90: script sheet row -> element -> motion kind equals current motion kind (T54 dld helpers) */
+extern s32 DldSysUndefSymbol;
+extern void *isysGetThisSubThread();
+extern u8 *GetScriptClass();
+static inline u8 *dldRef(u32 *lp, s32 fld) {
+    u8 *slot;
+    u32 off = *lp & 0x3FFFF;
+
+    slot = off ? *(u8 **)((u8 *)lp - off) : NULL;
+    return (slot != NULL && slot != (u8 *)DldSysUndefSymbol) ? *(u8 **)(slot + fld) : NULL;
+}
+
+static inline u8 *dldElem(u32 *lp) {
+    u8 *slot;
+    u32 w = *lp;
+    u32 off = w & 0x3FFFF;
+
+    slot = off ? *(u8 **)((u8 *)lp - off) : NULL;
+    return (slot != NULL && slot != (u8 *)DldSysUndefSymbol)
+               ? *(u8 **)(slot + 0x10) + ((w >> 18) & 0xFFF) * *(s32 *)(*(u8 **)(slot + 8) + 0xC)
+               : NULL;
+}
+static inline s32 dldCnt(u32 *lp) {
+    u8 *slot;
+    u32 off = *lp & 0x3FFFF;
+
+    slot = off ? *(u8 **)((u8 *)lp - off) : NULL;
+    return (slot != NULL && slot != (u8 *)DldSysUndefSymbol) ? *(s32 *)(slot + 0xC) : 0;
+}
+
 int Kite_InitSpecialPathWork(int a, int b, int c, int d)
 {
     return AI_InitAnimalLayout(a, b, c, d);
@@ -130,17 +167,83 @@ void Kite_SucceedKitePathWork(void *arg0, void *arg1)
     *(s64 *)((char *)arg0 + 0xC8) = *(s64 *)((char *)arg1 + 0xC8);
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0139_Kite_InitSpecialPathWork", func_400BB738);
+s32 func_400BB738(u8 *o) {
+    u32 *tab = (u32 *)dldElem((u32 *)(*(u8 **)(o + 0x20C) + 0x18));
+    s32 kind = AI_GetCurMotionKind(*(s32 *)(o + 0x44));
+    s32 n = 0;
+    s32 i;
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0139_Kite_InitSpecialPathWork", func_400BB8C0);
+    if (tab != NULL) {
+        n = dldCnt((u32 *)(*(u8 **)(o + 0x20C) + 0x18));
+    }
+    for (i = 0; i < n; i++) {
+        if (kind == (s32)dldElem(&tab[i])) {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+s32 func_400BB8C0(u8 *o) {
+    u32 *tab = (u32 *)dldElem((u32 *)(*(u8 **)(o + 0x20C) + 0x1C));
+    s32 kind = AI_GetCurControlMode(*(s32 *)(o + 0x44));
+    s32 n = 0;
+    s32 i;
+
+    if (kind != 0) {
+        n = dldCnt((u32 *)(*(u8 **)(o + 0x20C) + 0x1C));
+    }
+    for (i = 0; i < n; i++) {
+        if (kind == (s32)dldElem(&tab[i])) {
+            return 0;
+        }
+    }
+    return 1;
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0139_Kite_InitSpecialPathWork", func_400BBA48);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0139_Kite_InitSpecialPathWork", func_400BBC40);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0139_Kite_InitSpecialPathWork", func_400BBD90);
+s32 func_400BBD90(void) {
+    void *sub = isysGetThisSubThread();
+    u8 *sc = GetScriptClass(sub);
+    u32 *p = (u32 *)dldRef(*(u32 **)(sc + 0x48), 0x10);
+    u8 *e;
+    u8 *m;
+    s32 kind;
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0139_Kite_InitSpecialPathWork", func_400BBF00);
+    e = p ? dldElem(p) : NULL;
+    if (e != NULL) {
+        m = dldElem((u32 *)(e + 0x10));
+        kind = AI_GetCurMotionKind(sub);
+        if (m != NULL && kind != 0) {
+            if (m == (u8 *)kind) {
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
+
+s32 func_400BBF00(void) {
+    void *sub = isysGetThisSubThread();
+    u8 *sc = GetScriptClass(sub);
+    u32 *p = (u32 *)dldRef(*(u32 **)(sc + 0x48), 0x10);
+    u8 *e;
+    u8 *m;
+    s32 kind;
+
+    e = p ? dldElem(p) : NULL;
+    if (e != NULL) {
+        m = dldElem((u32 *)(e + 0x14));
+        kind = AI_GetCurMotionKind(sub);
+        if (m != NULL && m == (u8 *)kind) {
+            return 0;
+        }
+    }
+    return 1;
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0139_Kite_InitSpecialPathWork", func_400BC068);
 
