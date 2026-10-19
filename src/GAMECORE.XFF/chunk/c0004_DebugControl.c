@@ -138,7 +138,7 @@ void charrootdyn_getRegularColFinderPosition(u8 *a, u8 *b, s32 c, s32 d);
 void UpdateCharacterClassPastGeometry(u8 *cls);
 void SetCharacterObjDemoCutFinishFlag(s32 obj, s32 flag);
 void UpdateLayoutClassSimpleGeometry(u8 *layout, f32 f);
-void GetClothDynamics(s32 obj, s32 flag, s32 zero, f32 a, f32 b);
+void GetClothDynamics(s32 obj, f32 a, f32 b, s32 flag, s32 zero);
 void UpdateLayoutClassPastSimpleGeometry(u8 *layout);
 void SetLayoutClassRootQuaternion(u8 *layout, s32 a1);
 
@@ -165,7 +165,7 @@ void DebugSetObjectGeometry(s32 a0, s32 a1, u128 *a2)
             SetCharacterObjDemoCutFinishFlag(a0, 1);
         } else {
             UpdateLayoutClassSimpleGeometry(layout, hundred);
-            GetClothDynamics(a0, 1, 0, 0.01f, hundred);
+            GetClothDynamics(a0, 0.01f, hundred, 1, 0);
             UpdateLayoutClassPastSimpleGeometry(layout);
         }
         SetLayoutClassRootQuaternion(layout, a1);
@@ -177,8 +177,6 @@ s32 DebugGetMutekiMode(void)
     return D_401304C8;
 }
 
-/* NEARMISS-STUB SetObjectGeo */
-#if 0 /* NEARMISS 97.3% cat=sched sub=- | only difference: a1=1 for GetClothDynamics is scheduled before the 0.01f mov.s to fa1 (target sets a1 after); u128 lq/sq copies and extern calls match; shared 1 | attempts=1 */
 void SetObjectGeo(s32 a0, s32 a1, u128 *a2)
 {
     u8 *layout;
@@ -197,14 +195,12 @@ void SetObjectGeo(s32 a0, s32 a1, u128 *a2)
             SetCharacterObjDemoCutFinishFlag(a0, 1);
         } else {
             UpdateLayoutClassSimpleGeometry(layout, 100.0f);
-            GetClothDynamics(a0, 1, 0, 0.01f, 100.0f);
+            GetClothDynamics(a0, 0.01f, 100.0f, 1, 0);
             UpdateLayoutClassPastSimpleGeometry(layout);
         }
         SetLayoutClassRootQuaternion(layout, a1);
     }
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0004_DebugControl", SetObjectGeo);
 
 void SetObjectGeoAndUnparent(s32 a0, s32 a1, u128 *a2)
 {
@@ -227,7 +223,7 @@ void SetObjectGeoAndUnparent(s32 a0, s32 a1, u128 *a2)
             SetCharacterObjDemoCutFinishFlag(a0, 1);
         } else {
             UpdateLayoutClassSimpleGeometry(layout, hundred);
-            GetClothDynamics(a0, 1, 0, 0.01f, hundred);
+            GetClothDynamics(a0, 0.01f, hundred, 1, 0);
             UpdateLayoutClassPastSimpleGeometry(layout);
         }
         SetLayoutClassRootQuaternion(layout, a1);
