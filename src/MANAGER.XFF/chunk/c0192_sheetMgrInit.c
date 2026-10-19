@@ -10,7 +10,318 @@ extern char rootPtn[];
 void *iosMallocAlign(void *, int, int);
 void *memset(void *, int, int);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0192_sheetMgrInit", sheetMgrInit);
+typedef struct SheetReq192 {
+    int type;
+    unsigned int flags;
+    int arg8;
+    int argC;
+    int a10;
+    int a14;
+    int a18;
+    int a1C;
+    int a20;
+    int a24;
+    int *done;
+    struct SheetReq192 *next;
+} SheetReq192;
+typedef struct SheetReqList192 {
+    SheetReq192 *head;
+    SheetReq192 *tail;
+} SheetReqList192;
+extern int D_401B53F4;
+extern SheetReq192 D_401B53F8[];
+extern int D_401B53D8[];
+extern void *D_401B9028;
+extern int D_401B9030[];
+extern int D_4012E340;
+int iosCreateSema(int, int, int);
+void isysInitGroup(int *);
+void *iosCreateThread(void *, void *, int, int, int);
+void iosStartThread(void *, int);
+void waitVscheduler(void);
+void func_400EFB98(void);
+extern SheetReqList192 D_401B8FF8;
+extern SheetReqList192 D_401B9000[];
+extern char D_40135310[];
+int WaitSema(int);
+int SignalSema(int);
+static inline SheetReq192 *sheetGetReqEmpty192(void) /* inline helper */
+{
+    extern void iosJumpRecoverPoint(const char *, int);
+    SheetReq192 *s = D_401B8FF8.head;
+    SheetReq192 *r;
+
+    if (s != 0) {
+        D_401B8FF8.head = s->next;
+        if (D_401B8FF8.head == 0)
+            D_401B8FF8.tail = 0;
+    }
+    r = s;
+    if (r == 0)
+        ((void (*)(const char *))iosJumpRecoverPoint)(D_40135310);
+    return r;
+}
+static inline void sheetPostAllReqWait192(int k, int *done) /* inline helper */
+{
+    SheetReq192 *r;
+    SheetReqList192 *q;
+
+    r = sheetGetReqEmpty192();
+    r->flags = r->flags & ~1;
+    r->type = 10;
+    q = &D_401B9000[k];
+    r->done = done;
+    if (done != 0)
+        *done = 0xdead;
+    r->next = 0;
+    if (q->tail != 0) {
+        q->tail->next = r;
+        q->tail = r;
+    } else {
+        q->tail = r;
+        q->head = r;
+    }
+}
+
+/* sheetMgrInit: 100 in scratch (rea-c0192). The request free list is a 320 entry array (stride 0x30, next at 0x2c) chained forward; write the chain as an ASCENDING index loop (gcc reverses it into the countdown with two givs), then head, tail, last next = 0 in that order (the other orders of those 3 stores give 80 to 99.6). */
+static inline void sheetPostLoadSegmentIndex192(int a, int b, int k, int *done) /* inline helper */
+{
+    SheetReq192 *r;
+    SheetReqList192 *q;
+
+    r = sheetGetReqEmpty192();
+    r->flags = r->flags & ~1;
+    r->type = 0;
+    r->arg8 = a;
+    r->argC = b;
+    q = &D_401B9000[k];
+    r->done = done;
+    if (done != 0)
+        *done = 0xdead;
+    r->next = 0;
+    if (q->tail != 0) {
+        q->tail->next = r;
+        q->tail = r;
+    } else {
+        q->tail = r;
+        q->head = r;
+    }
+}
+
+static inline void sheetPostMapDataLoad192(int a, int b, int c, int d, int e, int k, int *done) /* inline helper */
+{
+    SheetReq192 *r;
+    SheetReqList192 *q;
+
+    r = sheetGetReqEmpty192();
+    r->flags = r->flags & ~1;
+    r->type = 2;
+    r->arg8 = a;
+    r->a10 = b;
+    r->a18 = c;
+    r->a14 = d;
+    r->a1C = e;
+    q = &D_401B9000[k];
+    r->done = done;
+    if (done != 0)
+        *done = 0xdead;
+    r->next = 0;
+    if (q->tail != 0) {
+        q->tail->next = r;
+        q->tail = r;
+    } else {
+        q->tail = r;
+        q->head = r;
+    }
+}
+
+static inline void sheetPostMapDataUnloadOneBlock192(int a, int b, int c, int k, int *done) /* inline helper */
+{
+    SheetReq192 *r;
+    SheetReqList192 *q;
+
+    r = sheetGetReqEmpty192();
+    r->flags = r->flags & ~1;
+    r->type = 3;
+    r->arg8 = c;
+    r->a10 = a;
+    r->a14 = b;
+    q = &D_401B9000[k];
+    r->done = done;
+    if (done != 0)
+        *done = 0xdead;
+    r->next = 0;
+    if (q->tail != 0) {
+        q->tail->next = r;
+        q->tail = r;
+    } else {
+        q->tail = r;
+        q->head = r;
+    }
+}
+
+static inline void sheetPostNopSegmentIndex192(int k, int *done) /* inline helper */
+{
+    SheetReq192 *r;
+    SheetReqList192 *q;
+
+    r = sheetGetReqEmpty192();
+    r->flags = r->flags & ~1;
+    r->type = 9;
+    q = &D_401B9000[k];
+    r->done = done;
+    if (done != 0)
+        *done = 0xdead;
+    r->next = 0;
+    if (q->tail != 0) {
+        q->tail->next = r;
+        q->tail = r;
+    } else {
+        q->tail = r;
+        q->head = r;
+    }
+}
+
+static inline void sheetPostSpecialFsEnd192(int x, int k, int *done) /* inline helper */
+{
+    SheetReq192 *r;
+    SheetReqList192 *q;
+
+    r = sheetGetReqEmpty192();
+    r->flags = r->flags & ~1;
+    r->type = 12;
+    q = &D_401B9000[k];
+    r->done = done;
+    if (done != 0)
+        *done = 0xdead;
+    r->next = 0;
+    if (q->tail != 0) {
+        q->tail->next = r;
+        q->tail = r;
+    } else {
+        q->tail = r;
+        q->head = r;
+    }
+}
+
+int sheetFsSrhSpecialFs(int);
+static inline void sheetPostSpecialFsStart192(int a, int b, int k, int *done) /* inline helper */
+{
+    SheetReq192 *r;
+    SheetReqList192 *q;
+    int v;
+
+    r = sheetGetReqEmpty192();
+    r->flags = r->flags & ~1;
+    r->type = 0xb;
+    v = sheetFsSrhSpecialFs(a);
+    r->a14 = b;
+    r->a18 = v;
+    q = &D_401B9000[k];
+    r->done = done;
+    if (done != 0)
+        *done = 0xdead;
+    r->next = 0;
+    if (q->tail != 0) {
+        q->tail->next = r;
+        q->tail = r;
+    } else {
+        q->tail = r;
+        q->head = r;
+    }
+}
+
+int sheetFsGetStageTexSegIndex(int, int);
+int sheetFsAddStageTexSegIndex(int);
+static inline void sheetPostStageTexLoad192(int a, int idx, int k, int *done) /* inline helper */
+{
+    SheetReq192 *r;
+    SheetReqList192 *q;
+
+    r = sheetGetReqEmpty192();
+    r->flags = r->flags & ~1;
+    r->type = 4;
+    r->arg8 = a;
+    r->argC = idx;
+    q = &D_401B9000[k];
+    r->done = done;
+    if (done != 0)
+        *done = 0xdead;
+    r->next = 0;
+    if (q->tail != 0) {
+        q->tail->next = r;
+        q->tail = r;
+    } else {
+        q->tail = r;
+        q->head = r;
+    }
+}
+
+int sheetFsDecStageTexSegIndex(int);
+static inline void sheetPostStageTexUnload192(int a, int idx, int k, int *done) /* inline helper */
+{
+    SheetReq192 *r;
+    SheetReqList192 *q;
+
+    r = sheetGetReqEmpty192();
+    r->flags = r->flags & ~1;
+    r->type = 5;
+    r->arg8 = a;
+    r->argC = idx;
+    q = &D_401B9000[k];
+    r->done = done;
+    if (done != 0)
+        *done = 0xdead;
+    r->next = 0;
+    if (q->tail != 0) {
+        q->tail->next = r;
+        q->tail = r;
+    } else {
+        q->tail = r;
+        q->head = r;
+    }
+}
+
+static inline void sheetPostUnloadSegmentIndex192(int a, int b, int k, int *done) /* inline helper */
+{
+    SheetReq192 *r;
+    SheetReqList192 *q;
+
+    r = sheetGetReqEmpty192();
+    r->flags = r->flags & ~1;
+    r->type = 1;
+    r->arg8 = a;
+    r->argC = b;
+    q = &D_401B9000[k];
+    r->done = done;
+    if (done != 0)
+        *done = 0xdead;
+    r->next = 0;
+    if (q->tail != 0) {
+        q->tail->next = r;
+        q->tail = r;
+    } else {
+        q->tail = r;
+        q->head = r;
+    }
+}
+
+void sheetMgrInit(void)
+{
+    int i;
+
+    D_401B53F4 = iosCreateSema(1, 1, 0);
+    isysInitGroup(D_401B53D8);
+    for (i = 0; i < 0x13f; i++)
+        D_401B53F8[i].next = &D_401B53F8[i + 1];
+    D_401B8FF8.head = D_401B53F8;
+    D_401B8FF8.tail = &D_401B53F8[0x13f];
+    D_401B53F8[0x13f].next = 0;
+    D_401B9028 = iosCreateThread(func_400EFB98, D_401B9030, 0x8000, 0x2b, 0);
+    iosStartThread(D_401B9028, 0);
+    while (D_4012E340 == 0)
+        waitVscheduler();
+}
 
 extern int D_4012E334;
 
@@ -140,29 +451,101 @@ int sheetMgrChkStageIndexResolve(int i)
     return (D_401C1038[i / 8] >> (i & 7)) & 1;
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0192_sheetMgrInit", sheetMgrLoadSegmentIndex);
+/* sheetMgrLoadSegmentIndex: 100 in scratch (rea-c0192). Posts one request: WaitSema, pop the free list D_401B8FF8 through a COPY of head, fill the request, push on queue D_401B9000[k] (k is a helper PARAMETER so gcc keeps the unfolded lui/addiu/addiu), SignalSema. THE trick for the last 4 percent: the push is written with the tail store duplicated in both arms, and in the empty-queue arm the tail store comes BEFORE the head store (tail = r; head = r). WaitSema/SignalSema must be declared int (eekernel.h), void shifts the lui register. Request type 0 on queue 1. */
+void sheetMgrLoadSegmentIndex(int a, int b, int *done)
+{
+    WaitSema(D_401B53F4);
+    sheetPostLoadSegmentIndex192(a, b, 1, done);
+    SignalSema(D_401B53F4);
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0192_sheetMgrInit", sheetMgrUnloadSegmentIndex);
+/* sheetMgrUnloadSegmentIndex: 100 in scratch (rea-c0192). Posts one request: WaitSema, pop the free list D_401B8FF8 through a COPY of head, fill the request, push on queue D_401B9000[k] (k is a helper PARAMETER so gcc keeps the unfolded lui/addiu/addiu), SignalSema. THE trick for the last 4 percent: the push is written with the tail store duplicated in both arms, and in the empty-queue arm the tail store comes BEFORE the head store (tail = r; head = r). WaitSema/SignalSema must be declared int (eekernel.h), void shifts the lui register. Request type 1 on queue 1. */
+void sheetMgrUnloadSegmentIndex(int a, int b, int *done)
+{
+    WaitSema(D_401B53F4);
+    sheetPostUnloadSegmentIndex192(a, b, 1, done);
+    SignalSema(D_401B53F4);
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0192_sheetMgrInit", sheetMgrNopSegmentIndex);
+/* sheetMgrNopSegmentIndex: 100 in scratch (rea-c0192). Posts one request: WaitSema, pop the free list D_401B8FF8 through a COPY of head, fill the request, push on queue D_401B9000[k] (k is a helper PARAMETER so gcc keeps the unfolded lui/addiu/addiu), SignalSema. THE trick for the last 4 percent: the push is written with the tail store duplicated in both arms, and in the empty-queue arm the tail store comes BEFORE the head store (tail = r; head = r). WaitSema/SignalSema must be declared int (eekernel.h), void shifts the lui register. Request type 9 on queue 1. */
+void sheetMgrNopSegmentIndex(int *done)
+{
+    WaitSema(D_401B53F4);
+    sheetPostNopSegmentIndex192(1, done);
+    SignalSema(D_401B53F4);
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0192_sheetMgrInit", sheetMgrMapDataLoad);
+/* sheetMgrMapDataLoad: 100 in scratch (rea-c0192). Posts one request: WaitSema, pop the free list D_401B8FF8 through a COPY of head, fill the request, push on queue D_401B9000[k] (k is a helper PARAMETER so gcc keeps the unfolded lui/addiu/addiu), SignalSema. THE trick for the last 4 percent: the push is written with the tail store duplicated in both arms, and in the empty-queue arm the tail store comes BEFORE the head store (tail = r; head = r). WaitSema/SignalSema must be declared int (eekernel.h), void shifts the lui register. Request type 2 on queue 3. */
+void sheetMgrMapDataLoad(int a, int b, int c, int d, int e, int *done)
+{
+    WaitSema(D_401B53F4);
+    sheetPostMapDataLoad192(a, b, c, d, e, 3, done);
+    SignalSema(D_401B53F4);
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0192_sheetMgrInit", sheetMgrMapDataUnloadOneBlock);
+/* sheetMgrMapDataUnloadOneBlock: 100 in scratch (rea-c0192). Posts one request: WaitSema, pop the free list D_401B8FF8 through a COPY of head, fill the request, push on queue D_401B9000[k] (k is a helper PARAMETER so gcc keeps the unfolded lui/addiu/addiu), SignalSema. THE trick for the last 4 percent: the push is written with the tail store duplicated in both arms, and in the empty-queue arm the tail store comes BEFORE the head store (tail = r; head = r). WaitSema/SignalSema must be declared int (eekernel.h), void shifts the lui register. Request type 3 on queue 1. */
+void sheetMgrMapDataUnloadOneBlock(int a, int b, int c, int *done)
+{
+    WaitSema(D_401B53F4);
+    sheetPostMapDataUnloadOneBlock192(a, b, c, 1, done);
+    SignalSema(D_401B53F4);
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0192_sheetMgrInit", sheetMgrStageTexLoad);
+/* sheetMgrStageTexLoad: 100 in scratch (rea-c0192). Posts one request: WaitSema, pop the free list D_401B8FF8 through a COPY of head, fill the request, push on queue D_401B9000[k] (k is a helper PARAMETER so gcc keeps the unfolded lui/addiu/addiu), SignalSema. THE trick for the last 4 percent: the push is written with the tail store duplicated in both arms, and in the empty-queue arm the tail store comes BEFORE the head store (tail = r; head = r). WaitSema/SignalSema must be declared int (eekernel.h), void shifts the lui register. Request type 4 on queue 2, skipped when the seg-index add reports nonzero. */
+void sheetMgrStageTexLoad(int a, int b, int c, int *done)
+{
+    int idx;
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0192_sheetMgrInit", sheetMgrStageTexUnload);
+    WaitSema(D_401B53F4);
+    idx = sheetFsGetStageTexSegIndex(b, c);
+    if (sheetFsAddStageTexSegIndex(idx) == 0)
+        sheetPostStageTexLoad192(a, idx, 2, done);
+    else if (done != 0)
+        *done = 0xdeaf;
+    SignalSema(D_401B53F4);
+}
+
+/* sheetMgrStageTexUnload: 100 in scratch (rea-c0192). Posts one request: WaitSema, pop the free list D_401B8FF8 through a COPY of head, fill the request, push on queue D_401B9000[k] (k is a helper PARAMETER so gcc keeps the unfolded lui/addiu/addiu), SignalSema. THE trick for the last 4 percent: the push is written with the tail store duplicated in both arms, and in the empty-queue arm the tail store comes BEFORE the head store (tail = r; head = r). WaitSema/SignalSema must be declared int (eekernel.h), void shifts the lui register. Request type 5 on queue 1, skipped when the seg-index dec reports nonzero. */
+void sheetMgrStageTexUnload(int a, int b, int c, int *done)
+{
+    int idx;
+
+    WaitSema(D_401B53F4);
+    idx = sheetFsGetStageTexSegIndex(b, c);
+    if (sheetFsDecStageTexSegIndex(idx) == 0)
+        sheetPostStageTexUnload192(a, idx, 1, done);
+    else if (done != 0)
+        *done = 0xdeaf;
+    SignalSema(D_401B53F4);
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0192_sheetMgrInit", sheetMgrAdpcmIntLoad);
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0192_sheetMgrInit", sheetMgrDirectFileLoad);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0192_sheetMgrInit", sheetMgrAllReqWait);
+/* sheetMgrAllReqWait: 100 in scratch (rea-c0192). Posts one request: WaitSema, pop the free list D_401B8FF8 through a COPY of head, fill the request, push on queue D_401B9000[k] (k is a helper PARAMETER so gcc keeps the unfolded lui/addiu/addiu), SignalSema. THE trick for the last 4 percent: the push is written with the tail store duplicated in both arms, and in the empty-queue arm the tail store comes BEFORE the head store (tail = r; head = r). WaitSema/SignalSema must be declared int (eekernel.h), void shifts the lui register. Request type 10 on queue 4. */
+void sheetMgrAllReqWait(int *done)
+{
+    WaitSema(D_401B53F4);
+    sheetPostAllReqWait192(4, done);
+    SignalSema(D_401B53F4);
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0192_sheetMgrInit", sheetMgrSpecialFsStart);
+/* sheetMgrSpecialFsStart: 100 in scratch (rea-c0192). Posts one request: WaitSema, pop the free list D_401B8FF8 through a COPY of head, fill the request, push on queue D_401B9000[k] (k is a helper PARAMETER so gcc keeps the unfolded lui/addiu/addiu), SignalSema. THE trick for the last 4 percent: the push is written with the tail store duplicated in both arms, and in the empty-queue arm the tail store comes BEFORE the head store (tail = r; head = r). WaitSema/SignalSema must be declared int (eekernel.h), void shifts the lui register. Request type 11 on queue 4. */
+void sheetMgrSpecialFsStart(int a, int b, int *done)
+{
+    WaitSema(D_401B53F4);
+    sheetPostSpecialFsStart192(a, b, 4, done);
+    SignalSema(D_401B53F4);
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0192_sheetMgrInit", sheetMgrSpecialFsEnd);
+/* sheetMgrSpecialFsEnd: 100 in scratch (rea-c0192). Posts one request: WaitSema, pop the free list D_401B8FF8 through a COPY of head, fill the request, push on queue D_401B9000[k] (k is a helper PARAMETER so gcc keeps the unfolded lui/addiu/addiu), SignalSema. THE trick for the last 4 percent: the push is written with the tail store duplicated in both arms, and in the empty-queue arm the tail store comes BEFORE the head store (tail = r; head = r). WaitSema/SignalSema must be declared int (eekernel.h), void shifts the lui register. Request type 12 on queue 4. */
+void sheetMgrSpecialFsEnd(int x, int *done)
+{
+    WaitSema(D_401B53F4);
+    sheetPostSpecialFsEnd192(x, 4, done);
+    SignalSema(D_401B53F4);
+}
 
 extern int D_4012E338;
 
