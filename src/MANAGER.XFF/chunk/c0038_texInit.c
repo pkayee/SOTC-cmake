@@ -1,5 +1,13 @@
 #include "common.h"
 
+struct TexDeleteNode;
+extern struct TexDeleteNode *D_4012A6A4;
+void func_40040338(void);
+void isysAddGroupWithLinkParam(void *, void *, s32, s32);
+
+int strcmp(const char *, const char *);
+void texScaleClut(void *mop, float *rgba);
+
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0038_texInit", texInit);
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0038_texInit", texScaleClutAlphaByName);
@@ -104,7 +112,37 @@ int texGetWorkSize(char *t)
     return off * 3 + 0x118;
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0038_texInit", texInitialize);
+void texInitialize(char *obj, char *cb)
+{
+    struct TexN
+    {
+        s32 used;
+        s32 a;
+        struct TexN *prev;
+        struct TexN *next;
+    } *n, *head;
+    char *b;
+
+    func_40040338();
+    b = *(char **)(*(char **)(obj + 0x20) + 0xC);
+    *(s32 *)(b + 0x34) = (s32)b;
+    n = (struct TexN *)(b + 0x30);
+    head = (struct TexN *)D_4012A6A4;
+    n->used = 1;
+    n->prev = 0;
+    n->next = head;
+    if (head != 0)
+    {
+        head->prev = n;
+    }
+    D_4012A6A4 = (struct TexDeleteNode *)n;
+    isysAddGroupWithLinkParam(obj, D_401AC5C0, 0, 0);
+    if (cb != 0)
+    {
+        *(char **)(cb + 0xC) = obj;
+        *(s32 *)(cb + 0x10) = *(s32 *)(cb + 0x10) + 1;
+    }
+}
 
 typedef struct TexDeleteNode
 {
@@ -149,8 +187,131 @@ void texDelete(char *t)
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0038_texInit", texReset);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0038_texInit", texSearchMopByName);
+char *texSearchMopByName(char *name)
+{
+    TexDeleteNode *n;
+    char *r;
+    char *o;
+    char *t;
+    int off;
 
+    r = 0;
+    for (n = D_4012A6A4; n != 0; n = n->next)
+    {
+        o = *(char **)((char *)n->a + 0x28);
+        t = *(char **)(o + 0x20);
+        off = 0;
+        switch (*(int *)(t + 0x1C) & 0x3F)
+        {
+        case 0x13:
+        case 0x1B:
+            off = 0x400;
+            break;
+        case 0x14:
+        case 0x24:
+        case 0x2C:
+            off = 0x40;
+        }
+        if (strcmp(name, t + *(int *)(t + 0x18) + off) == 0)
+        {
+            r = o;
+            break;
+        }
+    }
+    return r;
+}
+
+/* NEARMISS-STUB texScaleClutAlpha */
+#if 0 /* NEARMISS 83.65% cat=regalloc sub=- | REA READY drop-in scored 83.65 in-TU (apply_ready) | attempts=1 */
+void texScaleClutAlpha(char *mop, float alpha)
+{
+    u8 *t;
+    u8 *s;
+    u8 *d;
+    int cnt;
+    int i;
+    int v;
+    int j;
+    u8 *sp;
+    u8 *dp;
+
+    t = *(u8 **)(mop + 0x20);
+    cnt = 0;
+    d = *(u8 **)(*(u8 **)(t + 0xC) + 0x40);
+    s = t + *(int *)(t + 0x18);
+    switch (*(int *)(t + 0x1C) & 0x3F)
+    {
+    case 0x13:
+    case 0x1B:
+        cnt = 0x100;
+        break;
+    case 0x14:
+    case 0x24:
+    case 0x2C:
+        cnt = 0x10;
+    }
+    if (cnt != 0)
+    {
+        i = 0;
+        j = 0;
+        do
+        {
+            sp = s + j;
+            dp = d + j;
+            v = (int)((float)sp[3] * alpha);
+            if (v < 0x100)
+            {
+                if (v < 0)
+                {
+                    v = 0;
+                }
+                dp[3] = v;
+            }
+            else
+            {
+                dp[3] = 0xFF;
+            }
+            i++;
+            j = i * 4;
+        } while (i < cnt);
+    }
+}
+#endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0038_texInit", texScaleClutAlpha);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0038_texInit", texScaleClutByName);
+void texScaleClutByName(char *name, float *rgba)
+{
+    TexDeleteNode *n;
+    char *r;
+    char *o;
+    char *t;
+    int off;
+
+    r = 0;
+    for (n = D_4012A6A4; n != 0; n = n->next)
+    {
+        o = *(char **)((char *)n->a + 0x28);
+        t = *(char **)(o + 0x20);
+        off = 0;
+        switch (*(int *)(t + 0x1C) & 0x3F)
+        {
+        case 0x13:
+        case 0x1B:
+            off = 0x400;
+            break;
+        case 0x14:
+        case 0x24:
+        case 0x2C:
+            off = 0x40;
+        }
+        if (strcmp(name, t + *(int *)(t + 0x18) + off) == 0)
+        {
+            r = o;
+            break;
+        }
+    }
+    if (r != 0)
+    {
+        texScaleClut(r, rgba);
+    }
+}

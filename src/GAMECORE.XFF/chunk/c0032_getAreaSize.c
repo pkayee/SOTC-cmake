@@ -2,6 +2,14 @@
 
 extern u8 D_40130F88[];
 
+/* SetSeamlessZFogDist(a, b): cache (a,b), recompute fog z from the map size */
+extern s32 D_40130F64;
+extern s32 D_40130F68;
+extern f32 D_40130FC8;
+extern f32 D_40130FF8;
+extern s32 D_40130FFC;
+extern f32 D_40200F2C;
+
 float getAreaSize(void)
 {
     u8 *env = D_40130F88;
@@ -9,13 +17,64 @@ float getAreaSize(void)
     return *(float *)(env + 0x40) * (float)*(s32 *)(env + 0x38);
 }
 
+/* NEARMISS-STUB getStageAreaID */
+#if 0 /* NEARMISS 73.41% cat=regalloc sub=- | REA READY drop-in scored 73.41 in-TU (apply_ready) | attempts=1 */
+/* getStageAreaID(pos, outX, outZ): area index from world pos; env = D_40130F88 */
+void getStageAreaID(float *pos, int *outX, int *outZ)
+{
+    u8 *env = D_40130F88;
+    int ix = (int)((-pos[0] - *(float *)(env + 0x50)) / *(float *)(env + 0x40)) / *(s32 *)(env + 0x38);
+    int iz = *(s32 *)(env + 0x34) - (int)((-pos[2] - *(float *)(env + 0x54)) / *(float *)(env + 0x44)) / *(s32 *)(env + 0x3C) - 1;
+
+    if (ix < 0 || ix > *(s32 *)(env + 0x30) - 1) {
+        *outX = -1;
+    } else {
+        *outX = ix;
+    }
+    if (iz < 0 || iz > *(s32 *)(env + 0x34) - 1) {
+        *outZ = -1;
+    } else {
+        *outZ = iz;
+    }
+}
+#endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0032_getAreaSize", getStageAreaID);
 
+/* NEARMISS-STUB getStageAreaName */
+#if 0 /* NEARMISS 60.08% cat=regalloc sub=- | REA READY drop-in scored 60.08 in-TU (apply_ready) | attempts=1 */
+/* getStageAreaName(out, pos): 2-char area name (letter+digit) + NUL */
+void getStageAreaName(char *out, float *pos)
+{
+    u8 *env = D_40130F88;
+    int ix = (int)((-pos[0] - *(float *)(env + 0x50)) / *(float *)(env + 0x40)) / *(s32 *)(env + 0x38);
+    int iz = *(s32 *)(env + 0x34) - (int)((-pos[2] - *(float *)(env + 0x54)) / *(float *)(env + 0x44)) / *(s32 *)(env + 0x3C) - 1;
+
+    if (ix < 0 || ix > *(s32 *)(env + 0x30) - 1) {
+        out[0] = ix + 0x3F;
+    } else {
+        out[0] = ix + 0x41;
+    }
+    if (iz < 0 || iz > *(s32 *)(env + 0x34) - 1) {
+        out[1] = iz + 0x3F;
+    } else {
+        out[1] = iz + 0x30;
+    }
+    out[2] = 0;
+}
+#endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0032_getAreaSize", getStageAreaName);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0032_getAreaSize", getStageAreaNameUV);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0032_getAreaSize", SetSeamlessZFogDist);
+void SetSeamlessZFogDist(s32 a, s32 b)
+{
+    if (D_40130F64 != a || D_40130F68 != b) {
+        D_40130F64 = a;
+        D_40130F68 = b;
+        D_40200F2C = (D_40130FC8 * 0.5f + D_40130FC8 * (f32)(a + b - 1) - D_40130FF8) / 15.0f;
+        D_40130FFC = 0xF;
+    }
+}
 
 extern s32 D_40130F5C;
 
@@ -239,6 +298,29 @@ s32 GetStageChipNum(void)
     return 0;
 }
 
+/* NEARMISS-STUB DeleteSeamlessStageObject */
+#if 0 /* NEARMISS 60.0% cat=regalloc sub=- | REA READY drop-in scored 58.56 in-TU (apply_ready) | attempts=2 */
+s32 DeleteSeamlessStageObject(s32 layer, s32 chip, s32 *out)
+{
+    s32 *ent = *(s32 **)(D_40130F88.tbl + chip * 24 + layer * 4);
+    s32 r = 0;
+    s32 stat;
+    if (ent != 0) {
+        r = ent[3];
+    }
+    if (chip == -1) {
+        stat = 7;
+    } else {
+        stat = *(u32 *)(D_40130F88.tbl + chip * 24 + layer * 4 + 8) & 0xF;
+    }
+    if (stat == 5) {
+        *out = 0;
+        return 0;
+    }
+    *out = *(u32 *)(D_40130F88.tbl + chip * 24 + layer * 4 + 8) >> 4;
+    return r;
+}
+#endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0032_getAreaSize", DeleteSeamlessStageObject);
 
 extern u8 D_40130FF4[];
