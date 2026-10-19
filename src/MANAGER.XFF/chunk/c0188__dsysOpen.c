@@ -1,11 +1,101 @@
 #include "common.h"
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0188__dsysOpen", _dsysOpen);
+typedef struct DsysFile {
+    int a;
+    int b;
+    int c;
+    struct DsysFile *next;
+} DsysFile;
+extern DsysFile *D_401B3E7C;
+extern DsysFile *D_401B3E80;
+extern DsysFile dsysFileList[];
+extern void iosJumpRecoverPoint();
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0188__dsysOpen", dsysClose);
+/* dsys file slot open: pop a slot off the free list D_401B3E7C onto the used list D_401B3E80, fill mode b=dev c=mode, open by name when dev is 0, give the slot back on failure */
+extern const char D_40134C68[];
+extern s32 func_400EA7A0(s32 *, char *, s32);
+extern const char D_40134C90[];
+extern s32 LoaderSysFClose(s32);
+
+extern char D_401B3E88[];
+extern char D_40134F60[];
+
+static inline DsysFile *dsysSlotPop(void)
+{
+    DsysFile *f;
+
+    f = D_401B3E7C;
+    if (f != 0) {
+        D_401B3E7C = f->next;
+        f->next = D_401B3E80;
+        D_401B3E80 = f;
+    }
+    return f;
+}
+static inline void dsysSlotFree(DsysFile *f)
+{
+    DsysFile *cur;
+    DsysFile *prev;
+
+    prev = 0;
+    cur = D_401B3E80;
+    while (cur != 0) {
+        if (f == cur) {
+            goto found;
+        }
+        prev = cur;
+        cur = cur->next;
+    }
+    return;
+found:
+    if (prev != 0) {
+        prev->next = cur->next;
+    } else {
+        D_401B3E80 = cur->next;
+    }
+    f->next = D_401B3E7C;
+    D_401B3E7C = f;
+}
+
+DsysFile *_dsysOpen(char *name, s32 dev, s32 mode)
+{
+    DsysFile *f;
+    DsysFile *ret;
+
+    f = dsysSlotPop();
+    if (f == 0) {
+        return 0;
+    }
+    {
+        f->c = mode;
+        f->b = dev;
+        ret = f;
+        if (dev == 0) {
+            if (func_400EA7A0((s32 *)f, name, mode) < 0) {
+                ret = 0;
+            }
+        } else {
+            iosJumpRecoverPoint(D_40134C68);
+        }
+        if (ret == 0) {
+            dsysSlotFree(f);
+        }
+    }
+    return ret;
+}
+
+/* close a dsys file slot: LoaderSysFClose for dev 0, then unlink it from the used list D_401B3E80 and push it back on the free list D_401B3E7C */
+void dsysClose(DsysFile *f)
+{
+    if (f->b == 0) {
+        LoaderSysFClose(f->a);
+    } else {
+        iosJumpRecoverPoint(D_40134C90);
+    }
+    dsysSlotFree(f);
+}
 
 extern int LoaderSysFRead(int, void *, int);
-extern void iosJumpRecoverPoint(const char *);
 extern const char D_40134CB0[];
 
 int dsysRead(void *arg0, void *buffer, int size) {
@@ -34,16 +124,6 @@ int dsysWrite(void *arg0, void *buffer, int size) {
     }
     return var_s0;
 }
-
-typedef struct DsysFile {
-    int a;
-    int b;
-    int c;
-    struct DsysFile *next;
-} DsysFile;
-extern DsysFile *D_401B3E7C;
-extern int D_401B3E80;
-extern DsysFile dsysFileList[];
 
 void dsysFileInit(void)
 {
@@ -109,7 +189,7 @@ int nicosysdRecvDataRead(int a, int b, int c)
 }
 
 extern int D_401B4274;
-extern void func_400EB990(int, int);
+extern void func_400EB990(char *, void (*)(DsysFile *, char *));
 extern void func_400EBB08(int);
 
 void nicosysdExec(int arg0, int arg1, int arg2)
@@ -122,6 +202,57 @@ void nicosysdExec(int arg0, int arg1, int arg2)
     }
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0188__dsysOpen", nicosysdDummyReadCallBack);
+/* fifo dummy read callback: drain the packet payload into D_401B3E88 in chunks of at most 1000 bytes, no terminator */
+void nicosysdDummyReadCallBack(void *arg0, s32 *arg1)
+{
+    s32 rem;
+    s32 n;
+    s32 err;
+    char *buf;
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0188__dsysOpen", nicosysdEchoReadCallBack);
+    if (D_4012E310 != 0) {
+        rem = arg1[2];
+        if (rem > 0) {
+            buf = D_401B3E88;
+            do {
+                err = 0;
+                n = rem < 0x3E9 ? rem : 1000;
+                if (D_4012E310 != 0) {
+                    err = func_400EB788((int)arg0, (int)buf, n);
+                }
+                if (err != 0) {
+                    iosJumpRecoverPoint(D_40134F60);
+                }
+                rem -= n;
+            } while (rem > 0);
+        }
+    }
+}
+
+/* fifo echo read callback: read the packet payload into D_401B3E88 in chunks of at most 1000 bytes and terminate each chunk with a zero byte */
+void nicosysdEchoReadCallBack(void *arg0, s32 *arg1)
+{
+    s32 rem;
+    s32 n;
+    s32 err;
+    char *buf;
+
+    if (D_4012E310 != 0) {
+        rem = arg1[2];
+        if (rem > 0) {
+            buf = D_401B3E88;
+            do {
+                err = 0;
+                n = rem < 0x3E9 ? rem : 1000;
+                if (D_4012E310 != 0) {
+                    err = func_400EB788((int)arg0, (int)buf, n);
+                }
+                if (err != 0) {
+                    iosJumpRecoverPoint(D_40134F60);
+                }
+                rem -= n;
+                *(char *)(n + (s32)buf) = 0;
+            } while (rem > 0);
+        }
+    }
+}
