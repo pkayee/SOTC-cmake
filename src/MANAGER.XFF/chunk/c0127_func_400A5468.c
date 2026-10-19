@@ -456,20 +456,18 @@ void SpriteMenuSetSpriteObjectValueByHash(u8 *spriteMenu, s32 layerHash, s32 par
 #endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0127_func_400A5468", SpriteMenuSetSpriteObjectValueByHash);
 
-/* NEARMISS-STUB SpriteMenuSetLayerPriority */
-#if 0 /* NEARMISS 84.6% cat=sched sub=- | addu(+layer*13) hoisted before lw 4(p) (expected lw right after movn, addu after lw); base-local 83.1, inline 83.1, obj-local 84.6; scheduling idea needed | attempts=2 */
+/* c0127 SpriteMenuSetLayerPriority: SpriteMenu layer setter, class at spriteMenu+0x90 (tag 0x21), layers 0x68 bytes each; l += layer then deref (T59) */
 void SpriteMenuSetLayerPriority(u8 *spriteMenu, s32 layer, s32 priority)
 {
-    u8 *p = (((u8 *)spriteMenu)[8] == 0x21) ? (u8 *)spriteMenu + 0x90 : NULL;
-    s32 off = layer * 0x68;
+    u8 *p = smClass(spriteMenu);
+    SmLayer *l = (SmLayer *)*(s32 *)(p + 4);
 
-    *(s32 *)(*(u8 **)(p + 4) + off + 0x38) = priority;
+    l += layer;
+    l->priority = priority;
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0127_func_400A5468", SpriteMenuSetLayerPriority);
 
 /* NEARMISS-STUB SpriteMenuSetLayerPriorityAllLayer */
-#if 0 /* NEARMISS 89.0% cat=regalloc sub=- | gcc allocs a3/a5 vs expected a2/a5 in movz/movn loop; p hoisted, smClass re-read in body (89.0) | attempts=2 */
+#if 0 /* NEARMISS 89.0% cat=regalloc sub=- | REA READY drop-in scored 75.67 in-TU (apply_ready) | attempts=3 */
 void SpriteMenuSetLayerPriorityAllLayer(u8 *spriteMenu, s32 priority)
 {
     u8 *p = smClass(spriteMenu);
@@ -733,17 +731,15 @@ void SpriteMenuSetSelectMenuId(u8 *spriteMenu, s32 menuId)
     }
 }
 
-/* NEARMISS-STUB SpriteMenuSetDefaultSelectMenu */
-#if 0 /* NEARMISS 84.0% cat=sched sub=- | addu placement vs original | attempts=1 */
+/* c0127 SpriteMenuSetDefaultSelectMenu: SpriteMenu layer setter, class at spriteMenu+0x90 (tag 0x21), layers 0x68 bytes each; l += layer then deref (T59) */
 void SpriteMenuSetDefaultSelectMenu(u8 *spriteMenu, s32 layer, s32 menu)
 {
-    s32 off = layer * 0x68;
-    u8 *p = (((u8 *)spriteMenu)[8] == 0x21) ? (u8 *)spriteMenu + 0x90 : NULL;
+    u8 *p = smClass(spriteMenu);
+    SmLayer *l = (SmLayer *)*(s32 *)(p + 4);
 
-    *(s32 *)(*(u8 **)(p + 4) + off + 0x60) = menu;
+    l += layer;
+    l->menuId = menu;
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0127_func_400A5468", SpriteMenuSetDefaultSelectMenu);
 
 //INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0127_func_400A5468", SpriteMenuGetSelectSubMenuId);
 s32 SpriteMenuGetSelectSubMenuId(u8 *spriteMenu)
@@ -918,21 +914,15 @@ s32 SpriteMenuGetPadEvent(u8 *spriteMenu)
 }
 
 /* NEARMISS-STUB SpriteMenuIsFadeCheckAllLayer */
-#if 0 /* NEARMISS 66.0% cat=branch-layout sub=- | gcc if-converts type==0x21 select to movz; expected bne; s1/s2 swap | attempts=1 */
-s32 SpriteMenuIsFadeCheckLayer(u8 *spriteMenu, s32 layer);
-
+#if 0 /* NEARMISS 66.16% cat=regalloc sub=- | REA READY drop-in scored 66.16 in-TU (apply_ready) | attempts=2 */
 s32 SpriteMenuIsFadeCheckAllLayer(u8 *spriteMenu)
 {
+    u8 *p = NULL;
     s32 i;
-    u8 *p;
 
     if (spriteMenu[8] == 0x21)
     {
         p = spriteMenu + 0x90;
-    }
-    else
-    {
-        p = NULL;
     }
     for (i = 0; i < *(s32 *)(p + 8); i++)
     {
@@ -975,58 +965,49 @@ s32 SpriteMenuIsFadeCheckLayer(u8 *spriteMenu, s32 layer)
 #endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0127_func_400A5468", SpriteMenuIsFadeCheckLayer);
 
-/* NEARMISS-STUB SpriteMenuGetFadeByLayer */
-#if 0 /* NEARMISS 96.7% cat=rodata-const sub=- | jump-table reloc: expected lui/lw %hi/%lo(D_40133C70) named blob table, gcc emits local .rodata table (blocker %hi(sym+off)); also beqz vs beql bounds check and | attempts=1 */
-f32 SpriteMenuGetFadeByLayer(u8 *spriteMenu, s32 layer)
+/* c0127 SpriteMenuGetFadeByLayer: fade value of a layer picked by the layer def type via a switch (jump table D_40133C70: 0 -> +0x34, 2/3 -> +0x1C, 1/4 -> +0x20), default arm assigns NULL (no pre-init) */
+float SpriteMenuGetFadeByLayer(u8 *spriteMenu, s32 layer)
 {
-    u8 *p = (((u8 *)spriteMenu)[8] == 0x21) ? (u8 *)spriteMenu + 0x90 : NULL;
+    u8 *p = smClass(spriteMenu);
     u8 *obj = *(u8 **)(p + 4) + layer * 0x68;
-    s32 type = *(s32 *)(*(u8 **)obj + 0xC);
-    f32 *fade = NULL;
+    float *fade;
 
-    switch (type)
+    switch (*(s32 *)(*(u8 **)obj + 0xC))
     {
     case 0:
-        fade = (f32 *)(obj + 0x34);
+        fade = (float *)(obj + 0x34);
+        break;
+    case 2:
+    case 3:
+        fade = (float *)(obj + 0x1C);
         break;
     case 1:
-    case 2:
-        fade = (f32 *)(obj + 0x1C);
-        break;
-    case 3:
     case 4:
-        fade = (f32 *)(obj + 0x20);
+        fade = (float *)(obj + 0x20);
+        break;
+    default:
+        fade = NULL;
         break;
     }
     return *fade;
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0127_func_400A5468", SpriteMenuGetFadeByLayer);
 
-/* NEARMISS-STUB SpriteMenuSetPadEventCallback */
-#if 0 /* NEARMISS 84.0% cat=sched sub=- | addu placement vs original | attempts=1 */
+/* c0127 SpriteMenuSetPadEventCallback: SpriteMenu layer setter, class at spriteMenu+0x90 (tag 0x21), layers 0x68 bytes each; l += layer then deref (T59) */
 void SpriteMenuSetPadEventCallback(u8 *spriteMenu, s32 layer, s32 callback)
 {
-    s32 off = layer * 0x68;
-    u8 *p = NULL;
+    u8 *p = smClass(spriteMenu);
+    SmLayer *l = (SmLayer *)*(s32 *)(p + 4);
 
-    if (spriteMenu[8] == 0x21)
-    {
-        p = spriteMenu + 0x90;
-    }
-    *(s32 *)(*(u8 **)(p + 4) + off + 0x48) = callback;
+    l += layer;
+    l->padCallback = callback;
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0127_func_400A5468", SpriteMenuSetPadEventCallback);
 
-/* NEARMISS-STUB SpriteSubMenuSetPadEventCallback */
-#if 0 /* NEARMISS 84.0% cat=sched sub=- | addu placement vs original | attempts=1 */
+/* c0127 SpriteSubMenuSetPadEventCallback: SpriteMenu layer setter, class at spriteMenu+0x90 (tag 0x21), layers 0x68 bytes each; l += layer then deref (T59) */
 void SpriteSubMenuSetPadEventCallback(u8 *spriteMenu, s32 layer, s32 callback)
 {
-    s32 off = (layer * 13) << 3;
-    u8 *p = (((u8 *)spriteMenu)[8] == 0x21) ? (u8 *)spriteMenu + 0x90 : NULL;
+    u8 *p = smClass(spriteMenu);
+    SmLayer *l = (SmLayer *)*(s32 *)(p + 4);
 
-    *(s32 *)(*(u8 **)(p + 4) + off + 0x4C) = callback;
+    l += layer;
+    l->subPadCallback = callback;
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0127_func_400A5468", SpriteSubMenuSetPadEventCallback);
