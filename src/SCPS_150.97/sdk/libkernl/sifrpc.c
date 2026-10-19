@@ -81,47 +81,42 @@ void sceSifExitRpc(void)
     D_00132388[0] = 0;
 }
 
-/* NEARMISS-STUB func_001092C0 */
-#if 0 /* NEARMISS 97.6% cat=sched sub=- | gcc folds id=1 const materialisation | attempts=1 */
-void *func_001092C0(s32 *a0)
+void *func_001092C0(s32 *obj)
 {
-    s32 *entry;
-    s32 idx;
+    s32 *elem;
+    s32 i;
     s32 id;
-    s32 old;
+    s32 n;
+    s32 t;
 
     DIntr();
-    idx = 0;
-    entry = (s32 *)a0[1];
-    if (a0[2] > 0)
+    elem = (s32 *)obj[1];
+    for (i = 0; i < obj[2]; i++, elem += 16)
     {
-        do
+        if ((elem[4] & 1) == 0)
         {
-            if ((entry[4] & 1) == 0)
+            elem[4] = (i << 16) | 5;
+            n = obj[0];
+            t = n + 1;
+            obj[0] = t;
+            if (t == 1)
             {
-                entry[4] = (idx << 16) | 5;
-                old = a0[0];
-                id = old + 1;
-                a0[0] = id;
-                if (id == 1)
-                {
-                    a0[0] = old + 2;
-                    id = 1;
-                }
-                entry[5] = (s32)entry;
-                entry[6] = id;
-                EIntr();
-                return entry;
+                obj[0] = n + 2;
+                id = 1;
             }
-            idx++;
-            entry += 16;
-        } while (idx < a0[2]);
+            else
+            {
+                id = t;
+            }
+            elem[5] = (s32)elem;
+            elem[6] = id;
+            EIntr();
+            return elem;
+        }
     }
     EIntr();
-    return NULL;
+    return 0;
 }
-#endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/sifrpc", func_001092C0);
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libkernl/sifrpc", func_00109368);
 

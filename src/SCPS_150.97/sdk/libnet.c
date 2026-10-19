@@ -828,9 +828,6 @@ s32 func_00119808(void *cd, void *net_buf, s32 *if_id, s32 n, void *addr, s32 fl
     return 0;
 }
 
-/* NEARMISS-STUB sceLibnetWaitGetInterfaceID */
-#if 0 /* NEARMISS 92.0% cat=branch-layout sub=- | tail ret<0?ret:0 : target copies ret to v1 and bltz v1 with ld ra in delay; gcc emits slt/movn. inverted tail (ret>=0 ? 0 : ret) gave 90.9 | attempts=2 | attempts=2 */
-//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceLibnetWaitGetInterfaceID);
 s32 func_00119668(s32, s32, s32);
 
 s32 sceLibnetWaitGetInterfaceID(s32 a0, s32 a1, s32 a2, s32 a3)
@@ -841,19 +838,16 @@ s32 sceLibnetWaitGetInterfaceID(s32 a0, s32 a1, s32 a2, s32 a3)
     {
         return -0x21C;
     }
-    if (func_00119668(a0, a1, a2) >= 0)
+    if (func_00119668(a0, a1, a2) < 0)
     {
-        return 0;
-    }
-    ret = func_00119628(a0, a1, a2, a3);
-    if (ret < 0)
-    {
-        return ret;
+        ret = func_00119628(a0, a1, a2, a3);
+        if (ret < 0)
+        {
+            return ret;
+        }
     }
     return 0;
 }
-#endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceLibnetWaitGetInterfaceID);
 
 s32 sceLibnetWaitGetAddress(void *cd, void *net_buf, s32 *if_id, s32 n, void *addr, u32 flags)
 {
@@ -902,14 +896,13 @@ void sceSifMExitRpc(void)
     sceSifRemoveRebootNotifyHandler(0x80000014);
 }
 
-/* NEARMISS-STUB func_00119AF8 */
-#if 0 /* NEARMISS 97.6% cat=cse-hoist sub=ee-gcc2.9-991111 | 97.6%: missing addiu v1,zero,1 (li of const 1 for id on the id==1 path); gcc2.9 reuses the a1=1 register and drops the li. Variants: cond n==0 gives bnez 2x wor | attempts=1 */
 s32 *func_00119AF8(s32 *obj)
 {
     s32 *elem;
     s32 i;
     s32 id;
     s32 n;
+    s32 t;
 
     DIntr();
     elem = (s32 *)obj[1];
@@ -919,12 +912,16 @@ s32 *func_00119AF8(s32 *obj)
         {
             elem[4] = (i << 16) | 5;
             n = obj[0];
-            id = n + 1;
-            obj[0] = id;
-            if (id == 1)
+            t = n + 1;
+            obj[0] = t;
+            if (t == 1)
             {
                 obj[0] = n + 2;
                 id = 1;
+            }
+            else
+            {
+                id = t;
             }
             elem[5] = (s32)elem;
             elem[6] = id;
@@ -935,8 +932,6 @@ s32 *func_00119AF8(s32 *obj)
     EIntr();
     return 0;
 }
-#endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_00119AF8);
 
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_00119BA0);
 void func_00119BA0(s32 *p)
@@ -1824,8 +1819,6 @@ s32 func_0011BCB8(s32 path)
 }
 
 
-/* NEARMISS-STUB func_0011BD10 */
-#if 0 /* NEARMISS 85.8% cat=branch-layout sub=- | target shares one v0=0 return block (beqz to it from the strcmp DF0 test), fills bnez delay slot with addiu v0,1 and hoists strcpy a1=s0 into the strlen beqz de | attempts=1 */
 extern const char D_00138DF0[];
 extern const char D_00138DF8[];
 char *strchr(char *, s32);
@@ -1852,18 +1845,12 @@ s32 func_0011BD10(char *path)
         }
         strcpy(buf, path);
     }
-    if (strcmp(buf, D_00138DF0) == 0)
-    {
-        return 0;
-    }
-    if (strcmp(buf, D_00138DF8) == 0)
+    if (strcmp(buf, D_00138DF0) == 0 || strcmp(buf, D_00138DF8) == 0)
     {
         return 0;
     }
     return 1;
 }
-#endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_0011BD10);
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_0011BDC8);
 
@@ -2060,21 +2047,19 @@ INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_0011C9B0);
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_0011CB30);
 
 /* NEARMISS-STUB func_0011CBC0 */
-#if 0 /* NEARMISS 88.6% cat=regalloc sub=- | target dividend in v0 and n in a2 (lhu 0x28), ours puts n in v0 and dividend in a4; quotient-first local gave 55.6; u16 locals no help | attempts=2 */
-//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_0011CBC0);
-s32 _sceMcCoreSetCardSpec(s32, s32, s32, s32);
+#if 0 /* NEARMISS 91.82% cat=regalloc sub=- | 2-arg _sceMcCoreSetCardSpec(a0, spec) (Ghidra): 88.6->91.82; left: target n in a2 + t0 copy for spec[0] store, dividend/quotient in v0; ours n v0, dividend v1,  | attempts=2 */
+s32 _sceMcCoreSetCardSpec(s32, s32 *);
 
 s32 func_0011CBC0(s32 a0, s32 *a1)
 {
     s32 spec[4];
     s32 n = ((u16 *)a1)[0x14];
-    s32 m = ((u16 *)a1)[0x16];
 
     spec[0] = n;
-    spec[1] = m;
+    spec[1] = ((u16 *)a1)[0x16];
     spec[2] = (a1[12] << 10) / n;
     spec[3] = 1;
-    return _sceMcCoreSetCardSpec(a0, (s32)spec, n, m);
+    return _sceMcCoreSetCardSpec(a0, spec);
 }
 #endif
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_0011CBC0);
