@@ -16,6 +16,32 @@ extern int D_40131BCC;
 extern char *gcGetStageData(int);
 extern void initlayout(int, char *, int, int, int, int);
 
+extern u8 *GetCharacterClass(u8 *);
+extern u8 *GetLayoutClass(u8 *);
+extern s32 StageManagerCheckAreaExist(s32);
+extern u8 *SCRGetGetGeometryPointerLegalParentObj(u8 *);
+extern s32 ExecCharaGeometryPreprocess(u8 *, float, float, float);
+extern s32 ExecCharaGeometry(u8 *, u8 *);
+extern void ExecCharaGeometryPostprocess(u8 *);
+static inline s32 isLegalGeoParent(u8 *obj) /* inline helper */
+{
+    u8 *lay = GetLayoutClass(obj);
+    u8 *p;
+
+    if (lay != 0 && *(s32 *)(lay + 0x124) != 0) {
+        p = SCRGetGetGeometryPointerLegalParentObj(lay + 0xC0);
+        if (p != 0) {
+            switch (p[8]) {
+            case 9:
+            case 0xD:
+            case 0x16:
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
+
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0121_execObjectWithNonTaskSwitch", execObjectWithNonTaskSwitch);
 
 extern int isysGetThisSubThread();
@@ -129,7 +155,37 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0121_execObjectWithNonTaskSwit
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0121_execObjectWithNonTaskSwitch", func_400A5440);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0121_execObjectWithNonTaskSwitch", simpleExecCharaGeometry);
+/* GAMECORE c0121 simpleExecCharaGeometry: 100 in scratch. Relies on the TU decls above it: ViewIntervalClip(void *, void *, float), get_main_cameraman_camera_obj and the struct gcGlobalVar (OrientationGlobalsView, interval at 0x188). (1) the 0x9/0xD/0x16 test is a switch inside a static inline helper (gives the slti/beql tree). (2) gcGlobalVar address: g1 = &gcGlobalVar AFTER the camera call and a SEPARATE g2 = &gcGlobalVar at the Preprocess call give one hoisted lui in s3 plus two addiu (a shared g or struct-field/constant offset folding gives 76-95 percent). (3) the camera result in its own local, then g1, then ViewIntervalClip. (4) offset 0x370 is the folded constant (u8 *)&gcGlobalVar + 0x370 with its own lui. */
+void simpleExecCharaGeometry(u8 *obj)
+{
+    s32 did = 0;
+    u8 *cc;
+    float iv;
+    u8 *g1;
+    u8 *g2;
+    void *cam;
+
+    cc = GetCharacterClass(obj);
+    cam = get_main_cameraman_camera_obj();
+    g1 = (u8 *)&gcGlobalVar;
+    iv = ViewIntervalClip(obj, cam, *(float *)(g1 + 0x188));
+    if (*(s8 *)(cc + 0x524) != 0) {
+        if (*(s32 *)(GetCharacterClass(obj) + 0x10C0) == 0
+            || StageManagerCheckAreaExist(*(s32 *)(GetLayoutClass(obj) + 0x134)) != 0
+            || *(s16 *)(cc + 0x360) == 4
+            || isLegalGeoParent(obj)
+            || cc[0xD00] == 1 || *(s32 *)(cc + 0xFD0) == 1 || *(s16 *)(cc + 0x360) == 0xB) {
+            g2 = (u8 *)&gcGlobalVar;
+            did = ExecCharaGeometryPreprocess(obj, *(float *)(g2 + 0x178), iv, 1.0f / iv);
+        }
+    }
+    if (did != 0) {
+        cc = GetCharacterClass(obj);
+        ExecCharaGeometry(obj, (u8 *)&gcGlobalVar + 0x370);
+        cc[0x529] = StageManagerCheckAreaExist(*(s32 *)(GetLayoutClass(obj) + 0x134));
+    }
+    ExecCharaGeometryPostprocess(obj);
+}
 
 extern char D_40216E08[];
 extern int isysAddGroupWithLinkParam();
