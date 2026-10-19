@@ -2131,7 +2131,7 @@ INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_0011C4B0);
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_0011C5C8);
 s32 func_0011C4B0(s32, s32, s32 *);
 
-s32 func_0011C5C8(s32 a0, s32 a1, s32 *a2, s32 a3)
+s32 func_0011C5C8(s32 a0, s32 a1, s32 *a2)
 {
     s32 ret = func_0011C4B0(a0, a1, a2);
     if (ret == 0x7FFFFFFF)
@@ -2195,7 +2195,36 @@ s32 func_0011C8D8(s32 port, s32 *err)
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_0011C9B0);
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_0011CB30);
+s32 func_0011CB30(s32 port, u32 idx)
+{
+    s32 err;
+    s32 n;
+
+    if (idx == 0xFFFFFFFF)
+    {
+        return 0;
+    }
+    n = 1;
+    goto call;
+again:
+    n++;
+    idx &= 0x7FFFFFFF;
+call:
+    idx = func_0011C5C8(port, idx, &err);
+    if (err != 0)
+    {
+        return err;
+    }
+    if (idx == 0xFFFFFFFF)
+    {
+        return n;
+    }
+    if ((s32)idx < 0)
+    {
+        goto again;
+    }
+    return 0x81019002;
+}
 
 s32 _sceMcCoreSetCardSpec(s32 a0, s32 *spec);
 
@@ -2541,7 +2570,7 @@ s32 _sceMcpReadUserClustOnCache(s32 port, s32 dst, s32 clust)
     return _sceMcpReadClust(port, dst, clust, 1);
 }
 
-s32 _sceMcpReadUserClust(s32 a0, s32 a1, s32 a2)
+s32 _sceMcpReadUserClust(s32 a0, s32 a1, s32 a2, s32 a3)
 {
     return _sceMcpReadUserClustOnCache(a0, a1, a2);
 }
