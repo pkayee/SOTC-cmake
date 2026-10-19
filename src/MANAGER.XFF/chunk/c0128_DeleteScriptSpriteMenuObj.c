@@ -2,6 +2,43 @@
 
 extern void flushScriptObj(unsigned char *);
 
+s32 func_400A5468();
+s32 GetScriptObjWorkSize();
+void *_isysCreateObj(void *, s32, s32, s32, void (*)(void), s32);
+void isysSetObjImmediateDeleteFunc();
+void initScriptObj();
+void func_400A4CE0();
+void func_400A6B98(void);
+
+void InitTwoWayLink();
+void *iosMallocAlign();
+void func_400A75E8(void);
+extern void *memcpy(void *, const void *, unsigned int);
+
+extern s32 DldSysUndefSymbol;
+extern s32 sheetFsLanguageCode;
+void *spriteCreateObject();
+void spriteSetValue(void *, s32);
+void spriteSetPosition(void *, float, float);
+void spriteSetTextureCoordinateUV(void *, float, float, float, float);
+void spriteSetColor(void *, s32, s32, s32, s32);
+void spriteSetScale(void *, float, float);
+void spriteSetRotation(void *, float);
+void spriteSetPriority(void *, s32);
+void spriteSetBlendMode(void *, s32, u32, u32);
+void spriteSetIdentifier(void *, s32);
+/* dld link word: bits 0..17 = byte distance back to a slot holding the target (or DldSysUndefSymbol), wanted value = field of that target */
+static inline u8 *dldRef(u32 *lp, s32 fld) /* inline helper */
+{
+    u8 *slot;
+    u32 off = *lp & 0x3FFFF;
+
+    slot = off ? *(u8 **)((u8 *)lp - off) : NULL;
+    return (slot != NULL && slot != (u8 *)DldSysUndefSymbol) ? *(u8 **)(slot + fld) : NULL;
+}
+
+void spriteDrawSprite(void *, s32, float, float, float, float, float, float, s32, s32);
+
 void DeleteScriptSpriteMenuObj(unsigned char *p)
 {
     unsigned char *m = p[8] != 0x21 ? 0 : p + 0x20;
@@ -12,7 +49,24 @@ void DeleteScriptSpriteMenuObj(unsigned char *p)
         f(p);
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0128_DeleteScriptSpriteMenuObj", CreateScriptSpriteMenuObj);
+/* c0128 CreateScriptSpriteMenuObj: isys obj tag 0x21 size 0xD0; script block at +0x20 gets desc script area desc+0x2C; delete cb desc[0x28] stored at script block +0xA0 */
+u8 *CreateScriptSpriteMenuObj(void *grp, s32 extra, u8 *desc)
+{
+    u8 *s = desc + 0x2C;
+    s32 a = func_400A5468(desc);
+    s32 b = GetScriptObjWorkSize(s);
+    u8 *o = _isysCreateObj(grp, 0x21, 0xD0, extra + a + b, (void (*)(void))DeleteScriptSpriteMenuObj, 0x10);
+    u8 *c;
+
+    if (o != 0) {
+        isysSetObjImmediateDeleteFunc(o, func_400A6B98);
+        initScriptObj(o, s, *(s32 *)o);
+        func_400A4CE0(o, desc);
+        c = o[8] != 0x21 ? 0 : o + 0x20;
+        *(s32 *)(c + 0xA0) = *(s32 *)(desc + 0x28);
+    }
+    return o;
+}
 
 extern u8 padManagerData[];
 extern int D_4012B2A8;
@@ -147,8 +201,98 @@ void setDefaultMenuControlButton(void)
     D_4012B2A8 = MenuControlButtonContext_control_america;
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0128_DeleteScriptSpriteMenuObj", func_400A6BC8);
+/* c0128 func_400A6BC8(heap, obj, cls, ent): creates cls[1] sprites from 0x54-byte entries (obj is unused here); cls[0] = sprite ptr array, cls[2] = max value+1 */
+void func_400A6BC8(void *heap, void *obj, s32 *cls, u32 *e)
+{
+    s32 i = 0;
+    s32 bm;
+    s32 mx;
+    s32 id;
+    u8 *sp;
+    u32 *lp;
 
+    if (cls[1] > 0) {
+        for (;;) {
+            lp = (u32 *)(dldRef(e, 0x10) + sheetFsLanguageCode * 4 - 4);
+            id = *(s32 *)(dldRef(lp, 0x10) + 0xC);
+            bm = 0;
+            mx = e[2] + 1;
+            if (cls[2] < mx)
+                cls[2] = mx;
+            sp = spriteCreateObject(heap, id);
+            ((u32 *)cls[0])[i] = (u32)sp;
+            e[0x14] = (u32)sp;
+            spriteSetValue(sp, e[2]);
+            spriteSetPosition(sp, ((float *)e)[3], ((float *)e)[4]);
+            spriteSetTextureCoordinateUV(sp, ((float *)e)[7], ((float *)e)[8], ((float *)e)[9], ((float *)e)[10]);
+            spriteSetColor(sp, (u32)((float *)e)[11] & 0xFF, (u32)((float *)e)[12] & 0xFF, (u32)((float *)e)[13] & 0xFF, (u32)((float *)e)[14] & 0xFF);
+            spriteSetScale(sp, ((float *)e)[5], ((float *)e)[6]);
+            spriteSetRotation(sp, ((float *)e)[15]);
+            spriteSetPriority(sp, 1);
+            switch (e[0x10]) {
+            case 0: bm = 0; break;
+            case 1: bm = 1; break;
+            case 2: bm = 2; break;
+            case 3: bm = 3; break;
+            case 4: bm = 4; break;
+            case 5: bm = 5; break;
+            case 6: bm = 6; break;
+            }
+            i++;
+            spriteSetBlendMode(sp, bm, e[0x11], e[0x12]);
+            spriteSetIdentifier(sp, e[0x13]);
+            e += 0x15;
+            if (i >= cls[1])
+                break;
+        }
+    }
+}
+
+/* NEARMISS-STUB InitSpriteObj */
+#if 0 /* NEARMISS 60.71% cat=regalloc sub=- | REA READY drop-in scored -1.00 in-TU (apply_ready) | attempts=1 */
+/* c0128 InitSpriteObj(obj, desc): tag 0xE class at obj+0x90 (+0 sprite array, +4 count, +8 max id, +0x54 draw callback); desc[1] = dld link whose target+0x10 = entry table; returns 1 */
+s32 InitSpriteObj(u8 *obj, u8 *desc)
+{
+    u8 *c = obj[8] != 0xE ? 0 : obj + 0x90;
+    void *heap = *(void **)obj;
+    u32 *lp;
+    u8 *slot;
+    u8 *ent;
+    u32 off;
+
+    *(s32 *)(c + 0x54) = (s32)func_400A7260;
+    *(s32 *)c = (s32)iosMallocAlign(heap, *(s32 *)(desc + 8) << 2, 0x10);
+    *(s32 *)(c + 8) = 0;
+    *(s32 *)(c + 4) = *(s32 *)(desc + 8);
+    *(float *)(c + 0xC) = *(float *)(desc + 0xC);
+    *(s32 *)(c + 0x1C) = 0xFFFFFF;
+    *(float *)(c + 0x10) = *(float *)(desc + 0x10);
+    *(s32 *)(c + 0x14) = 0;
+    *(s32 *)(c + 0x18) = 0;
+    *(float *)(c + 0x20) = *(float *)(desc + 0x14);
+    *(float *)(c + 0x24) = *(float *)(desc + 0x18);
+    *(s32 *)(c + 0x2C) = *(s32 *)(desc + 0x20);
+    *(s32 *)(c + 0x34) = 0;
+    *(float *)(c + 0x30) = *(float *)(desc + 0x24);
+    *(float *)(c + 0x3C) = *(float *)(desc + 0x28);
+    *(float *)(c + 0x40) = *(float *)(c + 0x3C) + *(float *)(desc + 0x2C);
+    *(float *)(c + 0x44) = *(float *)(c + 0x40) + *(float *)(desc + 0x30);
+    *(float *)(c + 0x28) = *(float *)(desc + 0x1C);
+    *(s32 *)(c + 0x4C) = 1;
+    *(s32 *)(c + 0x48) = *(s32 *)(desc + 0x34);
+    *(s32 *)(c + 0x50) = 0;
+    slot = 0;
+    ent = 0;
+    lp = *(u32 **)(desc + 4);
+    off = *lp & 0x3FFFF;
+    if (off)
+        slot = *(u8 **)((u8 *)lp - off);
+    if (slot != 0 && slot != (u8 *)DldSysUndefSymbol)
+        ent = *(u8 **)(slot + 0x10);
+    func_400A6BC8(heap, obj, c, ent);
+    return 1;
+}
+#endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0128_DeleteScriptSpriteMenuObj", InitSpriteObj);
 
 char *GetSpriteClass(unsigned char *p)
@@ -205,12 +349,56 @@ int GetScriptSpriteObjWorkSize(unsigned char *p)
     return n + GetScriptObjWorkSize((int *)(p + 0x3C));
 }
 
+/* NEARMISS-STUB CreateScriptSpriteObj */
+#if 0 /* NEARMISS 99.64% cat=regalloc sub=- | REA READY drop-in scored 99.64 in-TU (apply_ready) | attempts=1 */
+/* c0128 CreateScriptSpriteObj: isys obj tag 0xE size 0xF0; desc[2]*0xA7+0x43 + script area size (desc+0x3C); delete cb desc[0x38] -> script block +0xCC */
+u8 *CreateScriptSpriteObj(void *grp, s32 extra, u8 *desc)
+{
+    u8 *s = desc + 0x3C;
+    s32 n = *(s32 *)(desc + 0x8) * 0xA7;
+    u8 *o;
+    u8 *c;
+
+    n = n + 0x43;
+    o = _isysCreateObj(grp, 0xE, 0xF0, extra + (n + GetScriptObjWorkSize(s)), (void (*)(void))DeleteScriptSpriteObj, 0x10);
+    if (o != 0) {
+        isysSetObjImmediateDeleteFunc(o, func_400A7360);
+        InitSpriteObj(o, desc);
+        initScriptObj(o, s, *(s32 *)o);
+        c = o[8] != 0xE ? 0 : o + 0x20;
+        *(s32 *)(c + 0xCC) = *(s32 *)(desc + 0x38);
+    }
+    return o;
+}
+#endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0128_DeleteScriptSpriteMenuObj", CreateScriptSpriteObj);
 
 void ExecScriptSpriteObj(void) {
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0128_DeleteScriptSpriteMenuObj", func_400A7260);
+/* c0128 func_400A7260(obj, key): sprite-obj (tag 0xE) draw callback; class at obj+0x90, draws sprites by layer 1..3 (sprite+0x5C) whose value (sprite+4) equals key, or all when key == -1 */
+void func_400A7260(u8 *obj, s32 key)
+{
+    u8 *c = obj[8] != 0xE ? 0 : obj + 0x90;
+    s32 layer;
+    s32 i;
+    u8 *spr;
+
+    if (*(s32 *)(c + 0x4C) != 0) {
+        for (layer = 1; layer < 4; layer++) {
+            for (i = 0; i < *(s32 *)(c + 4); i++) {
+                spr = *(u8 **)(*(u8 **)c + i * 4);
+                if (*(s32 *)(spr + 0x5C) == layer) {
+                    if (*(s32 *)(spr + 4) == key || key == -1) {
+                        spriteDrawSprite(spr, *(s32 *)(c + 0x1C),
+                                         *(float *)(c + 0xC) + *(float *)(c + 0x14), *(float *)(c + 0x10) + *(float *)(c + 0x18),
+                                         *(float *)(c + 0x20), *(float *)(c + 0x24), *(float *)(c + 0x28), *(float *)(c + 0x30), *(s32 *)(c + 0x48), -1);
+                    }
+                }
+            }
+        }
+    }
+}
 
 //INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0128_DeleteScriptSpriteMenuObj", func_400A7360);
 void func_400A7360(void)
@@ -226,7 +414,25 @@ char *GetSubLinkClass(unsigned char *p)
     return (char *)p + 0x1C;
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0128_DeleteScriptSpriteMenuObj", CreateSubLinkObj);
+/* c0128 CreateSubLinkObj(grp, deleteFn, data, size): isys obj tag 0x15 size 0x30, link block at +0x1C (+0xC delete fn, +0x10 copy of data) */
+u8 *CreateSubLinkObj(void *grp, s32 func, void *data, s32 size)
+{
+    u8 *o = _isysCreateObj(grp, 0x15, 0x30, size + 0x20, 0, 0x10);
+    u8 *l;
+    u8 *s;
+
+    if (o != 0) {
+        isysSetObjImmediateDeleteFunc(o, func_400A75E8);
+        l = o[8] != 0x15 ? 0 : o + 0x1C;
+        InitTwoWayLink(l, o);
+        *(void **)(l + 0x10) = iosMallocAlign(*(void **)o, size, 0x10);
+        s = o[8] != 0x15 ? 0 : o + 0x1C;
+        *(s32 *)(s + 0xC) = func;
+        if (data != 0)
+            memcpy(*(void **)(s + 0x10), data, size);
+    }
+    return o;
+}
 
 extern void *memcpy(void *, const void *, unsigned int);
 

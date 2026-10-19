@@ -40,6 +40,17 @@ void gameModeCls(u32 mode);
 void* CAM_get_target_obj(void* p);
 void nico_playerSetAttentionHeadActFlag(void* p, s32 flag);
 
+u8* GAMEUTIL_get_motion_kind(u8* a0);
+s32 GAMEUTIL_get_character_type(u8* a0);
+void GAMEUTIL_get_1p_left_analog_input(f32* x, f32* y);
+s32 is_pass_camera_etc_condition(s32 a0, u8* a1);
+
+typedef union { u128 q; f32 f; } F5380Cell;
+s32 act_camera_cutout_game_camera_param_manager(u8* a0, u8* a1);
+s32 is_camera_target_debug_move(s32 a0);
+f32 get_mode_common_data_filter_base_dist_to_look_at(u8* a0);
+void CAM_get_camera_position_by_look_at(u8* a0, u8* a1, u8* a2, f32 a3);
+
 void begin_check_and_boot_boss_subjective_camera_lws_animation(void) {
 }
 
@@ -223,16 +234,14 @@ void setZoomKey(s32 key)
     D_401322C8 = key;
 }
 
-/* NEARMISS-STUB func_400F4028 */
-#if 0 /* NEARMISS 45.0% cat=branch-layout sub=- | target sw in bnez delay slot then lw/beq; C puts sw before branch or beqzl | attempts=1 */
-s32 func_400F4028(u8* work, s32 flag) {
+s32 func_400F4028(u8* work, s32 flag)
+{
     *(s32*)(work + 0x90) = flag;
-    if (flag != 0) return 1;
-    if (*(s32*)(work + 0x8C) == 4) return 0;
+    if (flag == 0 && *(s32*)(work + 0x8C) == 4) {
+        return 0;
+    }
     return 1;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0189_begin_check_and_boot_boss_subjective_cam", func_400F4028);
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0189_begin_check_and_boot_boss_subjective_cam", is_lws_fixed_point_mode);
 s32 is_lws_fixed_point_mode(u8* work)
@@ -534,7 +543,38 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0189_begin_check_and_boot_boss
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0189_begin_check_and_boot_boss_subjective_cam", func_400F4938);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0189_begin_check_and_boot_boss_subjective_cam", func_400F4A50);
+void func_400F4A50(s32* a0, s32* a1, u8* a2, u8* a3)
+{
+    f32 in[2];
+    u8* kind = GAMEUTIL_get_motion_kind(a2);
+    s32 m;
+
+    *a0 = GAMEUTIL_get_character_type(a2);
+    if (kind != NULL) {
+        GAMEUTIL_get_1p_left_analog_input(&in[0], &in[1]);
+        m = *(s32*)(kind + 0x90);
+        *a1 = m;
+        switch (m) {
+        case 9:
+            if (is_pass_camera_etc_condition(2, a3 + 0x10) == 0) {
+                *a1 = 0;
+            }
+            break;
+        case 0x1A:
+            if (in[0] <= 0.0f) {
+                *a1 = 0x25;
+            }
+            break;
+        case 0x1B:
+            if (0.0f <= in[0]) {
+                *a1 = 0x25;
+            }
+            break;
+        }
+    } else {
+        *a1 = 0;
+    }
+}
 
 s32 func_400F4B68(u8* work)
 {
@@ -708,4 +748,34 @@ void func_400F5358(u8* work)
     reset_camera_collision_data_except_slide_move_ratio(work + 0x1830);
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0189_begin_check_and_boot_boss_subjective_cam", func_400F5380);
+void func_400F5380(u8* a0, u8* cam, s32 a2)
+{
+    s32 mode = *(s32*)(cam + 0x13C0);
+    s32 t;
+    s32 r;
+    u8* b;
+    f32 d;
+
+    if (mode == 0 || mode == 8) {
+        t = 1;
+    } else {
+        t = 0;
+    }
+    if (t == 1 || act_camera_cutout_game_camera_param_manager(cam + 0x50, cam) == 1) {
+        r = 1;
+    } else {
+        r = 0;
+    }
+    if (r == 1) {
+        b = a0 + 0xA0;
+        ((F5380Cell*)(b + 0x10))->q = ((F5380Cell*)(a0 + 0x1040))->q;
+        if (is_camera_target_debug_move(a2) == 0) {
+            ((F5380Cell*)(b + 0x20))->q = ((F5380Cell*)(a0 + 0xF90))->q;
+            ((F5380Cell*)(b + 0x30))->f = ((F5380Cell*)(a0 + 0xFA0))->f;
+            ((F5380Cell*)(b + 0x34))->f = ((F5380Cell*)(a0 + 0xFA4))->f;
+        }
+        d = get_mode_common_data_filter_base_dist_to_look_at(a0);
+        *(f32*)(b + 0x38) = d;
+        CAM_get_camera_position_by_look_at(b, a0 + 0xC0, a0 + 0xB0, d);
+    }
+}
