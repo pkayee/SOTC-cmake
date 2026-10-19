@@ -2046,23 +2046,18 @@ INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_0011C9B0);
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_0011CB30);
 
-/* NEARMISS-STUB func_0011CBC0 */
-#if 0 /* NEARMISS 91.82% cat=regalloc sub=- | 2-arg _sceMcCoreSetCardSpec(a0, spec) (Ghidra): 88.6->91.82; left: target n in a2 + t0 copy for spec[0] store, dividend/quotient in v0; ours n v0, dividend v1,  | attempts=2 */
-s32 _sceMcCoreSetCardSpec(s32, s32 *);
+s32 _sceMcCoreSetCardSpec(s32 a0, s32 *spec);
 
-s32 func_0011CBC0(s32 a0, s32 *a1)
+void func_0011CBC0(s32 a0, u8 *p)
 {
     s32 spec[4];
-    s32 n = ((u16 *)a1)[0x14];
 
-    spec[0] = n;
-    spec[1] = ((u16 *)a1)[0x16];
-    spec[2] = (a1[12] << 10) / n;
+    spec[0] = *(u16 *)(p + 0x28);
+    spec[1] = *(u16 *)(p + 0x2C);
+    spec[2] = (*(s32 *)(p + 0x30) << 10) / *(u16 *)(p + 0x28);
     spec[3] = 1;
-    return _sceMcCoreSetCardSpec(a0, spec);
+    _sceMcCoreSetCardSpec(a0, spec);
 }
-#endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_0011CBC0);
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", _sceMcFatGetInfo);
 
@@ -2296,7 +2291,7 @@ INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", _sceMcpReadSysInfo);
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", _sceMcpWriteSysInfo);
 
 /* NEARMISS-STUB _sceMcpReadClust */
-#if 0 /* NEARMISS 90.0% cat=sched sub=- | target puts mflo a2 in jal delay slot (mult;jal;mflo); gcc 2.9 keeps mflo before jal and nop in slot; struct McpClust 0x184 with u16 2A/2C matched the rest; n*a | attempts=1 */
+#if 0 /* NEARMISS 90.0% cat=sdk-compiler sub=mult-mflo-template | d2r97: buildable struct-cast stub (old one clashed with extern char D_00135738[]); instruction-identical except mflo a2 in the jal slot: ee-gcc2.9-991111 emits  | attempts=2 */
 typedef struct
 {
     u8 unk00[0x2A];
