@@ -349,18 +349,17 @@ int GetScriptSpriteObjWorkSize(unsigned char *p)
     return n + GetScriptObjWorkSize((int *)(p + 0x3C));
 }
 
-/* NEARMISS-STUB CreateScriptSpriteObj */
-#if 0 /* NEARMISS 99.64% cat=regalloc sub=- | REA READY drop-in scored 99.64 in-TU (apply_ready) | attempts=1 */
+void func_400A7360(void);
+s32 InitSpriteObj(u8 *obj, u8 *desc);
 /* c0128 CreateScriptSpriteObj: isys obj tag 0xE size 0xF0; desc[2]*0xA7+0x43 + script area size (desc+0x3C); delete cb desc[0x38] -> script block +0xCC */
 u8 *CreateScriptSpriteObj(void *grp, s32 extra, u8 *desc)
 {
     u8 *s = desc + 0x3C;
-    s32 n = *(s32 *)(desc + 0x8) * 0xA7;
-    u8 *o;
+    s32 a = *(s32 *)(desc + 0x8) * 0xA7 + 0x43;
+    s32 b = GetScriptObjWorkSize(s);
+    u8 *o = _isysCreateObj(grp, 0xE, 0xF0, extra + (a + b), (void (*)(void))DeleteScriptSpriteObj, 0x10);
     u8 *c;
 
-    n = n + 0x43;
-    o = _isysCreateObj(grp, 0xE, 0xF0, extra + (n + GetScriptObjWorkSize(s)), (void (*)(void))DeleteScriptSpriteObj, 0x10);
     if (o != 0) {
         isysSetObjImmediateDeleteFunc(o, func_400A7360);
         InitSpriteObj(o, desc);
@@ -370,8 +369,6 @@ u8 *CreateScriptSpriteObj(void *grp, s32 extra, u8 *desc)
     }
     return o;
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0128_DeleteScriptSpriteMenuObj", CreateScriptSpriteObj);
 
 void ExecScriptSpriteObj(void) {
 }
