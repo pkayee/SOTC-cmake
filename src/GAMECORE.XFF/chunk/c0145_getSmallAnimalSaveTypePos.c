@@ -171,29 +171,15 @@ int func_400C4BC0(void *arg0)
     return base + (*(short *)((char *)arg0 + 0x34) * 13) * 4 + 4;
 }
 
-/* NEARMISS-STUB func_400C4C20 */
-#if 0 /* NEARMISS 92.19% cat=regalloc sub=- | same CFG; ours uses v1 ptr and a0 ret, target a0 ptr and v0 ret; no extra moves | attempts=1 */
-int func_400C4C20(void *arg0, int arg1)
+int func_400C4C20(char *p, int arg1)
 {
-    int ret = 0;
-    char *p = *(char **)((char *)arg0 + 0x14);
-    if (p != 0) {
-        do {
-            ret = 1;
-            if (arg1 == *(int *)(p + 0xc)) {
-                break;
-            }
-            p = *(char **)(p + 0x58);
-            if (p == 0) {
-                ret = 0;
-                break;
-            }
-        } while (1);
+    p = *(char **)(p + 0x14);
+    while (p != 0) {
+        if (arg1 == *(int *)(p + 0xc)) return 1;
+        p = *(char **)(p + 0x58);
     }
-    return ret;
+    return 0;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0145_getSmallAnimalSaveTypePos", func_400C4C20);
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0145_getSmallAnimalSaveTypePos", func_400C4C60);
 int func_400C4C60(void *arg0)

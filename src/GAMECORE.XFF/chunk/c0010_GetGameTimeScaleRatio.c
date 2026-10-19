@@ -159,7 +159,24 @@ void func_40021D78(void)
     func_400216E8();
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0010_GetGameTimeScaleRatio", func_40021DB8);
+void texTransResolve(void);
+u64 iosGetTCountExtension(void);
+f32 iosUsedPacketBufferSize(void);
+s32 ptclCounterGet(void);
+s32 ptclCounterInit(void);
+
+void func_40021DB8(void)
+{
+    u8 *g;
+
+    texTransResolve();
+    g = gcGlobalVar;
+    *(u64 *)(g + 0x18) = iosGetTCountExtension();
+    *(f32 *)(g + 0x1C0) = iosUsedPacketBufferSize();
+    *(s32 *)(g + 0x1C4) = ptclCounterGet();
+    ptclCounterInit();
+    *(u64 *)(g + 0x1B0) += 1;
+}
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0010_GetGameTimeScaleRatio", func_40021E08);
 extern u64 D_40130A80;

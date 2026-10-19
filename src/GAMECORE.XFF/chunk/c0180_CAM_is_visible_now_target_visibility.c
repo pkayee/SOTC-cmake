@@ -263,18 +263,13 @@ s32 func_400EA0F8(s32 x)
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0180_CAM_is_visible_now_target_visibility", func_400EA108);
 
-/* NEARMISS-STUB func_400EA1B0 */
-#if 0 /* NEARMISS 99.0% cat=regalloc sub=- | loaded int uses v1 not v0; expected reuses v0 for lw and return | attempts=1 */
 s32 func_400EA1B0(f32 x, void *param)
 {
-    if (*(s32*)((u8*)param + 0x5D4) != 0)
-    {
-        return 0;
+    if (*(s32*)((u8*)param + 0x5D4) == 0) {
+        if (x <= *(f32*)((u8*)param + 0xD8)) return 1;
     }
-    return x <= *(f32*)((u8*)param + 0xD8);
+    return 0;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0180_CAM_is_visible_now_target_visibility", func_400EA1B0);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0180_CAM_is_visible_now_target_visibility", func_400EA1D8);
 

@@ -296,15 +296,11 @@ void func_400F4108(u8* work, s32 flag)
 
 extern u128 ZUnitVector;
 
-/* NEARMISS-STUB func_400F4160 */
-#if 0 /* NEARMISS 99.9% cat=regalloc sub=- | only mismatch: target stores 0xB0 float, then sq 0xA0, then 0xB4 float; ours schedules both float stores after the sq (store order); reordering the stores gives | attempts=1 */
 extern u128 ZUnitVector;
-
 void func_400F4160(u8* work)
 {
     u8* aim = work + 0x4;
     f32 zf;
-
     *(s32*)work = 0;
     CAM_init_aim_angle_rot(aim, 0);
     CAM_init_aim_angle_rot(work + 0x48, 1);
@@ -314,11 +310,9 @@ void func_400F4160(u8* work)
     *(s32*)(work + 0x98) = 0;
     zf = 0.0f;
     *(u128*)(work + 0xA0) = ZUnitVector;
-    *(f32*)(work + 0xB0) = zf;
     *(f32*)(work + 0xB4) = zf;
+    *(f32*)(work + 0xB0) = zf;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0189_begin_check_and_boot_boss_subjective_cam", func_400F4160);
 
 void func_400F41D8(u8* p)
 {
@@ -414,31 +408,16 @@ u8* get_cur_camera_target(void);
 u8* GetCharacterClass(void* chara);
 s32 is_camera_target_change(s32 a0);
 
-/* NEARMISS-STUB func_400F4488 */
-#if 0 /* NEARMISS 92.67% cat=regalloc sub=- | target keeps result in v1 then copies to v0 at shared exit; C variants give v0 directly (early-return and shared-exit both 92.67) | attempts=1 */
-u8* get_cur_camera_target(void);
-u8* GetCharacterClass(void* chara);
-
+static inline s32 isCurCameraTargetCharacter(void)
+{
+    u8 *t = get_cur_camera_target();
+    if (t != 0 && GetCharacterClass(t) != 0) return 1;
+    return 0;
+}
 s32 func_400F4488(void)
 {
-    u8* target = get_cur_camera_target();
-    s32 result = 0;
-
-    if (target != NULL)
-    {
-        u8* cc = GetCharacterClass(target);
-
-        result = 1;
-        if (cc != NULL)
-        {
-            return result;
-        }
-        result = 0;
-    }
-    return result;
+    return isCurCameraTargetCharacter();
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0189_begin_check_and_boot_boss_subjective_cam", func_400F4488);
 
 void func_400F44C8(u8* work, s32 a1)
 {
@@ -495,13 +474,10 @@ s32 func_400F4620(u8* a0, s32 a1, s32 a2)
     return func_400F2290(a0, a1, a2, v);
 }
 
-/* NEARMISS-STUB func_400F4670 */
-#if 0 /* NEARMISS 92.3% cat=branch-layout sub=- | return-1 block falls through in target (beqz to RET1 at fallthrough); ours places return-0 as fallthrough with bnez to RET1; separate early returns/nested-if/mo | attempts=1 */
 s32 func_400F4670(u8* work)
 {
     s32 type = *(s32*)(work + 0x13C0);
     u8* p = work + 0x3350;
-
     if (type != 7)
     {
         p = NULL;
@@ -510,14 +486,9 @@ s32 func_400F4670(u8* work)
             p = work + 0x35C0;
         }
     }
-    if (type != 0 && (p == NULL || ((*(s32*)(p + 0x8C) != 0 && *(s32*)(p + 0x8C) != 2) && *(s32*)(p + 0x98) == 0)))
-    {
-        return 0;
-    }
-    return 1;
+    if (type == 0 || (p != NULL && (*(s32*)(p + 0x8C) == 0 || *(s32*)(p + 0x8C) == 2 || *(s32*)(p + 0x98) != 0))) return 1;
+    return 0;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0189_begin_check_and_boot_boss_subjective_cam", func_400F4670);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0189_begin_check_and_boot_boss_subjective_cam", func_400F46D8);
 

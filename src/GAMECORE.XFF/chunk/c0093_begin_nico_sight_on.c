@@ -135,10 +135,8 @@ float func_400801B0(s32 arg)
     return yaw;
 }
 
-/* NEARMISS-STUB func_400801F0 */
-#if 0 /* NEARMISS 93.68% cat=sched sub=- | lui/addiu of YUnitVector before bnez; target has mov.s f12 before lui-addiu, addiu in delay slot | attempts=1 */
 extern void *GAMEUTIL_get_riding_horse_object(void *chara);
-extern void GAMEUTIL_act_axis_rot_root_quaternion_abs(void *q, f32 *axis, f32 ang);
+extern void GAMEUTIL_act_axis_rot_root_quaternion_abs(void *q, f32 ang, f32 *axis);
 extern f32 YUnitVector[];
 
 void func_400801F0(u8 *arg0, f32 arg1)
@@ -150,10 +148,8 @@ void func_400801F0(u8 *arg0, f32 arg1)
     {
         obj = *(void **)(arg0 + 4);
     }
-    GAMEUTIL_act_axis_rot_root_quaternion_abs(obj, YUnitVector, arg1);
+    GAMEUTIL_act_axis_rot_root_quaternion_abs(obj, arg1, YUnitVector);
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0093_begin_nico_sight_on", func_400801F0);
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0093_begin_nico_sight_on", func_40080240);
 extern s32 ScriptCtrlDef_SCRPlayerSightOnTurnLeft;
