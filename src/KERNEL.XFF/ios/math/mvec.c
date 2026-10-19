@@ -30,7 +30,24 @@ INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/mvec", iosMulMvec);
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/mvec", iosApplyM_Mat);
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/mvec", iosCalcIcolorToBrightness);
+//INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/mvec", iosCalcIcolorToBrightness);
+extern const MvecRaw D_40047550;
+void iosMulMvec(u_long128 *, u_long128 *, u_long128 *);
+
+u32 iosCalcIcolorToBrightness(u32 c)
+{
+    MvecU x;
+    MvecRaw y;
+    s32 sum;
+    x.w[0] = c & 0xFF;
+    x.w[1] = (c >> 8) & 0xFF;
+    x.w[2] = (c >> 16) & 0xFF;
+    x.w[3] = c >> 24;
+    y = D_40047550;
+    iosMulMvec(&x.q, &x.q, (u_long128 *)&y);
+    sum = x.w[0] + x.w[1] + x.w[2];
+    return (sum >> 23) & 0xFF;
+}
 
 INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/math/mvec", iosIColScale);
 

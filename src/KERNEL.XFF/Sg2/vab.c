@@ -43,9 +43,6 @@ s32 get_vabid(void)
     return -1;
 }
 
-/* NEARMISS-STUB func_4003EBE0 */
-#if 0 /* NEARMISS 98.19% cat=branch-layout sub=- | early -1 return: target loads slot->unk0 into v0 and fills the bnez delay slot with addiu v0,-1; ours loads v1 and nop-pads, so ret -1 is materialised after the branch | attempts=3 */
-/* func_4003EBE0 best C: 98.19% (same as kR10). Tried: local decl reorder (no change); merged `||` early-return condition (worse, ~many arg_mism). Single-return rewrite NOT tried. Remaining: slot->unk0 test loads v1 (target v0), early -1 return delay slot nop (target addiu v0,-1). */
 typedef struct {
     s32 pad0[3];
     s32 magic;  /* 0xC */
@@ -56,10 +53,9 @@ typedef struct {
     s32 flag7C;
 } VabHd;
 
-s32 func_4003EBE0(VabSlot *slot, VabHd *hd);
-
-s32 func_4003EBE0(VabSlot *slot, VabHd *hd)
+s32 func_4003EBE0(VabSlot *slot, void *arg1)
 {
+    VabHd *hd = arg1;
     s32 t;
     u16 *c;
 
@@ -67,97 +63,95 @@ s32 func_4003EBE0(VabSlot *slot, VabHd *hd)
     {
         return -1;
     }
-    if (slot->unk0 != 0)
+    if (slot->unk0 == 0)
     {
-        return -1;
+        if (hd->flag7C == -1)
+        {
+            slot->unk0 = 3;
+        }
+        else
+        {
+            slot->unk0 = 4;
+        }
+        slot->unk4 = (s32)hd;
+        if (hd->off[0] != -1)
+        {
+            hd->ptr[0] = hd->off[0] + (s32)hd;
+        }
+        else
+        {
+            hd->ptr[0] = 0;
+        }
+        if (hd->off[1] != -1)
+        {
+            hd->ptr[1] = hd->off[1] + (s32)hd;
+        }
+        else
+        {
+            hd->ptr[1] = 0;
+        }
+        if (hd->off[2] != -1)
+        {
+            hd->ptr[2] = hd->off[2] + (s32)hd;
+        }
+        else
+        {
+            hd->ptr[2] = 0;
+        }
+        if (hd->off[3] != -1)
+        {
+            hd->ptr[3] = hd->off[3] + (s32)hd;
+        }
+        else
+        {
+            hd->ptr[3] = 0;
+        }
+        if (hd->off[4] != -1)
+        {
+            hd->ptr[4] = hd->off[4] + (s32)hd;
+        }
+        else
+        {
+            hd->ptr[4] = 0;
+        }
+        if (hd->off[5] != -1)
+        {
+            hd->ptr[5] = hd->off[5] + (s32)hd;
+        }
+        else
+        {
+            hd->ptr[5] = 0;
+        }
+        c = (u16 *)hd->ptr[1];
+        slot->sub.unk4 = (s32)hd;
+        if (c != 0)
+        {
+            *(s32 *)&slot->sub.unk8 = *c;
+            slot->sub.unkC = hd->ptr[1] + 2;
+        }
+        else
+        {
+            slot->sub.unkC = 0;
+            *(s32 *)&slot->sub.unk8 = -1;
+        }
+        c = (u16 *)hd->ptr[2];
+        if (c != 0)
+        {
+            *(s32 *)&slot->sub.unk10 = *c;
+            t = hd->ptr[2];
+            slot->sub.unk14 = t;
+            slot->sub.unk18 = t + 2;
+        }
+        else
+        {
+            slot->sub.unk18 = 0;
+            *(s32 *)&slot->sub.unk10 = -1;
+        }
+        slot->sub.unk0 = 0x7F;
+        return 0;
     }
-    if (hd->flag7C == -1)
-    {
-        slot->unk0 = 3;
-    }
-    else
-    {
-        slot->unk0 = 4;
-    }
-    slot->unk4 = (s32)hd;
-    if (hd->off[0] != -1)
-    {
-        hd->ptr[0] = hd->off[0] + (s32)hd;
-    }
-    else
-    {
-        hd->ptr[0] = 0;
-    }
-    if (hd->off[1] != -1)
-    {
-        hd->ptr[1] = hd->off[1] + (s32)hd;
-    }
-    else
-    {
-        hd->ptr[1] = 0;
-    }
-    if (hd->off[2] != -1)
-    {
-        hd->ptr[2] = hd->off[2] + (s32)hd;
-    }
-    else
-    {
-        hd->ptr[2] = 0;
-    }
-    if (hd->off[3] != -1)
-    {
-        hd->ptr[3] = hd->off[3] + (s32)hd;
-    }
-    else
-    {
-        hd->ptr[3] = 0;
-    }
-    if (hd->off[4] != -1)
-    {
-        hd->ptr[4] = hd->off[4] + (s32)hd;
-    }
-    else
-    {
-        hd->ptr[4] = 0;
-    }
-    if (hd->off[5] != -1)
-    {
-        hd->ptr[5] = hd->off[5] + (s32)hd;
-    }
-    else
-    {
-        hd->ptr[5] = 0;
-    }
-    c = (u16 *)hd->ptr[1];
-    slot->sub.unk4 = (s32)hd;
-    if (c != 0)
-    {
-        *(s32 *)&slot->sub.unk8 = *c;
-        slot->sub.unkC = hd->ptr[1] + 2;
-    }
-    else
-    {
-        slot->sub.unkC = 0;
-        *(s32 *)&slot->sub.unk8 = -1;
-    }
-    c = (u16 *)hd->ptr[2];
-    if (c != 0)
-    {
-        *(s32 *)&slot->sub.unk10 = *c;
-        t = hd->ptr[2];
-        slot->sub.unk14 = t;
-        slot->sub.unk18 = t + 2;
-    }
-    else
-    {
-        slot->sub.unk18 = 0;
-        *(s32 *)&slot->sub.unk10 = -1;
-    }
-    slot->sub.unk0 = 0x7F;
-    return 0;
+    return -1;
 }
-#endif
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/vab", func_4003EBE0);
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/vab", func_4003ED58);
 s32 func_4003ED58(VabSlot *arg0, s32 arg1)
