@@ -120,7 +120,52 @@ void *GetScriptClass(unsigned char *object)
     }
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0114_EntryObjectManagerCollisionGroup", initScriptObj);
+/* MANAGER c0114 initScriptObj(obj, info, work): fill the script class of obj from the 9-word create info (info[0] = script entry, [1] = start arg, [2] = thread arg, [3] = priority group, [4] = parent obj, [5] = flags byte, [6..8] copied to cls+0x40..0x48). Registers obj in execScriptGroup[prio] when it has a script, and in the parent class group (+0x30) when it has a parent. */
+extern int execScriptGroup[];
+extern void isysInitSubThreadObj(int, int, int, int);
+extern int isysInitGroup(int *); /* returns int here: the call_value keeps v0 busy, so the info[6..8] copy temps start in v1 */
+
+void initScriptObj(int obj, int *info, int work)
+{
+    int prio = info[3];
+    char *s = GetScriptClass((unsigned char *)obj);
+    int v;
+    char *t;
+
+    if (info[0] != 0) {
+        isysInitSubThreadObj(obj, info[0], work, info[2]);
+        v = info[1];
+        *(int *)((char *)GetScriptClass((unsigned char *)obj) + 0x24) = v;
+        *(int *)(s + 0x20) = prio;
+        *(unsigned char *)(s + 0x28) = 0;
+        *(unsigned char *)(s + 0x29) = *(unsigned char *)(info + 5);
+        isysAddGroupWithLinkParam((void *)obj, &execScriptGroup[prio], 0, 0);
+        *(int *)(s + 0x34) = 0;
+    } else {
+        *(int *)s = 0;
+        *(int *)(s + 0x34) = 0;
+    }
+    *(int *)(s + 0x38) = 0;
+    *(int *)(s + 0x3C) = 0;
+    if (info[4] != 0) {
+        isysAddGroupWithLinkParam((void *)obj, (char *)GetScriptClass((unsigned char *)info[4]) + 0x30, 0, 0);
+    }
+    *(int *)(s + 0x2C) = info[4];
+    isysInitGroup((int *)(s + 0x30));
+    *(int *)(s + 0x40) = info[6];
+    *(int *)(s + 0x44) = info[7];
+    *(int *)(s + 0x48) = info[8];
+    t = GetScriptClass((unsigned char *)obj);
+    *(int *)(t + 0x54) = 0;
+    *(int *)(t + 0x58) = 0;
+    t = GetScriptClass((unsigned char *)obj);
+    *(int *)(t + 0x5C) = 0;
+    *(int *)(t + 0x60) = 0;
+    t = GetScriptClass((unsigned char *)obj);
+    *(int *)(t + 0x4C) = 0;
+    *(int *)(t + 0x50) = 0;
+}
+
 
 void func_400970C8(int *group)
 {
@@ -164,7 +209,7 @@ void func_400970C8(int *group)
 }
 
 extern int execScriptGroup[];
-extern void isysInitGroup(int *);
+extern int isysInitGroup(int *);
 
 void initScriptSystem(void)
 {

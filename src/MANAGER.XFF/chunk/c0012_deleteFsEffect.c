@@ -304,4 +304,60 @@ f32 getFogFactor1(void) {
     return ((p->d - p->c) * (p->b + p->a) / (p->b - p->a) + (p->d + p->c)) * p->e;
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0012_deleteFsEffect", drawBlur);
+extern s32 D_40124860;
+
+void iosDlPushLayer(s32 layer);
+void iosDlPopLayer(void);
+s32 gsRegBegin(void); /* int: its call_value keeps v0 busy, so the (u64)a0 << 32 temp lands in v1 */
+void gsRegEnd(void);
+void gsReg(s32, u64);
+s32 getDispScreenWidth(void);
+s32 getDispScreenHeight(void);
+s32 getDrawScreenWidth(void);
+s32 getDrawScreenHeight(void);
+s32 getDispBufferAddressTBP(void);
+s32 getTWH(s32 n);
+
+void drawBlur(s32 a0) {
+    s32 dispW = getDispScreenWidth();
+    s32 dispH = getDispScreenHeight();
+    s32 drawW = getDrawScreenWidth();
+    s32 drawH = getDrawScreenHeight();
+    s32 halfW = drawW >> 1;
+    s32 halfH = drawH >> 1;
+    s32 tbp;
+    s32 twhH;
+    s32 twhW;
+    u64 lo;
+    u64 hi;
+
+    if (D_40124860 > 0) {
+        D_40124860 = D_40124860 - 1;
+        return;
+    }
+    if (a0 == 0) {
+        return;
+    }
+    iosDlPushLayer(0x15);
+    gsRegBegin();
+    gsReg(0x42, ((u64)a0 << 32) | 0x64);
+    gsReg(0x47, 0x31001);
+    gsReg(0x49, 0);
+    gsReg(0x3B, 0x0000008000000080ULL);
+    gsReg(0x14, 0x20);
+    tbp = getDispBufferAddressTBP();
+    twhH = getTWH(dispH);
+    twhW = getTWH(dispW);
+    lo = (u64)tbp | ((u64)twhH << 30);
+    hi = ((u64)twhW << 26) | ((u64)(dispW / 64) << 14);
+    gsReg(6, lo | hi);
+    gsReg(0, 0x156);
+    gsReg(1, 0x3F80000080808080ULL);
+    gsReg(3, 0x80008);
+    gsReg(4, ((u64)((0x800 - halfH) << 4) << 16 | (u64)((0x800 - halfW) << 4)) | 0xFFFFFFFF00000000ULL);
+    gsReg(3, (u64)((dispW << 4) + 8) | ((u64)((dispH << 4) + 9) << 16));
+    gsReg(4, (u64)((halfW + 0x800) << 4) | ((u64)((halfH + 0x800) << 4) << 16) | 0xFFFFFFFF00000000ULL);
+    gsReg(0x47, 0x5178D);
+    gsRegEnd();
+    iosDlPopLayer();
+}
