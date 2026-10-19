@@ -163,8 +163,41 @@ void UpdateAnimationClassPastSimpleInfo(void *arg0)
     (*(float *)((char *)(arg0) + 0xC)) = (float) (*(float *)((char *)(arg0) + 8));
 }
 
+/* NEARMISS-STUB GetAnimationClassCurrentInfoDirectResource */
+#if 0 /* NEARMISS 47.41% cat=cse-hoist sub=- | signature is (AnimClass *a, u8 *res, float t) (Ghidra puts t first); u32 n = res[1]>>20, scale = n ? n*2^-12 : 1. Ours copies res via v0 and folds (n>>1) into w | attempts=1 */
+extern int GetMotionFrameDirectResource(void *, void *, void *, float);
+
+void GetAnimationClassCurrentInfoDirectResource(AnimClass *a, u8 *res, float t) {
+    float scale = 1.0f;
+    u32 n = *(u32 *)(res + 4) >> 20;
+
+    if (n != 0) {
+        scale = (float)n * 0.000244140625f;
+    }
+    a->f = GetMotionFrameDirectResource(&a->b, &a->d, res, t * a->e * scale);
+}
+#endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0053_constructor_neck_turn", GetAnimationClassCurrentInfoDirectResource);
 
+/* NEARMISS-STUB SetAnimationClassLastInfoDirectResource */
+#if 0 /* NEARMISS 77.78% cat=sched sub=- | AnimClass fields right (inv/e/ratio=1, mot/a/d=0, b=c=(float)(s16 res[4]-1), f/g=0, Reset(table,0,0), return 1); target issues swc1 2C,1C,28 then the zeros with | attempts=1 */
+int SetAnimationClassLastInfoDirectResource(AnimClass *a, u8 *res) {
+    float last = *(s16 *)(res + 4) - 1;
+
+    a->inv = 1.0f;
+    a->e = 1.0f;
+    a->ratio = 1.0f;
+    a->mot = 0;
+    a->a = 0;
+    a->d = 0;
+    a->c = last;
+    a->b = last;
+    a->f = 0;
+    a->g = 0;
+    ResetAnimeFrameTableInfo(a->table, 0, 0);
+    return 1;
+}
+#endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0053_constructor_neck_turn", SetAnimationClassLastInfoDirectResource);
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0053_constructor_neck_turn", func_40051478);

@@ -1,6 +1,52 @@
 #include "common.h"
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0170_get_particle_parameter_blend_disp", get_particle_parameter_blend_disp);
+static inline u8 *blendDispElem(u8 *p1, s32 p3)
+{
+    s32 n = *(s32 *)(p1 + 0xD0);
+
+    if (n - 1 < p3)
+    {
+        return (u8 *)(*(s32 *)(p1 + 0xD4) + n * 0x1BC - 0x1BC);
+    }
+    return (u8 *)(*(s32 *)(p1 + 0xD4) + p3 * 0x1BC);
+}
+
+static inline void blendDispWeights(float p0, float *p1, float *p2)
+{
+    if (p0 < 0.0f)
+    {
+        *p1 = p0 + 1.0f;
+        *p2 = 0.0f;
+        return;
+    }
+    if (p0 < 1.0f)
+    {
+        *p1 = 1.0f - p0;
+        *p2 = p0;
+        return;
+    }
+    *p1 = 0.0f;
+    *p2 = p0;
+}
+
+void get_particle_parameter_blend_disp(float t, float *out, u8 *a, u8 *b, s32 idx)
+{
+    u8 *ea = (u8 *)(*(s32 *)(a + 0xD4) + idx * 0x1BC);
+    u8 *eb;
+    float w0;
+    float w1;
+
+    if (b != 0)
+    {
+        eb = blendDispElem(b, idx);
+        blendDispWeights(t, &w0, &w1);
+        *out = w0 * *(float *)(ea + 0x180) + w1 * *(float *)(eb + 0x180);
+    }
+    else
+    {
+        *out = *(float *)(ea + 0x180);
+    }
+}
 
 //INCLUDE_ASM(...);
 void *func_400D7598(s32 p0, u8 *p1, s32 p2, s32 p3)
