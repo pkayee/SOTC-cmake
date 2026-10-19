@@ -152,7 +152,31 @@ void nico_deletePlayerParachute(void *actor)
     nico_ResetCharacterObjFallDownInfo(actor);
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0104_nico_CheckPlayerThroughObject", func_4008DAB8);
+extern void ColCont2_Release(void *);
+extern void player_resetHangPointWork(void *);
+extern void player_resetAvoidDangerCliffWork(void *, void *);
+extern void player_resetSlipEffect(void *, void *);
+
+static inline void deletePlayerParachute_inl(void *actor)
+{
+    void **p = (void **)(GetSCRCharaAIWorkPtr(actor) + 0x1BE0);
+    if (*p != 0) {
+        unloadObj(*p);
+        *p = 0;
+    }
+    nico_ResetCharacterObjFallDownInfo(actor);
+}
+
+void func_4008DAB8(void *a)
+{
+    u8 *w = GetSCRCharaAIWorkPtr(a);
+
+    ColCont2_Release(w + 0xD60);
+    player_resetHangPointWork(w + 0x1A40);
+    player_resetAvoidDangerCliffWork(a, w + 0x1B30);
+    deletePlayerParachute_inl(a);
+    player_resetSlipEffect(a, w + 0x1BE8);
+}
 
 extern char *GetCharacterClass(void *);
 extern void nico_resetHorseRidingStatusForHorse(void *);
@@ -172,7 +196,26 @@ void nico_resetPlayerHorseBridle(void *a)
         nico_resetHorseRidingStatusForHorse(h);
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0104_nico_CheckPlayerThroughObject", func_4008DBB0);
+extern void *getPlayerColCont2(void *);
+
+static inline void resetPlayerHorseBridle_inl(void *a)
+{
+    void *h = getHorse(a);
+    if (h != 0)
+        nico_resetHorseRidingStatusForHorse(h);
+}
+
+void func_4008DBB0(void *a)
+{
+    u8 *w = GetSCRCharaAIWorkPtr(a);
+
+    resetPlayerHorseBridle_inl(a);
+    *(s32 *)(GetSCRCharaAIWorkPtr(a) + 0xD28) = 0;
+    ColCont2_Release(getPlayerColCont2(a));
+    player_resetHangPointWork(w + 0x1A40);
+    player_resetAvoidDangerCliffWork(a, w + 0x1B30);
+    player_resetSlipEffect(a, w + 0x1BE8);
+}
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0104_nico_CheckPlayerThroughObject", func_4008DC60);
 extern u32 charrootdyn_getCollisionAttribute(void);

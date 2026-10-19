@@ -114,7 +114,36 @@ typedef struct {
 } AIChr;
 extern float iosGetRandom();
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0146_func_400C5E70", func_400C5E70);
+void func_400C5E70(AIChr *o)
+{
+    int k;
+    float a;
+    float b;
+    float v;
+
+    k = o->f158;
+    if (k != 2 && k != 6 && k != 8 && k != 9 && k != 10 && k != 11 && k != 13)
+        return;
+    k = o->f17C;
+    if (k == 0x1E || k == 0x1F) {
+        o->f210 = -o->f210;
+        o->f218 = -o->f218;
+    } else if (k == 0x1C || k == 0x1D) {
+        a = o->f218;
+        b = o->f210;
+        if (a < 0.0f)
+            a = -a;
+        o->f210 = a;
+        if (k == 0x1C)
+            o->f218 = -b;
+        else
+            o->f218 = b;
+    }
+    o->f214 = 0.0f;
+    v = o->f210;
+    o->f264 = ((v < o->f214) ? -v : v) / ((AIParam *)o->f64)->p14
+            + ((v < 0.0f) ? -v : v) * ((AIParam *)o->f64)->p30;
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0146_func_400C5E70", func_400C5F98);
 
@@ -122,7 +151,38 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0146_func_400C5E70", func_400C
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0146_func_400C5E70", func_400C6930);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0146_func_400C5E70", func_400C6B60);
+int AI_UpdateVelocity(float *vel, float target, float accel);
+
+static inline void aiFlyVelocity(AIChr *o, float v)
+{
+    float *vel = &o->f26C;
+    float t = o->f18C;
+
+    if (t <= o->f188)
+        *vel = o->f2AC + o->f2A4 * 0.16666666f * t * t * t + o->f2A8 * 0.5f * t * t;
+    else
+        AI_UpdateVelocity(vel, v, ((AIParam *)o->f64)->p5C);
+}
+
+void func_400C6B60(AIChr *o, int a, int b)
+{
+    float v = o->f2A0;
+
+    if (a == 0x13) {
+        if (b == 0x11) {
+            aiFlyVelocity(o, v);
+        } else if (b == 0x12) {
+            aiFlyVelocity(o, -v);
+        }
+    } else if (a == 0x14) {
+        if (b == 0x11) {
+            aiFlyVelocity(o, -v);
+        } else if (b == 0x12) {
+            aiFlyVelocity(o, v);
+        }
+    }
+    return;
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0146_func_400C5E70", func_400C6CB8);
 
@@ -153,8 +213,6 @@ void func_400C70B8(AIChr *o)
 #endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0146_func_400C5E70", func_400C70B8);
 
-/* NEARMISS-STUB func_400C71A8 */
-#if 0 /* NEARMISS 95.61% cat=regalloc sub=- | f230 block: target lwc1 f260 then lw v0 (param), ours lw v1 then lwc1; p local / swapped mul / void return all worse | attempts=1 */
 int AI_UpdateVelocity(float *vel, float target, float accel);
 
 void func_400C71A8(AIChr *o)
@@ -162,14 +220,16 @@ void func_400C71A8(AIChr *o)
     AI_UpdateVelocity(&o->f23C, 0.0f, ((AIParam *)o->f64)->p44);
     o->f260 = ((AIParam *)o->f64)->pA0;
     AI_UpdateVelocity(&o->f264, o->f260, ((AIParam *)o->f64)->p9C);
-    o->f230 = ((AIParam *)o->f64)->p14 * o->f260;
-    AI_UpdateVelocity(&o->f234, ((AIParam *)o->f64)->p94, ((AIParam *)o->f64)->p98);
+    {
+        float r = o->f260;
+        AIParam *p = (AIParam *)o->f64;
+        o->f230 = p->p14 * r;
+        AI_UpdateVelocity(&o->f234, p->p94, p->p98);
+    }
     AI_UpdateVelocity(&o->f210, o->f230, o->f234);
     AI_UpdateVelocity(&o->f238, ((AIParam *)o->f64)->p40, ((AIParam *)o->f64)->p3C);
     AI_UpdateVelocity(&o->f218, 0.0f, o->f238);
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0146_func_400C5E70", func_400C71A8);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0146_func_400C5E70", func_400C7270);
 
