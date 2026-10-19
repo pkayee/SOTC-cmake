@@ -39,7 +39,23 @@ void setGuardModeSlowLegCtrlWork(void *arg0, int arg1)
 void deleteSlowLegCtrlWork(void) {
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0219_setDashSlowLegCtrlWork", func_40116E60);
+extern void _resetBaseMoveWork(void *, u8 *);
+extern u8 *GetCharacterClass(void *);
+void func_40116ED0(u8 *w);
+
+void func_40116E60(void *obj, u8 *w)
+{
+    _resetBaseMoveWork(obj, w);
+    *(s32 *)(w + 0x30) = 0;
+    *(f32 *)(w + 0x40) = 1.0f;
+    *(s32 *)(w + 0x9C) = 0;
+    *(s32 *)(w + 0x34) = 0;
+    *(s32 *)(w + 0x74) = 0;
+    *(s32 *)(w + 0x78) = 0;
+    *(s32 *)(w + 0x3C) = 0;
+    func_40116ED0(w);
+    *(s32 *)(w + 0x98) = *(s8 *)(GetCharacterClass(obj) + 0x35F);
+}
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0219_setDashSlowLegCtrlWork", func_40116ED0);
 void func_40116ED0(u8* w)

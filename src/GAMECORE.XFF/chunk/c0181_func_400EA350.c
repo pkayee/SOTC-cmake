@@ -133,25 +133,37 @@ void func_400EA608(s32 *n, s32 *list)
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0181_func_400EA350", func_400EA690);
 
-/* NEARMISS-STUB func_400EA790 */
-#if 0 /* NEARMISS 86.02% cat=regalloc sub=- | d2 r101: plain v[0..2] = (t+t)*cam[0x1070/0x1074/0xD8] after memset; target reaches 0x1070/0x1074 via addiu base cam+0x1030 (+0x40/+0x44) and allocates s-regs t | attempts=1 */
 extern void *memset(void *, int, unsigned int);
-extern f32 *doit_double_spring_interp_cntrl3D(f32, void *, f32 *, void *);
+extern f32 *doit_double_spring_interp_cntrl3D(void *, f32 *, void *, f32);
+extern void set_param_double_spring_interp_common(void *, f32, f32, f32, f32);
+f32 func_400EA960(f32, f32, f32);
 
 void func_400EA790(f32 dt, void *spring, u8 *cam, u8 *tgt, void *mode)
 {
     f32 v[4];
+    u8 *b = cam + 0x1030;
 
     memset(v, 0, 0x10);
-    v[0] = (*(f32 *)(tgt + 0x130) + *(f32 *)(tgt + 0x130)) * *(f32 *)(cam + 0x1070);
-    v[1] = (*(f32 *)(tgt + 0x134) + *(f32 *)(tgt + 0x134)) * *(f32 *)(cam + 0x1074);
+    v[0] = (*(f32 *)(tgt + 0x130) + *(f32 *)(tgt + 0x130)) * *(f32 *)(b + 0x40);
+    v[1] = (*(f32 *)(tgt + 0x134) + *(f32 *)(tgt + 0x134)) * *(f32 *)(b + 0x44);
     v[2] = (*(f32 *)(tgt + 0x138) + *(f32 *)(tgt + 0x138)) * *(f32 *)(cam + 0xD8);
-    doit_double_spring_interp_cntrl3D(dt, spring, v, mode);
+    doit_double_spring_interp_cntrl3D(spring, v, mode, dt);
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0181_func_400EA350", func_400EA790);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0181_func_400EA350", func_400EA848);
+void func_400EA848(f32 dt, u8 *w, u8 *cam, void *mode)
+{
+    f32 v[4];
+    u8 *tgt = *(u8 **)cam;
+    u8 *a = cam + 0x14;
+    u8 *b = cam + 0x1030;
+
+    memset(v, 0, 0x10);
+    v[0] = func_400EA960((*(f32 *)(a + 0x30) - *(f32 *)(tgt + 0x130)) * *(f32 *)(b + 0x40), *(f32 *)(b + 0x30), *(f32 *)(a + 0x24));
+    v[1] = func_400EA960((*(f32 *)(a + 0x34) - *(f32 *)(tgt + 0x134)) * *(f32 *)(b + 0x44), *(f32 *)(b + 0x34), *(f32 *)(a + 0x28));
+    v[2] = func_400EA960((*(f32 *)(a + 0x38) - *(f32 *)(tgt + 0x138)) * *(f32 *)(cam + 0xD8), *(f32 *)(b + 0x38), *(f32 *)(a + 0x2C));
+    set_param_double_spring_interp_common(w + 0x40, *(f32 *)(tgt + 0x13C), *(f32 *)(tgt + 0x144), *(f32 *)(tgt + 0x140), -1.0f);
+    doit_double_spring_interp_cntrl3D(w + 0x40, v, mode, dt);
+}
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0181_func_400EA350", func_400EA960);
 
@@ -233,6 +245,26 @@ void func_400EAA48(void *ratio, void *val, f32 target, f32 rate)
     GAMEUTIL_doit_interp_value_cntrl(val, ratio, target);
 }
 
+/* NEARMISS-STUB func_400EAAD8 */
+#if 0 /* NEARMISS 94.71% cat=sched sub=- | d2 r103: early-return reset + expression bases (w+0x1C0/0x200, locals 85.2); only the beq delay slot differs: target fills it with addiu s1,w,0x1C0 (ours with t | attempts=1 */
+extern u128 ZeroVector;
+extern void reset_double_spring_interp_cntrl3D(void *, void *);
+extern void func_400E7470(void *, void *, void *, void *, void *);
+
+void func_400EAAD8(f32 dt, u8 *w, void *a, void *b, void *c, u8 **pp, u8 *cam)
+{
+    f32 r;
+
+    if (*(s32 *)(cam + 0x13C0) != 1) {
+        reset_double_spring_interp_cntrl3D(w + 0x1C0, &ZeroVector);
+        return;
+    }
+    func_400E7470(w + 0x200, a, b, w, c);
+    r = *(f32 *)(*pp + 0x78);
+    set_param_double_spring_interp_common(w + 0x1C0, r, -1.0f, r * 0.5f, -1.0f);
+    doit_double_spring_interp_cntrl3D(w + 0x1C0, (f32 *)(w + 0x200), 0, dt);
+}
+#endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0181_func_400EA350", func_400EAAD8);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0181_func_400EA350", func_400EABA8);

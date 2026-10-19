@@ -53,7 +53,17 @@ void func_40112AF0(void *w, void *ctrl)
 void func_40112B20(void) {
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0215_createHumanCtrlWork", func_40112B28);
+extern s32 *ScriptCtrlDef_SCRAccel;
+extern s32 *ScriptCtrlDef_SCRDash;
+extern void CharaCtrlSetScriptCtrlStatus(void *, s32);
+
+void func_40112B28(u8 *w)
+{
+    CharaCtrlSetScriptCtrlStatus(*(void **)(w + 8), ScriptCtrlDef_SCRAccel[1]);
+    if (*(s32 *)(*(u8 **)(w + 0xCC) + 0x30) != 0) {
+        CharaCtrlSetScriptCtrlStatus(*(void **)(w + 8), ScriptCtrlDef_SCRDash[1]);
+    }
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0215_createHumanCtrlWork", getAttainInversePos);
 
@@ -65,6 +75,36 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0215_createHumanCtrlWork", cal
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0215_createHumanCtrlWork", calcMoveAngle);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0215_createHumanCtrlWork", calcAngleTime);
+extern float fabsf(float);
+extern f32 calcMoveAngle(f32, f32, f32, f32 *, f32);
+
+static inline int chkMoveAngleInl(float angle, float target)
+{
+    if (fabsf(angle + target) <= 1.7453291e-02f) {
+        return 1;
+    }
+    if ((target >= 0.0f && angle >= 0.0f) || (target <= 0.0f && angle <= 0.0f)) {
+        if (fabsf(angle) >= fabsf(target)) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+f32 calcAngleTime(f32 x, f32 cur, f32 spd, f32 d)
+{
+    f32 t;
+    f32 r;
+
+    if (x >= 0.0f) {
+        r = calcMoveAngle(spd, cur, d, &t, x);
+    } else {
+        r = calcMoveAngle(-spd, cur, d, &t, x);
+    }
+    if (chkMoveAngleInl(r, x) != 0) {
+        return t;
+    }
+    return t += fabsf(r + x) / spd;
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0215_createHumanCtrlWork", calcProgRotRatio);
