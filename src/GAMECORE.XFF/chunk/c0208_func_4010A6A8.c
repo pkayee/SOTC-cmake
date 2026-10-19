@@ -56,21 +56,21 @@ void setHoverAttackBirdCtrlWork(char *p, int arg1)
 }
 
 /* NEARMISS-STUB func_4010AE58 */
-#if 0 /* NEARMISS 89.04% cat=regalloc sub=- | d2 r88: 720-perm store sweep max 89.04; root = const 1 in v1 and the 0x13C ptr in a2 (target ptr v1, 1 in a2); chained 1-stores, const local, src-ptr local, 3-a | attempts=2 */
+#if 0 /* NEARMISS 92.3% cat=sched sub=- | d2 r90: union-member .q load (alias 0) + chained x34 = x38 = 1 give the target regs (ptr v1, 1 a2); left: target stores 0x38 before the sq and 0x34 after it (ou | attempts=3 */
 u8 *GetCharacterClass(void *chara);
 s32 _resetBaseMoveWork(void *arg0, void *arg1);
 void func_4010AF80(void *arg0);
 void func_4010AEC8(char *arg0);
+typedef union { u128 q; f32 f[4]; } AE58Vec;
 
 void func_4010AE58(char *arg0, char *arg1)
 {
     u8 *chara = GetCharacterClass(arg0);
 
-    *(s32 *)(arg1 + 0x38) = 1;
-    *(s32 *)(arg1 + 0x34) = 1;
-    *(s128 *)(arg1 + 0x250) = *(s128 *)(*(u8 **)(chara + 0x13C));
-    *(s32 *)(arg1 + 0x30) = 0;
+    ((AE58Vec *)(arg1 + 0x250))->q = (*(AE58Vec **)(chara + 0x13C))->q;
+    *(s32 *)(arg1 + 0x34) = *(s32 *)(arg1 + 0x38) = 1;
     *(s32 *)(arg1 + 0x3C) = 0;
+    *(s32 *)(arg1 + 0x30) = 0;
     *(s32 *)(arg1 + 0x154) = 0;
     _resetBaseMoveWork(arg0, arg1);
     func_4010AF80(arg1);

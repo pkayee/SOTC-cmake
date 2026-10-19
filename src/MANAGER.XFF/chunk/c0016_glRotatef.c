@@ -210,51 +210,24 @@ void glVertex2fv(f32 *p)
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0016_glRotatef", glVertex3f);
 
-/* NEARMISS-STUB glVertex3fv */
-#if 0 /* NEARMISS 99.44% cat=regalloc sub=- | d2 r78: union-member u128 copy (U128A_t ->q) fixes the count reload (92 -> 99.44); left: addu operand order (target addu v0,v1(base),v0(n<<6), ours n<<6 first); | attempts=2 */
 typedef union { u128 q; f32 f[4]; s32 w[4]; } U128A_t;
-void func_40026360(s32 mode);
-void func_40026738(s32 mode);
 
 void glVertex3fv(f32 *v)
 {
-    u128 tmp;
-    u8 *p;
-    s32 n;
-
     func_40026360(1);
-    p = D_401248C0;
-    tmp = ((U128A_t *)v)->q;
-    n = *(s32 *)(p + 0x41F0);
-    ((U128A_t *)(p + 0x200 + (n << 6)))->q = tmp;
-    func_40026738(*(s32 *)(p + 0x41F0));
+    ((U128A_t *)&((GlVertState *)D_401248C0)->a.v[((GlVertState *)D_401248C0)->b.n])->q = ((U128A_t *)v)->q;
+    func_40026738(((GlVertState *)D_401248C0)->b.n);
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0016_glRotatef", glVertex3fv);
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0016_glRotatef", glVertex4f);
 
-/* NEARMISS-STUB glVertex4fv */
-#if 0 /* NEARMISS 99.44% cat=regalloc sub=- | d2 r78: union-member u128 copy (U128A_t ->q) fixes the count reload (92 -> 99.44); left: addu operand order (target addu v0,v1(base),v0(n<<6), ours n<<6 first); | attempts=2 */
-typedef union { u128 q; f32 f[4]; s32 w[4]; } U128A_t;
-void func_40026360(s32 mode);
-void func_40026738(s32 mode);
 
 void glVertex4fv(f32 *v)
 {
-    u128 tmp;
-    u8 *p;
-    s32 n;
-
     func_40026360(1);
-    p = D_401248C0;
-    tmp = ((U128A_t *)v)->q;
-    n = *(s32 *)(p + 0x41F0);
-    ((U128A_t *)(p + 0x200 + (n << 6)))->q = tmp;
-    func_40026738(*(s32 *)(p + 0x41F0));
+    ((U128A_t *)&((GlVertState *)D_401248C0)->a.v[((GlVertState *)D_401248C0)->b.n])->q = ((U128A_t *)v)->q;
+    func_40026738(((GlVertState *)D_401248C0)->b.n);
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0016_glRotatef", glVertex4fv);
 
 typedef union { s128 q; float f[4]; } Vec4;
 extern Vec4 D_40124950;
