@@ -2,6 +2,14 @@
 
 extern char D_40134288[];
 
+typedef struct { s32 f[12]; } McReq;
+extern McReq D_401B16E0[];
+extern u8 D_401B16A0[];
+extern char D_401342B0[];
+extern float D_4012BB38;
+extern int D_4012BB4C;
+extern s64 *D_4012BB3C;
+
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0173_mcManager", mcManager);
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0173_mcManager", mcWrite);
@@ -19,28 +27,247 @@ void mcRead(u8 *m, s32 buf, s32 n)
     *(s32 *)(m + 0x2c) = *(s32 *)(m + 0x2c) + n;
 }
 
-extern int D_401B1744;
+extern void (*D_401B1744)(void);
 
-void mcReqSetWaitFunc(int arg0)
+void mcReqSetWaitFunc(void (*arg0)(void))
 {
     D_401B1744 = arg0;
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0173_mcManager", mcGetInfo);
+s32 mcGetInfo(s32 a, s32 b)
+{
+    McReq *r;
+    McReq *p;
+    s32 i;
+    void (*fn)(void);
 
+    i = 0;
+    p = D_401B16E0;
+    do {
+        if (p->f[0] == 0) {
+            r = p;
+            goto found;
+        }
+        p++;
+        i++;
+    } while (i < 2);
+    r = 0;
+    LoaderSysPrintf(D_401342B0);
+found:
+    r->f[1] = a;
+    r->f[2] = b;
+    D_4012BB38 = 0;
+    r->f[0] = 1;
+    iosSendMsg(D_401B16A0, r, 1);
+    if (__builtin_expect(r->f[0], 0)) {
+        fn = D_401B1744;
+        do {
+            fn();
+            fn = D_401B1744;
+        } while (r->f[0] != 0);
+    }
+    D_4012BB4C = 1;
+    return r->f[11];
+}
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0173_mcManager", mcGetMainDataInfo);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0173_mcManager", mcSaveGameData);
+s32 mcSaveGameData(s32 a, s32 b, s32 c, s32 d, s32 e)
+{
+    McReq *r;
+    McReq *p;
+    s32 i;
+    void (*fn)(void);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0173_mcManager", mcLoadGameData);
+    i = 0;
+    p = D_401B16E0;
+    do {
+        if (p->f[0] == 0) {
+            r = p;
+            goto found;
+        }
+        p++;
+        i++;
+    } while (i < 2);
+    r = 0;
+    LoaderSysPrintf(D_401342B0);
+found:
+    r->f[1] = a;
+    r->f[2] = b;
+    r->f[5] = c;
+    r->f[4] = d;
+    r->f[10] = e;
+    D_4012BB38 = 0;
+    r->f[0] = 3;
+    iosSendMsg(D_401B16A0, r, 1);
+    if (__builtin_expect(r->f[0], 0)) {
+        fn = D_401B1744;
+        do {
+            fn();
+            fn = D_401B1744;
+        } while (r->f[0] != 0);
+    }
+    D_4012BB4C = 1;
+    if (r->f[11] == 0) {
+        *(s32 *)&D_4012BB3C = 0;
+    }
+    return r->f[11];
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0173_mcManager", mcDeleteGameData);
+extern s64 D_401B16D8;
+typedef union { s64 d; s32 w[2]; } McU64;
+s32 mcLoadGameData(s32 a, s32 b, s32 c, u8 *d)
+{
+    McReq *r;
+    McReq *p;
+    s32 i;
+    void (*fn)(void);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0173_mcManager", mcLoadOptionData);
+    i = 0;
+    p = D_401B16E0;
+    do {
+        if (p->f[0] == 0) {
+            r = p;
+            goto found;
+        }
+        p++;
+        i++;
+    } while (i < 2);
+    r = 0;
+    LoaderSysPrintf(D_401342B0);
+found:
+    r->f[1] = a;
+    r->f[2] = b;
+    r->f[5] = c;
+    D_4012BB38 = 0;
+    r->f[0] = 4;
+    iosSendMsg(D_401B16A0, r, 1);
+    if (__builtin_expect(r->f[0], 0)) {
+        fn = D_401B1744;
+        do {
+            fn();
+            fn = D_401B1744;
+        } while (r->f[0] != 0);
+    }
+    D_4012BB4C = 1;
+    if (r->f[11] == 0) {
+        s64 t = *(s64 *)(d + c * 0x98 + 0x118);
+        D_4012BB3C = &D_401B16D8;
+        ((McU64 *)D_4012BB3C)->d = t;
+    }
+    return r->f[11];
+}
+
+s32 mcDeleteGameData(s32 a, s32 b, s32 c, s32 d)
+{
+    McReq *r;
+    McReq *p;
+    s32 i;
+    void (*fn)(void);
+
+    i = 0;
+    p = D_401B16E0;
+    do {
+        if (p->f[0] == 0) {
+            r = p;
+            goto found;
+        }
+        p++;
+        i++;
+    } while (i < 2);
+    r = 0;
+    LoaderSysPrintf(D_401342B0);
+found:
+    r->f[1] = a;
+    r->f[2] = b;
+    r->f[5] = c;
+    r->f[10] = d;
+    D_4012BB38 = 0;
+    r->f[0] = 5;
+    iosSendMsg(D_401B16A0, r, 1);
+    if (__builtin_expect(r->f[0], 0)) {
+        fn = D_401B1744;
+        do {
+            fn();
+            fn = D_401B1744;
+        } while (r->f[0] != 0);
+    }
+    D_4012BB4C = 1;
+    return r->f[11];
+}
+
+s32 mcLoadOptionData(s32 a, s32 b)
+{
+    McReq *r;
+    McReq *p;
+    s32 i;
+    void (*fn)(void);
+
+    i = 0;
+    p = D_401B16E0;
+    do {
+        if (p->f[0] == 0) {
+            r = p;
+            goto found;
+        }
+        p++;
+        i++;
+    } while (i < 2);
+    r = 0;
+    LoaderSysPrintf(D_401342B0);
+found:
+    r->f[1] = a;
+    r->f[2] = b;
+    D_4012BB38 = 0;
+    r->f[0] = 6;
+    iosSendMsg(D_401B16A0, r, 1);
+    if (__builtin_expect(r->f[0], 0)) {
+        fn = D_401B1744;
+        do {
+            fn();
+            fn = D_401B1744;
+        } while (r->f[0] != 0);
+    }
+    D_4012BB4C = 1;
+    return r->f[11];
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0173_mcManager", mcFormat);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0173_mcManager", mcUnformat);
+s32 mcUnformat(s32 a, s32 b)
+{
+    McReq *r;
+    McReq *p;
+    s32 i;
+    void (*fn)(void);
+
+    i = 0;
+    p = D_401B16E0;
+    do {
+        if (p->f[0] == 0) {
+            r = p;
+            goto found;
+        }
+        p++;
+        i++;
+    } while (i < 2);
+    r = 0;
+    LoaderSysPrintf(D_401342B0);
+found:
+    r->f[1] = a;
+    r->f[2] = b;
+    D_4012BB38 = 0;
+    r->f[0] = 8;
+    iosSendMsg(D_401B16A0, r, 1);
+    if (__builtin_expect(r->f[0], 0)) {
+        fn = D_401B1744;
+        do {
+            fn();
+            fn = D_401B1744;
+        } while (r->f[0] != 0);
+    }
+    D_4012BB4C = 1;
+    return r->f[11];
+}
 
 extern float D_4012BB38;
 
@@ -49,15 +276,201 @@ float mcGetProcessPer(void)
     return D_4012BB38;
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0173_mcManager", mcDirectFileCreate);
+s32 mcDirectFileCreate(s32 a, s32 b, s32 c, s32 *out)
+{
+    McReq *r;
+    McReq *p;
+    s32 i;
+    void (*fn)(void);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0173_mcManager", mcDirectFileDelete);
+    i = 0;
+    p = D_401B16E0;
+    do {
+        if (p->f[0] == 0) {
+            r = p;
+            goto found;
+        }
+        p++;
+        i++;
+    } while (i < 2);
+    r = 0;
+    LoaderSysPrintf(D_401342B0);
+found:
+    r->f[1] = a;
+    r->f[2] = b;
+    r->f[3] = c;
+    D_4012BB38 = 0;
+    r->f[0] = 11;
+    iosSendMsg(D_401B16A0, r, 1);
+    if (__builtin_expect(r->f[0], 0)) {
+        fn = D_401B1744;
+        do {
+            fn();
+            fn = D_401B1744;
+        } while (r->f[0] != 0);
+    }
+    D_4012BB4C = 1;
+    *out = r->f[6];
+    return r->f[11];
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0173_mcManager", mcDirectFileWrite);
+s32 mcDirectFileDelete(s32 a, s32 b, s32 c)
+{
+    McReq *r;
+    McReq *p;
+    s32 i;
+    void (*fn)(void);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0173_mcManager", mcDirectFileRead);
+    i = 0;
+    p = D_401B16E0;
+    do {
+        if (p->f[0] == 0) {
+            r = p;
+            goto found;
+        }
+        p++;
+        i++;
+    } while (i < 2);
+    r = 0;
+    LoaderSysPrintf(D_401342B0);
+found:
+    r->f[1] = a;
+    r->f[2] = b;
+    r->f[3] = c;
+    D_4012BB38 = 0;
+    r->f[0] = 12;
+    iosSendMsg(D_401B16A0, r, 1);
+    if (__builtin_expect(r->f[0], 0)) {
+        fn = D_401B1744;
+        do {
+            fn();
+            fn = D_401B1744;
+        } while (r->f[0] != 0);
+    }
+    D_4012BB4C = 1;
+    return r->f[11];
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0173_mcManager", mcReqGetDir);
+s32 mcDirectFileWrite(s32 a, s32 b, s32 c, s32 d, s32 e, s32 f)
+{
+    McReq *r;
+    McReq *p;
+    s32 i;
+    void (*fn)(void);
+
+    i = 0;
+    p = D_401B16E0;
+    do {
+        if (p->f[0] == 0) {
+            r = p;
+            goto found;
+        }
+        p++;
+        i++;
+    } while (i < 2);
+    r = 0;
+    LoaderSysPrintf(D_401342B0);
+found:
+    r->f[1] = a;
+    r->f[2] = b;
+    r->f[3] = c;
+    r->f[6] = d;
+    r->f[9] = e;
+    r->f[7] = f;
+    D_4012BB38 = 0;
+    r->f[0] = 14;
+    iosSendMsg(D_401B16A0, r, 1);
+    if (__builtin_expect(r->f[0], 0)) {
+        fn = D_401B1744;
+        do {
+            fn();
+            fn = D_401B1744;
+        } while (r->f[0] != 0);
+    }
+    D_4012BB4C = 1;
+    return r->f[11];
+}
+
+s32 mcDirectFileRead(s32 a, s32 b, s32 c, s32 d, s32 e, s32 f)
+{
+    McReq *r;
+    McReq *p;
+    s32 i;
+    void (*fn)(void);
+
+    i = 0;
+    p = D_401B16E0;
+    do {
+        if (p->f[0] == 0) {
+            r = p;
+            goto found;
+        }
+        p++;
+        i++;
+    } while (i < 2);
+    r = 0;
+    LoaderSysPrintf(D_401342B0);
+found:
+    r->f[1] = a;
+    r->f[2] = b;
+    r->f[3] = c;
+    r->f[6] = d;
+    r->f[9] = e;
+    r->f[7] = f;
+    D_4012BB38 = 0;
+    r->f[0] = 13;
+    iosSendMsg(D_401B16A0, r, 1);
+    if (__builtin_expect(r->f[0], 0)) {
+        fn = D_401B1744;
+        do {
+            fn();
+            fn = D_401B1744;
+        } while (r->f[0] != 0);
+    }
+    D_4012BB4C = 1;
+    return r->f[11];
+}
+
+s32 mcReqGetDir(s32 a, s32 b, s32 c, s32 d, s32 e, s32 f, s32 g)
+{
+    McReq *r;
+    McReq *p;
+    s32 i;
+    void (*fn)(void);
+
+    i = 0;
+    p = D_401B16E0;
+    do {
+        if (p->f[0] == 0) {
+            r = p;
+            goto found;
+        }
+        p++;
+        i++;
+    } while (i < 2);
+    r = 0;
+    LoaderSysPrintf(D_401342B0);
+found:
+    r->f[1] = a;
+    r->f[2] = b;
+    r->f[3] = c;
+    r->f[6] = d;
+    r->f[7] = e;
+    r->f[8] = f;
+    r->f[9] = g;
+    D_4012BB38 = 0;
+    r->f[0] = 10;
+    iosSendMsg(D_401B16A0, r, 1);
+    if (__builtin_expect(r->f[0], 0)) {
+        fn = D_401B1744;
+        do {
+            fn();
+            fn = D_401B1744;
+        } while (r->f[0] != 0);
+    }
+    D_4012BB4C = 1;
+    return r->f[11];
+}
 
 /* NEARMISS-STUB mcGetLastSaveGameDataIndex */
 #if 0 /* NEARMISS 86.65625% cat=branch-layout sub=- | loop tail/early return layout and -1 test reg differ; arg copy/const order | attempts=1 */
