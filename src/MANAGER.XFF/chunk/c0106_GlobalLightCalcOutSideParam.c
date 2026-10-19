@@ -205,7 +205,59 @@ LightClass *GetImpactWorstWorkLightClass(LightManager *mgr)
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0106_GlobalLightCalcOutSideParam", GetDirColorFromWorkLight);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0106_GlobalLightCalcOutSideParam", CreateLightObj);
+typedef union {
+    s128 q;
+    float f[4];
+    int i[4];
+} ClVec4;
+
+typedef struct {
+    char pad0[0x1C0];
+    int type;
+    char pad1C4[0xC];
+    ClVec4 color;
+    ClVec4 dir;
+    float range;
+    float intensity;
+} ClLightClass;
+
+typedef struct {
+    char pad0[8];
+    unsigned char kind;
+    char pad9[0x17];
+    ClLightClass light;
+} ClLightObj;
+
+typedef struct {
+    char pad0[0x7C];
+    int type;
+    ClVec4 color;
+    ClVec4 dir;
+    float range;
+    float intensity;
+} ClLightData;
+
+extern int GetLayoutObjWorkSize(void *);
+extern unsigned char *_isysCreateObj(void *, int, int, void *, void *, int);
+extern void InitLayoutObj(void *, void *);
+extern void func_4008E108(void);
+
+ClLightObj *CreateLightObj(void *heap, int size, ClLightData *data)
+{
+    ClLightObj *obj = (ClLightObj *)_isysCreateObj(heap, 0x13, 0x220, (void *)(size + GetLayoutObjWorkSize(data)), func_4008E108, 0x10);
+    ClLightClass *light;
+
+    if (obj != 0) {
+        InitLayoutObj(obj, data);
+        light = (obj->kind == 0x13) ? &obj->light : 0;
+        light->type = data->type;
+        light->color.q = data->color.q;
+        light->dir.q = data->dir.q;
+        light->range = data->range;
+        light->intensity = data->intensity;
+    }
+    return obj;
+}
 
 char *GetLightClass(unsigned char *p)
 {

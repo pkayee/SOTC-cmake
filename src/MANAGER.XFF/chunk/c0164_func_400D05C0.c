@@ -12,7 +12,20 @@ int get_top_emitter_list_from_particle_geodisp(int arg0)
     return 0;
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0164_func_400D05C0", create_and_boot_particle_geodisp);
+extern int get_fast_get_malloc_partition(void);
+extern int *initParticleObject(int, int);
+extern int func_400D24E8(int, int, int, int, int, int);
+
+int *create_and_boot_particle_geodisp(int a, int b, int c, int d, int e)
+{
+    int *obj = initParticleObject(get_fast_get_malloc_partition(), 0x1F3);
+
+    if (obj != 0) {
+        char *gd = (char *)GetGeoDispClass(obj);
+        *(int *)(gd + 0xE8) = func_400D24E8(*obj, a, b, c, d, e);
+    }
+    return obj;
+}
 
 extern void func_400CC1E8(int);
 extern void isysRequestDeleteObj(int);
@@ -59,9 +72,67 @@ void doit_particle_geodisp(int arg0)
     func_400CC510(temp_v0);
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0164_func_400D05C0", clip_particle_geodisp);
+typedef union {
+    u128 q;
+    f32 f[4];
+} PgdVec4;
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0164_func_400D05C0", calc_light_particle_geodisp);
+extern int func_400D2588(int);
+extern int func_400D25F8(int);
+extern char *iosgluGetCameraContext(void);
+extern void getZ(PgdVec4 *, PgdVec4 *, char *);
+extern void SetGeoDispClassLightColMan(char *);
+
+void clip_particle_geodisp(int obj)
+{
+    int *lst;
+    int e;
+    char *gd;
+    PgdVec4 p;
+    PgdVec4 z;
+
+    if (obj != 0) {
+        lst = (int *)((char *)GetGeoDispClass() + 0xE8);
+    } else {
+        lst = 0;
+    }
+    e = *lst;
+    gd = (char *)GetGeoDispClass(obj);
+    if (func_400D2588(e) == 1) {
+        p.q = *(u128 *)(e + 0x20);
+        p.f[3] = 0.0f;
+        *(f32 *)(gd + 0x30) = 0.0f;
+        getZ(&z, &p, iosgluGetCameraContext() + 0x1A0);
+        *(f32 *)(gd + 0x28) = z.f[2];
+        *(f32 *)(gd + 0x24) = z.f[1];
+        *(f32 *)(gd + 0x20) = z.f[0];
+        if (*(f32 *)(gd + 0x20) <= 0.0f) {
+            *(f32 *)(gd + 0x20) = 0.01f;
+        }
+    } else {
+        *(f32 *)(gd + 0x30) = -1.0f;
+    }
+}
+
+void calc_light_particle_geodisp(int obj)
+{
+    char *gd = (char *)GetGeoDispClass(obj);
+    int *lst;
+    int e;
+
+    if (obj != 0) {
+        lst = (int *)((char *)GetGeoDispClass(obj) + 0xE8);
+    } else {
+        lst = 0;
+    }
+    e = *lst;
+    if (func_400D25F8(e) == 1) {
+        ((PgdVec4 *)(gd + 0x10))->q = ((PgdVec4 *)(e + 0x20))->q;
+        *(u64 *)(gd + 0xC0) &= ~1;
+        ((PgdVec4 *)(gd + 0x10))->f[3] = 1.0f;
+        SetGeoDispClassLightColMan(gd);
+    }
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0164_func_400D05C0", disp_particle_geodisp);
 
