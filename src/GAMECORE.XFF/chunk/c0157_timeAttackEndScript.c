@@ -1,12 +1,110 @@
 #include "common.h"
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0157_timeAttackEndScript", timeAttackEndScript);
+struct TimeAttackView {
+    s32 a;
+    s32 b;
+    s32 c;
+    u32 flags;
+    char pad10[0x4];
+    float limit;
+    float elapsed;
+};
+extern struct TimeAttackView g_TimeAttack;
+extern u8 gcGlobalVar[];
+u32 MakeStrHashValue(const char *str);
+s32 SpriteMenuGetLayerNoByHash(void *menu, s32 hash);
+void SpriteMenuSetDispFlag(void *menu, s32 layer, s32 flag);
+void SpriteMenuSetDispFlagAll(void *menu, s32 flag);
+s32 SpriteMenuIsFadeCheckAllLayer(void *menu);
+s32 SpriteMenuGetMenuIdByHash(void *menu, s32 layerHash, s32 hash);
+void SpriteMenuSetLayer(void *menu, s32 layer);
+void SpriteMenuSetSelectMenuId(void *menu, s32 id);
+void *isysGetThisSubThread(void);
+u8 *GetSpriteMenuClass(void *thread);
+void ScrSpriteParamSetup(void *sp, void *param);
+void ScrSpriteParamEnd(void *sp, s32 flag);
+void scrRun(void);
+void scriptIntrSignal();
+extern struct TimeAttackView g_Replay;
+extern char D_40136D40[];
+extern char D_40136D60[];
+void func_400D5E40(void);
+extern char D_40136C20[];
+extern char D_40136B90[];
+extern s32 ScrIntrDef_GAME_CANCEL;
+void func_400D59D0(void);
+s32 func_400D2D28(void *menu, struct TimeAttackView *t);
+
+extern char D_40136C58[];
+extern char D_40136C70[];
+extern char D_40136C90[];
+u8 *SpriteMenuGetPartsDefByHash(void *menu, s32 layerHash, s32 partHash);
+s32 func_400D2E50(void *menu, struct TimeAttackView *t, s32 *flag);
+
+static inline s32 replayInDone(void *menu, struct TimeAttackView *t)
+{
+    if ((t->b == 8 || t->b == 13) && SpriteMenuIsFadeCheckAllLayer(menu) == 0) {
+        SpriteMenuSetDispFlagAll(menu, 0);
+        return 1;
+    }
+    if (t->flags & 2) {
+        t->flags &= ~2;
+        SpriteMenuSetDispFlag(menu, SpriteMenuGetLayerNoByHash(menu, MakeStrHashValue(D_40136D40)), 0);
+        return 1;
+    }
+    return 0;
+}
+
+void timeAttackEndScript(void *param)
+{
+    void *thread = isysGetThisSubThread();
+    u8 *cls = GetSpriteMenuClass(thread);
+    struct TimeAttackView *t = &g_TimeAttack;
+    u8 sp[16];
+
+    ScrSpriteParamSetup(sp, param);
+    SpriteMenuSetDispFlag(thread, SpriteMenuGetLayerNoByHash(thread, MakeStrHashValue(D_40136C20)), 1);
+    SpriteMenuSetLayer(thread, SpriteMenuGetLayerNoByHash(thread, MakeStrHashValue(D_40136C20)));
+    SpriteMenuSetSelectMenuId(thread, SpriteMenuGetMenuIdByHash(thread, MakeStrHashValue(D_40136C20), MakeStrHashValue(D_40136B90)));
+    while (1) {
+        u8 *g = gcGlobalVar;
+        ((void (*)(f32, void *, s32, void (*)(void), struct TimeAttackView *))(*(void **)(cls + 0x28)))(*(f32 *)(g + 0x170), thread, 1, func_400D59D0, t);
+        if (func_400D2D28(thread, t) != 0)
+            break;
+        ((void (*)(void *))(*(void **)(cls + 0x2C)))(thread);
+        scrRun();
+    }
+    ScrSpriteParamEnd(sp, 1);
+    if (t->b == 0xB)
+        scriptIntrSignal(ScrIntrDef_GAME_CANCEL);
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0157_timeAttackEndScript", timeAttackOverBGScript);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0157_timeAttackEndScript", timeAttackOverAlertScript);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0157_timeAttackEndScript", timeAttackTimeScript);
+void timeAttackTimeScript(void *param)
+{
+    void *thread = isysGetThisSubThread();
+    u8 *cls = GetSpriteMenuClass(thread);
+    struct TimeAttackView *t = &g_TimeAttack;
+    u8 sp[16];
+    s32 flag = 0;
+
+    ScrSpriteParamSetup(sp, param);
+    *(s32 *)(SpriteMenuGetPartsDefByHash(thread, MakeStrHashValue(D_40136C58), MakeStrHashValue(D_40136C70)) + 0xC) = 0;
+    *(s32 *)(SpriteMenuGetPartsDefByHash(thread, MakeStrHashValue(D_40136C58), MakeStrHashValue(D_40136C90)) + 0xC) = (s32)(t->limit * 100.0f);
+    SpriteMenuSetDispFlag(thread, SpriteMenuGetLayerNoByHash(thread, MakeStrHashValue(D_40136C58)), 1);
+    while (1) {
+        u8 *g = gcGlobalVar;
+        ((void (*)(f32, void *, s32, void (*)(void), struct TimeAttackView *))(*(void **)(cls + 0x28)))(*(f32 *)(g + 0x180), thread, 1, 0, t);
+        if (func_400D2E50(thread, t, &flag) != 0)
+            break;
+        ((void (*)(void *))(*(void **)(cls + 0x2C)))(thread);
+        scrRun();
+    }
+    ScrSpriteParamEnd(sp, 1);
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0157_timeAttackEndScript", SetItemMenuDisp);
 
@@ -18,4 +116,24 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0157_timeAttackEndScript", fun
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0157_timeAttackEndScript", func_400D4470);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0157_timeAttackEndScript", ReplayInScript);
+void ReplayInScript(void *param)
+{
+    void *thread = isysGetThisSubThread();
+    u8 *cls = GetSpriteMenuClass(thread);
+    struct TimeAttackView *t = &g_Replay;
+    u8 sp[16];
+
+    ScrSpriteParamSetup(sp, param);
+    SpriteMenuSetDispFlag(thread, SpriteMenuGetLayerNoByHash(thread, MakeStrHashValue(D_40136D40)), 1);
+    SpriteMenuSetLayer(thread, SpriteMenuGetLayerNoByHash(thread, MakeStrHashValue(D_40136D40)));
+    SpriteMenuSetSelectMenuId(thread, SpriteMenuGetMenuIdByHash(thread, MakeStrHashValue(D_40136D40), MakeStrHashValue(D_40136D60)));
+    while (1) {
+        u8 *g = gcGlobalVar;
+        ((void (*)(f32, void *, s32, void (*)(void), struct TimeAttackView *))(*(void **)(cls + 0x28)))(*(f32 *)(g + 0x170), thread, 1, func_400D5E40, t);
+        if (replayInDone(thread, t) != 0)
+            break;
+        ((void (*)(void *))(*(void **)(cls + 0x2C)))(thread);
+        scrRun();
+    }
+    ScrSpriteParamEnd(sp, 1);
+}
