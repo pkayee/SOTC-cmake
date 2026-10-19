@@ -55,6 +55,13 @@ extern void *sndVabCreate(void);
 extern void sndVabHDOpen(void *, void *, s32);
 extern void sheetMgrDirectFileLoad(s32, s32, s32, s32, s32 *);
 
+static inline s32 sepReq(void *f, s32 u, s32 id) {
+    if (id == u) {
+        return 0;
+    }
+    return sndSepReq(f, 0, 0, id, 0, 0, 0);
+}
+
 static inline void seStopType(u8 *c, s32 mode) {
     u8 *def = *(u8 **)(c + 0x44);
 
@@ -107,7 +114,10 @@ void initSoundManager(void) {
     sndSepInitTickParam(D_401B3450, 0x20, 0x50);
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0186_initSoundManager", sePlay);
+/* DldSysUndefSymbol is a dld slot whose first word is the undefined-symbol marker */
+s32 sePlay(s32 id) {
+    return sepReq(func_400EA248, *(s32 *)DldSysUndefSymbol, id);
+}
 
 /* swap sound request: second arg goes in the 7th sndSepReq slot */
 s32 sePlaySwapSound(s32 id, s32 swap) {
@@ -226,7 +236,26 @@ s32 func_400EA248(SeU *c) {
     return 0;
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0186_initSoundManager", func_400EA310);
+/* default param init from the se def (c+0x44): needs c+0x10 set, else -1; union typing keeps the def word reloaded */
+s32 func_400EA310(SeU *c) {
+    SeU *def = (SeU *)c->w[0x11];
+    u32 a;
+    u32 b;
+    f32 v;
+
+    if (c->w[4] == 0) {
+        return -1;
+    }
+    a = def->w[2];
+    c->h[0xA] = a & 0x1F;
+    b = def->w[2];
+    c->h[0xB] = (b >> 5) & 0x7F;
+    v = def->f[3];
+    c->f[6] = v;
+    c->f[7] = v;
+    sndSepSetDefaultParam(c);
+    return 0;
+}
 
 /* 3D se update, variant returning 3: camera pos, se pos, fog-scaled volume at c+0x1C, then sound3DCalc */
 s32 func_400EA368(u8 *c) {
