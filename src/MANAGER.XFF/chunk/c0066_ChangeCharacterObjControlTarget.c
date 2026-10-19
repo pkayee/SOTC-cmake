@@ -23,6 +23,29 @@ void func_40061030(s32, s32, s32, s32, f32);
 f32 ViewIntervalClip(s32, s32, f32);
 u8 *GetScrLwsOriClass();
 
+extern s32 DldSysUndefSymbol;
+static inline u8 *dldElem(u32 *lp) { /* inline helper */
+    u8 *slot;
+    u32 w = *lp;
+    u32 off = w & 0x3FFFF;
+
+    slot = off ? *(u8 **)((u8 *)lp - off) : NULL;
+    return (slot != NULL && slot != (u8 *)DldSysUndefSymbol)
+               ? *(u8 **)(slot + 0x10) + ((w >> 18) & 0xFFF) * *(s32 *)(*(u8 **)(slot + 8) + 0xC)
+               : NULL;
+}
+
+s32 func_4005E098();
+
+s32 func_4005FD78();
+
+extern u128 ZeroPoint;
+extern u128 IdentityQuaternion;
+s32 _isysRecvSubMsg();
+s32 ForceParentLayoutObj();
+void SetCharacterClassMotionNormalSyncMode();
+void SetCharacterClassMotionAddSyncMode();
+
 void ChangeCharacterObjControlTarget(s32 obj, s32 v) {
     *(s32 *)(GetCharacterClass(obj) + 0x940) = v;
 }
@@ -38,11 +61,46 @@ void ChangeCharacterObjControlledTarget(s32 a, s32 b, s32 c, s32 d) {
     }
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0066_ChangeCharacterObjControlTarget", CharaCtrlSearchControlChange);
+u8 *CharaCtrlSearchControlChange(u8 *target, u8 *tbl) {
+    s32 i;
+    s32 n;
+    u8 *ent;
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0066_ChangeCharacterObjControlTarget", CheckControlDef);
+    if (tbl != NULL) {
+        n = *(s32 *)(tbl + 0xC);
+        ent = *(u8 **)(tbl + 0x10);
+        for (i = 0; i < n; i++, ent += 0x10) {
+            if (dldElem((u32 *)(ent + 8)) == target) {
+                return dldElem((u32 *)(ent + 0xC));
+            }
+        }
+    }
+    return NULL;
+}
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0066_ChangeCharacterObjControlTarget", CheckControlDefByStatus);
+s32 CheckControlDef(s32 a, s32 b, s32 c, u32 *lp) {
+    s32 *p = (s32 *)dldElem(lp);
+
+    while (*p != 1) {
+        if (func_4005E098(a, b, c, p) == 0) {
+            return 0;
+        }
+        p += 0xC;
+    }
+    return 1;
+}
+
+s32 CheckControlDefByStatus(s32 a, u32 *lp) {
+    s32 *p = (s32 *)dldElem(lp);
+
+    while (*p != 1) {
+        if (func_4005FD78(a, p) == 0) {
+            return 0;
+        }
+        p += 0xC;
+    }
+    return 1;
+}
 
 void CharaCtrlPlayableControl(s32 a, s32 b, s32 c, f32 dt) {
     if (dt != 0.0f) {
@@ -304,4 +362,35 @@ void ResetCharacterClassMailRelationalTriggerFlags(u8 *a) {
     DecreaseDamageLockTime(a + 0x200);
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0066_ChangeCharacterObjControlTarget", RecvCharacterObjMail);
+void RecvCharacterObjMail(s32 obj) {
+    s32 msg[24];
+    u8 *cc = GetCharacterClass(obj);
+
+    while (_isysRecvSubMsg(cc + 0x1028, msg, 0x60) != 0) {
+        switch (msg[20]) {
+        case 0:
+            break;
+        case 1:
+            ChangeCharacterObjControlTarget(obj, msg[0]);
+            break;
+        case 2:
+            ChangeCharacterObjControlledTarget(obj, msg[16], (s32)msg, msg[17]);
+            break;
+        case 3:
+            SetCharacterClassMotionNormalSyncMode(cc, msg[0]);
+            break;
+        case 5:
+            SetCharacterClassMotionAddSyncMode(cc, msg[0]);
+            break;
+        case 4: {
+            u8 *lc;
+
+            ForceParentLayoutObj(obj, msg);
+            lc = GetLayoutClass(obj);
+            *(u128 *)(lc + 0x70) = ZeroPoint;
+            *(u128 *)(lc + 0x60) = IdentityQuaternion;
+            break;
+        }
+        }
+    }
+}

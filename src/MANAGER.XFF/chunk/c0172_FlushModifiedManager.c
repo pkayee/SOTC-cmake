@@ -4,6 +4,14 @@
 void iosJumpRecoverPoint(char *);
 extern char D_40134240[];
 
+typedef struct { char name[0x10]; s32 size; s32 pad[11]; } McDirEnt;
+extern char *strrchr(const char *, int);
+extern char *strcpy(char *, const char *);
+extern s32 strlen(const char *);
+extern s32 iosMcMkDir(s32, s32, char *);
+extern s32 iosMcCreateFile(s32, s32, char *);
+extern s32 iosMcGetDir(s32, s32, char *, s32, s32, void *, void *);
+
 void FlushModifiedManager(s32 *p)
 {
     s32 n = p[0];
@@ -278,4 +286,25 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0172_FlushModifiedManager", fun
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0172_FlushModifiedManager", func_400DA750);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0172_FlushModifiedManager", func_400DA8B0);
+/* memory card: create the file named at +0xC (making its directory), then read back the dir entry size into +0x18 */
+void func_400DA8B0(s32 *w)
+{
+    McDirEnt ent;
+    s32 cnt[4];
+    s32 len = strlen((char *)w[3]);
+    char str[len + 1];
+    char *sl;
+
+    strcpy(str, (char *)w[3]);
+    sl = strrchr(str, 0x2F);
+    if (sl != 0)
+    {
+        *sl = 0;
+        iosMcMkDir(w[1], w[2], str);
+    }
+    w[11] = iosMcCreateFile(w[1], w[2], (char *)w[3]);
+    iosMcGetDir(w[1], w[2], (char *)w[3], 0, 1, &ent, cnt);
+    if (cnt[0] != 1)
+        ent.size = 0;
+    w[6] = ent.size;
+}
