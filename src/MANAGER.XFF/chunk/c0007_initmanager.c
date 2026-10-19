@@ -111,32 +111,26 @@ void initmanagerPartitionConf(PartConf *cfg) {
 #endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0007_initmanager", initmanagerPartitionConf);
 
-/* NEARMISS-STUB getPartitionByName */
-#if 0 /* NEARMISS 94.74% cat=sched sub=- | no cause recorded | attempts=1 */
-void *getPartitionByName(char *name) {
-    PartConf *cfg;
+void *getPartitionByName(char *name)
+{
+    PartConf *cfg = (PartConf *)D_40124794;
     PartEnt *e;
     s32 i;
 
-    cfg = (PartConf *)D_40124794;
-    if (cfg != 0) {
+    if (cfg != NULL)
+    {
         e = cfg->ents;
-        i = 1;
-        if (i < cfg->count) {
-            e++;
-            do {
-                if (strcmp((char *)e->f0, name) == 0) {
-                    return (void *)e->handle;
-                }
-                i++;
-                e++;
-            } while (i < ((PartConf *)D_40124794)->count);
+        e++;
+        for (i = 1; i < ((PartConf *)D_40124794)->count; i++, e++)
+        {
+            if (strcmp((char *)e->f0, name) == 0)
+            {
+                return (void *)e->handle;
+            }
         }
     }
     return &rootPtn;
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0007_initmanager", getPartitionByName);
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0007_initmanager", GAMEUTIL_get_spring_interpolate_value3D_extend);
 

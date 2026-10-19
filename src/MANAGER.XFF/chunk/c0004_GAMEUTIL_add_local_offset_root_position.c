@@ -389,6 +389,33 @@ f32 GAMEUTIL_increase_yaw_limit(s32 *a0, s32 a1, f32 yaw, f32 delta, f32 lo, f32
     return GAMEUTIL_increase_yaw_limit_extend(a0, 1, 1, a1, yaw, delta, lo, hi);
 }
 
+/* NEARMISS-STUB GAMEUTIL_increase_yaw_region */
+#if 0 /* NEARMISS 95.8% cat=regalloc sub=- | d2 r94: sibling is_inside_of_region_yaw shape + call through a static inline increase_yaw_limit wrapper (kills the sibcall) 78.8->95.80; left: yaw/delta saved i | attempts=1 */
+static inline f32 yawLimitInl(s32 *a0, s32 a1, f32 yaw, f32 delta, f32 lo, f32 hi)
+{
+    return GAMEUTIL_increase_yaw_limit_extend(a0, 1, 1, a1, yaw, delta, lo, hi);
+}
+
+f32 GAMEUTIL_increase_yaw_region(s32 *moved, s32 mode, f32 yaw, f32 delta, f32 center, f32 width)
+{
+    f32 half = width * 0.5f;
+    f32 lo = center;
+    f32 hi;
+    f32 neg;
+
+    if (is_nearly_zero(half, 0.0001f) == 0)
+    {
+        lo = func_4001C350(center + half);
+    }
+    neg = -half;
+    hi = center;
+    if (is_nearly_zero(neg, 0.0001f) == 0)
+    {
+        hi = func_4001C350(center + neg);
+    }
+    return yawLimitInl(NULL, mode, yaw, delta, lo, hi);
+}
+#endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0004_GAMEUTIL_add_local_offset_root_position", GAMEUTIL_increase_yaw_region);
 
 f32 GAMEUTIL_increase_yaw_limit_clip_extend(s32 *moved, s32 min_clip, s32 max_clip, s32 mode, f32 yaw, f32 delta, f32 lo, f32 hi);
@@ -452,7 +479,65 @@ f32 GAMEUTIL_get_limit_clip_yaw_abs(f32 yaw, f32 a, f32 lo, f32 hi, s32 *clipped
     return ret;
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0004_GAMEUTIL_add_local_offset_root_position", GAMEUTIL_increase_pitch);
+f32 GAMEUTIL_increase_pitch(s32 *moved, s32 clip, f32 pitch, f32 delta, f32 max, f32 min)
+{
+    s32 m = 0;
+    f32 r = pitch;
+
+    if (is_nearly_zero(delta, 0.0001f) == 0)
+    {
+        if (max > 1.4835296f)
+        {
+            max = 1.4835296f;
+        }
+        else if (min < -1.4835296f)
+        {
+            min = -1.4835296f;
+        }
+        if (pitch > max)
+        {
+            if (delta < 0.0f)
+            {
+                r = pitch + delta;
+                if (r < max && clip)
+                {
+                    r = max;
+                }
+                m = 1;
+            }
+        }
+        else if (pitch < min)
+        {
+            if (delta > 0.0f)
+            {
+                r = pitch + delta;
+                if (r > min && clip)
+                {
+                    r = min;
+                }
+                m = 1;
+            }
+        }
+        else
+        {
+            r = pitch + delta;
+            if (r > max)
+            {
+                r = max;
+            }
+            else if (r < min)
+            {
+                r = min;
+            }
+            m = 1;
+        }
+    }
+    if (moved != NULL)
+    {
+        *moved = m;
+    }
+    return r;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0004_GAMEUTIL_add_local_offset_root_position", GAMEUTIL_increase_pitch_limit_clip);
 
