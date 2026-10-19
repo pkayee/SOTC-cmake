@@ -13,6 +13,79 @@ extern u128 YUnitVector;
 extern u128 ZUnitVector;
 void GetOffsetPositionAxis();
 
+static inline s32 nearZero(f32 v, f32 eps) {
+    if ((v < 0.0f ? -v : v) <= eps) {
+        return 1;
+    }
+    return 0;
+}
+/* copy of GAMEUTIL_increase_pitch (c0004) as the inline the real source used; get_interp_pitch passes NULL, 0, 85 deg limits */
+static inline f32 incPitch(s32 *moved, s32 clip, f32 cur, f32 delta, f32 max, f32 min)
+{
+    s32 m = 0;
+    f32 r = cur;
+
+    if (nearZero(delta, 0.0001f) == 0)
+    {
+        if (1.4835296f < max)
+        {
+            max = 1.4835296f;
+        }
+        else if (min < -1.4835296f)
+        {
+            min = -1.4835296f;
+        }
+        if (max < cur)
+        {
+            if (delta < 0.0f)
+            {
+                r = cur + delta;
+                m = 1;
+                if (r < max)
+                {
+                    if (clip)
+                    {
+                        r = max;
+                    }
+                }
+            }
+        }
+        else if (cur < min)
+        {
+            if (0.0f < delta)
+            {
+                r = cur + delta;
+                m = 1;
+                if (min < r)
+                {
+                    if (clip)
+                    {
+                        r = min;
+                    }
+                }
+            }
+        }
+        else
+        {
+            r = cur + delta;
+            m = 1;
+            if (max < r)
+            {
+                r = max;
+            }
+            else if (r < min)
+            {
+                r = min;
+            }
+        }
+    }
+    if (moved != NULL)
+    {
+        *moved = m;
+    }
+    return r;
+}
+
 static inline s32 nearlyZero3D(f32 eps, f32 *v) {
     if (NEARABS(v[0]) <= eps && NEARABS(v[1]) <= eps && NEARABS(v[2]) <= eps) {
         return 1;
@@ -29,47 +102,17 @@ static inline u8 *dldRef(u32 *lp, s32 fld) {
     return (slot != NULL && slot != (u8 *)DldSysUndefSymbol) ? *(u8 **)(slot + fld) : NULL;
 }
 
-/* NEARMISS-STUB GAMEUTIL_get_interp_pitch */
-#if 0 /* NEARMISS 54.0% cat=regalloc sub=constant-load-placement | best 54.0% (iter3 C: !(t<=0)&&!(1<=t) form, single exit r, eps/hi/lo as consts). diff: near-check bool materialization (addiu/daddu v0) and f-reg naming differ; | attempts=1 */
+/* T66: t clamps return a or b directly (value in f0), then the inline clamp body; two ifs with return, not one r variable */
 f32 GAMEUTIL_get_interp_pitch(f32 a, f32 b, f32 t)
 {
-    f32 d;
-    f32 r;
-    f32 nd;
-    s32 near;
-
-    r = a;
-    if (!(t <= 0.0f) && !(1.0f <= t)) {
-        d = t * (b - a);
-        if (d < 0.0f) {
-            nd = -d;
-            near = nd <= 0.0001f;
-        } else {
-            near = d <= 0.0001f;
-        }
-        if (!near) {
-            if (1.4835296f < a) {
-                if (d < 0.0f) {
-                    r = a + d;
-                }
-            } else if (a < -1.4835296f) {
-                if (0.0f < d) {
-                    r = a + d;
-                }
-            } else {
-                r = a + d;
-                if (1.4835296f < r) {
-                    r = 1.4835296f;
-                } else if (r < -1.4835296f) {
-                    r = -1.4835296f;
-                }
-            }
-        }
+    if (t <= 0.0f) {
+        return a;
     }
-    return r;
+    if (1.0f <= t) {
+        return b;
+    }
+    return incPitch(NULL, 0, a, t * (b - a), 1.4835296f, -1.4835296f);
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0003_GAMEUTIL_get_interp_pitch", GAMEUTIL_get_interp_pitch);
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0003_GAMEUTIL_get_interp_pitch", GAMEUTIL_act_yaw_rot_region_check);
 
