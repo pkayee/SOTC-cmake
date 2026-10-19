@@ -126,7 +126,46 @@ void unsetEndEditWorkTool(void *arg0)
     unsetEditWorkTool(arg0);
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0205_setStartEditWorkTool", openEditWorkTool);
+static inline int ewtOpen205(void *p) /* inline copy of func_400FC890 */
+{
+    if (p == NULL)
+        return 0;
+    D_4012E3C8 = p;
+    if (((EwtTool205 *)D_4012EA68)->open != 0)
+        windowCloseRequest(((EwtTool205 *)D_4012EA68)->win[1]);
+    if (((EwtWin205 *)D_4012E468)->open != 0)
+        windowCloseRequest(((EwtWin205 *)D_4012E468)->win[1]);
+    if (((EwtWin205 *)D_4012EA38)->open != 0)
+        windowCloseRequest(((EwtWin205 *)D_4012EA38)->win[1]);
+    createMenu(D_4012E468, 0);
+    func_400FB9A0(((EwtWin205 *)D_4012E468)->win[1], 0, 0);
+    return 1;
+}
+
+static inline u8 *etiFind205(s32 id) /* helper */
+{
+    EtiWork205 *w = (EtiWork205 *)D_401C4990;
+    u8 *p;
+    u8 *q;
+
+    if (id != 0) {
+        p = (u8 *)w->free.head;
+        if (p != NULL) {
+            q = p;
+            do {
+                if (*(s32 *)q == id)
+                    return q;
+                q = *(u8 **)(q + 8);
+            } while (q != NULL);
+        }
+    }
+    return NULL;
+}
+
+int openEditWorkTool(s32 id)
+{
+    return ewtOpen205(etiFind205(id));
+}
 
 s32 func_400FC6C8(u32 idx, s32 off)
 {

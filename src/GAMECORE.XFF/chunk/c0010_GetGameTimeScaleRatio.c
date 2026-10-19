@@ -367,7 +367,7 @@ void func_400222E8(void)
 }
 
 /* NEARMISS-STUB constructor_nico_yaw_pitch_cntrl */
-#if 0 /* NEARMISS 97.2% cat=sched sub=- | 16 f32/s32 stores + 11 float literals (exact decimals, all const loads match); gcc schedules stores out of source order (13C before 138, EC/D0 groups, F4 before | attempts=1 */
+#if 0 /* NEARMISS 99.88% cat=sched sub=- | d2 r81 hill-climbed source order of the 29 post-call stores (2 runs + exhaustive single-move): only swc1 0xD8 / 0xEC order left (target D8 first). Inline set_ba | attempts=2 */
 void reset_nico_yaw_pitch_cntrl(u8 *p);
 void GAMEUTIL_constructor_move_angle(u8 *p);
 void constructor_nico_yaw_pitch_cntrl(u8 *a0)
@@ -386,34 +386,34 @@ void constructor_nico_yaw_pitch_cntrl(u8 *a0)
     *(f32 *)(a0 + 0xAC) = -1.39626324176788330078125f;
     GAMEUTIL_constructor_move_angle(a0 + 0xB0);
     *(s32 *)(a0 + 0xCC) = 0;
-    *(f32 *)(a0 + 0x138) = 1.0f;
-    *(f32 *)(a0 + 0x13C) = 1.0f;
-    *(f32 *)(a0 + 0xD8) = 0.872664511203765869140625f;
-    *(f32 *)(a0 + 0xEC) = 0.0872664527f;
-    *(f32 *)(a0 + 0xF0) = 0.1745329053f;
-    *(f32 *)(a0 + 0xF4) = 0.523598730564117431640625f;
-    *(f32 *)(a0 + 0xF8) = 0.698131620883941650390625f;
-    *(f32 *)(a0 + 0xFC) = 0.3490658105f;
-    *(f32 *)(a0 + 0x100) = 0.7999999523162841796875f;
-    *(f32 *)(a0 + 0x120) = 1.483529567718505859375f;
-    *(f32 *)(a0 + 0x124) = -1.483529567718505859375f;
-    *(f32 *)(a0 + 0x128) = 1.5533428192138671875f;
-    *(f32 *)(a0 + 0x12C) = -1.5533428192138671875f;
     *(f32 *)(a0 + 0xD0) = 0.0872664527f;
     *(f32 *)(a0 + 0xD4) = 0.1745329053f;
     *(f32 *)(a0 + 0xDC) = 0.698131620883941650390625f;
     *(f32 *)(a0 + 0xE0) = 0.3490658105f;
+    *(f32 *)(a0 + 0xEC) = 0.0872664527f;
+    *(f32 *)(a0 + 0xD8) = 0.872664511203765869140625f;
+    *(f32 *)(a0 + 0xF4) = 0.523598730564117431640625f;
     *(f32 *)(a0 + 0xE4) = 0.7999999523162841796875f;
+    *(f32 *)(a0 + 0xF8) = 0.698131620883941650390625f;
+    *(f32 *)(a0 + 0xFC) = 0.3490658105f;
     *(s32 *)(a0 + 0xE8) = 0;
     *(s32 *)(a0 + 0x10C) = 0;
+    *(f32 *)(a0 + 0x100) = 0.7999999523162841796875f;
+    *(f32 *)(a0 + 0x120) = 1.483529567718505859375f;
+    *(f32 *)(a0 + 0x124) = -1.483529567718505859375f;
     *(s32 *)(a0 + 0x108) = 0;
     *(s32 *)(a0 + 0x104) = 0;
+    *(f32 *)(a0 + 0x13C) = 1.0f;
+    *(f32 *)(a0 + 0x128) = 1.5533428192138671875f;
     *(s32 *)(a0 + 0x110) = 0;
     *(s32 *)(a0 + 0x114) = 0;
     *(s32 *)(a0 + 0x118) = 0;
     *(s32 *)(a0 + 0x11C) = 0;
+    *(f32 *)(a0 + 0x12C) = -1.5533428192138671875f;
+    *(f32 *)(a0 + 0x138) = 1.0f;
     *(s32 *)(a0 + 0x134) = 0;
     *(s32 *)(a0 + 0x130) = 0;
+    *(f32 *)(a0 + 0xF0) = 0.1745329053f;
 }
 #endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0010_GetGameTimeScaleRatio", constructor_nico_yaw_pitch_cntrl);
