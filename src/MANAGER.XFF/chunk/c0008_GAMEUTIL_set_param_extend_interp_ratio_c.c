@@ -28,6 +28,19 @@ void spriteTexFast(s32, s32, s32, s32, s32, void *, void *, s32);
 
 void GAMEUTIL_get_spring_interpolate_value3D_extend(f32 a, f32 b, f32 *d1, f32 *d2, f32 *s, f32 *p, f32 k, f32 dt);
 
+static inline f32 interpRatio(f32 rate, f32 a, f32 b) {
+    if (rate <= 0.0f) {
+        return a;
+    }
+    if (1.0f <= rate) {
+        return b;
+    }
+    if (b == a) {
+        return b;
+    }
+    return rate * b + (1.0f - rate) * a;
+}
+
 void GAMEUTIL_set_param_extend_interp_ratio_cntrl(f32 p1, f32 p2, f32 p3, f32 *c)
 {
     s32 r;
@@ -53,39 +66,21 @@ void GAMEUTIL_reset_interp_value_cntrl(f32 *c, f32 v) {
     GAMEUTIL_get_interp_value_interp_value_cntrl(c);
 }
 
-/* NEARMISS-STUB GAMEUTIL_doit_interp_value_cntrl */
-#if 0 /* NEARMISS 95.9% cat=regalloc sub=- | FP reg naming (rate/c0 loads order and f-regs) + else-path store order (expected c2,c0,then c1 in jal delay); compare form c.le.s vs c.lt.s for rate<=0 branch | attempts=1 */
-void GAMEUTIL_doit_interp_value_cntrl(f32 v, f32 *c, s32 *p)
-{
-    f32 r;
-    f32 rate;
-
+void GAMEUTIL_doit_interp_value_cntrl(f32 v, f32 *c, s32 *p) {
     if (p[0] == 1) {
         if (p[2] == 1) {
             c[0] = c[1];
         }
         c[2] = v;
-        rate = ((f32 *)p)[4];
-        r = c[0];
-        if (rate <= 0.0f) {
-            r = c[0];
-        } else {
-            r = v;
-            if (rate < 1.0f && v != c[0]) {
-                r = rate * v + (1.0f - rate) * c[0];
-            }
-        }
-        c[1] = r;
+        c[1] = interpRatio(((f32 *)p)[4], c[0], v);
     } else {
-        c[2] = v;
         c[0] = v;
         c[1] = v;
+        c[2] = v;
         GAMEUTIL_get_interp_value_interp_value_cntrl(c);
     }
     GAMEUTIL_get_interp_value_interp_value_cntrl(c);
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0008_GAMEUTIL_set_param_extend_interp_ratio_c", GAMEUTIL_doit_interp_value_cntrl);
 
 f32 GAMEUTIL_get_interp_value_interp_value_cntrl(f32 *c) {
     return c[1];
@@ -282,45 +277,22 @@ s32 func_4001E0F0(f32 *c, f32 a, f32 b) {
     return 0;
 }
 
-/* NEARMISS-STUB func_4001E138 */
-#if 0 /* NEARMISS 95.1% cat=regalloc sub=- | branch shape matches; expected reloads c[5] for the sum compare and holds rate in f6/1.0 in f7 (ours f4/f6); rate<1 test emitted as c.lt.s where expected has c. | attempts=1 */
-void func_4001E138(f32 *c, s32 mode)
-{
+void func_4001E138(f32 *c, s32 mode) {
     f32 rate;
-    f32 r;
-    f32 sum;
 
     if (mode == 1) {
         rate = c[4];
         if (rate <= 0.0f) {
-            if (c[5] < c[3]) {
+            if (c[3] > c[5]) {
                 c[3] = c[5];
             }
-            return;
-        }
-        if (1.0f <= rate) {
+        } else if (1.0f <= rate) {
             c[3] = c[5] + c[6];
-            return;
-        }
-        r = c[5];
-        sum = c[5] + c[6];
-        if (rate <= 0.0f) {
-            r = c[5];
         } else {
-            r = sum;
-            if (rate < 1.0f) {
-                if (sum == c[5]) {
-                    c[3] = sum;
-                    return;
-                }
-                r = rate * sum + (1.0f - rate) * c[5];
-            }
+            c[3] = interpRatio(rate, c[5], c[5] + c[6]);
         }
-        c[3] = r;
     }
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0008_GAMEUTIL_set_param_extend_interp_ratio_c", func_4001E138);
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0008_GAMEUTIL_set_param_extend_interp_ratio_c", func_4001E1E8);
 
