@@ -14,6 +14,74 @@ void sheetFileRead(void *, void *, s32);
 void *setEditWorkTool(void *a, s32 b, s32 c, s32 d);
 int func_400FC890(void *p);
 
+/* MANAGER c0205 audioDecCreate: init the audio decoder work (9 words, sema at +0x20) and hook the pcm tick proc. */
+void pcm_tickprocsub();
+void setPcmTickProcFunc(void *fn);
+s32 iosCreateSema(s32 a, s32 b, s32 c);
+
+void EE_MixBufClear(void);
+void iosDeleteSema(s32 sema);
+
+void createMenu(void *menu, s32 arg1);
+void func_400FB9A0(s32 a0, s32 a1, s32 a2);
+
+/* MANAGER c0205 initEtiInfoWork: once, init the two node lists at D_401C4990 and chain 20 nodes (stride 0x21C) of D_401C1F60 into the second list. */
+extern u8 D_401C4990[];
+extern u8 D_401C1F60[];
+extern s32 D_4012E3C4;
+typedef struct EtiList205 {
+    s32 n;
+    s32 head;
+    s32 tail;
+} EtiList205;
+static inline void etiListInit205(EtiList205 *l) /* helper */
+{
+    l->n = 0;
+    l->head = 0;
+    l->tail = 0;
+}
+static inline void etiListAdd205(EtiList205 *l, u8 *node) /* helper */
+{
+    if (node != NULL)
+    {
+        if (l->tail != 0)
+            *(u8 **)((u8 *)l->tail + 0x8) = node;
+        else
+            l->head = (s32)node;
+        *(u8 **)(node + 0x8) = NULL;
+        l->n++;
+        l->tail = (s32)node;
+    }
+}
+typedef struct EtiWork205 {
+    EtiList205 free;
+    EtiList205 used;
+    s32 f18;
+} EtiWork205;
+
+/* MANAGER c0205 spriteMovieImage: fullscreen textured sprite for the movie image, GS regs set from the draw screen size. Layout of the stack args follows the c0100 sibling. */
+typedef struct SprQuad205 {
+    u64 q[2];
+} SprQuad205;
+typedef struct SprMov205 {
+    SprQuad205 col;
+    SprQuad205 uv;
+    s32 a[4];
+} SprMov205;
+extern const SprQuad205 D_401357F0;
+extern const SprQuad205 D_40135800;
+void iosDlPushLayer(s32 layer);
+void iosDlPopLayer(void);
+void gsRegBegin(void);
+void gsRegEnd(void);
+void gsReg(s32, u64);
+s32 getDrawScreenWidth(void);
+s32 getDrawScreenHeight(void);
+s32 getDrawBufferAddressFBP(void);
+s32 getTextureAreaAddressTBP(void);
+s32 getTWH(s32 n);
+void spriteTexFast(s32, s32, s32, s32, s32, void *, void *, s32);
+
 int setStartEditWorkTool(void *a, s32 b, s32 c, s32 d, s32 e, s32 f, s32 g)
 {
     u8 *r = (u8 *)setEditWorkTool(a, b, c, f);
@@ -154,46 +222,21 @@ void func_400FC850(u8* arg0)
     }
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0205_setStartEditWorkTool", func_400FC890);
-
-/* NEARMISS-STUB initEtiInfoWork */
-#if 0 /* NEARMISS 99.95% cat=sched sub=- | EtiWork{free,used,f18} struct + list inlines: only free-list init store sw zero,0(v1) sinks below move a2,a0 (target order 0,4,8); all 6 init orders 99.92-99.95 | attempts=2 */
-extern u8 D_401C4990[];
-extern u8 D_401C1F60[];
-extern s32 D_4012E3C4;
-
-typedef struct EtiList205 {
-    s32 n;
-    u8 *head;
-    u8 *tail;
-} EtiList205;
-
-static inline void etiListInit205(EtiList205 *l)
+int func_400FC890(void *p)
 {
-    l->n = 0;
-    l->head = NULL;
-    l->tail = NULL;
+    if (p == NULL)
+        return 0;
+    D_4012E3C8 = p;
+    if (((EwtTool205 *)D_4012EA68)->open != 0)
+        windowCloseRequest(((EwtTool205 *)D_4012EA68)->win[1]);
+    if (((EwtWin205 *)D_4012E468)->open != 0)
+        windowCloseRequest(((EwtWin205 *)D_4012E468)->win[1]);
+    if (((EwtWin205 *)D_4012EA38)->open != 0)
+        windowCloseRequest(((EwtWin205 *)D_4012EA38)->win[1]);
+    createMenu(D_4012E468, 0);
+    func_400FB9A0(((EwtWin205 *)D_4012E468)->win[1], 0, 0);
+    return 1;
 }
-
-static inline void etiListAdd205(EtiList205 *l, u8 *node)
-{
-    if (node != NULL)
-    {
-        if (l->tail != NULL)
-            *(u8 **)(l->tail + 0x8) = node;
-        else
-            l->head = node;
-        *(u8 **)(node + 0x8) = NULL;
-        l->n++;
-        l->tail = node;
-    }
-}
-
-typedef struct EtiWork205 {
-    EtiList205 free;
-    EtiList205 used;
-    s32 f18;
-} EtiWork205;
 
 void initEtiInfoWork(void)
 {
@@ -202,9 +245,7 @@ void initEtiInfoWork(void)
 
     if (D_4012E3C4 == 0)
     {
-        ((EtiWork205 *)D_401C4990)->free.n = 0;
-        ((EtiWork205 *)D_401C4990)->free.tail = NULL;
-        ((EtiWork205 *)D_401C4990)->free.head = NULL;
+        etiListInit205(&((EtiWork205 *)D_401C4990)->free);
         etiListInit205(&((EtiWork205 *)D_401C4990)->used);
         for (i = 0, node = D_401C1F60; i < 0x14; i++, node += 0x21C)
             etiListAdd205(&((EtiWork205 *)D_401C4990)->used, node);
@@ -212,8 +253,6 @@ void initEtiInfoWork(void)
         ((EtiWork205 *)D_401C4990)->f18 = 0;
     }
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0205_setStartEditWorkTool", initEtiInfoWork);
 
 void *loadPathData(void *f, void *b, int size)
 {
@@ -504,7 +543,20 @@ u8* getLayoutPointData(u8* arg0, s32 arg1)
     return temp;
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0205_setStartEditWorkTool", audioDecCreate);
+s32 audioDecCreate(s32 *w, s32 a1, s32 a2, s32 a3, s32 a4)
+{
+    w[6] = a4;
+    w[5] = a3;
+    w[1] = a1;
+    w[3] = a2;
+    w[0] = 0;
+    w[2] = 0;
+    w[4] = 0;
+    w[7] = 0;
+    w[8] = iosCreateSema(1, 1, 0);
+    setPcmTickProcFunc(pcm_tickprocsub);
+    return 1;
+}
 
 s32 audioDecIsPreset(u8* arg0)
 {
@@ -517,7 +569,17 @@ s32 audioDecIsPreset(u8* arg0)
     return 0;
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0205_setStartEditWorkTool", audioDecReset);
+void audioDecReset(s32 *w)
+{
+    setPcmTickProcFunc(0);
+    changeVolume(0);
+    EE_MixBufClear();
+    w[0] = 0;
+    w[2] = 0;
+    w[4] = 0;
+    w[7] = 0;
+    iosDeleteSema(w[8]);
+}
 
 void changeVolume(s32 arg0)
 {
@@ -531,4 +593,39 @@ void changeVolumeDirect(s32 arg0)
     Sg2ExPcmOutputSetVol(arg0, arg0);
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0205_setStartEditWorkTool", spriteMovieImage);
+void spriteMovieImage(void)
+{
+    SprMov205 spr;
+    s32 w;
+    s32 h;
+    s32 tbp;
+    s32 twhH;
+    s32 twhW;
+
+    w = getDrawScreenWidth();
+    h = getDrawScreenHeight();
+    iosDlPushLayer(0x1C);
+    spr.col = D_401357F0;
+    spr.uv = D_40135800;
+    spr.a[0] = (-w / 2) << 4;
+    spr.a[1] = (-h / 2) << 4;
+    spr.a[2] = w << 4;
+    spr.a[3] = h << 4;
+    gsRegBegin();
+    gsReg(0x4C, (u64)getDrawBufferAddressFBP() | ((u64)((w >> 6) & 0x3F) << 16));
+    gsReg(0x18, ((u64)((0x800 - w / 2) << 4)) | (((u64)((0x800 - h / 2) << 4)) << 32));
+    gsReg(0x40, ((u64)(w - 1) << 16) | ((u64)(h - 1) << 48));
+    gsReg(0x47, 0x31001);
+    gsReg(0x3F, 0);
+    if (w == 0x200 && h == 0x1C0)
+        gsReg(0x14, 0);
+    else
+        gsReg(0x14, 0x60);
+    tbp = getTextureAreaAddressTBP();
+    twhH = getTWH(0x1C0);
+    twhW = getTWH(0x200);
+    gsReg(6, ((u64)tbp | 0x120000) | (((u64)twhH << 30) | ((u64)twhW << 26)) | ((u64)0x8000 << 19));
+    spriteTexFast(spr.a[0], spr.a[1], spr.a[2], spr.a[3], 0xFFFFFF, &spr.uv, &spr.col, 0);
+    gsRegEnd();
+    iosDlPopLayer();
+}
