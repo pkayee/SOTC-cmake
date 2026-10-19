@@ -431,8 +431,6 @@ void func_400F6080(u8 *p, f32 x, f32 y, f32 z, f32 nearZ, f32 farZ)
     m[0xE] = (farZ * nearZ * -2.0f) / (farZ - nearZ);
 }
 
-/* NEARMISS-STUB func_400F6180 */
-#if 0 /* NEARMISS 99.42% cat=regalloc sub=- | FP constants (2048/0xCAFED161/0x4AFED35F/1.0) assigned to different fpr than target; store order search best 99.42 | attempts=1 */
 void func_400F6180(u8 *obj, s32 a, s32 b)
 {
     f32 *m = (f32 *)obj;
@@ -442,13 +440,11 @@ void func_400F6180(u8 *obj, s32 a, s32 b)
     fVar2 = (f32)b * 0.5f * *(f32 *)&D_4012E374;
     fVar1 = (f32)a * 0.5f * *(f32 *)&D_4012E374;
     iosUnitMatrix(obj);
-    m[0xD] = 2048.0f;
-    m[0xC] = 2048.0f;
+    m[0] = fVar1;
     m[5] = -fVar2;
     m[10] = -8349872.5f;
     m[0xE] = 8350127.5f;
-    m[0] = fVar1;
+    m[0xC] = 2048.0f;
+    m[0xD] = 2048.0f;
     m[0xF] = 1.0f;
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0198_add_object_animation_camera_region", func_400F6180);

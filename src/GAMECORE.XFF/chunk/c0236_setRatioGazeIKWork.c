@@ -131,22 +131,19 @@ void initTailIKWork(int a, int b, char *p)
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0236_setRatioGazeIKWork", nico_calcTailGenealogicalNodeTail);
 
-/* NEARMISS-STUB ReflectIK_initWormDynamics */
-#if 0 /* NEARMISS 97.75% cat=sched sub=- | d2 r88: 120-perm sweep; best source order d1,d3,d0,d2(ZeroVector),f gives target regs; left: target emits d2 (ZeroVector) copy second and d3 last, ours d3 secon | attempts=2 */
-extern u128 ZeroVector;
+typedef union { u128 q; f32 f[4]; } RIKVec;
+extern RIKVec ZeroVector;
 
-void ReflectIK_initWormDynamics(void *dst, u128 *a, u128 *b, u128 *c, float f)
+void ReflectIK_initWormDynamics(void *dst, RIKVec *a, RIKVec *b, RIKVec *c, float f)
 {
-    u128 *d = (u128 *)dst;
+    RIKVec *d = (RIKVec *)dst;
 
-    d[1] = *a;
-    d[3] = *c;
-    d[0] = *b;
-    d[2] = ZeroVector;
+    d[1].q = a->q;
+    d[2].q = ZeroVector.q;
+    d[0].q = b->q;
+    d[3].q = c->q;
     *(float *)((u8 *)dst + 0x40) = f;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0236_setRatioGazeIKWork", ReflectIK_initWormDynamics);
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0236_setRatioGazeIKWork", func_4012D738);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0236_setRatioGazeIKWork", func_4012DA20);

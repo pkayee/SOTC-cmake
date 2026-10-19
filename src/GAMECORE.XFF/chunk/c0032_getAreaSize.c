@@ -327,8 +327,14 @@ s32 GetStageChipNum(void)
 }
 
 /* NEARMISS-STUB DeleteSeamlessStageObject */
-#if 0 /* NEARMISS 68.18% cat=cse-hoist sub=- | d2 r83: SeamlessChip{obj[2];stat[2];pad[2]} 24B struct index via D_40130F88+8 (68.18); target reloads tbl and recomputes tbl+chip*24+layer*4 in the chip!=-1 arm | attempts=3 */
+#if 0 /* NEARMISS 69.1% cat=cse-hoist sub=- | d2 r90: the three &D_40130F88 copies (a3,t2,t3) = INLINE-PTR-PARAM getter; getChips(m)[chip] gives the target addu order (chip*24 + chips) but cse/gcse still me | attempts=4 */
 typedef struct { s32 *obj[2]; u32 stat[2]; s32 pad[2]; } SeamlessChip;
+typedef struct { s32 x0; s32 x4; SeamlessChip *chips; } SeamlessMgr;
+
+static inline SeamlessChip *seamlessGetChip(SeamlessMgr *m, s32 chip)
+{
+    s32 off = chip * sizeof(SeamlessChip); return (SeamlessChip *)(off + (u8 *)m->chips);
+}
 
 s32 DeleteSeamlessStageObject(s32 layer, s32 chip, s32 *out)
 {
@@ -336,26 +342,21 @@ s32 DeleteSeamlessStageObject(s32 layer, s32 chip, s32 *out)
     s32 r;
     u32 stat;
 
-    ent = (*(SeamlessChip **)(D_40130F88 + 8))[chip].obj[layer];
+    ent = seamlessGetChip((SeamlessMgr *)&D_40130F88, chip)->obj[layer];
     r = 0;
-    if (ent != 0)
-    {
+    if (ent != 0) {
         r = ent[3];
     }
-    if (chip == -1)
-    {
+    if (chip == -1) {
         stat = 7;
+    } else {
+        stat = seamlessGetChip((SeamlessMgr *)&D_40130F88, chip)->stat[layer] & 0xF;
     }
-    else
-    {
-        stat = (*(SeamlessChip **)(D_40130F88 + 8))[chip].stat[layer] & 0xF;
-    }
-    if (stat == 5)
-    {
+    if (stat == 5) {
         *out = 0;
         return 0;
     }
-    *out = (*(SeamlessChip **)(D_40130F88 + 8))[chip].stat[layer] >> 4;
+    *out = seamlessGetChip((SeamlessMgr *)&D_40130F88, chip)->stat[layer] >> 4;
     return r;
 }
 #endif
