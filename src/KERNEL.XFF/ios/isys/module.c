@@ -1275,7 +1275,59 @@ void isysLaunchExecModule(ModObj *obj)
     entry(obj);
 }
 
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", isysInitModuleObjExisted);
+/* KERNEL.XFF ios/isys/module isysInitModuleObjExisted: tail of isysCreateModuleObjExisted without the alloc. Args in order a0..a3,t0,t1 = obj, xff, symdef, resolve, build, parent (parent goes as 8th arg of func_40019D68). In-TU 100 on first try (copy of the matched isysCreateModuleObjExisted tail). */
+ModObj *isysInitModuleObjExisted(ModObj *obj, struct t_xffEntPntHdr *xff, s32 symdef, s32 resolve, s32 build, s32 parent)
+{
+    s32 sign;
+    struct t_xffEntPntHdr *x;
+    s32 *ret;
+    s32 isRet;
+
+    obj->bits.hashed = 0;
+    ret = func_40019D68(xff, obj, obj->partition, func_4001C3B0, func_4001C440, (void *)DldSysUndefSymbol, func_400199B0, parent);
+    sign = 0;
+    if (ret != 0)
+    {
+        sign = obj->bits.hashed;
+    }
+    x = xff;
+    if (ret != 0)
+    {
+        x = (struct t_xffEntPntHdr *)ret;
+    }
+    obj->entry = ret ? (void *)*ret : xff->entryPnt;
+    obj->hdr = x;
+    obj->bits.hashed = 0;
+    obj->bits.sepImage = (isRet = (ret != 0));
+    obj->bits.relocated = 0;
+    if (isRet == 0)
+    {
+        if (x->symTabNrE)
+        {
+            if (symdef)
+            {
+                isysAddGroupWithLinkParam(obj, symbolDefModuleGroup, 0, 0);
+            }
+        }
+        if (x->impSymIxsNrE)
+        {
+            if (resolve)
+            {
+                isysAddGroupWithLinkParam(obj, needResolveModuleGroup, 0, 0);
+            }
+        }
+        if (build)
+        {
+            func_40019B58(obj, obj->partition);
+        }
+        func_4001A170((ModPend *)&obj->pendCount, &rootPtn, x);
+    }
+    if (ret != 0)
+    {
+        obj->bits.hashed = sign;
+    }
+    return obj;
+}
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/ios/isys/module", isysFlushModuleObj);
 s32 isysFlushModuleObj(ModObj *obj)
