@@ -185,7 +185,32 @@ void func_400A2338(u8 *o)
     isysFlushISYSLetterObj(o);
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0125_CreateScriptLwsOri", DeleteScriptLwsOrientObjSubObjects);
+/* DeleteScriptLwsOrientObjSubObjects: c = kind-0x16 payload; c+0x1148 = def (count at 0x30, rows at 0x54 stride 0xC), c+0x1150 = sub-object slots stride 0x50.
+   The loop test re-reads c->def->count every pass (the target reloads def only after the delete calls, the count on both paths). */
+s32 IsNonISysObjTypeRes(s32);
+s32 delete_object_animation_camera_region(void *);
+void isysRequestDeleteObj();
+s32 FlushLayoutObj(u8 *);
+
+void DeleteScriptLwsOrientObjSubObjects(u8 *o)
+{
+    u8 *c = o[8] != 0x16 ? 0 : o + 0x20;
+    s32 *slot = *(s32 **)(c + 0x1150);
+    s32 *row = *(s32 **)(*(u8 **)(c + 0x1148) + 0x54);
+    int i;
+
+    for (i = 0; i < *(s32 *)(*(u8 **)(c + 0x1148) + 0x30); i++, slot += 0x14, row += 3) {
+        if (*slot != 0) {
+            if (IsNonISysObjTypeRes(row[1]) == 0 && *row != 0 && row[1] < 0x2b && 0x26 < row[1]) {
+                delete_object_animation_camera_region((void *)*slot);
+            }
+            isysRequestDeleteObj(*slot);
+            FlushLayoutObj((u8 *)*slot);
+            *slot = 0;
+        }
+    }
+}
+
 
 void func_400A24A0(void) {
 }

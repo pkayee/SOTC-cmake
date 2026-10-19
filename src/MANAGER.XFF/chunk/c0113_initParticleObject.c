@@ -92,7 +92,7 @@ void *iosMallocInGarbagePtn(s32, s32);
 void vschedSetNextFrameForceGarbage(void);
 void sheetWait(void);
 MgrModObj *isysCreateModuleObjExisted(void *, s32, void *, s32, s32, s32, void *);
-void isysAddGroupWithLinkParam(void *, void *, s32, s32);
+s32 isysAddGroupWithLinkParam(void *, void *, s32, s32); /* int: the call_value keeps v0 busy, so the following flags test loads into v1 */
 void iosJumpRecoverPoint(const char *);
 u8 *sheetFileGetDataAdrs(s32);
 s32 IsClusterCollision(void *);
@@ -210,8 +210,6 @@ void debugCreateAnimObjSegmentDefDisp(void) {
 void debugDeleteAnimObjSegmentDefDisp(void) {
 }
 
-/* NEARMISS-STUB loadCdMotionFile */
-#if 0 /* NEARMISS 99.57% cat=regalloc sub=flagtest-v0v1 | single diff: the 'obj->flags & 0x40000000' test loads into v1 and the lui mask into v0 in the target; ours has them swapped (lw v0/lui v1). Tried flags u32/s32, | attempts=1 */
 MgrModObj *loadCdMotionFile(s32 sheet, s32 unused, s32 size) {
     void *buf;
     MgrModObj *obj;
@@ -238,8 +236,6 @@ MgrModObj *loadCdMotionFile(s32 sheet, s32 unused, s32 size) {
     *(MgrModObj **)(data + 0xC) = obj;
     return obj;
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0113_initParticleObject", loadCdMotionFile);
 
 void unloadCdMotionFile(s32 sheet, s32 unused, MgrModObj *obj) {
     u8 *data = sheetFileGetDataAdrs(sheet);
@@ -330,13 +326,12 @@ void unloadCdNfbFile(s32 a0, s32 a1, void *buf) {
     }
 }
 
-/* NEARMISS-STUB loadCdXffFile */
-#if 0 /* NEARMISS 96.15% cat=regalloc sub=flagtest-v0v1 | same flags-test v0/v1 swap as loadCdMotionFile; knock-on: and-result in v1 blocks hoisting lui v1 into the bnez delay slot (we emit bnezl) | attempts=1 */
 MgrModObj *loadCdXffFile(s32 sheet, s32 unused, s32 size) {
     void *buf;
     MgrModObj *obj;
     void *ptn = &rootPtn;
     s32 z = 0;
+    MgrModObj *ret;
 
     while ((buf = iosMallocInGarbagePtn(size, 0x10)) == NULL) {
         vschedSetNextFrameForceGarbage();
@@ -350,13 +345,12 @@ MgrModObj *loadCdXffFile(s32 sheet, s32 unused, s32 size) {
             iosJumpRecoverPoint(D_40133278);
         }
     }
-    if (obj != NULL) {
+    ret = obj;
+    if (ret != NULL) {
         D_401AD480.xff += size;
     }
-    return obj;
+    return ret;
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0113_initParticleObject", loadCdXffFile);
 
 void unloadCdXffFile(s32 sheet, s32 unused, MgrModObj *obj) {
     D_401AD480.xff -= sheetFileGetSize(sheet);
