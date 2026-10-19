@@ -4,8 +4,8 @@ extern s32 D_00135A58[];
 
 s32 _sceMcCoreAuthentication(s32);
 s32 _sceMcCoreCheckNewCard(s32);
-s32 _sceMcCoreGetCardSpec(void);
-s32 _sceMcpReadUserClustOnCache(void);
+s32 _sceMcCoreGetCardSpec();
+s32 _sceMcpReadUserClustOnCache();
 s32 _sceMcpWriteUserClustOnCache(void);
 s32 func_00119598(s32, s32, s32, s32, s32);
 s32 func_0011B770(s32, s32, s32);
@@ -110,6 +110,21 @@ typedef struct
 {
     s32 w[0x61];
 } McSysInfo;
+
+extern u8 D_00165FC0[];
+
+extern const char D_00138E90[];
+
+typedef struct
+{
+    s32 w[0x100];
+} McClustBuf;
+typedef struct
+{
+    u8 pad00[0x34];
+    s32 userBase;
+    u8 pad38[0x184 - 0x38];
+} McpSysDesc;
 
 s32 CallRpc(void *cd, s32 cmd, void *buf, s32 ssize, s32 rsize)
 {
@@ -2512,11 +2527,23 @@ s32 _sceMcpFlushCache(s32 a0)
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", _sceMcpWriteUserClustOnCache);
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", _sceMcpReadUserClustOnCache);
-
-s32 _sceMcpReadUserClust(void)
+s32 _sceMcpReadUserClustOnCache(s32 port, s32 dst, s32 clust)
 {
-    return _sceMcpReadUserClustOnCache();
+    s32 off = port * 0x2010;
+    s32 base = *(s32 *)(D_0015F600 + off);
+
+    clust += ((McpSysDesc *)D_00135738)[port].userBase;
+    if (clust >= base && clust < base + *(s32 *)(D_0015F600 + off + 0xC))
+    {
+        *(McClustBuf *)dst = *(McClustBuf *)(D_0015F600 + 0x10 + port * 0x2010 + (clust - base) * 0x400);
+        return 1;
+    }
+    return _sceMcpReadClust(port, dst, clust, 1);
+}
+
+s32 _sceMcpReadUserClust(s32 a0, s32 a1, s32 a2)
+{
+    return _sceMcpReadUserClustOnCache(a0, a1, a2);
 }
 
 s32 _sceMcpWriteUserClust(void)
@@ -2787,7 +2814,55 @@ s32 _sceMcCoreReadClock(s32 port, McClock8 *out)
     return r[2];
 }
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", _sceMcCoreReadPage2);
+s32 _sceMcCoreReadPage2(s32 port, s32 buf, s32 a, s32 n, s32 flag)
+{
+    s32 cmd[1];
+    s32 *r;
+    u8 *dst;
+    u8 *src;
+    s32 i;
+
+    if (sceDbcGetConnection(D_00163E48[port].unk04) == 3)
+    {
+        return 0;
+    }
+    D_00163EC0[0] = a;
+    D_00163EC0[2] = D_00163E48[port].unk08[0];
+    D_00163EC0[3] = D_00163E48[port].unk08[1];
+    D_00163EC0[4] = D_00163E48[port].unk08[2];
+    cmd[0] = 0x2080;
+    D_00163EC0[1] = n;
+    D_00163EC0[5] = 0;
+    D_00163EC0[6] = 0;
+    D_00163EC0[7] = 0;
+    D_00163EC0[8] = 0;
+    D_00163EC0[9] = flag;
+    memset(D_00165F40, 0, 0x100);
+    D_00135A44[0] = 1;
+    while (sceDbcSendData3(D_00163E48[port].unk04, D_00135A44[0], cmd, D_00163EC0, func_00121158) != 1)
+    {
+    }
+    r = func_00121100();
+    if (r[2] == 0)
+    {
+        return 0;
+    }
+    dst = (u8 *)buf;
+    src = D_00165FC0;
+    if (n > 0)
+    {
+        i = n;
+        do
+        {
+            i--;
+            SyncDCache(src, src + D_00163EC0[2]);
+            memcpy(dst, src, D_00163EC0[2]);
+            src += D_00163EC0[2];
+            dst += D_00163EC0[2];
+        } while (i != 0);
+    }
+    return n;
+}
 
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", _sceMcCoreReadPage);
 s32 _sceMcCoreReadPage2(s32, s32, s32, s32, s32);
@@ -2796,7 +2871,43 @@ s32 _sceMcCoreReadPage(s32 port, s32 a, s32 b, s32 c)
     _sceMcCoreReadPage2(port, a, b, c, D_00163E48[port].unk08[3]);
 }
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", _sceMcCoreWritePage);
+s32 _sceMcCoreWritePage(s32 port, s32 buf, s32 a, s32 n)
+{
+    s32 cmd[1];
+    s32 *r;
+    u32 len;
+
+    if (sceDbcGetConnection(D_00163E48[port].unk04) == 3)
+    {
+        return 0;
+    }
+    len = D_00163E48[port].unk08[0] * n;
+    if (len > 0x2000)
+    {
+        scePrintf(D_00138E90);
+        return 0;
+    }
+    D_00163EC0[0] = a;
+    D_00163EC0[2] = D_00163E48[port].unk08[0];
+    D_00163EC0[3] = D_00163E48[port].unk08[1];
+    D_00163EC0[4] = D_00163E48[port].unk08[2];
+    D_00163EC0[5] = D_00163E48[port].unk08[6];
+    D_00163EC0[6] = D_00163E48[port].unk08[5];
+    D_00163EC0[9] = D_00163E48[port].unk08[3];
+    D_00163EC0[1] = n;
+    D_00163EC0[7] = 0;
+    D_00163EC0[8] = 0;
+    memcpy(&D_00163EC0[10], (void *)buf, len);
+    cmd[0] = 0x2080;
+    memset(D_00165F40, 0, 0x100);
+    SyncDCache(D_00165F40, (u8 *)D_00165F40 + 0xFF);
+    D_00135A44[0] = 2;
+    while (sceDbcSendData3(D_00163E48[port].unk04, D_00135A44[0], cmd, D_00163EC0, func_00121158) != 1)
+    {
+    }
+    r = func_00121030();
+    return r[2] != 0 ? n : 0;
+}
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", _sceMcCoreWriteSameData);
 
