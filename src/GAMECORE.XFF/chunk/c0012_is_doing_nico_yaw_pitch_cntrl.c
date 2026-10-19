@@ -102,19 +102,20 @@ f32 func_40023F88(f32 v, u8 *p);
 f32 func_40023FC8(f32 v, u8 *p);
 f32 GAMEUTIL_increase_pitch_limit_clip(s32 e, s32 f, f32 a, f32 b, f32 c, f32 d);
 
-/* NEARMISS-STUB get_max_min_clip_base_pitch_nico_yaw_pitch_cntrl */
-#if 0 /* NEARMISS 48.2% cat=stack-frame sub=- | target is a non-tail jal to GAMEUTIL_increase_pitch_limit_clip with frame 0x20 (p kept in s0, ra saved); ours sibcalls j with frame 0x30 (extra spills) | attempts=1 */
-f32 get_max_min_clip_base_pitch_nico_yaw_pitch_cntrl(f32 a, u8 *p)
+static inline f32 clip_pitch_inline(f32 a, f32 b, f32 c, u8 *p)
 {
     f32 r1;
     f32 r2;
 
-    r1 = func_40023F88(0.0f, p);
-    r2 = func_40023FC8(0.0f, p);
-    return GAMEUTIL_increase_pitch_limit_clip(a, 0.0f, r1, r2, 0, 0);
+    r1 = func_40023F88(c, p);
+    r2 = func_40023FC8(c, p);
+    return GAMEUTIL_increase_pitch_limit_clip(0, 0, a, b, r1, r2);
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0012_is_doing_nico_yaw_pitch_cntrl", get_max_min_clip_base_pitch_nico_yaw_pitch_cntrl);
+
+f32 get_max_min_clip_base_pitch_nico_yaw_pitch_cntrl(f32 a, u8 *p)
+{
+    return clip_pitch_inline(a, 0.0f, 0.0f, p);
+}
 
 f32 get_offset_yaw_nico_yaw_pitch_cntrl(u8 *p)
 {
