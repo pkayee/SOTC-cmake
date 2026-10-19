@@ -64,9 +64,74 @@ void UpdateGlobalLightAmbient(void *light, void *parameter)
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0106_GlobalLightCalcOutSideParam", UpdateGlobalLightDistant);
 
+/* NEARMISS-STUB IsEnvelopeDistantLightType */
+#if 0 /* NEARMISS 96.25% cat=cse-hoist sub=- | search loop: target recomputes found ptr l+(i<<6) (addu a0,a1) separately from the compare address; ours reuses it (move t0,a1) | attempts=1 */
+typedef struct {
+    u8 pad0[0x2C];
+    u32 flags;
+    s8 id;
+    u8 pad31[0xF];
+} DistantLight;
+
+static inline DistantLight *globalLightFindDistant(DistantLight *l, s32 id)
+{
+    DistantLight *d = 0;
+    s32 i;
+
+    for (i = 0; i < 3; i++) {
+        if (l[i].id == id) {
+            d = (DistantLight *)((u8 *)l + i * 0x40);
+            break;
+        }
+    }
+    return d;
+}
+
+s32 IsEnvelopeDistantLightType(DistantLight *l, u8 *prm)
+{
+    DistantLight *d = globalLightFindDistant(l, *(s32 *)(prm + 0x24));
+
+    if (d->flags & 0x20000) {
+        return 1;
+    }
+    return 0;
+}
+#endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0106_GlobalLightCalcOutSideParam", IsEnvelopeDistantLightType);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0106_GlobalLightCalcOutSideParam", globalLightCalcLightNum);
+s32 globalLightCalcLightNum(u8 *w, s32 type)
+{
+    s32 n = 4;
+
+    switch (type) {
+    case 0x19:
+        n = 3;
+        *(s32 *)(w + 0x110) |= 4;
+        *(s32 *)(w + 0x124) = *(s32 *)(w + 0x120) + 1;
+        break;
+    case 0x1A:
+        switch (*(s32 *)(w + 0x120)) {
+        case 0:
+            n = 0;
+            *(s32 *)(w + 0x110) |= 8;
+            break;
+        case 1:
+            n = 1;
+            *(s32 *)(w + 0x110) |= 0x10;
+            break;
+        case 2:
+            n = 2;
+            *(s32 *)(w + 0x110) |= 0x20;
+            break;
+        }
+        if (n != 4) {
+            *(s32 *)(w + 0x120) += 1;
+            *(s32 *)(w + 0x124) += 1;
+        }
+        break;
+    }
+    return n;
+}
 
 void CalcColorParamDistantLight(void *arg0)
 {
