@@ -206,6 +206,41 @@ void func_400617B0(u8 *p)
     *(float *)(p + 0x24) = *(float *)(p + 0x24) * (*(float *)(v + 0x74) * *(float *)(v + 0x14));
 }
 
+/* NEARMISS-STUB func_400617E0 */
+#if 0 /* NEARMISS 99.64% cat=sched sub=- | d2 r101: fields 4/C/10/14 are f32 0.0f (keeps the gcGlobalVar+0x178 lwc1 after them), a[0],a[1],a[2] source order gives target 8,0,4; left: target stores the s3 | attempts=1 */
+extern u8 gcGlobalVar[];
+extern void isysRequestDeleteObj(void *);
+
+void func_400617E0(s32 *a)
+{
+    u8 *o = (u8 *)a[3];
+    s32 save;
+    s32 i;
+    s32 *q;
+
+    if (a[0] != 0) {
+        a[0] = 0;
+        a[1] = 0;
+        a[2] = 0;
+    }
+    save = *(s32 *)(o + 8);
+    if (*(void **)(o + 0x6C) != 0) {
+        isysRequestDeleteObj(*(void **)(o + 0x6C));
+        *(void **)(o + 0x6C) = 0;
+    }
+    for (i = 0, q = (s32 *)(o + 0x1C); i < 4; i++, q += 4) {
+        if (*q != 0) {
+            return;
+        }
+    }
+    *(f32 *)(o + 4) = 0.0f;
+    *(s32 *)(o + 8) = save;
+    *(f32 *)(o + 0xC) = 0.0f;
+    *(f32 *)(o + 0x10) = 0.0f;
+    *(f32 *)(o + 0x14) = 0.0f;
+    *(f32 *)(o + 0x18) = *(f32 *)(gcGlobalVar + 0x178);
+}
+#endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0066_effectSetDamageWork", func_400617E0);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0066_effectSetDamageWork", func_40061888);
