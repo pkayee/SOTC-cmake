@@ -27,38 +27,29 @@ void gluCylinder(u64 a, u64 b, u64 c)
     _gluCylinder(b, c);
 }
 
-/* NEARMISS-STUB iosgluAddVertex4fv */
-#if 0 /* NEARMISS 50.7% cat=cse-hoist sub=- | ours CSEs count load before sq; target reloads count after vector store; ptr store scheduled late | attempts=1 */
 extern void *iosReallocAlign(void *ptn, void *oldUser, s32 size, s32 align);
+typedef union { f32 f[4]; u128 q; } GluV4;
+typedef struct { void *pool; s32 b; s32 n; GluV4 *v; } GluObj;
 
-void iosgluAddVertex4fv(u32 *param_1, u128 *param_2)
+void iosgluAddVertex4fv(GluObj *o, GluV4 *p)
 {
-    param_1[3] = (u32)iosReallocAlign((void *)param_1[0], (void *)param_1[3], param_1[2] * 16 + 16, 16);
-    *(u128 *)((u8 *)param_1[3] + param_1[2] * 16) = *param_2;
-    param_1[2] = param_1[2] + 1;
+    o->v = iosReallocAlign(o->pool, o->v, o->n * 16 + 16, 16);
+    o->v[o->n].q = p->q;
+    o->n++;
 }
-#endif
-INCLUDE_ASM("asm/DBGMGR.XFF/nonmatchings/chunk/c0008_DebugDispQuaternion", iosgluAddVertex4fv);
 
-/* NEARMISS-STUB iosgluAddVertex3f */
-#if 0 /* NEARMISS 75.3% cat=cse-hoist sub=- | ours CSEs param_4[2] count load across vector sq; target reloads count after sq; stores scheduled earlier | attempts=1 */
-extern void *iosReallocAlign(void *ptn, void *oldUser, s32 size, s32 align);
-
-void iosgluAddVertex3f(f32 x, f32 y, f32 z, u32 *param_4)
+void iosgluAddVertex3f(f32 x, f32 y, f32 z, GluObj *o)
 {
-    f32 v[4] = { x, y, z, 1.0f };
+    GluV4 t;
 
-    param_4[3] = (u32)iosReallocAlign((void *)param_4[0], (void *)param_4[3], param_4[2] * 16 + 16, 16);
-    *(u128 *)((u8 *)param_4[3] + param_4[2] * 16) = *(u128 *)v;
-    param_4[2] = param_4[2] + 1;
+    t.f[0] = x; t.f[1] = y; t.f[2] = z; t.f[3] = 1.0f;
+    o->v = iosReallocAlign(o->pool, o->v, o->n * 16 + 16, 16);
+    o->v[o->n].q = t.q;
+    o->n++;
 }
-#endif
-INCLUDE_ASM("asm/DBGMGR.XFF/nonmatchings/chunk/c0008_DebugDispQuaternion", iosgluAddVertex3f);
 
 INCLUDE_ASM("asm/DBGMGR.XFF/nonmatchings/chunk/c0008_DebugDispQuaternion", iosgluAddPrim);
 
-/* NEARMISS-STUB iosgluCreateObject */
-#if 0 /* NEARMISS 82.38% cat=struct-layout sub=- | target copies struct via a0 with ptr moved to a0 before ld ra; ours keeps ptr in v0, ld ra late | attempts=1 */
 typedef struct IosgluDefaultObj {
     s32 a;
     s32 b;
@@ -68,16 +59,15 @@ typedef struct IosgluDefaultObj {
 extern IosgluDefaultObj D_4001E078;
 extern void *iosMallocAlign(s32, s32, s32);
 
-void iosgluCreateObject(s32 param_1)
+IosgluDefaultObj *iosgluCreateObject(s32 param_1)
 {
     IosgluDefaultObj *p;
 
     p = iosMallocAlign(param_1, 0xc, 4);
     *p = D_4001E078;
     p->a = param_1;
+    return p;
 }
-#endif
-INCLUDE_ASM("asm/DBGMGR.XFF/nonmatchings/chunk/c0008_DebugDispQuaternion", iosgluCreateObject);
 //INCLUDE_ASM("asm/DBGMGR.XFF/nonmatchings/chunk/c0008_DebugDispQuaternion", iosgluDeleteObject);
 typedef struct IosgluEntry {
     s32 a;

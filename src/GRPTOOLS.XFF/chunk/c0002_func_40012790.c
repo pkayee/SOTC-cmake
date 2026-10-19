@@ -60,8 +60,6 @@ void func_40012820(void)
     }
 }
 
-/* NEARMISS-STUB func_40012890 */
-#if 0 /* NEARMISS 98.08% cat=regalloc sub=- | base ptr a1 vs loaded field v1 swapped | attempts=1 */
 void func_40012890(void)
 {
     u8 *base = D_40016174;
@@ -69,11 +67,9 @@ void func_40012890(void)
 
     if (p != NULL)
     {
-        func_40011F50(p);
+        func_40011F50(p, base);
     }
 }
-#endif
-INCLUDE_ASM("asm/GRPTOOLS.XFF/nonmatchings/chunk/c0002_func_40012790", func_40012890);
 
 //INCLUDE_ASM("asm/GRPTOOLS.XFF/nonmatchings/chunk/c0002_func_40012790", func_400128C8);
 u8 *func_400128C8(void)
@@ -273,8 +269,6 @@ s32 func_400137B8()
     return DebugDispGlobalLightClass(*(s32 *)(D_400166FC + 0xF8), 0, 3.0f);
 }
 
-/* NEARMISS-STUB func_400137E8 */
-#if 0 /* NEARMISS 98.08% cat=regalloc sub=- | base ptr a1 vs loaded field v1 swapped | attempts=1 */
 void func_400137E8(void)
 {
     u8 *base = D_400166FC;
@@ -282,11 +276,9 @@ void func_400137E8(void)
 
     if (p != NULL)
     {
-        func_40012E28(p);
+        func_40012E28(p, base);
     }
 }
-#endif
-INCLUDE_ASM("asm/GRPTOOLS.XFF/nonmatchings/chunk/c0002_func_40012790", func_400137E8);
 
 //INCLUDE_ASM("asm/GRPTOOLS.XFF/nonmatchings/chunk/c0002_func_40012790", func_40013820);
 u8 *func_40013820(void)

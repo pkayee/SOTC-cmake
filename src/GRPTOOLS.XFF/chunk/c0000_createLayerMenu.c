@@ -23,25 +23,15 @@ void func_40010A20(void)
 void func_40010A80(void) {
 }
 
-/* NEARMISS-STUB swordEffectTool */
-#if 0 /* NEARMISS 88.13% cat=regalloc sub=- | ret var lands in a1 and the cond value in v1 (target: cond in a1, ret built in v0 before bnez); if-return shape worse; 3 variants | attempts=1 */
 extern u8 D_40014948[];
 void createParamMenu(u8 *a0, s32 a1);
-
 u8 *swordEffectTool(void)
 {
     u8 *p = D_40014948;
-    u8 *ret = NULL;
-
-    if (*(s32 *)(p + 0x30) == 0)
-    {
-        createParamMenu(p, 0);
-        ret = p + 0x30;
-    }
-    return ret;
+    if (*(s32 *)(p + 0x30) != 0) return NULL;
+    createParamMenu(p, 0);
+    return p + 0x30;
 }
-#endif
-INCLUDE_ASM("asm/GRPTOOLS.XFF/nonmatchings/chunk/c0000_createLayerMenu", swordEffectTool);
 
 void changeFogParam();
 void refractionInit();
@@ -130,26 +120,17 @@ void func_40010C28(void) {
     SetEffectDebugLock(0);
 }
 
-/* NEARMISS-STUB fullScreenEffectTool */
-#if 0 /* NEARMISS 92.78% cat=regalloc sub=- | ret var lands in a0 instead of v0 and lui uses v1 not a0 (target zeroes v0 before bnez and computes s0+0x30 into v0); 3 variants tried | attempts=1 */
 extern u8 D_40015778[];
-void createParamMenu(u8 *a0, s32 a1);
 
 u8 *fullScreenEffectTool(void)
 {
     u8 *p = D_40015778;
-    u8 *ret = NULL;
 
-    if (*(s32 *)(p + 0x30) == 0)
-    {
-        SetEffectDebugLock(1);
-        createParamMenu(p, 0);
-        ret = p + 0x30;
-    }
-    return ret;
+    if (*(s32 *)(p + 0x30) != 0) return NULL;
+    SetEffectDebugLock(1);
+    createParamMenu(p, 0);
+    return p + 0x30;
 }
-#endif
-INCLUDE_ASM("asm/GRPTOOLS.XFF/nonmatchings/chunk/c0000_createLayerMenu", fullScreenEffectTool);
 
 INCLUDE_ASM("asm/GRPTOOLS.XFF/nonmatchings/chunk/c0000_createLayerMenu", func_40010C88);
 
@@ -176,9 +157,7 @@ void func_400115E0() {
     DebugDispFogColClass(*(u8 **)(D_40015818 + 0x98), 0, 3.0f);
 }
 
-/* NEARMISS-STUB func_40011610 */
-#if 0 /* NEARMISS 98.08% cat=regalloc sub=- | base and loaded value swapped: target keeps base in a1 and value in v1, ours base v1 value a1 (3 variants tried) | attempts=1 */
-void func_40010E68(u8 *a0);
+void func_40010E68(u8 *a0, u8 *a1);
 
 void func_40011610(void)
 {
@@ -189,11 +168,9 @@ void func_40011610(void)
     v = *(u8 **)(p + 0x98);
     if (v != NULL)
     {
-        func_40010E68(v);
+        func_40010E68(v, p);
     }
 }
-#endif
-INCLUDE_ASM("asm/GRPTOOLS.XFF/nonmatchings/chunk/c0000_createLayerMenu", func_40011610);
 
 //INCLUDE_ASM("asm/GRPTOOLS.XFF/nonmatchings/chunk/c0000_createLayerMenu", func_40011648);
 u8 *GetFogColMan(void);
@@ -272,8 +249,6 @@ u8 *func_40011738(void) {
     return D_40015818 + 0x84;
 }
 
-/* NEARMISS-STUB func_40011748 */
-#if 0 /* NEARMISS 90.0% cat=regalloc sub=GRPTOOLS-kF1 | store-sink+reg: target keeps s->A0=0 after if-join (ours sinks it into fallthrough), first ptr in v1 (ours v0), 2nd ptr loaded to a0 with beql epilogue | attempts=1 */
 void iosFree(void *p);
 
 void func_40011748(void) {
@@ -283,15 +258,13 @@ void func_40011748(void) {
     *(s32 *)(ctx + 0x94) = 0;
     if (p != NULL) {
         iosFree(p);
+        *(s32 *)(ctx + 0xA0) = 0;
     }
-    *(s32 *)(ctx + 0xA0) = 0;
     if (*(u8 **)(ctx + 0x9C) != NULL) {
         iosFree(*(u8 **)(ctx + 0x9C));
         *(s32 *)(ctx + 0x9C) = 0;
     }
 }
-#endif
-INCLUDE_ASM("asm/GRPTOOLS.XFF/nonmatchings/chunk/c0000_createLayerMenu", func_40011748);
 
 void func_40010C88(u8 *a0, s32 a1);
 
@@ -313,17 +286,16 @@ void func_400117A0(s32 a0, s32 a1)
     return;
 }
 
-/* NEARMISS-STUB func_40011818 */
-#if 0 /* NEARMISS 99.41% cat=regalloc sub=- | lw/bnez value in a0 (ours) vs a2 (target); base/flag order otherwise matches, tail j matches | attempts=1 */
-void func_40011818(void)
+extern u8 padManagerData[];
+void func_40010FC8();
+
+void func_40011818(void *a, void *b)
 {
     if ((*(s32 *)(padManagerData + 0x8) & 0x20) && (*(s32 *)(D_40015818 + 0x94) == 0))
     {
-        func_40010FC8();
+        func_40010FC8(a, b);
     }
 }
-#endif
-INCLUDE_ASM("asm/GRPTOOLS.XFF/nonmatchings/chunk/c0000_createLayerMenu", func_40011818);
 
 //INCLUDE_ASM("asm/GRPTOOLS.XFF/nonmatchings/chunk/c0000_createLayerMenu", func_40011860);
 u8 *func_40011860(void) {
