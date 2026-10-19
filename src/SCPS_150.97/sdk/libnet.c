@@ -126,6 +126,29 @@ typedef struct
     u8 pad38[0x184 - 0x38];
 } McpSysDesc;
 
+s32 func_0011DD60(s32, s32, void *, s32, s32);
+s32 _sceMcpFlushCache(s32);
+
+s32 _sceMcCoreReadClock(s32 port, McClock8 *out);
+s32 _sceMcCoreGetConnection(s32);
+s32 _sceMcpGetCardSpec();
+s32 _sceMcCoreBlockErase(s32, s32);
+
+extern char D_0015F200[];
+s32 _sceMcpReadUserClust(s32, s32, s32, s32);
+s32 _sceMcpWriteUserClust();
+typedef struct
+{
+    s32 w[0x80];
+} McDirEnt;
+
+s32 func_0011C9B0();
+
+static inline s32 BCD(u8 x)
+{
+    return (x >> 4) * 10 + (x & 0xF);
+}
+
 s32 CallRpc(void *cd, s32 cmd, void *buf, s32 ssize, s32 rsize)
 {
     s32 s0;
@@ -2243,7 +2266,36 @@ INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", _sceMcFatGetInfo);
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", _sceMcFatFormat);
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", _sceMcFatUnFormat);
+s32 _sceMcFatUnFormat(s32 port)
+{
+    s32 spec[4];
+    s32 n;
+    s32 i;
+
+    if (_sceMcCoreGetConnection(port) == 0)
+    {
+        return 0x81010013;
+    }
+    if (_sceMcpGetCardSpec(port, spec) == 0)
+    {
+        return 0x8101006F;
+    }
+    D_0015E0C8[port].unk894 = 0;
+    D_0015E0C8[port].unk800 = -1;
+    D_0015E0C8[port].unk804 = -1;
+    D_0015E0C8[port].unk890 = 0;
+    D_0015E0C8[port].unk88C = 0;
+    *(Str2 *)D_0015E0C8[port].unk808 = *(Str2 *)D_00138E08;
+    n = spec[2] / spec[1];
+    for (i = 0; i < n; i++)
+    {
+        if (_sceMcCoreBlockErase(port, i) == 0)
+        {
+            return 0x8101006F;
+        }
+    }
+    return 0;
+}
 
 /* NEARMISS-STUB func_0011D9E0 */
 #if 0 /* NEARMISS 95.6% cat=struct-layout sub=ee-gcc2.9-991111 | table D_0015E0C8 stride 0x898, fields +0x888/+0x88C: gcc2.9 folds +0x888 into %hi/%lo(D+0x888) and swaps addu operands; target keeps lui/addiu of D and addu a2, | attempts=1 */
@@ -2338,13 +2390,113 @@ INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_0011DAE8);
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_0011DD60);
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_0011E1B0);
+s32 func_0011E1B0(s32 port, void *src, s32 clust, s32 ent)
+{
+    s32 err = 0;
+    s32 ret = 0x8101006F;
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_0011E358);
+    for (;;)
+    {
+        if (ent < 2)
+        {
+            if (_sceMcpReadUserClust(port, (s32)D_0015F200, clust, 1) == 0)
+            {
+                return 0x8101006F;
+            }
+            *(McDirEnt *)(D_0015F200 + ent * 0x200) = *(McDirEnt *)src;
+            if (_sceMcpWriteUserClust(port, (s32)D_0015F200, clust, 1) != 0)
+            {
+                ret = 0;
+            }
+            return ret;
+        }
+        clust = func_0011C5C8(port, clust, &err);
+        if (err != 0)
+        {
+            return err;
+        }
+        if (clust == 0xFFFFFFFF)
+        {
+            return 0x8101006F;
+        }
+        clust &= 0x7FFFFFFF;
+        ent -= 2;
+    }
+}
+
+s32 func_0011E358(s32 port, s32 clust, s32 cnt, s32 *err)
+{
+    s32 n = 0;
+    s32 i;
+    char *p;
+
+    *err = 0;
+    for (;;)
+    {
+        if (_sceMcpReadUserClust(port, (s32)D_0015F200, clust, 1) == 0)
+        {
+            *err = 0x8101006F;
+            return -1;
+        }
+        i = 0;
+        p = D_0015F200;
+        do
+        {
+            cnt--;
+            if ((*(u16 *)p & 0x8000) == 0)
+            {
+                n++;
+            }
+            if (cnt == 0)
+            {
+                return i == 0 ? n + 1 : n;
+            }
+            i++;
+            p += 0x200;
+        } while (i < 2);
+        clust = func_0011C5C8(port, clust, err);
+        if (*err != 0)
+        {
+            return -1;
+        }
+        if (clust == 0xFFFFFFFF)
+        {
+            return n;
+        }
+        clust &= 0x7FFFFFFF;
+    }
+}
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_0011E488);
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", func_0011E958);
+s32 func_0011E958(s32 port, s32 clust, u8 *clk)
+{
+    u8 ent[0x200];
+    u8 par[0x200];
+    s32 ret;
+
+    ret = func_0011C9B0(port, par, clust, 0);
+    if (ret != 0)
+    {
+        return ret;
+    }
+    if (strcmp((char *)par + 0x40, D_00138DF0) != 0)
+    {
+        return 0x81019002;
+    }
+    ret = func_0011C9B0(port, ent, *(s32 *)(par + 0x10), *(s32 *)(par + 0x14));
+    if (ret != 0)
+    {
+        return ret;
+    }
+    *(u16 *)(ent + 0x1E) = 2000 + BCD(clk[7]);
+    ent[0x1D] = BCD(clk[6]);
+    ent[0x1C] = BCD(clk[5]);
+    ent[0x1B] = BCD(clk[3]);
+    ent[0x1A] = BCD(clk[2]);
+    ent[0x19] = BCD(clk[1]);
+    return func_0011E1B0(port, ent, *(s32 *)(par + 0x10), *(s32 *)(par + 0x14));
+}
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", _sceMcFatSearchFile);
 
@@ -2360,9 +2512,103 @@ INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", _sceMcFatChDir);
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", _sceMcFatGetDir);
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", _sceMcFatSetAttr);
+s32 _sceMcFatSetAttr(s32 port, s32 path, u16 attr)
+{
+    char buf[0x80];
+    u8 ent[0x200];
+    u8 clk[0x10];
+    s32 clust;
+    s32 idx;
+    s32 ret;
+    extern s32 func_0011DA88();
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", _sceMcFatRename);
+    ret = func_0011D9E0(port);
+    if (ret != 0)
+    {
+        return ret;
+    }
+    ret = func_0011DA88(port, path, buf);
+    if (ret != 0)
+    {
+        return ret;
+    }
+    ret = func_0011DD60(port, (s32)buf, ent, (s32)&clust, (s32)&idx);
+    if (ret != 0x81010011)
+    {
+        return ret;
+    }
+    if ((*(u16 *)ent & 0x20) == 0)
+    {
+        return 0x81010014;
+    }
+    *(u16 *)ent = (*(u16 *)ent & 0xE7F0) | (attr & 0x180F);
+    _sceMcCoreReadClock(port, (McClock8 *)clk);
+    *(u16 *)(ent + 0x1E) = 2000 + BCD(clk[7]);
+    ent[0x1D] = BCD(clk[6]);
+    ent[0x1C] = BCD(clk[5]);
+    ent[0x1B] = BCD(clk[3]);
+    ent[0x1A] = BCD(clk[2]);
+    ent[0x19] = BCD(clk[1]);
+    ret = func_0011E1B0(port, ent, clust, idx);
+    if (ret != 0)
+    {
+        return ret;
+    }
+    return _sceMcpFlushCache(port) != 0 ? 0 : 0x8101006F;
+}
+
+s32 _sceMcFatRename(s32 port, s32 oldPath, s32 newName)
+{
+    u8 ent[0x200];
+    char buf1[0x80];
+    char buf2[0x80];
+    s32 clust;
+    s32 idx;
+    s32 ret;
+    extern s32 func_0011DA88();
+
+    ret = func_0011D9E0(port);
+    if (ret != 0)
+    {
+        return ret;
+    }
+    ret = func_0011DA88(port, oldPath, buf1);
+    if (ret != 0)
+    {
+        return ret;
+    }
+    if (strchr((char *)newName, 0x2F) != 0)
+    {
+        return 0x81010016;
+    }
+    strcpy(buf2, buf1);
+    strcpy(strrchr(buf2, 0x2F) + 1, (char *)newName);
+    if (func_0011BCB8(newName) == 0)
+    {
+        return 0x81010016;
+    }
+    if (func_0011BC48((char *)newName) == 0)
+    {
+        return 0x8101005B;
+    }
+    ret = func_0011DD60(port, (s32)buf2, ent, (s32)&clust, (s32)&idx);
+    if (ret != 0x81010002)
+    {
+        return ret;
+    }
+    ret = func_0011DD60(port, (s32)buf1, ent, (s32)&clust, (s32)&idx);
+    if (ret != 0x81010011)
+    {
+        return ret;
+    }
+    strcpy((char *)ent + 0x40, (char *)newName);
+    ret = func_0011E1B0(port, ent, clust, idx);
+    if (ret != 0)
+    {
+        return ret;
+    }
+    return _sceMcpFlushCache(port) != 0 ? 0 : 0x8101006F;
+}
 
 /* NEARMISS-STUB _sceMcFatGetEntSpace */
 #if 0 /* NEARMISS 96.9% cat=call-abi sub=- | target calls func_0011DA88 with 3 args (a3 left as-is); callee is defined with 4 params so the prototype forbids the 3-arg call, best uses a 0 4th arg (addiu a3 | attempts=1 */
