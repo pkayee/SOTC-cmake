@@ -167,8 +167,181 @@ void func_400FF8F0(u8 *c) {
     sceIpuSync(0, 0);
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0208b_func_400FF4E8", func_400FF9B8);
+extern char D_401358B0[];
+extern char D_401358F0[];
+extern char D_40135930[];
+void scePrintf(char *, ...);
+s32 _sceMpegNextHeader(u8 *);
+s32 _sceMpegFlush(u8 *);
+s32 func_40100540(u8 *, s32, s32);
 
+s32 func_400FF9B8(u8 *m)
+{
+    u8 *c = *(u8 **)(m + 0x40);
+    s32 r = 0;
+    s32 h = 1;
+
+    *(s32 *)c = 0;
+    if (*(s32 *)(c + 0xEC) & 0x3F) {
+        _sceMpegError1(c, D_401358B0, *(s32 *)(c + 0xEC));
+        return -1;
+    }
+    if (*(s32 *)(c + 0x878) != 0) {
+        scePrintf(D_401358F0);
+        return -1;
+    }
+    *(s32 *)(c + 0x834) = 0;
+    do {
+        if (r != -1) {
+            do {
+                h = _sceMpegNextHeader(c);
+                if (h < 0) {
+                    return -1;
+                }
+            } while (h != 0 && *(s32 *)(c + 0x184) != *(s32 *)(c + 0xE8) && *(s32 *)(c + 0x858) != 0);
+        }
+        switch (h) {
+        case 0:
+            _sceMpegFlush(m);
+            *(s32 *)c = 1;
+            break;
+        case 1:
+            *(s32 *)(c + 0xBC) = 0;
+            *(s32 *)(c + 0xB8) = 0;
+            *(s32 *)(c + 0xB4) = 0;
+            r = func_40100540(m, *(s32 *)(c + 0xB4), *(s32 *)(c + 0xA8));
+            *(s32 *)(c + 0xB4) += 1;
+            break;
+        case 2:
+            r = func_40100540(m, *(s32 *)(c + 0xB8), *(s32 *)(c + 0xAC));
+            *(s32 *)(c + 0xB8) += 1;
+            break;
+        case 3:
+        case 4:
+            r = func_40100540(m, *(s32 *)(c + 0xBC), *(s32 *)(c + 0xB0));
+            *(s32 *)(c + 0xBC) += 1;
+            break;
+        }
+        if (*(s32 *)(c + 0x878) != 0) {
+            scePrintf(D_40135930);
+            return -1;
+        }
+        if (*(s32 *)(c + 0x834) != 0) {
+            return 1;
+        }
+    } while (*(s32 *)c == 0);
+    return 1;
+}
+
+/* NEARMISS-STUB func_400FFB70 */
+#if 0 /* NEARMISS 99.94% cat=sched sub=- | d2 r92: full body exact incl. if/else r=1/r=0 (gives the xori/movn) and the t/o regs (decl order t,p,r,o,lim); only left: target schedules o=0 before the xori a | attempts=1 */
+#define W208(p, o) (*(s32 *)((u8 *)(p) + (o)))
+#define P208(p, o) (*(u8 **)((u8 *)(p) + (o)))
+
+s32 func_400FFB70(u8 *c, s32 flag)
+{
+    s32 t = W208(c, 0x184);
+    s32 p = W208(c, 0x160);
+    s32 r = 0;
+    u8 *o = 0;
+    s32 lim = (t == 3) ? 2 : 4;
+
+    if (p == 3) {
+        W208(c, 0x1D0) = W208(c, 0x1D4);
+        W208(c, 0x1E0) = W208(c, 0x1E4);
+        W208(c, 0x1F0) = W208(c, 0x1F4);
+        if (W208(c, 0xB4) + W208(c, 0xB8) >= lim) {
+            W208(c, 0xFC) = 0;
+            W208(c, 0x1B8) = 0;
+            W208(c, 0x1B4) = 0;
+        }
+        if ((W208(c, 0xFC) != 0 || W208(c, 0x1B8) != 0) && W208(c, 0x1B4) == 0) {
+            W208(P208(c, 0x1C8), 0x28) = 0;
+            W208(P208(c, 0x1D8), 0x28) = 0;
+            W208(P208(c, 0x1E8), 0x28) = 0;
+            t = W208(c, 0x184);
+        }
+        W208(c, 0xFC) = 0;
+        W208(c, 0x1B8) = 0;
+        if (t == 3) {
+            if (W208(P208(c, 0x1C8), 0x28) == 1 || W208(c, 0x1B4) != 0) {
+                if (W208(P208(c, 0x1CC), 0x28) == 1) {
+                    r = 1;
+                } else {
+                    r = 0;
+                }
+            }
+        } else {
+            if ((W208(P208(c, 0x1D8), 0x28) == 1 && W208(P208(c, 0x1E8), 0x28) == 1) || W208(c, 0x1B4) != 0) {
+                if (W208(P208(c, 0x1DC), 0x28) == 1) {
+                    if (W208(P208(c, 0x1EC), 0x28) == 1) {
+                        r = 1;
+                    } else {
+                        r = 0;
+                    }
+                }
+            }
+        }
+    } else {
+        if (flag == 0) {
+            u8 *a;
+
+            a = P208(c, 0x1C8);
+            P208(c, 0x1C8) = P208(c, 0x1CC);
+            P208(c, 0x1CC) = a;
+            a = P208(c, 0x1D8);
+            P208(c, 0x1D8) = P208(c, 0x1DC);
+            P208(c, 0x1DC) = a;
+            a = P208(c, 0x1E8);
+            P208(c, 0x1E8) = P208(c, 0x1EC);
+            P208(c, 0x1EC) = a;
+        }
+        W208(c, 0x1D0) = W208(c, 0x1CC);
+        W208(c, 0x1E0) = W208(c, 0x1DC);
+        W208(c, 0x1F0) = W208(c, 0x1EC);
+        if (t == 3) {
+            if (p != 2 || W208(P208(c, 0x1C8), 0x28) == 1) {
+                r = 1;
+            }
+        } else {
+            u8 *q = (t == 1) ? P208(c, 0x1EC) : P208(c, 0x1DC);
+
+            if (p != 2 || (flag != 0 && W208(q, 0x28) == 1) || (W208(P208(c, 0x1D8), 0x28) == 1 && W208(P208(c, 0x1E8), 0x28) == 1)) {
+                r = 1;
+            }
+        }
+    }
+    switch (t) {
+    case 1:
+        o = P208(c, 0x1E0);
+        break;
+    case 2:
+        o = P208(c, 0x1F0);
+        break;
+    case 3:
+        o = P208(c, 0x1D0);
+        break;
+    }
+    W208(o, 0x28) = 0;
+    *(u64 *)(o + 0x18) = *(u64 *)(c + 0x838);
+    W208(o, 0x2C) = W208(c, 0x160);
+    *(u64 *)(o + 0x20) = *(u64 *)(c + 0x840);
+    W208(o, 0x30) = W208(c, 0x184);
+    W208(o, 0x34) = W208(c, 0x14C);
+    W208(o, 0x38) = W208(c, 0x198);
+    W208(o, 0x3C) = W208(c, 0x188);
+    W208(o, 0x40) = W208(c, 0x194);
+    W208(o, 0x44) = W208(c, 0x19C);
+    W208(o, 0x48) = W208(c, 0x1A0);
+    W208(o, 0x4C) = W208(c, 0x1A4);
+    W208(o, 0x50) = W208(c, 0x1A8);
+    W208(o, 0x54) = W208(c, 0x1AC);
+    W208(o, 0x58) = W208(c, 0x1B0);
+    W208(o, 0x5C) = W208(c, 0x158);
+    W208(o, 0x60) = W208(c, 0x15C);
+    return r;
+}
+#endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0208b_func_400FF4E8", func_400FFB70);
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0208b_func_400FF4E8", func_400FFE28);

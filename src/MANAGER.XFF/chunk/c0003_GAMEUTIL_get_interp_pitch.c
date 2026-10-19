@@ -114,11 +114,121 @@ f32 GAMEUTIL_get_interp_pitch(f32 a, f32 b, f32 t)
     return incPitch(NULL, 0, a, t * (b - a), 1.4835296f, -1.4835296f);
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0003_GAMEUTIL_get_interp_pitch", GAMEUTIL_act_yaw_rot_region_check);
+void iosApplyRotMatrix();
+void iosRotMatrixY(void *, f32);
+s32 GAMEUTIL_is_yaw_dir_inside_of_region(u128 *, u128 *, u128 *, s32, f32);
+s32 GAMEUTIL_is_yaw_dir_sandwich(u128 *, u128 *, u128 *);
+f32 GAMEUTIL_get_difference_radi_yaw_dir(u128 *, u128 *);
+s32 GAMEUTIL_get_rot_dir_for_near_to_aim_yaw_dir(f32, s32, u128 *, u128 *);
+
+static inline s32 actYawRot003(f32 yaw, u128 *out, u128 *in, u128 *m) {
+
+    if (nearZero(yaw, 0.0001f) == 1) {
+        *out = *in;
+        return 0;
+    }
+    iosRotMatrixY(m, yaw);
+    iosApplyRotMatrix(out, m, in);
+    return 1;
+}
+
+s32 GAMEUTIL_act_yaw_rot_region_check(f32 yaw, u128 *out, u128 *in, f32 range, s32 p4, s32 clip)
+{
+    u128 org[1];
+    u128 a[1];
+    u128 b[1];
+    u128 m[4];
+    s32 r;
+
+    org[0] = *in;
+    r = actYawRot003(yaw, out, org, m);
+
+    if (r == 1) {
+        if (GAMEUTIL_is_yaw_dir_inside_of_region(a, b, org, p4, range) == 1) {
+            if (GAMEUTIL_is_yaw_dir_sandwich(a, org, out) == 1) {
+                *out = a[0];
+            } else if (GAMEUTIL_is_yaw_dir_sandwich(b, org, out) == 1) {
+                *out = b[0];
+            }
+        } else {
+            u128 *best;
+            s32 d;
+            f32 da = GAMEUTIL_get_difference_radi_yaw_dir(org, a);
+            f32 db = GAMEUTIL_get_difference_radi_yaw_dir(org, b);
+
+            if (da < db) {
+                m[0] = a[0];
+            } else {
+                m[0] = b[0];
+            }
+            best = m;
+            d = GAMEUTIL_get_rot_dir_for_near_to_aim_yaw_dir(0.0f, 0, org, best);
+            if ((d == 1 && yaw < 0.0f) || (d == -1 && 0.0f < yaw)) {
+                *out = org[0];
+                r = 0;
+            } else if (clip != 0 && GAMEUTIL_is_yaw_dir_sandwich(best, org, out) == 1) {
+                *out = m[0];
+            }
+        }
+    }
+    return r;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0003_GAMEUTIL_get_interp_pitch", GAMEUTIL_act_pitch_rot);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0003_GAMEUTIL_get_interp_pitch", GAMEUTIL_act_pitch_rot_limit_clip);
+s32 GAMEUTIL_act_pitch_rot(f32 *v, f32 d);
+f32 iosGetACosfExact(f32);
+void iosRotMatrixX(void *, f32);
+void iosApplyRotMatrix();
+
+s32 GAMEUTIL_act_pitch_rot_limit_clip(f32 *v, f32 d, f32 max, f32 min)
+{
+    u128 m[4];
+    f32 z = 0.0f;
+    s32 r = GAMEUTIL_act_pitch_rot(v, d);
+    f32 p = iosGetACosfExact(v[2]);
+
+    if (v[1] < z) {
+        p = -p;
+    }
+    if (1.4835296f < p) {
+        p = 1.4835296f;
+    } else if (p < -1.4835296f) {
+        p = -1.4835296f;
+    }
+    if (max < p) {
+        f32 t = max;
+
+        if (nearZero(t, 0.0001f) == 1) {
+            *(u128 *)v = ZUnitVector;
+        } else {
+            if (1.4835296f < t) {
+                t = 1.4835296f;
+            } else if (t < -1.4835296f) {
+                t = -1.4835296f;
+            }
+            iosRotMatrixX(m, -t);
+            iosApplyRotMatrix(v, m, &ZUnitVector);
+        }
+        r = 1;
+    } else if (p < min) {
+        f32 t = min;
+
+        if (nearZero(t, 0.0001f) == 1) {
+            *(u128 *)v = ZUnitVector;
+        } else {
+            if (1.4835296f < t) {
+                t = 1.4835296f;
+            } else if (t < -1.4835296f) {
+                t = -1.4835296f;
+            }
+            iosRotMatrixX(m, -t);
+            iosApplyRotMatrix(v, m, &ZUnitVector);
+        }
+        r = 1;
+    }
+    return r;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0003_GAMEUTIL_get_interp_pitch", GAMEUTIL_get_rot_dir_for_near_to_aim_yaw_dir);
 

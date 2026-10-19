@@ -73,7 +73,7 @@ void shadowDraw(void);
 void bgEnd(void);
 s32 *getFogMode(void);
 void zFog(void);
-void drawBlur(void);
+void drawBlur(s32);
 void drawCameraBlur(s32, f32);
 void screenBrightness(s32);
 void drawFrontFog(void);
@@ -182,8 +182,6 @@ void glResetWithLayerNo(s32 layer) {
     iosDlPopLayer();
 }
 
-/* NEARMISS-STUB graphFrameFinish */
-#if 0 /* NEARMISS 98.94% cat=regalloc sub=blur-a0 | blur value: target keeps D_40129C70 in a0 (lw a0; blez a0; bgez a0; negu v0,a0), ours v0 + extra reload/bgezl; local var for the value did not change it | attempts=1 */
 void graphFrameFinish(void) {
     s32 blur;
 
@@ -201,7 +199,7 @@ void graphFrameFinish(void) {
             }
             blur = D_40129C70;
             if (blur > 0) {
-                drawBlur();
+                drawBlur(blur);
             } else if (blur < 0) {
                 D_40129C70 = -blur;
             }
@@ -217,8 +215,6 @@ void graphFrameFinish(void) {
         iosDlPopLayer();
     }
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0017_gluSetWrapMode", graphFrameFinish);
 
 void LockFullScreenEffect(void) {
     D_40129DF8 = 1;

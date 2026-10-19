@@ -50,6 +50,44 @@ static inline unsigned char *dldElem(unsigned int *lp) {
                : 0;
 }
 
+/* NEARMISS-STUB EntryObjectManagerCollisionGroup */
+#if 0 /* NEARMISS 87.46% cat=branch-layout sub=- | d2 r92 (REA pseudo): body exact; loop.c still reverses i (li 15 countdown) although the target keeps i up with slti 0x10 in fp. Indexed flags/grp give 85.6, u32 | attempts=2 */
+extern u8 *D_4012B040;
+extern void *GetLayoutClass(void *);
+extern void isysAddGroupRelativeWithLinkParam(void *, void *, int *, int, int, int);
+
+void EntryObjectManagerCollisionGroup(void *obj, u8 *desc)
+{
+    u32 i;
+    u8 *g = D_4012B040 + 0x60;
+
+    *(s32 *)(*(u8 **)((u8 *)GetLayoutClass(obj) + 0x174) + 0x20) = *(s32 *)(desc + 0xC);
+    for (i = 0; i < 16; i++) {
+        u8 *grp = g + i * 4 + 4;
+
+        if (((s32 *)(desc + 0x10))[i] != 0) {
+            s32 done = 0;
+            int o = 0;
+            int *it;
+    
+            for (it = isysGroupForFirst(grp, 0); it != 0; it = isysGroupForNext(it, 0)) {
+                o = *it;
+                if (*(s32 *)(*(u8 **)((u8 *)GetLayoutClass((void *)o) + 0x174) + 0x20) >= *(s32 *)(desc + 0xC)) {
+                    isysAddGroupRelativeWithLinkParam(obj, grp, it, 0, 0, 0);
+                    done = 1;
+                    break;
+                }
+            }
+            if (o != 0) {
+                isysGroupForExit(o, 0);
+            }
+            if (!done) {
+                isysAddGroupWithLinkParam(obj, grp, 0, 0);
+            }
+        }
+    }
+}
+#endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0114_EntryObjectManagerCollisionGroup", EntryObjectManagerCollisionGroup);
 
 void EntryInterestGroup(int base, void *obj, unsigned int *lp)
