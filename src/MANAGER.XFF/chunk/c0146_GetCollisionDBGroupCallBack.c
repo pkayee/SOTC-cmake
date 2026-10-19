@@ -133,6 +133,51 @@ s32 CollisionObjectJudgeCallbackExceptPluralObj(s32 obj, s32 *list)
     return 1;
 }
 
+/* NEARMISS-STUB CollisionObjectJudgeCallbackExceptDescendPluralObj */
+#if 0 /* NEARMISS 95.75% cat=regalloc sub=- | control flow matches with a static inline (target!=0 && p!=0 guard + do-while, if(cls==NULL) p=0 else ...); only cls lands in v1 (+move a0) where the target kee | attempts=1 */
+static inline s32 collisionJudgeNotDescend(s32 p, s32 target)
+{
+    u8 *cls;
+
+    if (target != 0 && p != 0)
+    {
+        do
+        {
+            if (p == target)
+            {
+                return 0;
+            }
+            cls = GetLayoutClass(p);
+            if (cls == NULL)
+            {
+                p = 0;
+            }
+            else
+            {
+                p = *(s32 *)(cls + 0x194);
+                if (p == 0)
+                {
+                    p = (s32)GetLayoutParentObj(cls);
+                }
+            }
+        } while (p != 0);
+    }
+    return 1;
+}
+s32 CollisionObjectJudgeCallbackExceptDescendPluralObj(s32 obj, s32 *list)
+{
+    s32 i;
+
+    for (i = 0; i < list[0]; i++)
+    {
+        if (!collisionJudgeNotDescend(obj, list[i + 1]))
+        {
+            return 0;
+        }
+    }
+    return 1;
+}
+#endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0146_GetCollisionDBGroupCallBack", CollisionObjectJudgeCallbackExceptDescendPluralObj);
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0146_GetCollisionDBGroupCallBack", DebugDispCollisionDBColor);
@@ -162,11 +207,118 @@ void *getCollisionVirtualWallDispFlag(void)
     return D_4012B334;
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0146_GetCollisionDBGroupCallBack", func_400BB870);
+typedef struct
+{
+    s32 idx : 31;
+    s32 leaf : 1;
+} CollTreeChild;
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0146_GetCollisionDBGroupCallBack", func_400BB998);
+typedef struct
+{
+    s32 axis;
+    float split;
+    CollTreeChild child[2];
+} CollTreeNode;
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0146_GetCollisionDBGroupCallBack", func_400BBAC8);
+void func_400BB870(float *pos, u8 *tree, s32 idx, void (*cb)(u8 *q, u8 *tree, s32 idx), u8 *q)
+{
+    CollTreeNode *n = &(*(CollTreeNode **)(tree + 8))[idx];
+    float r = pos[3];
+    float p = pos[n->axis];
+
+    if (p <= n->split * *(float *)(q + 0x10) + r)
+    {
+        if (n->child[0].leaf)
+        {
+            cb(q, tree, n->child[0].idx);
+        }
+        else
+        {
+            func_400BB870(pos, tree, n->child[0].idx, cb, q);
+        }
+    }
+    if (n->split * *(float *)(q + 0x10) - r <= p)
+    {
+        if (n->child[1].leaf)
+        {
+            cb(q, tree, n->child[1].idx);
+        }
+        else
+        {
+            func_400BB870(pos, tree, n->child[1].idx, cb, q);
+        }
+    }
+}
+
+typedef struct
+{
+    float split;
+    u32 axis : 2;
+    u32 left : 14;
+    u32 leftLeaf : 1;
+    u32 right : 14;
+    u32 rightLeaf : 1;
+} CollTreeNode2;
+
+void func_400BB998(float *pos, u8 *tree, s32 idx, void (*cb)(u8 *q, u8 *tree, s32 idx), u8 *q)
+{
+    CollTreeNode2 *n = &(*(CollTreeNode2 **)(tree + 8))[idx];
+    float r = pos[3];
+    float p = pos[n->axis];
+
+    if (p <= n->split * *(float *)(q + 0x10) + r)
+    {
+        if (n->leftLeaf)
+        {
+            cb(q, tree, n->left);
+        }
+        else
+        {
+            func_400BB998(pos, tree, n->left, cb, q);
+        }
+    }
+    if (n->split * *(float *)(q + 0x10) - r <= p)
+    {
+        if (n->rightLeaf)
+        {
+            cb(q, tree, n->right);
+        }
+        else
+        {
+            func_400BB998(pos, tree, n->right, cb, q);
+        }
+    }
+}
+
+void func_400BBAC8(float *pos, u8 *tree, s32 idx, void (*cb)(u8 *q, u8 *tree, s32 idx), u8 *q)
+{
+    CollTreeNode2 *n = &(*(CollTreeNode2 **)(tree + 8))[idx];
+    float r = pos[3];
+    float p = pos[n->axis];
+
+    if (p <= n->split * *(float *)(q + 0x10) + r)
+    {
+        if (n->leftLeaf)
+        {
+            cb(q, tree, n->left);
+        }
+        else
+        {
+            func_400BBAC8(pos, tree, n->left, cb, q);
+        }
+    }
+    if (n->split * *(float *)(q + 0x10) - r <= p)
+    {
+        if (n->rightLeaf)
+        {
+            cb(q, tree, n->right);
+        }
+        else
+        {
+            func_400BBAC8(pos, tree, n->right, cb, q);
+        }
+    }
+}
 
 s32 GetColMultiDepVtxInfoVertexNormal(void *arg0, void *arg1)
 {
