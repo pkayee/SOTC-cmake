@@ -69,8 +69,6 @@ found:
     D_4012BB4C = 1;
     return r->f[11];
 }
-/* NEARMISS-STUB mcGetMainDataInfo */
-#if 0 /* NEARMISS 94.62% cat=sched sub=- | family shape (EXPECT-GUARD wait loop) matches; left: after iosStartThread the target schedules li v1,cmd before lui v0,%hi(D_4012BB38) and both lui before the B | attempts=1 */
 extern s32 rootPtn;
 extern float D_401B1740;
 void func_400DBD38(void);
@@ -80,6 +78,7 @@ s32 mcGetMainDataInfo(s32 a, s32 b, s32 c)
     McReq *r;
     McReq *p;
     s32 i;
+    s32 cmd;
     void (*fn)(void);
 
     i = 0;
@@ -101,8 +100,9 @@ found:
     D_401B1740 = 0.1f;
     D_4012BB4C = 0;
     iosStartThread(iosCreateThreadS(func_400DBD38, 0, &rootPtn, 0x1000, 0x2F, 0), 0);
+    cmd = 2;
     D_4012BB38 = 0;
-    r->f[0] = 2;
+    r->f[0] = cmd;
     iosSendMsg(D_401B16A0, r, 1);
     if (__builtin_expect(r->f[0], 0)) {
         fn = D_401B1744;
@@ -114,8 +114,7 @@ found:
     D_4012BB4C = 1;
     return r->f[11];
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0173_mcManager", mcGetMainDataInfo);
+
 
 s32 mcSaveGameData(s32 a, s32 b, s32 c, s32 d, s32 e)
 {
@@ -277,17 +276,12 @@ found:
     return r->f[11];
 }
 
-/* NEARMISS-STUB mcFormat */
-#if 0 /* NEARMISS 94.26% cat=sched sub=- | family shape (EXPECT-GUARD wait loop) matches; left: after iosStartThread the target schedules li v1,cmd before lui v0,%hi(D_4012BB38) and both lui before the B | attempts=1 */
-extern s32 rootPtn;
-extern float D_401B1740;
-void func_400DBD38(void);
-void iosStartThread(void *, s32);
 s32 mcFormat(s32 a, s32 b)
 {
     McReq *r;
     McReq *p;
     s32 i;
+    s32 cmd;
     void (*fn)(void);
 
     i = 0;
@@ -308,8 +302,9 @@ found:
     D_401B1740 = 17.0f;
     D_4012BB4C = 0;
     iosStartThread(iosCreateThreadS(func_400DBD38, 0, &rootPtn, 0x1000, 0x2F, 0), 0);
+    cmd = 7;
     D_4012BB38 = 0;
-    r->f[0] = 7;
+    r->f[0] = cmd;
     iosSendMsg(D_401B16A0, r, 1);
     if (__builtin_expect(r->f[0], 0)) {
         fn = D_401B1744;
@@ -321,8 +316,7 @@ found:
     D_4012BB4C = 1;
     return r->f[11];
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0173_mcManager", mcFormat);
+
 
 s32 mcUnformat(s32 a, s32 b)
 {
@@ -563,33 +557,32 @@ found:
     return r->f[11];
 }
 
-/* NEARMISS-STUB mcGetLastSaveGameDataIndex */
-#if 0 /* NEARMISS 86.65625% cat=branch-layout sub=- | loop tail/early return layout and -1 test reg differ; arg copy/const order | attempts=1 */
-extern s64 *D_4012BB3C;
+typedef struct { u8 pad0[0xC]; s32 state; u8 pad10[0x30]; s64 id; u8 pad48[0x50]; } McSlot173;
 
 s32 mcGetLastSaveGameDataIndex(u8 *arg0)
 {
     s32 i;
-    u8 *p;
+    s32 r;
+    McSlot173 *s;
 
     if (D_4012BB3C != 0) {
+        s = (McSlot173 *)(arg0 + 0xD8);
         i = 0;
-        p = arg0 + 0xD8;
         do {
-            if (*(s32 *)(p + 0xC) == 1 && *D_4012BB3C == *(s64 *)(p + 0x40)) {
+            if (s[i].state == 1 && *D_4012BB3C == s[i].id) {
                 return i;
             }
             i++;
-            p += 0x98;
         } while (i < 10);
     }
     if (*(s32 *)(arg0 + 0x4C) != 0) {
-        return *(s32 *)(arg0 + 0x50);
+        r = *(s32 *)(arg0 + 0x50);
+    } else {
+        r = -1;
     }
-    return -1;
+    return r;
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0173_mcManager", mcGetLastSaveGameDataIndex);
+
 
 extern int D_4012BB40;
 

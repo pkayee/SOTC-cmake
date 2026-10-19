@@ -125,7 +125,7 @@ s32 is_reach_src_value_double_spring_interp_cntrl(f32 v, s32 *c)
 }
 
 /* NEARMISS-STUB constructor_double_spring_interp_cntrl3D */
-#if 0 /* NEARMISS 99.5% cat=regalloc sub=- | loop address temps: ours puts off+p2 in a1 and off+p3 in v0 (expected a1=off+p3, v0=off+p2); stores/setup match; decl order and store order tried | attempts=1 */
+#if 0 /* NEARMISS 99.75% cat=sched sub=- | d2 r84: loop stores in source order p1,p2,p3 give the target regs (a1=p3 addr) but store order p1,p2,p3 vs target p1,p3,[delay]p2; p1/p2/p3 assign x store x dec | attempts=2 */
 void constructor_double_spring_interp_cntrl3D(f32 v1, f32 v2, s32 *c)
 {
     s32 i;
@@ -138,8 +138,8 @@ void constructor_double_spring_interp_cntrl3D(f32 v1, f32 v2, s32 *c)
     p3 = &c[12];
     for (i = 0; i < 3; i++) {
         p1[i] = 0;
-        p3[i] = 0;
         p2[i] = 0;
+        p3[i] = 0;
     }
     set_param_double_spring_interp_common((f32 *)c, 2.0f, -1.0f, 1.0f, -1.0f);
     ((f32 *)c)[4] = v1;

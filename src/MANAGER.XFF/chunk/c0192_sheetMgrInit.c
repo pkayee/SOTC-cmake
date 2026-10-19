@@ -521,6 +521,58 @@ void sheetMgrStageTexUnload(int a, int b, int c, int *done)
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0192_sheetMgrInit", sheetMgrAdpcmIntLoad);
 
+/* NEARMISS-STUB sheetMgrDirectFileLoad */
+#if 0 /* NEARMISS 99.81% cat=regalloc sub=- | d2 r84: -da greg: param a (pseudo 84) is 1 insn longer-lived than b/c/d because sched1 puts the WaitSema a0 load (insn 33) between the a and b copies, so a gets | attempts=1 */
+static inline SheetReq192 *sheetGetReqEmptyDF192(void) /* inline helper */
+{
+    extern void iosJumpRecoverPoint(const char *, int);
+    SheetReq192 *s = D_401B8FF8.head;
+    SheetReq192 *r;
+
+    if (s != 0) {
+        D_401B8FF8.head = s->next;
+        if (D_401B8FF8.head == 0)
+            D_401B8FF8.tail = 0;
+    }
+    r = s;
+    if (r == 0)
+        ((void (*)(const char *))iosJumpRecoverPoint)(D_40135310);
+    return r;
+}
+
+static inline void sheetPostDFL192(int a, int b, int c, int d, int k, int *done) /* inline helper */
+{
+    SheetReq192 *r;
+    SheetReqList192 *q;
+
+    r = sheetGetReqEmptyDF192();
+    r->type = 8;
+    r->a10 = a;
+    r->flags = r->flags & ~1;
+    r->a14 = b;
+    r->a18 = c;
+    r->a1C = d;
+    q = &D_401B9000[k];
+    r->done = done;
+    if (done != 0)
+        *done = 0xdead;
+    r->next = 0;
+    if (q->tail != 0) {
+        q->tail->next = r;
+        q->tail = r;
+    } else {
+        q->tail = r;
+        q->head = r;
+    }
+}
+
+void sheetMgrDirectFileLoad(int a, int b, int c, int d, int *done)
+{
+    WaitSema(D_401B53F4);
+    sheetPostDFL192(a, b, c, d, 0, done);
+    SignalSema(D_401B53F4);
+}
+#endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0192_sheetMgrInit", sheetMgrDirectFileLoad);
 
 /* sheetMgrAllReqWait: 100 in scratch (rea-c0192). Posts one request: WaitSema, pop the free list D_401B8FF8 through a COPY of head, fill the request, push on queue D_401B9000[k] (k is a helper PARAMETER so gcc keeps the unfolded lui/addiu/addiu), SignalSema. THE trick for the last 4 percent: the push is written with the tail store duplicated in both arms, and in the empty-queue arm the tail store comes BEFORE the head store (tail = r; head = r). WaitSema/SignalSema must be declared int (eekernel.h), void shifts the lui register. Request type 10 on queue 4. */
