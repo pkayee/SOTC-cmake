@@ -1,8 +1,7 @@
 #include "common.h"
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0182_doit_camera_view_angle_cntrl", doit_camera_view_angle_cntrl);
-/* NEARMISS-STUB doit_camera_view_angle_cntrl */
-#if 0 /* NEARMISS 75.2% cat=regalloc sub=- | s3/s0 allocation, ctx+0x13D0 slot | attempts=1 */
+/* doit_camera_view_angle_cntrl(cam, ctx, mode, value): per-frame view-angle spring step; cam+0 / cam+0x20 = double-spring interp objects (cam+0x1C = current angle, cam+0x3C = scale), ctx+0x13D0 = slot holding the current camera-param block (+0x174/0x178/0x17C = spring params), mode 1 = reset to the lws-anime angle; the func_400EB278 call is duplicated per branch (not hoisted) and the clamp is if / else if (else-if gives the tail jump on both) */
 u8 *get_cur_using_lws_anime_mode_base_class(u8 *ctx);
 s32 is_view_angle_exist_lws_anime_mode_base(u8 *work);
 f32 func_400EB278(s32 mode, u8 *obj, void *p);
@@ -11,9 +10,22 @@ void reset_double_spring_interp_cntrl(u8 *obj, f32 value);
 void set_param_double_spring_interp_common(u8 *obj, f32 a, f32 b, f32 c, f32 d);
 void doit_double_spring_interp_cntrl(u8 *obj, f32 x, s32 zero, f32 value);
 
+typedef struct { u128 pos; u128 dir; u128 up; } CamSet;
+void *get_camera_position(s32 obj);
+void *get_camera_direction(s32 obj);
+void *get_camera_up_direction(s32 obj);
+void doit_game_camera(u8 *gcam, u8 *cam, f32 value);
+
+typedef union {
+    u128 q;
+    s32 i;
+} CamW;
+f32 get_view_angle(s32 clip);
+
 void doit_camera_view_angle_cntrl(u8 *cam, u8 *ctx, s32 mode, f32 value)
 {
     u8 *base;
+    u8 *slot = ctx + 0x13D0;
     u8 *cc;
     s32 exist;
     f32 f20;
@@ -25,16 +37,16 @@ void doit_camera_view_angle_cntrl(u8 *cam, u8 *ctx, s32 mode, f32 value)
     {
         exist = is_view_angle_exist_lws_anime_mode_base(base);
     }
-    f21 = func_400EB278(exist, ctx + 0x13D0, base);
     if (mode == 1)
     {
-        reset_double_spring_interp_cntrl(cam, f21);
+        reset_double_spring_interp_cntrl(cam, func_400EB278(exist, slot, base));
         reset_double_spring_interp_cntrl(cam + 0x20, 1.0f);
     }
     else
     {
+        f21 = func_400EB278(exist, slot, base);
         f20 = func_400EB2A8(exist, ctx, base);
-        cc = *(u8 **)(ctx + 0x13D0);
+        cc = *(u8 **)slot;
         if (exist == 1)
         {
             set_param_double_spring_interp_common(cam + 0x20, *(f32 *)(cc + 0x174), *(f32 *)(cc + 0x17C), *(f32 *)(cc + 0x178), -1.0f);
@@ -51,15 +63,12 @@ void doit_camera_view_angle_cntrl(u8 *cam, u8 *ctx, s32 mode, f32 value)
     if (*(f32 *)(cam + 0x1C) < 1.0f)
     {
         reset_double_spring_interp_cntrl(cam, 1.0f);
-        return;
     }
-    if (179.0f < *(f32 *)(cam + 0x1C))
+    else if (179.0f < *(f32 *)(cam + 0x1C))
     {
         reset_double_spring_interp_cntrl(cam, 179.0f);
     }
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0182_doit_camera_view_angle_cntrl", doit_camera_view_angle_cntrl);
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0182_doit_camera_view_angle_cntrl", constructor_camera_view_angle_cntrl);
 void constructor_double_spring_interp_cntrl(u8 *obj, f32 value);
@@ -419,22 +428,14 @@ void set_camera_parameter_and_update_cameraman(f32 value, s32 *cam, s32 unused, 
 }
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0182_doit_camera_view_angle_cntrl", get_camera_parameter_cameraman);
-/* NEARMISS-STUB get_camera_parameter_cameraman */
-#if 0 /* NEARMISS 78.4% cat=sched sub=- | sq placement vs jal delay slot | attempts=1 */
-void *get_camera_position(s32 obj);
-void *get_camera_direction(s32 obj);
-void *get_camera_up_direction(s32 obj);
-f32 get_view_angle(s32 clip);
-
-void get_camera_parameter_cameraman(u128 *pos, u128 *dir, u128 *up, f32 *angle, s32 *cam)
+/* get_camera_parameter_cameraman(pos, dir, up, angle, cam): copies the three 16-byte camera vectors and the view angle out of the cameraman (cam->i = camera obj handle). pos/dir/up/cam share one union type so the cam load stays after the sq stores (alias set, T38 family) */
+void get_camera_parameter_cameraman(CamW *pos, CamW *dir, CamW *up, f32 *angle, CamW *cam)
 {
-    *pos = *(u128 *)get_camera_position(*cam);
-    *dir = *(u128 *)get_camera_direction(*cam);
-    *up = *(u128 *)get_camera_up_direction(*cam);
-    *angle = get_view_angle(get_clip_screen(*cam));
+    pos->q = *(u128 *)get_camera_position(cam->i);
+    dir->q = *(u128 *)get_camera_direction(cam->i);
+    up->q = *(u128 *)get_camera_up_direction(cam->i);
+    *angle = get_view_angle(get_clip_screen(cam->i));
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0182_doit_camera_view_angle_cntrl", get_camera_parameter_cameraman);
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0182_doit_camera_view_angle_cntrl", check_free_cameraman);
 void isysRequestDeleteObj(void *obj);
@@ -489,19 +490,18 @@ void func_400EBA38(void) {
 void func_400EBA40(void) {
 }
 
-/* NEARMISS-STUB func_400EBA48 */
-#if 0 /* NEARMISS 100.0% cat=no-c-form sub=-dead-copy | scores 100 only with u128 locals that force dead 16-byte copies: a codegen trick, not original-looking C; human ruling: not accepted | attempts=1 */
-void func_400EBA48(f32 value, u8 *cam)
+/* func_400EBA48(cam, value): per-frame game-camera step; cam+0 = camera obj handle, cam+0x20 = game camera. The three get_camera_* vectors are copied into a dead 3 x 16-byte stack set (sq to 0x0/0x10/0x20 of sp): an AGGREGATE local keeps the stores (scalar u128 locals are deleted), no volatile */
+void func_400EBA48(u8 *cam, f32 value)
 {
     s32 obj = *(s32 *)cam;
-    u128 pos = *(u128 *)get_camera_position(obj);
-    u128 dir = *(u128 *)get_camera_direction(obj);
-    u128 up = *(u128 *)get_camera_up_direction(obj);
+    CamSet cs;
+
+    cs.pos = *(u128 *)get_camera_position(obj);
+    cs.dir = *(u128 *)get_camera_direction(obj);
+    cs.up = *(u128 *)get_camera_up_direction(obj);
 
     doit_game_camera(cam + 0x20, cam, value);
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0182_doit_camera_view_angle_cntrl", func_400EBA48);
 
 void func_400EBAC0(void) {
 }
