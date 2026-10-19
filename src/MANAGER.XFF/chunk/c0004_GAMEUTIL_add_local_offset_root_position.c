@@ -1,5 +1,45 @@
 #include "common.h"
 
+s32 GAMEUTIL_is_between_yaw_and_yaw_extend_abs(f32 yaw, f32 a, f32 lo, f32 hi);
+
+f32 GAMEUTIL_get_difference_yaw_and_yaw(f32 yaw1, f32 yaw2);
+
+static inline s32 yawBetween(f32 value, f32 min, f32 max)
+{
+    f32 d = min - max;
+    s32 wrap = 0;
+    s32 ret;
+
+    if ((d < 0.0f) ? (d < -3.1415926f) : (3.1415926f < d))
+    {
+        wrap = 1;
+    }
+    if ((min <= value && value <= max) || (max <= value && value <= min))
+    {
+        ret = wrap == 0;
+    }
+    else
+    {
+        ret = wrap != 0;
+    }
+    return ret;
+}
+
+static inline f32 yawDiff(f32 yaw1, f32 yaw2)
+{
+    f32 diff = yaw2 - yaw1;
+
+    if (diff < 0.0f)
+    {
+        diff = -diff;
+    }
+    if (3.1415926f < diff)
+    {
+        diff = 6.2831852f - diff;
+    }
+    return diff;
+}
+
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0004_GAMEUTIL_add_local_offset_root_position", GAMEUTIL_add_local_offset_root_position);
 
 u8 *GetLayoutClass(void *chara);
@@ -342,25 +382,75 @@ f32 GAMEUTIL_increase_yaw(s32 *moved, f32 yaw, f32 delta)
     return y;
 }
 
-s32 GAMEUTIL_increase_yaw_limit_extend();
+f32 GAMEUTIL_increase_yaw_limit_extend(s32 *moved, s32 min_clip, s32 max_clip, s32 mode, f32 yaw, f32 delta, f32 lo, f32 hi);
 
-s32 GAMEUTIL_increase_yaw_limit(void *a0, void *a1)
+f32 GAMEUTIL_increase_yaw_limit(s32 *a0, s32 a1, f32 yaw, f32 delta, f32 lo, f32 hi)
 {
-    return GAMEUTIL_increase_yaw_limit_extend(a0, 1, 1, a1);
+    return GAMEUTIL_increase_yaw_limit_extend(a0, 1, 1, a1, yaw, delta, lo, hi);
 }
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0004_GAMEUTIL_add_local_offset_root_position", GAMEUTIL_increase_yaw_region);
 
-s32 GAMEUTIL_increase_yaw_limit_clip_extend();
+f32 GAMEUTIL_increase_yaw_limit_clip_extend(s32 *moved, s32 min_clip, s32 max_clip, s32 mode, f32 yaw, f32 delta, f32 lo, f32 hi);
 
-s32 GAMEUTIL_increase_yaw_limit_clip(void *a0, void *a1)
+f32 GAMEUTIL_increase_yaw_limit_clip(s32 *a0, s32 a1, f32 yaw, f32 delta, f32 lo, f32 hi)
 {
-    return GAMEUTIL_increase_yaw_limit_clip_extend(a0, 1, 1, a1);
+    return GAMEUTIL_increase_yaw_limit_clip_extend(a0, 1, 1, a1, yaw, delta, lo, hi);
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0004_GAMEUTIL_add_local_offset_root_position", GAMEUTIL_increase_yaw_limit_clip_extend);
+f32 GAMEUTIL_increase_yaw_limit_clip_extend(s32 *out, s32 min_clip, s32 max_clip, s32 mode, f32 yaw, f32 delta, f32 lo, f32 hi)
+{
+    s32 moved = 0;
+    f32 r = GAMEUTIL_increase_yaw_limit_extend(&moved, min_clip, max_clip, mode, yaw, delta, lo, hi);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0004_GAMEUTIL_add_local_offset_root_position", GAMEUTIL_get_limit_clip_yaw_abs);
+    if (GAMEUTIL_is_between_yaw_and_yaw(r, lo, hi) == 0)
+    {
+        f32 d1 = GAMEUTIL_get_difference_yaw_and_yaw(r, lo);
+        f32 d2 = GAMEUTIL_get_difference_yaw_and_yaw(r, hi);
+
+        if (d1 <= d2)
+        {
+            if (min_clip == 1)
+            {
+                moved = 1;
+                r = lo;
+            }
+        }
+        else if (max_clip == 1)
+        {
+            moved = 1;
+            r = hi;
+        }
+    }
+    if (out != NULL)
+    {
+        *out = moved;
+    }
+    return r;
+}
+
+f32 GAMEUTIL_get_limit_clip_yaw_abs(f32 yaw, f32 a, f32 lo, f32 hi, s32 *clipped)
+{
+    s32 flag = 0;
+    f32 ret = yaw;
+
+    if (GAMEUTIL_is_between_yaw_and_yaw_extend_abs(yaw, a, lo, hi) == 0)
+    {
+        f32 r = GAMEUTIL_get_move_radi_from_yaw1_to_yaw2(a, yaw);
+
+        ret = lo;
+        if (!(0.0f <= r))
+        {
+            ret = hi;
+        }
+        flag = 1;
+    }
+    if (clipped != NULL)
+    {
+        *clipped = flag;
+    }
+    return ret;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0004_GAMEUTIL_add_local_offset_root_position", GAMEUTIL_increase_pitch);
 
@@ -382,7 +472,32 @@ f32 GAMEUTIL_get_difference_yaw_and_yaw(f32 yaw1, f32 yaw2)
     return diff;
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0004_GAMEUTIL_add_local_offset_root_position", GAMEUTIL_get_difference_yaw_and_yaw_extend);
+f32 GAMEUTIL_get_difference_yaw_and_yaw_extend(s32 *out, s32 mode, f32 yaw1, f32 yaw2, f32 test)
+{
+    s32 flag = 1;
+    f32 d = yawDiff(yaw1, yaw2);
+
+    if (mode == 1 && GAMEUTIL_is_between_yaw_and_yaw(test, yaw1, yaw2) == 0)
+    {
+        f32 a = yawDiff(yaw1, test);
+        f32 b = yawDiff(yaw2, test);
+
+        if (b < a)
+        {
+            a = b;
+        }
+        if (3.1415923f < d + a)
+        {
+            flag = 0;
+            d = 6.2831846f - d;
+        }
+    }
+    if (out != NULL)
+    {
+        *out = flag;
+    }
+    return d;
+}
 
 f32 GAMEUTIL_get_difference_pitch_and_pitch(f32 pitch1, f32 pitch2)
 {
@@ -427,9 +542,35 @@ f32 GAMEUTIL_get_move_radi_from_pitch1_to_pitch2(f32 pitch1, f32 pitch2)
     return pitch2 - pitch1;
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0004_GAMEUTIL_add_local_offset_root_position", GAMEUTIL_is_between_yaw_and_yaw);
+s32 GAMEUTIL_is_between_yaw_and_yaw(f32 value, f32 min, f32 max)
+{
+    f32 d = min - max;
+    s32 wrap = 0;
+    s32 ret;
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0004_GAMEUTIL_add_local_offset_root_position", GAMEUTIL_is_between_yaw_and_yaw_extend_abs);
+    if ((d < 0.0f) ? (d < -3.1415926f) : (3.1415926f < d))
+    {
+        wrap = 1;
+    }
+    if ((min <= value && value <= max) || (max <= value && value <= min))
+    {
+        ret = wrap == 0;
+    }
+    else
+    {
+        ret = wrap != 0;
+    }
+    return ret;
+}
+
+s32 GAMEUTIL_is_between_yaw_and_yaw_extend_abs(f32 value, f32 min, f32 max1, f32 max2)
+{
+    if (yawBetween(value, min, max1) == 1 || yawBetween(value, min, max2) == 1)
+    {
+        return 1;
+    }
+    return 0;
+}
 
 s32 GAMEUTIL_is_between_pitch_and_pitch(f32 value, f32 min, f32 max)
 {
@@ -440,4 +581,30 @@ s32 GAMEUTIL_is_between_pitch_and_pitch(f32 value, f32 min, f32 max)
     return 0;
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0004_GAMEUTIL_add_local_offset_root_position", GAMEUTIL_is_inside_of_region_yaw);
+s32 GAMEUTIL_is_inside_of_region_yaw(f32 value, f32 center, f32 width, f32 *out_lo, f32 *out_hi)
+{
+    f32 half = width * 0.5f;
+    f32 lo = center;
+    f32 hi;
+    f32 neg;
+
+    if (is_nearly_zero(half, 0.0001f) == 0)
+    {
+        lo = func_4001C350(center + half);
+    }
+    neg = -half;
+    hi = center;
+    if (is_nearly_zero(neg, 0.0001f) == 0)
+    {
+        hi = func_4001C350(center + neg);
+    }
+    if (out_lo != NULL)
+    {
+        *out_lo = lo;
+    }
+    if (out_hi != NULL)
+    {
+        *out_hi = hi;
+    }
+    return yawBetween(value, lo, hi);
+}
