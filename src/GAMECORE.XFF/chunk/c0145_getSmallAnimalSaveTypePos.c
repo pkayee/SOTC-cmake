@@ -68,7 +68,50 @@ void setSObjNodeLock(void *arg0, int arg1)
     (*(int *)((char *)(arg0) + 0x54)) = arg1;
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0145_getSmallAnimalSaveTypePos", deleteRequestSObjNode);
+extern s32 func_400C49A0(void *, void *, s32);
+
+typedef struct {
+    u8 pad0[0x10];
+    s32 n;
+    s32 head;
+    s32 tail;
+} SObjReqEnt;
+
+typedef struct {
+    s32 num;
+    SObjReqEnt ent[20];
+    s32 pad234;
+    s32 n;
+    s32 head;
+    s32 tail;
+} SObjReqSet;
+
+s32 deleteRequestSObjNode(s32 id)
+{
+    SObjReqSet *m = (SObjReqSet *)D_402177F0;
+    s32 j, i;
+    s32 node;
+    SObjReqEnt *e;
+
+    for (j = 0; j < m->num; j++) {
+        for (i = 0; i < m->num; i++) {
+            e = &m->ent[i];
+            for (node = e->head; node != 0; node = *(s32 *)(node + 0x58)) {
+                if (id == *(s32 *)node) {
+                    func_400C49A0(m, &e->n, node);
+                    return 1;
+                }
+            }
+        }
+    }
+    for (node = m->head; node != 0; node = *(s32 *)(node + 0x58)) {
+        if (id == *(s32 *)node) {
+            func_400C49A0(m, &m->n, node);
+            return 1;
+        }
+    }
+    return 0;
+}
 
 extern void iosGetClock(void *);
 extern long iosGetClockSecond(void *);
@@ -123,6 +166,76 @@ char *getNearInterestSmallAnimal(void *a, void *b)
     return 0;
 }
 
+/* NEARMISS-STUB func_400C49A0 */
+#if 0 /* NEARMISS 90.32% cat=regalloc sub=- | static inline list remove (found var, do/while) + append, ALL-s32 list fields (u8* fields 82.4: n load hoisted above pointer stores); left: return 0 for node==0 | attempts=1 */
+typedef struct {
+    s32 n;
+    s32 head;
+    s32 tail;
+} SObjList;
+
+#define SOBJ_NEXT(p) (*(s32 *)((p) + 0x58))
+
+extern void func_400C2A98(void *);
+
+static inline s32 sobjListRemove(SObjList *l, s32 node)
+{
+    s32 p;
+    s32 prev;
+    s32 found;
+
+    if (l->head == 0) {
+        found = 0;
+    } else {
+        prev = 0;
+        p = l->head;
+        do {
+            if (p == node) {
+                if (prev != 0)
+                    SOBJ_NEXT(prev) = SOBJ_NEXT(node);
+                if (l->head == node)
+                    l->head = SOBJ_NEXT(node);
+                if (l->tail == node)
+                    l->tail = prev;
+                l->n--;
+                found = 1;
+                goto done;
+            }
+            prev = p;
+            p = SOBJ_NEXT(p);
+        } while (p != 0);
+        found = 0;
+    }
+done:
+    return found;
+}
+
+static inline void sobjListAppend(SObjList *l, s32 node)
+{
+    if (node != 0) {
+        if (l->tail != 0)
+            SOBJ_NEXT(l->tail) = node;
+        else
+            l->head = node;
+        SOBJ_NEXT(node) = 0;
+        l->tail = node;
+        l->n++;
+    }
+}
+
+s32 func_400C49A0(u8 *m, SObjList *l, s32 node)
+{
+    if (node == 0)
+        return 0;
+    if (sobjListRemove(l, node)) {
+        func_400C2A98((void *)node);
+        sobjListAppend((SObjList *)(m + 0x244), node);
+        func_400C4AE0((void *)node);
+        return 1;
+    }
+    return 0;
+}
+#endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0145_getSmallAnimalSaveTypePos", func_400C49A0);
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0145_getSmallAnimalSaveTypePos", func_400C4A98);
@@ -153,8 +266,6 @@ void func_400C4AE0(void *arg0)
     h[0x50 / 2] = m;
     h[0x52 / 2] = m;
 }
-/* NEARMISS-STUB func_400C4B08 */
-#if 0 /* NEARMISS 98.09% cat=regalloc sub=- | target: m=&D_40216E10 in s1, loop copy daddu s4,s1 for the in-loop flag store; ours re-forms lui s4/%lo; all-m form 80.6, inline loop helper 80.6 | attempts=1 */
 s32 func_400C41E0(void *, void *, s32);
 
 void func_400C4B08(s32 *w)
@@ -168,13 +279,12 @@ void func_400C4B08(s32 *w)
         return;
     for (i = *w - 1; i >= 0; i--) {
         if (func_400C41E0(w, (char *)w + i * 0x1C + 0x14, 1) != 0) {
-            *(s32 *)(D_40216E10 + 0x13C8) = 1;
+            char *g = D_40216E10;
+            *(s32 *)(g + 0x13C8) = 1;
             return;
         }
     }
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0145_getSmallAnimalSaveTypePos", func_400C4B08);
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0145_getSmallAnimalSaveTypePos", func_400C4BC0);
 extern char SH_SmallAnimalTypeDEFAULT[];
