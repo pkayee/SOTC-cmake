@@ -1,5 +1,26 @@
 #include "common.h"
 
+s32 GAMEUTIL_check_and_get_normalize_vector(f32 *in, s32 flag, f32 *out);
+
+f32 func_40023CF0(s32 *out, u8 *buf, f32 a, f32 b, f32 c, f32 d, f32 e, f32 f, f32 g);
+
+extern u8 gcGlobalVar[];
+f32 GAMEUTIL_get_dist_ratio(f32 a, f32 b, f32 c);
+f32 GAMEUTIL_update_and_get_move_angle(u8 *buf, f32 a, f32 b);
+
+f32 GAMEUTIL_increase_yaw_limit_clip(s32 e, s32 f, f32 a, f32 b, f32 c, f32 d);
+
+f32 func_40023E40(f32 v, u8 *p);
+
+f32 func_40023EE8(f32 v, u8 *p);
+f32 GAMEUTIL_increase_yaw(s32 kind, f32 a, f32 b);
+
+s32 is_enable_base_pitch_rot_nico_yaw_pitch_cntrl(u8 *p);
+f32 func_40024218(f32 a, f32 b, f32 c, u8 *p);
+
+s32 is_enable_base_yaw_rot_nico_yaw_pitch_cntrl(u8 *p);
+f32 func_40024298(f32 a, f32 b, f32 c, u8 *p);
+
 s32 is_doing_nico_yaw_pitch_cntrl(u8 *p)
 {
     return *(s32 *)(p + 0x2C);
@@ -19,10 +40,8 @@ void update_offset_yaw_pitch_another_factor_nico_yaw_pitch_cntrl(f32 a, f32 b, u
     *(f32 *)(p + 0x50) = GAMEUTIL_get_move_radi_from_pitch1_to_pitch2(*(f32 *)(p + 0x68), b);
 }
 
-f32 func_40024298(f32 a, f32 b, f32 c);
 
-/* NEARMISS-STUB update_base_yaw_nico_yaw_pitch_cntrl */
-#if 0 /* NEARMISS 91.0% cat=regalloc sub=- | in-TU: target copies v into f13 before mtc1 zero/bne, ours in delay slot; param-order and truthy-if variants no better | attempts=2 */
+// c0012 REA: tail call arg order. func_40024298 declared (f32,f32,f32,u8 *p) with the pointer LAST in the call; p first = 95.9.
 f32 update_base_yaw_nico_yaw_pitch_cntrl(f32 v, u8 *p)
 {
     f32 base;
@@ -30,42 +49,58 @@ f32 update_base_yaw_nico_yaw_pitch_cntrl(f32 v, u8 *p)
 
     if (is_enable_base_yaw_rot_nico_yaw_pitch_cntrl(p) == 1) {
         base = *(f32 *)(p + 0x5C);
-        nb = func_40024298(base, v, base);
+        nb = func_40024298(base, v, base, p);
         *(f32 *)(p + 0x5C) = nb;
         return GAMEUTIL_get_move_radi_from_yaw1_to_yaw2(base, nb);
     }
     return 0.0f;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0012_is_doing_nico_yaw_pitch_cntrl", update_base_yaw_nico_yaw_pitch_cntrl);
 
-f32 func_40024218(f32 a, f32 b, f32 c);
 
-/* NEARMISS-STUB update_base_pitch_nico_yaw_pitch_cntrl */
-#if 0 /* NEARMISS 91.0% cat=regalloc sub=- | in-TU: target copies v into f13 before is_enable bne, keeps v in f20 across call; ours copies in delay slot; same as yaw | attempts=2 */
 f32 update_base_pitch_nico_yaw_pitch_cntrl(f32 v, u8 *p)
 {
     f32 base;
     f32 nb;
-    f32 tv;
 
-    tv = v;
     if (is_enable_base_pitch_rot_nico_yaw_pitch_cntrl(p) == 1) {
         base = *(f32 *)(p + 0x68);
-        nb = func_40024218(base, tv, base);
+        nb = func_40024218(base, v, base, p);
         *(f32 *)(p + 0x68) = nb;
         return GAMEUTIL_get_move_radi_from_pitch1_to_pitch2(base, nb);
     }
     return 0.0f;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0012_is_doing_nico_yaw_pitch_cntrl", update_base_pitch_nico_yaw_pitch_cntrl);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0012_is_doing_nico_yaw_pitch_cntrl", get_max_min_clip_base_yaw_nico_yaw_pitch_cntrl);
+// c0012 REA: result in a local r and returned gives jal + common epilogue; a direct return of the call tail-calls with j (74).
+f32 get_max_min_clip_base_yaw_nico_yaw_pitch_cntrl(f32 a, u8 *p)
+{
+    f32 v;
+    f32 r1;
+    f32 r2;
+    f32 r;
+
+    v = *(f32 *)(p + 0x110);
+    if (*(s32 *)(p + 0x104) == 1) {
+        if (*(s32 *)(p + 0x108) == 1) {
+            r1 = func_40023E40(v, p);
+        } else {
+            r1 = GAMEUTIL_increase_yaw(0, v, *(f32 *)(p + 0x128));
+        }
+        if (*(s32 *)(p + 0x10C) == 1) {
+            r2 = func_40023EE8(v, p);
+        } else {
+            r2 = GAMEUTIL_increase_yaw(0, *(f32 *)(p + 0x110), *(f32 *)(p + 0x12C));
+        }
+        r = GAMEUTIL_increase_yaw_limit_clip(0, 0, a, 0.0f, r1, r2);
+    } else {
+        r = GAMEUTIL_increase_yaw(0, a, 0.0f);
+    }
+    return r;
+}
 
 f32 func_40023F88(f32 v, u8 *p);
 f32 func_40023FC8(f32 v, u8 *p);
-f32 GAMEUTIL_increase_pitch_limit_clip(f32 a, f32 b, f32 c, f32 d, s32 e, s32 f);
+f32 GAMEUTIL_increase_pitch_limit_clip(s32 e, s32 f, f32 a, f32 b, f32 c, f32 d);
 
 /* NEARMISS-STUB get_max_min_clip_base_pitch_nico_yaw_pitch_cntrl */
 #if 0 /* NEARMISS 48.2% cat=stack-frame sub=- | target is a non-tail jal to GAMEUTIL_increase_pitch_limit_clip with frame 0x20 (p kept in s0, ra saved); ours sibcalls j with frame 0x30 (extra spills) | attempts=1 */
@@ -131,8 +166,8 @@ f32 get_base_pitch_nico_yaw_pitch_cntrl(u8 *p)
     return *(f32 *)(p + 0x68);
 }
 
-f32 GAMEUTIL_increase_yaw(s32 kind, f32 value);
-f32 GAMEUTIL_increase_yaw_limit_clip_extend(f32 a, f32 b, f32 c, f32 d, s32 e, s32 f, s32 g, s32 h);
+f32 GAMEUTIL_increase_yaw(s32 kind, f32 a, f32 b);
+f32 GAMEUTIL_increase_yaw_limit_clip_extend(f32 a, f32 b, f32 c, s32 e, s32 f, s32 g, s32 h, f32 d);
 
 /* NEARMISS-STUB get_merge_yaw_nico_yaw_pitch_cntrl */
 #if 0 /* NEARMISS 69.2% cat=branch-layout sub=- | target branches on a2 (flag materialised in a2 via delay-slot a2=0) then reloads p+0x10C for the tail call; ours folds the flag into xori/sltiu (bool trick), an | attempts=1 */
@@ -171,7 +206,42 @@ void *func_40023920(s32 *p)
     return memset(p + 1, 0, 0x28);
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0012_is_doing_nico_yaw_pitch_cntrl", func_40023948);
+void func_40023948(f32 *outA, f32 *outB, f32 x, f32 y)
+{
+    f32 v[4];
+    f32 m;
+
+    v[0] = x;
+    v[1] = y;
+    v[2] = 0.0f;
+    v[3] = 0.0f;
+    if (GAMEUTIL_check_and_get_normalize_vector(v, 0, v) == 1) {
+        m = v[0] < 0.0f ? -v[0] : v[0];
+        if (m < (v[1] < 0.0f ? -v[1] : v[1])) {
+            m = v[1] < 0.0f ? -v[1] : v[1];
+        }
+        m = 1.0f / m;
+        *outA = m * x;
+        *outB = m * y;
+        if (*outA < 0.0f ? *outA < -1.0f : 1.0f < *outA) {
+            if (0.0f <= *outA) {
+                *outA = 1.0f;
+            } else {
+                *outA = -1.0f;
+            }
+        }
+        if (*outB < 0.0f ? *outB < -1.0f : 1.0f < *outB) {
+            if (0.0f <= *outB) {
+                *outB = 1.0f;
+            } else {
+                *outB = -1.0f;
+            }
+        }
+    } else {
+        *outA = x;
+        *outB = y;
+    }
+}
 
 /* NEARMISS-STUB func_40023B28 */
 #if 0 /* NEARMISS 89.4% cat=branch-layout sub=- | loop shape ok; regs swapped (target: count in v1, loop counter a1, ptr v0); a-store placement and b-store duplication in blezl slot differ | attempts=1 */
@@ -235,24 +305,105 @@ void func_40023B88(f32 *avg1, f32 *avg2, u8 *p)
 #endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0012_is_doing_nico_yaw_pitch_cntrl", func_40023B88);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0012_is_doing_nico_yaw_pitch_cntrl", func_40023BF0);
+void func_40023BF0(f32 v, u8 *p)
+{
+    f32 lo;
+    f32 hi;
+    f32 r;
+    f32 x;
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0012_is_doing_nico_yaw_pitch_cntrl", func_40023CF0);
+    x = *(f32 *)(p + 0x68);
+    hi = *(f32 *)(p + 0xAC);
+    lo = *(f32 *)(p + 0xA8);
+    if (*(f32 *)(p + 0x120) < x + lo) {
+        lo = *(f32 *)(p + 0x120) - x;
+        if (lo < 0.0f) {
+            lo = 0.0f;
+        }
+    }
+    if (x + hi < *(f32 *)(p + 0x124)) {
+        hi = *(f32 *)(p + 0x124) - x;
+        if (0.0f < hi) {
+            hi = 0.0f;
+        }
+    }
+    r = func_40023CF0((s32 *)(p + 0x4C), p + 0xB0, *(f32 *)(p + 0x74), *(f32 *)(p + 0x78), v, *(f32 *)(p + 0x50), *(f32 *)(p + 0xA4), lo, hi);
+    *(s32 *)(p + 0x48) = 0;
+    *(f32 *)(p + 0x50) = r;
+    *(s32 *)(p + 0x44) = 0;
+    if (lo - 0.017453292f <= r) {
+        *(s32 *)(p + 0x44) = 1;
+    } else if (r <= hi + 0.017453292f) {
+        *(s32 *)(p + 0x48) = 1;
+    }
+}
+
+f32 func_40023CF0(s32 *out, u8 *buf, f32 a, f32 b, f32 c, f32 d, f32 e, f32 f, f32 g)
+{
+    f32 ratio;
+    f32 t;
+    f32 diff;
+    f32 fc;
+
+    fc = c;
+    if (c < 0.0f) {
+        fc = -c;
+    }
+    ratio = GAMEUTIL_get_dist_ratio(fc, a, b);
+    if (0.0f <= c) {
+        if (f <= e) {
+            t = f;
+        } else {
+            t = e + ratio * (f - e);
+        }
+    } else {
+        if (e <= g) {
+            t = g;
+        } else {
+            t = e + ratio * (g - e);
+        }
+    }
+    diff = t - d;
+    if (diff < 0.0f ? (-0.0017453289f < diff) : (diff < 0.0017453289f)) {
+        *out = 0;
+    } else {
+        if (0.0f < diff) {
+            *out = 1;
+        } else {
+            *out = -1;
+        }
+    }
+    return d + GAMEUTIL_update_and_get_move_angle(buf, diff, *(f32 *)(gcGlobalVar + 0x180));
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0012_is_doing_nico_yaw_pitch_cntrl", func_40023E40);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0012_is_doing_nico_yaw_pitch_cntrl", func_40023EE8);
+// c0012 REA: GAMEUTIL_increase_yaw_limit_clip declared ints first (s32,s32,f32 x4); floats first = 86.5. flag = 0.0f <= radi as an expression.
+f32 func_40023EE8(f32 v, u8 *p)
+{
+    if (*(s32 *)(p + 0x10C) == 1) {
+        s32 flag;
+        f32 radi;
 
-f32 GAMEUTIL_increase_pitch_limit_clip(f32 a, f32 b, f32 c, f32 d, s32 e, s32 f);
+        radi = GAMEUTIL_get_move_radi_from_yaw1_to_yaw2(*(f32 *)(p + 0x110), v);
+        flag = 0.0f <= radi;
+        if (flag == 0) {
+            return GAMEUTIL_increase_yaw_limit_clip(0, 0, *(f32 *)(p + 0x118), -*(f32 *)(p + 0x84), *(f32 *)(p + 0x118), v);
+        }
+    }
+    return GAMEUTIL_increase_yaw(0, *(f32 *)(p + 0x118), -*(f32 *)(p + 0x84));
+}
+
+f32 GAMEUTIL_increase_pitch_limit_clip(s32 e, s32 f, f32 a, f32 b, f32 c, f32 d);
 
 f32 func_40023F88(f32 v, u8 *p)
 {
-    return GAMEUTIL_increase_pitch_limit_clip(*(f32 *)(p + 0x120), -*(f32 *)(p + 0xA8), 1.483529567718505859375f, v, 0, 0);
+    return GAMEUTIL_increase_pitch_limit_clip(0, 0, *(f32 *)(p + 0x120), -*(f32 *)(p + 0xA8), 1.483529567718505859375f, v);
 }
 
 f32 func_40023FC8(f32 v, u8 *p)
 {
-    return GAMEUTIL_increase_pitch_limit_clip(*(f32 *)(p + 0x124), -*(f32 *)(p + 0xAC), v, -1.483529567718505859375f, 0, 0);
+    return GAMEUTIL_increase_pitch_limit_clip(0, 0, *(f32 *)(p + 0x124), -*(f32 *)(p + 0xAC), v, -1.483529567718505859375f);
 }
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0012_is_doing_nico_yaw_pitch_cntrl", func_40024008);
@@ -272,6 +423,33 @@ f32 func_400241A0(f32 x, f32 y, f32 z, s32 i0, s32 i1, s32 i2, s32 i3)
     return 0.0f;
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0012_is_doing_nico_yaw_pitch_cntrl", func_40024218);
+f32 func_40024218(f32 a, f32 b, f32 c, u8 *p)
+{
+    f32 r1;
+    f32 r2;
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0012_is_doing_nico_yaw_pitch_cntrl", func_40024298);
+    r1 = func_40023F88(c, p);
+    r2 = func_40023FC8(c, p);
+    return GAMEUTIL_increase_pitch_limit_clip(0, 0, a, b, r1, r2);
+}
+
+f32 func_40024298(f32 a, f32 b, f32 c, u8 *p)
+{
+    f32 r1;
+    f32 r2;
+
+    if (*(s32 *)(p + 0x104) == 1) {
+        if (*(s32 *)(p + 0x108) == 1) {
+            r1 = func_40023E40(c, p);
+        } else {
+            r1 = GAMEUTIL_increase_yaw(0, *(f32 *)(p + 0x110), *(f32 *)(p + 0x128));
+        }
+        if (*(s32 *)(p + 0x10C) == 1) {
+            r2 = func_40023EE8(c, p);
+        } else {
+            r2 = GAMEUTIL_increase_yaw(0, *(f32 *)(p + 0x110), *(f32 *)(p + 0x12C));
+        }
+        return GAMEUTIL_increase_yaw_limit_clip(0, 0, a, b, r1, r2);
+    }
+    return GAMEUTIL_increase_yaw(0, a, b);
+}
