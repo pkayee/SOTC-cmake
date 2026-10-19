@@ -139,24 +139,20 @@ void func_400C4A98(void *arg0)
     } while (i >= 0);
 }
 
-/* NEARMISS-STUB func_400C4AE0 */
-#if 0 /* NEARMISS 86.5% cat=branch-layout sub=- | store order: target sh 0x50 in jr delay slot; ours hoists it after first store (scheduler); one -1 reg matches | attempts=1 */
 void func_400C4AE0(void *arg0)
 {
     int m = -1;
     int *p = (int *)arg0;
     short *h = (short *)arg0;
     p[0] = 0;
-    h[0x52 / 2] = m;
     p[1] = 0;
     p[2] = 0;
     p[3] = m;
     p[4] = 0;
     p[0x15] = 0;
     h[0x50 / 2] = m;
+    h[0x52 / 2] = m;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0145_getSmallAnimalSaveTypePos", func_400C4AE0);
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0145_getSmallAnimalSaveTypePos", func_400C4B08);
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0145_getSmallAnimalSaveTypePos", func_400C4BC0);

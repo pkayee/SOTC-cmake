@@ -505,7 +505,33 @@ void func_400418F0(s32 a0)
     }
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0039_stagemanager_createsubthread", func_400419B8);
+static inline void loadstagecoreSub(void *a, s32 n, s32 c, s32 sub, s32 d)
+{
+    s32 *sh;
+    u8 *s;
+    s32 st;
+
+    sh = (DldSysUndefSymbol != (s32)SH_StageDataDEFAULT) ? (s32 *)SH_StageDataDEFAULT : 0;
+    s = (sh != 0) ? (u8 *)sh[4] + n * 20 : 0;
+    if (++*(u16 *)(s + 0x10) == 1)
+    {
+        sheetMgrLoadSegmentIndex(SH_StageDataDEFAULT, n, &st);
+        sheetMgrNopSegmentIndex(0);
+        while ((u32)(st - 0xDEAF) >= 2)
+        {
+            scrRun();
+        }
+        if (st != 0xDEB0)
+        {
+            initstage(a, n, c, sub, d, 0);
+        }
+    }
+}
+
+void func_400419B8(s32 a0)
+{
+    loadstagecoreSub(rootPtn, (a0 >> 15) & 0x3FFF, (a0 >> 5) & 0x3FF, (a0 << 27) >> 27, 1);
+}
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0039_stagemanager_createsubthread", func_40041AE0);
 void func_40041AE0(s32 a0)
@@ -564,42 +590,10 @@ void func_40041C50(s32 a0)
     func_4003BCB0(a0);
 }
 
-/* NEARMISS-STUB func_40041CC8 */
-#if 0 /* NEARMISS 99.12% cat=regalloc sub=- | idx before low fixes the andi/sra slot (91.2->99.1); left: SH hi reg a3 vs a2 and sh in a2 vs a1 (target sh and s share a1); call args a0,a2,a1 order; if/else,  | attempts=3 */
 void func_40041CC8(s32 a0)
 {
-    u8 *root;
-    s32 idx;
-    s32 low;
-    s32 *sh;
-    u8 *s;
-    s32 st;
-
-    sh = (s32 *)SH_StageDataDEFAULT;
-    if (DldSysUndefSymbol == (s32)SH_StageDataDEFAULT)
-    {
-        sh = 0;
-    }
-    root = rootPtn;
-    idx = a0 >> 16;
-    low = a0 & 0xFFFF;
-    s = (sh != 0) ? (u8 *)sh[4] + idx * 20 : 0;
-    if (++*(u16 *)(s + 0x10) == 1)
-    {
-        sheetMgrLoadSegmentIndex(SH_StageDataDEFAULT, idx, &st);
-        sheetMgrNopSegmentIndex(0);
-        while ((u32)(st - 0xDEAF) >= 2)
-        {
-            scrRun();
-        }
-        if (st != 0xDEB0)
-        {
-            initstage(root, idx, low, -1, 1, 0);
-        }
-    }
+    loadstagecoreSub(rootPtn, a0 >> 16, a0 & 0xFFFF, -1, 1);
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0039_stagemanager_createsubthread", func_40041CC8);
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0039_stagemanager_createsubthread", func_40041DD8);
 void func_40041DD8(s32 a0)

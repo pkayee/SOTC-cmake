@@ -165,7 +165,44 @@ int bgmScriptRecvSoundSignal(int arg0)
     return temp_v1;
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0042_bgmScriptSetStatus", bgmDemoPackagePlay);
+extern s32 DldSysUndefSymbol;
+
+static inline s32 dldCount(u32 *lp)
+{
+    u32 off = *lp & 0x3FFFF;
+    u8 *t = off != 0 ? *(u8 **)((u8 *)lp - off) : 0;
+
+    return (t != 0 && t != (u8 *)DldSysUndefSymbol) ? *(s32 *)(t + 0xC) : 0;
+}
+
+static inline u8 *dldRow(u32 *lp)
+{
+    u32 w = *lp;
+    u32 off = w & 0x3FFFF;
+    u8 *t = off != 0 ? *(u8 **)((u8 *)lp - off) : 0;
+
+    return (t != 0 && t != (u8 *)DldSysUndefSymbol) ? *(u8 **)(t + 0x10) + ((w >> 18) & 0xFFF) * *(s32 *)(*(u8 **)(t + 8) + 0xC) : 0;
+}
+/* GAMECORE c0042: demo package (relative-pointer sheet ref at +4): row count from the sheet header, then clear field +8 of every row's 0x40 target (rows stride 0x50). */
+void bgmDemoPackagePlay(u8 *obj)
+{
+    u8 *row;
+    u8 *r;
+    s32 n;
+    s32 cnt;
+
+    n = dldCount((u32 *)(obj + 4));
+    row = dldRow((u32 *)(obj + 4));
+    r = row;
+    if (n > 0) {
+        cnt = n;
+        do {
+            *(s32 *)(*(u8 **)(r + 0x40) + 8) = 0;
+            r += 0x50;
+            cnt--;
+        } while (cnt != 0);
+    }
+}
 
 extern int D_40131584;
 
