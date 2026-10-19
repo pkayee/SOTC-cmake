@@ -1,8 +1,69 @@
 #include "common.h"
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0172_FlushModifiedManager", FlushModifiedManager);
+/* ModifiedManager: p[0]=count, p[2]=flag bytes, p[3]=index width (1/2/4), p[4]=index list */
+void iosJumpRecoverPoint(char *);
+extern char D_40134240[];
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0172_FlushModifiedManager", EntryModifiedManager);
+void FlushModifiedManager(s32 *p)
+{
+    s32 n = p[0];
+    s32 i;
+
+    if (n == 0)
+        return;
+    i = p[3];
+    switch (i)
+    {
+    case 1:
+    {
+        u8 *q = (u8 *)p[4];
+        for (i = 0; i < n; i++)
+            *((u8 *)p[2] + *q++) = 0;
+        break;
+    }
+    case 2:
+    {
+        u16 *q = (u16 *)p[4];
+        for (i = 0; i < n; i++)
+            *((u8 *)p[2] + *q++) = 0;
+        break;
+    }
+    case 4:
+    {
+        s32 *q = (s32 *)p[4];
+        for (i = 0; i < n; i++)
+            *((u8 *)p[2] + *q++) = 0;
+        break;
+    }
+    default:
+        iosJumpRecoverPoint(D_40134240);
+        break;
+    }
+    p[0] = 0;
+}
+
+/* ModifiedManager entry: append v to the index list (width p[3]) and set flag byte v */
+s32 EntryModifiedManager(s32 *p, s32 v)
+{
+    s32 i = p[0];
+    s32 w = p[3];
+
+    p[0] = i + 1;
+    switch (w)
+    {
+    case 1:
+        *((u8 *)p[4] + i) = v;
+        break;
+    case 2:
+        *((u16 *)p[4] + i) = v;
+        break;
+    case 4:
+        *((s32 *)p[4] + i) = v;
+        break;
+    }
+    *((u8 *)p[2] + v) = 1;
+    return i;
+}
 
 //INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0172_FlushModifiedManager", RelocateModifiedManager);
 int RelocateModifiedManager(s32 *p, s32 n, s32 addr)
@@ -158,6 +219,55 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0172_FlushModifiedManager", kbG
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0172_FlushModifiedManager", func_400D96A0);
 
+/* NEARMISS-STUB kbInit */
+#if 0 /* NEARMISS 94.75% cat=regalloc sub=- | REA READY drop-in scored 94.75 in-TU (apply_ready) | attempts=1 */
+/* keyboard state tables: 256 entries of 3 words, low 4 flag bits cleared in the three tables */
+void kbInit(void)
+{
+    u8 *g = (u8 *)D_401AE250;
+    u32 *q;
+    u32 v;
+    s32 i;
+
+    *(s32 *)(g + 0x2408) = 0;
+    *(s32 *)(g + 0x2404) = 0;
+    *(s32 *)(g + 0xC00) = 0;
+    q = (u32 *)(g + 0xC04);
+    for (i = 0xFF; i >= 0; i--)
+    {
+        v = *q;
+        v &= ~8;
+        v &= ~4;
+        v &= ~2;
+        v &= ~1;
+        *q = v;
+        q += 3;
+    }
+    q = D_401AFA54;
+    for (i = 0xFF; i >= 0; i--)
+    {
+        v = *q;
+        v &= ~8;
+        v &= ~4;
+        v &= ~2;
+        v &= ~1;
+        *q = v;
+        q += 3;
+    }
+    q = D_401AE250;
+    for (i = 0xFF; i >= 0; i--)
+    {
+        v = *q;
+        v &= ~8;
+        v &= ~4;
+        v &= ~2;
+        v &= ~1;
+        *q = v;
+        q += 3;
+    }
+    usbdevAddCallbackFunc(func_400D96A0, 1);
+}
+#endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0172_FlushModifiedManager", kbInit);
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0172_FlushModifiedManager", func_400D98A8);
