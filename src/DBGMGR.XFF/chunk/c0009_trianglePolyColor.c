@@ -40,6 +40,8 @@ extern float D_4001E094;
 extern V4 D_4001EBA0;
 void triangleDispAttribute();
 
+void func_40016CD8(s32 a, s32 b, s32 c, float w);
+
 void trianglePolyColor(float r, float g, float b, float a, s32 force) {
     float v[4];
     V4 col;
@@ -94,9 +96,46 @@ INCLUDE_ASM("asm/DBGMGR.XFF/nonmatchings/chunk/c0009_trianglePolyColor", DebugDi
 
 INCLUDE_ASM("asm/DBGMGR.XFF/nonmatchings/chunk/c0009_trianglePolyColor", DebugDispVectorTriangle);
 
-INCLUDE_ASM("asm/DBGMGR.XFF/nonmatchings/chunk/c0009_trianglePolyColor", DebugDispWideLineHalf);
+/* DBGMGR c0009: wide line draw, float is the FIRST param (f12 stays w, ints a0..a2) while the callee prototype keeps w last (arg schedule); ev_85315f23c5e6ec4e0f761112955f943aea828d9efd02b59a0cd611bb1ba00b10 */
+void DebugDispWideLineHalf(float w, s32 a, s32 b, s32 c) {
+    if (D_4001E060 != 0) {
+        iosDlPushLayer(0x18);
+        glBegin(2);
+        glBlendFunc(5, 6);
+        glZOffset(1.08f);
+        glEnd();
+        glEnable(3);
+        glBegin(8);
+        glBlendFunc(5, 6);
+        glEnd();
+        func_40016CD8(a, b, c, w);
+        glBegin(8);
+        glZOffset(1.0f);
+        glEnable(8);
+        glBlendFunc(5, 6);
+        glEnd();
+        iosDlPopLayer();
+    }
+}
 
-INCLUDE_ASM("asm/DBGMGR.XFF/nonmatchings/chunk/c0009_trianglePolyColor", DebugDispWideLineNotBlend);
+/* DBGMGR c0009: wide line draw, float is the FIRST param (f12 stays w, ints a0..a2) while the callee prototype keeps w last (arg schedule); ev_85315f23c5e6ec4e0f761112955f943aea828d9efd02b59a0cd611bb1ba00b10 */
+void DebugDispWideLineNotBlend(float w, s32 a, s32 b, s32 c) {
+    if (D_4001E060 != 0) {
+        iosDlPushLayer(0x18);
+        glBegin(2);
+        glBlendFunc(5, 6);
+        glZOffset(1.08f);
+        glEnd();
+        glDisable(3);
+        func_40016CD8(a, b, c, w);
+        glBegin(8);
+        glZOffset(1.0f);
+        glEnable(8);
+        glBlendFunc(5, 6);
+        glEnd();
+        iosDlPopLayer();
+    }
+}
 
 INCLUDE_ASM("asm/DBGMGR.XFF/nonmatchings/chunk/c0009_trianglePolyColor", DebugDispArrowNoLayer);
 
