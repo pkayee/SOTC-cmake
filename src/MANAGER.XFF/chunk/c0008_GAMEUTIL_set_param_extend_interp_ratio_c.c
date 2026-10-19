@@ -11,6 +11,23 @@ f32 GAMEUTIL_get_interp_value_interp_value_cntrl();
 void func_4001E138(f32 *c, s32 r);
 s32 func_4001E0F0(f32 *c, f32 a, f32 b);
 
+typedef struct BgDrawSpr {
+    s32 a[4];
+    u64 q1[2];
+    u64 q2[2];
+} BgDrawSpr;
+extern u64 D_401300A0[2];
+extern u64 D_401300B0[2];
+s32 getDrawScreenWidth(void);
+s32 getDrawScreenHeight(void);
+s32 getFrameBufferSizeTBP(void);
+void gsRegBegin(void);
+void gsRegEnd(void);
+void gsReg(s32, u64);
+void spriteTexFast(s32, s32, s32, s32, s32, void *, void *, s32);
+
+void GAMEUTIL_get_spring_interpolate_value3D_extend(f32 a, f32 b, f32 *d1, f32 *d2, f32 *s, f32 *p, f32 k, f32 dt);
+
 void GAMEUTIL_set_param_extend_interp_ratio_cntrl(f32 p1, f32 p2, f32 p3, f32 *c)
 {
     s32 r;
@@ -155,7 +172,32 @@ f32 *reset_double_spring_interp_cntrl3D(f32 *c, f32 *src)
     return d1;
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0008_GAMEUTIL_set_param_extend_interp_ratio_c", doit_double_spring_interp_cntrl3D);
+f32 *doit_double_spring_interp_cntrl3D(f32 dt, f32 *c, f32 *src, s32 mode) {
+    if (mode == 1) {
+        s32 i;
+        f32 v;
+        f32 *d1;
+        f32 *d2;
+
+        d2 = &c[8];
+        d1 = &c[12];
+        for (i = 0; i < 3; i++) {
+            v = src[i];
+            d1[i] = v;
+            d2[i] = v;
+        }
+        return d1;
+    } else {
+        f32 *d1;
+        f32 *d2 = &c[8];
+        f32 *p = &c[5];
+
+        GAMEUTIL_get_spring_interpolate_value3D_extend(c[0], c[1], d2, d2, src, p, c[4], dt);
+        d1 = &c[12];
+        GAMEUTIL_get_spring_interpolate_value3D_extend(c[2], c[3], d1, d1, d2, p, c[4], dt);
+        return d1;
+    }
+}
 
 s32 is_reach_src_value_double_spring_interp_cntrl3D(void *control, f32 *target)
 {
@@ -191,8 +233,8 @@ f32 reset_aim_angle_interp_cntrl(f32 *c, f32 v) {
     return v;
 }
 
-f32 func_4001E1E8(u32 mode, f32 a, f32 b, f32 d);
-f32 func_4001E3A8(u32 mode, f32 a, f32 b, f32 d);
+f32 func_4001E1E8(u32 mode, f32 a, f32 b, f32 c, f32 d, f32 e, f32 f);
+f32 func_4001E3A8(u32 mode, f32 a, f32 b, f32 c, f32 d, f32 e, f32 f);
 
 /* NEARMISS-STUB doit_aim_angle_interp_cntrl */
 #if 0 /* NEARMISS 66.3% cat=struct-layout sub=- | expected copies unused float param p3 (mov.s fa5,fa2) before the flag test and keeps p1/p2 in fv0/ft0; ours drops the dead p3 copy and reorders arg setup; flag/ | attempts=1 */
@@ -286,7 +328,33 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0008_GAMEUTIL_set_param_extend_
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0008_GAMEUTIL_set_param_extend_interp_ratio_c", bgEnd);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0008_GAMEUTIL_set_param_extend_interp_ratio_c", bgDraw);
+void bgDraw(void) {
+    BgDrawSpr spr;
+    s32 w;
+    s32 h;
+
+    w = getDrawScreenWidth();
+    h = getDrawScreenHeight();
+    spr.a[0] = (-w / 2) << 4;
+    spr.a[1] = (-h / 2) << 4;
+    spr.a[2] = w << 4;
+    spr.a[3] = h << 4;
+    spr.q1[0] = D_401300A0[0];
+    spr.q1[1] = D_401300A0[1];
+    spr.q2[0] = D_401300B0[0];
+    spr.q2[1] = D_401300B0[1];
+    iosSetRootDC();
+    gsRegBegin();
+    gsReg(6, ((u64)getFrameBufferSizeTBP() | 0x20110000) | ((u64)0x8000 << 18));
+    gsReg(0x14, 0xFFFFFFCE00000360ULL);
+    gsReg(0x47, 0x31001);
+    gsReg(0x42, 0x8000000054ULL);
+    spriteTexFast(spr.a[0], spr.a[1], spr.a[2], spr.a[3], 0xFFFFFF, spr.q2, spr.q1, 1);
+    gsReg(0x42, 0x8000000044ULL);
+    gsReg(0x47, 0x5100D);
+    gsRegEnd();
+    texResetVRAMRequest(0);
+}
 
 void bgBegin(void) {
     iosDlPushLayer(1);
