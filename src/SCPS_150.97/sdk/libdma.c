@@ -28,23 +28,21 @@ void WaitDma(sceDmaChan *d)
 #endif
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libdma", WaitDma);
 
-/* NEARMISS-STUB WatchDma */
-#if 0 /* NEARMISS 79.24% cat=branch-layout sub=- | loop shape: target if+do-while with string hoist | attempts=1 */
+extern char D_001385F0[];
+
 void WatchDma(sceDmaChan *d, void *addr, int timeout)
 {
     int count;
 
     count = timeout ? timeout : 0x1000000;
-    while ((u_int)d->madr < (u_int)addr) {
+    while (*(volatile u_int *)&d->madr < (u_int)addr) {
         count--;
         if (count < 0) {
-            scePrintf("libdma: sync timeout\n");
+            scePrintf(D_001385F0);
             sceDmaPause(d);
         }
     }
 }
-#endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libdma", WatchDma);
 
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libdma", CheckAddress);
 u_int CheckAddress(u_int addr)
@@ -79,8 +77,6 @@ sceDmaChan *sceDmaGetChan(int id)
     return 0;
 }
 
-/* NEARMISS-STUB sceDmaReset */
-#if 0 /* NEARMISS 97.09% cat=sched sub=- | extra sw+nop at D_STAT/memclr join; target store in jal delay slot | attempts=1 */
 int sceDmaReset(int mode)
 {
     sceDmaEnv env;
@@ -102,7 +98,7 @@ int sceDmaReset(int mode)
         }
     }
     *(volatile u_int *)0x1000E010 = 0xFF1F;
-    *(volatile u_int *)0x1000E010 &= 0xFF1F0000;
+    *(u_int *)0x1000E010 &= 0xFF1F0000;
     memclr(&env, 0x14);
     sceDmaPutEnv(&env);
     if (mode == 1) {
@@ -110,8 +106,6 @@ int sceDmaReset(int mode)
     }
     return dmae;
 }
-#endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libdma", sceDmaReset);
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libdma", sceDmaPutEnv);
 

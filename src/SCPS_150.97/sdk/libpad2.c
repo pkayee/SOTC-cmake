@@ -244,8 +244,6 @@ int scePad2GetState(int socket)
 #endif
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libpad2", scePad2GetState);
 
-/* NEARMISS-STUB scePad2GetButtonInfo */
-#if 0 /* NEARMISS 98.84% cat=branch-layout sub=- | cond-move: target keeps kind in v0 then movn v0,zero,bit; ours folds to movz with 0 preset (return bit?0:kind); switch dispatch already matches | attempts=1 */
 int scePad2GetButtonInfo(int socket, u8 *buf, int idx)
 {
     Pad2Button rec;
@@ -259,7 +257,11 @@ int scePad2GetButtonInfo(int socket, u8 *buf, int idx)
         switch (rec.kind)
         {
         case 1:
-            return ((buf[rec.byte] >> rec.shift) & 1) ? 0 : rec.kind;
+            if ((buf[rec.byte] >> rec.shift) & 1)
+            {
+                return 0;
+            }
+            return 1;
         case 8:
             v = buf[rec.byte] >> rec.shift;
             if (rec.shift != 0)
@@ -272,8 +274,6 @@ int scePad2GetButtonInfo(int socket, u8 *buf, int idx)
     }
     return -1;
 }
-#endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libpad2", scePad2GetButtonInfo);
 
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libpad2", func_001156D8);
 void func_001156D8(s32 socket)
