@@ -13,10 +13,21 @@ int CheckDeathTentacle(void)
     return 1;
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0064_CreateDeathTentacle", func_4005E190);
+void meshObjectFree(void *);
+
+void func_4005E190(void *arg0, u8 *w)
+{
+    u8 *info = *(u8 **)(w + 4);
+    s32 i;
+
+    for (i = 0; i < *(s32 *)(info + 0x50); i++) {
+        if (((void **)(w + 0x14))[i] != 0)
+            meshObjectFree(((void **)(w + 0x14))[i]);
+    }
+}
 
 extern void isysJumpSubThread(void (*)(void), void *);
-extern void func_4005E2E0(void);
+extern void func_4005E2E0();
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0064_CreateDeathTentacle", func_4005E200);
 void func_4005E200(void *arg0)
@@ -79,8 +90,68 @@ int AI_GetBaseWorkSize(int arg0, int arg1)
     return var_v1;
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0064_CreateDeathTentacle", func_4005E2E0);
+void scrRunM(int);
+s32 func_4005D310(u8 *);
 
+void func_4005E2E0(u8 *w)
+{
+    u8 *info = *(u8 **)(w + 4);
+
+    while (*(s32 *)(info + 0x58) == 0)
+        scrRunM(1);
+    while (1) {
+        *(s32 *)(w + 0x384) = func_4005D310(w);
+        scrRunM(1);
+    }
+}
+
+/* NEARMISS-STUB dischargeInit */
+#if 0 /* NEARMISS 95.6% cat=sched sub=- | only the e=w+0x20 copy (daddu s1,v1) vs the d+0x10 lwc1 order: target sw elem; daddu; lwc1, ours lwc1 first. PI2 literal 6.28318501f and iosRotMatrixY(void*,f32 | attempts=1 */
+extern char *getSpecialEffectObjWork();
+extern char *getEditWorkInitData(int);
+extern s32 ScriptAnimationObjDef_EEL_THUNDER_CIRCLE;
+extern u128 ZeroPoint;
+extern u128 IdentityQuaternion;
+f32 iosGetSinf(f32);
+f32 iosGetCosf(f32);
+void iosUnitMatrix(void *);
+void iosRotMatrixY(void *, f32);
+s32 _SCRSetupLWS(s32, s32, void *, void *, s32);
+void _SCRStartLWS(s32, s32, s32, s32);
+
+void dischargeInit(u8 *o)
+{
+    char *w = getSpecialEffectObjWork(o);
+    char *d = getEditWorkInitData(*(s32 *)(*(u8 **)(o + 0x1C) + 8));
+    f32 *e;
+    s32 i;
+    f32 a;
+
+    *(f32 **)(w + 0xC) = (f32 *)(w + 0x20);
+    e = (f32 *)(w + 0x20);
+    *(s32 *)(w + 8) = *(f32 *)(d + 0x10);
+    for (i = 0; i < *(s32 *)(w + 8); i++) {
+        a = ((f32)i / (f32)*(s32 *)(w + 8)) * 6.28318501f;
+        e[8] = -iosGetSinf(a);
+        e[9] = 0.0f;
+        e[10] = iosGetCosf(a);
+        e[11] = 1.0f;
+        e[0] = 1.0f;
+        e[1] = 0.0f;
+        e[2] = 0.0f;
+        e[3] = 0.0f;
+        e[4] = 1.0f;
+        e[5] = 0.0f;
+        e[6] = 0.0f;
+        e[7] = 0.0f;
+        iosUnitMatrix(e + 12);
+        iosRotMatrixY(e + 12, -a);
+        e += 28;
+    }
+    *(s32 *)(w + 0x10) = _SCRSetupLWS(ScriptAnimationObjDef_EEL_THUNDER_CIRCLE, 0, &ZeroPoint, &IdentityQuaternion, 0);
+    _SCRStartLWS(*(s32 *)(w + 0x10), -1, 1, 0);
+}
+#endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0064_CreateDeathTentacle", dischargeInit);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0064_CreateDeathTentacle", dischargeMain);
@@ -133,7 +204,7 @@ extern float getPlayerMaxGrip(void);
 extern void setPlayerGrip(float);
 extern void createArrowThrustWork(void *, void *, void *);
 extern void scrRunM(int);
-extern void func_4005EA98(void);
+extern void func_4005EA98();
 
 void nico_dorminStart(void)
 {
@@ -156,7 +227,26 @@ void nico_dorminStart(void)
     isysJumpSubThread(func_4005EA98, w);
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0064_CreateDeathTentacle", func_4005EA98);
+s32 *GetDamageClass(void *);
+void addPlayerHp(f32);
+f32 getPlayerHp(void);
+void updateArrowThrustWork(void *, void *);
+
+void func_4005EA98(u8 *w)
+{
+    void *th = isysGetThisSubThread();
+
+    while (1) {
+        CharaCtrlResetAllScriptCtrlStatus(th);
+        if (*GetDamageClass(th) == 3) {
+            addPlayerHp(-1.0f);
+            if (getPlayerHp() < 0.0f)
+                setPlayerHp(1.0f);
+        }
+        updateArrowThrustWork(th, w + 0x10);
+        scrRunM(1);
+    }
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0064_CreateDeathTentacle", nico_balltest);
 

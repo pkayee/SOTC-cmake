@@ -128,8 +128,47 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0146_func_400C5E70", func_400C
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0146_func_400C5E70", func_400C6F08);
 
+/* NEARMISS-STUB func_400C70B8 */
+#if 0 /* NEARMISS 98.0% cat=sched sub=- | only lw o->f64 hoisted above sw zero,0x184 (target keeps source order: store, store, then param load) | attempts=1 */
+int AI_UpdateVelocity(float *vel, float target, float accel);
+
+void func_400C70B8(AIChr *o)
+{
+    float t;
+
+    o->f184 = 0;
+    o->f260 = 1.0f;
+    AI_UpdateVelocity(&o->f264, 1.0f, ((AIParam *)o->f64)->p20);
+    o->f230 = 0.0f;
+    t = o->f18C;
+    if (t <= ((AIParam *)o->f64)->pA4) {
+        o->f210 = o->f2F0 + o->f2E8 * 0.5f * t * t + o->f2EC * t;
+    } else {
+        AI_UpdateVelocity(&o->f210, o->f230, 1.0f);
+    }
+    AI_UpdateVelocity(&o->f238, ((AIParam *)o->f64)->p40, ((AIParam *)o->f64)->p3C);
+    AI_UpdateVelocity(&o->f218, 0.0f, o->f238);
+    AI_UpdateVelocity(&o->f23C, 0.0f, ((AIParam *)o->f64)->p44);
+}
+#endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0146_func_400C5E70", func_400C70B8);
 
+/* NEARMISS-STUB func_400C71A8 */
+#if 0 /* NEARMISS 95.61% cat=regalloc sub=- | f230 block: target lwc1 f260 then lw v0 (param), ours lw v1 then lwc1; p local / swapped mul / void return all worse | attempts=1 */
+int AI_UpdateVelocity(float *vel, float target, float accel);
+
+void func_400C71A8(AIChr *o)
+{
+    AI_UpdateVelocity(&o->f23C, 0.0f, ((AIParam *)o->f64)->p44);
+    o->f260 = ((AIParam *)o->f64)->pA0;
+    AI_UpdateVelocity(&o->f264, o->f260, ((AIParam *)o->f64)->p9C);
+    o->f230 = ((AIParam *)o->f64)->p14 * o->f260;
+    AI_UpdateVelocity(&o->f234, ((AIParam *)o->f64)->p94, ((AIParam *)o->f64)->p98);
+    AI_UpdateVelocity(&o->f210, o->f230, o->f234);
+    AI_UpdateVelocity(&o->f238, ((AIParam *)o->f64)->p40, ((AIParam *)o->f64)->p3C);
+    AI_UpdateVelocity(&o->f218, 0.0f, o->f238);
+}
+#endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0146_func_400C5E70", func_400C71A8);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0146_func_400C5E70", func_400C7270);
@@ -177,4 +216,49 @@ int func_400C7408(AIChr *o)
     return (k == 0x11) ? 0x1C : 0x1D;
 }
 
+/* NEARMISS-STUB func_400C7578 */
+#if 0 /* NEARMISS 95.85% cat=branch-layout sub=- | last k==0x18 test if-converted to movn (target bnel v0=0x1A / b v0=0x1F); up flag v1 vs v0. switch = binary tree 89.7, r-var chain 93.4 | attempts=1 */
+void *isysGetThisSubThread(void);
+
+int func_400C7578(AIChr *o)
+{
+    int k;
+    int near;
+    int up;
+
+    isysGetThisSubThread();
+    near = (o->f114 <= o->f30 * 0.79999998f);
+    if (near) {
+        if (o->fB0 < 8.0f) {
+            k = 0x15;
+            if (0.0f <= o->f88) {
+                k = 0x16;
+            }
+        } else {
+            k = 0x16;
+            if (!(0.0f <= o->f88)) {
+                k = 0x15;
+            }
+        }
+        if (k == 0x15) {
+            return 0x1C;
+        }
+        if (k == 0x16) {
+            return 0x1D;
+        }
+        if (k == 0x17) {
+            return 0x1E;
+        }
+        if (k == 0x18) {
+            return 0x1F;
+        }
+        return 0x1A;
+    }
+    up = (0.70710665f <= o->f120);
+    if (up) {
+        return 0x1A;
+    }
+    return func_400C7408(o);
+}
+#endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0146_func_400C5E70", func_400C7578);

@@ -4,7 +4,33 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0164_SCRSetupWeaponPlayer", SC
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0164_SCRSetupWeaponPlayer", setIsWeapon);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0164_SCRSetupWeaponPlayer", nico_weaponstart);
+extern u8 gcGlobalVar[];
+void *isysGetThisSubThread(void);
+void *GetLayoutClass(void *);
+s32 _omakeSelectFlagChk(s32);
+void SetLayoutObjAccessSwitch(void *, s32);
+void nico_weaponUpdateGeometry(void *);
+void FlushCollisionWork(void *);
+void scrRun(void);
+
+void nico_weaponstart(void)
+{
+    void *th = isysGetThisSubThread();
+    void *lc = GetLayoutClass(th);
+    u8 *g = gcGlobalVar;
+
+    while (1) {
+        if (_omakeSelectFlagChk(7) != 0)
+            SetLayoutObjAccessSwitch(th, 0);
+        else
+            SetLayoutObjAccessSwitch(th, 1);
+        if (*(s32 *)(g + 0x1AC) == 0) {
+            nico_weaponUpdateGeometry(lc);
+            FlushCollisionWork(th);
+        }
+        scrRun();
+    }
+}
 
 extern int initWeaponSpriteStatus();
 

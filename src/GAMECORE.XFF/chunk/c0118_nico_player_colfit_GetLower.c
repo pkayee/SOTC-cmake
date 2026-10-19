@@ -61,7 +61,33 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0118_nico_player_colfit_GetLow
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0118_nico_player_colfit_GetLower", pendulum_test);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0118_nico_player_colfit_GetLower", nico_player_avoid_ControlRootY);
+typedef union {
+    u128 q;
+    f32 f[4];
+} AvoidVec;
+
+s32 ClipCollisionFinderCallBack(void *res, AvoidVec *from, AvoidVec *to, void *col, void *filter, s32 arg);
+s32 character_ikcolattrfilter();
+
+void nico_player_avoid_ControlRootY(s32 *w)
+{
+    u8 *c = GetCharacterClass((void *)w[0]);
+    u8 *m = (u8 *)(w[5] * 0x40 + w[2]);
+    AvoidVec from;
+    AvoidVec to;
+    struct {
+        u8 pad[0x44];
+        f32 y;
+        u8 pad2[0x8];
+    } res;
+
+    from.q = *(u128 *)(m + 0x30);
+    to.q = from.q;
+    from.f[1] = *(f32 *)(c + 0x44);
+    to.f[1] = *(f32 *)(m + 0x34) + 0.15f;
+    if (ClipCollisionFinderCallBack(&res, &from, &to, c + 0xD90, character_ikcolattrfilter, 0) != 0)
+        *(f32 *)(c + 0x44) = *(f32 *)(c + 0x44) - (to.f[1] - res.y);
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0118_nico_player_colfit_GetLower", player_updateSlipEffect);
 

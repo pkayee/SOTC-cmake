@@ -153,6 +153,27 @@ void func_400C4AE0(void *arg0)
     h[0x50 / 2] = m;
     h[0x52 / 2] = m;
 }
+/* NEARMISS-STUB func_400C4B08 */
+#if 0 /* NEARMISS 98.09% cat=regalloc sub=- | target: m=&D_40216E10 in s1, loop copy daddu s4,s1 for the in-loop flag store; ours re-forms lui s4/%lo; all-m form 80.6, inline loop helper 80.6 | attempts=1 */
+s32 func_400C41E0(void *, void *, s32);
+
+void func_400C4B08(s32 *w)
+{
+    char *m = D_40216E10;
+    s32 i;
+
+    if (*(s32 *)(m + 0x13C8) != 0)
+        return;
+    if ((*(s32 *)(m + 0x13C8) = func_400C41E0(w, (char *)w + 0x238, 1)) != 0)
+        return;
+    for (i = *w - 1; i >= 0; i--) {
+        if (func_400C41E0(w, (char *)w + i * 0x1C + 0x14, 1) != 0) {
+            *(s32 *)(D_40216E10 + 0x13C8) = 1;
+            return;
+        }
+    }
+}
+#endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0145_getSmallAnimalSaveTypePos", func_400C4B08);
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0145_getSmallAnimalSaveTypePos", func_400C4BC0);
@@ -273,7 +294,24 @@ char *func_400C4D10(char *arg0, int arg1)
 #endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0145_getSmallAnimalSaveTypePos", func_400C4D10);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0145_getSmallAnimalSaveTypePos", func_400C4D60);
+char *func_400C4D60(char *set, s32 a, s32 b)
+{
+    char *head;
+    char *p;
+
+    if (a != -1 && b != -1) {
+        head = *(char **)(set + 0x23C);
+        for (p = head; p != 0; p = *(char **)(p + 0x58)) {
+            if (*(s32 *)p != 0 && a == *(s16 *)(p + 0x52) && b == *(s16 *)(p + 0x50))
+                return p;
+        }
+        for (p = head; p != 0; p = *(char **)(p + 0x58)) {
+            if (a == *(s16 *)(p + 0x52) && b == *(s16 *)(p + 0x50))
+                return p;
+        }
+    }
+    return 0;
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0145_getSmallAnimalSaveTypePos", func_400C4E08);
 
