@@ -132,21 +132,23 @@ s32 SCRConditionDamagedWeaponType(s32 a0, s32 type)
 }
 
 /* NEARMISS-STUB SCRConditionDamagedColType */
-#if 0 /* NEARMISS 88.57% cat=cse-hoist sub=- | target computes attr!=0 before colType==-1 and reuses | attempts=1 */
+#if 0 /* NEARMISS 92.14% cat=branch-layout sub=- | d2 r88: r = attr != 0; eq = attr == colType; if (colType != -1) r = eq; gets both setcc before the beq (target shape) but ifcvt turns the then-move into movn; t | attempts=2 */
 s32 SCRConditionDamagedColType(s32 a0, s32 a1, s32 a2, s32 a3, s32 gpAttr, s32 colType)
 {
-    u8* damage = GetDamageClass(a0);
+    u8 *damage = GetDamageClass(a0);
     s32 attr;
-    if (*(s32*)damage == 0)
-    {
-        return 0;
+    s32 r = 0;
+    s32 eq;
+
+    if (*(s32 *)damage != 0) {
+        attr = nico_GetCharacterAttackedGPAttr(a0, gpAttr);
+        r = attr != 0;
+        eq = attr == colType;
+        if (colType != -1) {
+            r = eq;
+        }
     }
-    attr = nico_GetCharacterAttackedGPAttr(a0, gpAttr);
-    if (colType == -1)
-    {
-        return attr != 0;
-    }
-    return attr == colType;
+    return r;
 }
 #endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0227_finishLoadMotList", SCRConditionDamagedColType);

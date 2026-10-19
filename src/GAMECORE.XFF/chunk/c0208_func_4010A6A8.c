@@ -56,11 +56,11 @@ void setHoverAttackBirdCtrlWork(char *p, int arg1)
 }
 
 /* NEARMISS-STUB func_4010AE58 */
-#if 0 /* NEARMISS 89.0% cat=regalloc sub=- | a2/v1 swapped for constant 1 and load pointer; store order differs | attempts=1 */
+#if 0 /* NEARMISS 89.04% cat=regalloc sub=- | d2 r88: 720-perm store sweep max 89.04; root = const 1 in v1 and the 0x13C ptr in a2 (target ptr v1, 1 in a2); chained 1-stores, const local, src-ptr local, 3-a | attempts=2 */
 u8 *GetCharacterClass(void *chara);
 s32 _resetBaseMoveWork(void *arg0, void *arg1);
 void func_4010AF80(void *arg0);
-void func_4010AEC8(void *arg0);
+void func_4010AEC8(char *arg0);
 
 void func_4010AE58(char *arg0, char *arg1)
 {

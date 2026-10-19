@@ -443,7 +443,55 @@ void func_4008F0E8(s32 obj)
     func_4008BAC0(obj);
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0105_SCRPlayerCombatMode", func_4008F148);
+typedef struct {
+    void *obj0;
+    void *obj1;
+    s32 done0;
+    s32 done1;
+    s32 x10;
+    u8 keep0;
+    u8 keep1;
+} SCRHandle105;
+void func_4008B458(void *buf, void *a, u8 *work);
+void isysRequestDeleteObj(void *);
+void func_40088BC8(u8 *work);
+void SCRSetupArrow1ByPlayer2(void *a, s32 b, void *c, void *d);
+void func_4008F148(void *a)
+{
+    u8 buf[16];
+    u8 *work;
+    SCRHandle105 *h;
+
+    work = GetSCRCharaAIWorkPtr();
+    func_4008B458(buf, a, work);
+    h = (SCRHandle105 *)(work + 0x60);
+    if (h->obj1 != 0) {
+        if (h->keep1 == 0) {
+            if (h->done1 == 0) {
+                isysRequestDeleteObj(h->obj1);
+            }
+        } else {
+            isysRequestDeleteObj(h->obj1);
+        }
+        h->obj1 = 0;
+        h->done1 = 1;
+        h->keep1 = 0;
+    }
+    if (h->obj0 != 0) {
+        if (h->keep0 == 0) {
+            if (h->done0 == 0) {
+                isysRequestDeleteObj(h->obj0);
+            }
+        } else {
+            isysRequestDeleteObj(h->obj0);
+        }
+        h->obj0 = 0;
+        h->done0 = 1;
+        h->keep0 = 0;
+    }
+    func_40088BC8(work);
+    SCRSetupArrow1ByPlayer2(a, *(s32 *)(work + 0x70), buf, work + 0x150);
+}
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0105_SCRPlayerCombatMode", func_4008F250);
 void func_4008F250(void)

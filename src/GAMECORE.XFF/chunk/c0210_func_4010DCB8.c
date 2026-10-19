@@ -95,10 +95,8 @@ void func_4010E830(void *arg0, void *arg1)
 #endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0210_func_4010DCB8", func_4010E830);
 
-/* NEARMISS-STUB func_4010E8B0 */
-#if 0 /* NEARMISS 79.875% cat=sched sub=- | lwc1 f0 hoisted before lq 0x10 copy; 0x70/0xEC store order swapped vs asm | attempts=1 */
-extern f32 D_40137660;
-extern f32 D_40137664;
+extern const f32 D_40137660;
+extern const f32 D_40137664;
 extern u128 fltMaxVector;
 
 void func_4010E8B0(void *arg0)
@@ -110,14 +108,12 @@ void func_4010E8B0(void *arg0)
     f0 = D_40137664;
     *(u128 *)((char *)arg0 + 0x60) = *(u128 *)((char *)arg0 + 0x10);
     *(f32 *)((char *)arg0 + 0xE8) = f0;
-    *(f32 *)((char *)arg0 + 0xEC) = f1;
     *(f32 *)((char *)arg0 + 0x70) = f1;
+    *(f32 *)((char *)arg0 + 0xEC) = f1;
     *(s32 *)((char *)arg0 + 0xE4) = 0;
     *(s32 *)((char *)arg0 + 0xF4) = 0;
     *(u128 *)((char *)arg0 + 0x100) = fltMaxVector;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0210_func_4010DCB8", func_4010E8B0);
 
 /* NEARMISS-STUB func_4010E8F0 */
 #if 0 /* NEARMISS 78.125% cat=regalloc sub=- | lw order/param reg: compiler loads target first, delay slots nop; asm fills v0=1 delays | attempts=1 */
