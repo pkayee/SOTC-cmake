@@ -127,6 +127,23 @@ extern Q8 D_40019898;
 
 extern void func_40015488();
 
+extern void GAMEUTIL_get_yaw_pitch_by_direction(float *, float *, float *);
+
+typedef struct { float f[0x17E]; } PtclBlk;
+
+extern char D_400194C0[];
+extern s32 *get_top_emitter_list_from_particle_geodisp(s32);
+extern void glDrawLineArrow(float *, float, float, void *, float *, int);
+
+typedef struct { float f[0x6F]; } PtclEnt;
+
+static inline PtclSeg *CurSeg(void) {
+    if (D_400193B0 < 0x32) {
+        return &g_ainParticleSegment[D_400193B0];
+    }
+    return 0;
+}
+
 void save_main_sub_particle_effect_lod_to_npe_file(char *m, char *s, char *name) {
     char buf[128];
     if (m != 0) {
@@ -191,7 +208,13 @@ void func_40014FA8(char *a, char *b) {
     GAMEUTIL_get_direction_by_yaw_pitch(a + 0x40, *(float *)(b + 0x38) * 3.1415927f / 180.0f, *(float *)(b + 0x3c) * 3.1415927f / 180.0f);
 }
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0003_save_main_sub_particle_effect_lod_to_npe", func_40015000);
+void func_40015000(char *a, char *b) {
+    float *yaw = (float *)(a + 0x38);
+    float *pitch = (float *)(a + 0x3c);
+    GAMEUTIL_get_yaw_pitch_by_direction(yaw, pitch, (float *)(b + 0x40));
+    *yaw = *yaw * 180.0f / 3.1415927f;
+    *pitch = *pitch * 180.0f / 3.1415927f;
+}
 
 float func_40015088(float a, float b) {
     return a - b * 0.5f;
@@ -208,7 +231,9 @@ float func_400150C8(float a, float b) {
     return a + b * 0.5f;
 }
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0003_save_main_sub_particle_effect_lod_to_npe", func_400150E0);
+void func_400150E0(PtclBlk *dst, PtclBlk *src) {
+    *dst = *src;
+}
 
 void func_400151B8(void *a, int b, int c) {
     if (b != 0) {
@@ -264,7 +289,24 @@ void disp_particle_customize_mode(void) {
     }
 }
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0003_save_main_sub_particle_effect_lod_to_npe", func_40015358);
+void func_40015358(float alpha, int extra) {
+    float col[4] = {1.0f, 0.5f, 0.5f, alpha};
+    int v;
+    if (D_40019420 != 0) {
+        v = *get_top_emitter_list_from_particle_geodisp(D_40019420) + 0x10;
+    } else {
+        v = 0;
+    }
+    if (v != 0) {
+        if (D_40019420 != 0) {
+            v = *get_top_emitter_list_from_particle_geodisp(D_40019420) + 0x10;
+        } else {
+            v = 0;
+        }
+        *(s128 *)D_400194C0 = *(s128 *)(v + 0x90);
+    }
+    glDrawLineArrow((float *)&D_40019380, *(float *)&D_40019484, *(float *)&D_40019484 * 0.3f, D_400194C0, col, extra);
+}
 
 float func_40015430(float a) {
     if (a > 0.0f) {
@@ -307,7 +349,14 @@ int *func_400154E0(void) {
     return &D_400193B8;
 }
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0003_save_main_sub_particle_effect_lod_to_npe", func_400154F0);
+void func_400154F0(void) {
+    if (D_400193B8 >= CurSeg()->c) {
+        D_400193B8 = 0;
+    } else if (D_400193B8 < 0) {
+        D_400193B8 = CurSeg()->c - 1;
+    }
+    func_40013FF0();
+}
 
 int *func_40015598(void) {
     return &D_400193C4;
@@ -383,7 +432,21 @@ void func_40015860(char *a) {
     createYesNoDialog(&D_400197A8, *(int *)(a + 0x94));
 }
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0003_save_main_sub_particle_effect_lod_to_npe", func_400158D8);
+void func_400158D8(void) {
+    char *p;
+    int k;
+    PtclEnt *src;
+    int i;
+    if (D_400193C4 == 1) {
+        p = D_4002B910;
+    } else {
+        p = D_4002BF08;
+    }
+    src = (PtclEnt *)(p + 0xc0);
+    for (k = 1; k < 3; k++) {
+        *(PtclEnt *)(p + k * 0x1bc + 0xc0) = *src;
+    }
+}
 
 void func_40015A08(char *a) {
     D_400197D8.f[6] = (float)(getDrawScreenWidth() / 2 - 0x80);
@@ -391,7 +454,10 @@ void func_40015A08(char *a) {
     createYesNoDialog(&D_400197D8, *(int *)(a + 0x94));
 }
 
-INCLUDE_ASM("asm/PRTTOOL.XFF/nonmatchings/chunk/c0003_save_main_sub_particle_effect_lod_to_npe", func_40015A80);
+void func_40015A80(void) {
+    *(PtclBlk *)D_4002BF08 = *(PtclBlk *)D_4002B910;
+    convert_to_particle_effect_lod(D_40019368, D_4002BF08);
+}
 
 void func_40015B88(char *a) {
     D_40019808.f[6] = (float)(getDrawScreenWidth() / 2 - 0x80);
