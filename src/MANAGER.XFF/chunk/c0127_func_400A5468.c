@@ -19,6 +19,17 @@ typedef struct SmLayer
     s32 subMenuId;
 } SmLayer;
 
+/* c0127 SpriteMenuIsFadeCheckAllLayer: 1 when any layer fade is still running; the class pointer comes from an inline helper with an early return so gcc keeps the bne form instead of movz (T60) */
+static inline u8 *smClass2(u8 *sm)
+{
+    if (sm[8] == 0x21)
+    {
+        return sm + 0x90;
+    }
+    return NULL;
+}
+s32 SpriteMenuIsFadeCheckLayer(u8 *spriteMenu, s32 layer);
+
 static inline u8 *smClass(u8 *spriteMenu)
 {
     return (spriteMenu[8] == 0x21) ? spriteMenu + 0x90 : NULL;
@@ -913,17 +924,11 @@ s32 SpriteMenuGetPadEvent(u8 *spriteMenu)
     return *(s32 *)(p + 0x10);
 }
 
-/* NEARMISS-STUB SpriteMenuIsFadeCheckAllLayer */
-#if 0 /* NEARMISS 66.16% cat=regalloc sub=- | REA READY drop-in scored 66.16 in-TU (apply_ready) | attempts=2 */
 s32 SpriteMenuIsFadeCheckAllLayer(u8 *spriteMenu)
 {
-    u8 *p = NULL;
+    u8 *p = smClass2(spriteMenu);
     s32 i;
 
-    if (spriteMenu[8] == 0x21)
-    {
-        p = spriteMenu + 0x90;
-    }
     for (i = 0; i < *(s32 *)(p + 8); i++)
     {
         if (SpriteMenuIsFadeCheckLayer(spriteMenu, i))
@@ -933,37 +938,66 @@ s32 SpriteMenuIsFadeCheckAllLayer(u8 *spriteMenu)
     }
     return 0;
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0127_func_400A5468", SpriteMenuIsFadeCheckAllLayer);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0127_func_400A5468", SpriteMenuIsFadeCheckSelectLayer);
+/* c0127 SpriteMenuIsFadeCheckSelectLayer: -1 without a selected layer, else nonzero while the selected layer fade differs from its target (jump table D_40133C30; nested if, T60) */
+s32 SpriteMenuIsFadeCheckSelectLayer(u8 *spriteMenu)
+{
+    u8 *p = smClass(spriteMenu);
+    s32 layer = *(s32 *)(p + 0xC);
 
-/* NEARMISS-STUB SpriteMenuIsFadeCheckLayer */
-#if 0 /* NEARMISS 95.0% cat=rodata-const sub=- | switch jump table references %hi(D_40133C50) sub-table of blob D_40133C30; bc1t vs bc1f | attempts=1 */
+    if (layer != -1)
+    {
+        u8 *obj = *(u8 **)(p + 4) + layer * 0x68;
+        float *fade;
+
+        switch (*(s32 *)(*(u8 **)obj + 0xC))
+        {
+        case 0:
+            fade = (float *)(obj + 0x34);
+            break;
+        case 2:
+        case 3:
+            fade = (float *)(obj + 0x1C);
+            break;
+        case 1:
+        case 4:
+            fade = (float *)(obj + 0x20);
+            break;
+        default:
+            fade = NULL;
+            break;
+        }
+        return *(float *)(obj + 8) != *fade;
+    }
+    return -1;
+}
+
+/* c0127 SpriteMenuIsFadeCheckLayer: nonzero while the layer fade value (picked by def type via jump table D_40133C50: 0 -> +0x34, 2/3 -> +0x1C, 1/4 -> +0x20) differs from the target at layer+8 (the != gives bc1f with li 1 in the delay slot) */
 s32 SpriteMenuIsFadeCheckLayer(u8 *spriteMenu, s32 layer)
 {
-    u8 *p = (spriteMenu[8] == 0x21) ? spriteMenu + 0x90 : NULL;
+    u8 *p = smClass(spriteMenu);
     u8 *obj = *(u8 **)(p + 4) + layer * 0x68;
-    f32 *fade = NULL;
+    float *fade;
 
     switch (*(s32 *)(*(u8 **)obj + 0xC))
     {
     case 0:
-        fade = (f32 *)(obj + 0x34);
+        fade = (float *)(obj + 0x34);
+        break;
+    case 2:
+    case 3:
+        fade = (float *)(obj + 0x1C);
         break;
     case 1:
-    case 2:
-        fade = (f32 *)(obj + 0x1C);
-        break;
-    case 3:
     case 4:
-        fade = (f32 *)(obj + 0x20);
+        fade = (float *)(obj + 0x20);
+        break;
+    default:
+        fade = NULL;
         break;
     }
-    return *(f32 *)(obj + 8) == *fade;
+    return *(float *)(obj + 8) != *fade;
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0127_func_400A5468", SpriteMenuIsFadeCheckLayer);
 
 /* c0127 SpriteMenuGetFadeByLayer: fade value of a layer picked by the layer def type via a switch (jump table D_40133C70: 0 -> +0x34, 2/3 -> +0x1C, 1/4 -> +0x20), default arm assigns NULL (no pre-init) */
 float SpriteMenuGetFadeByLayer(u8 *spriteMenu, s32 layer)

@@ -10,6 +10,16 @@ extern f32 D_40130FF8;
 extern s32 D_40130FFC;
 extern f32 D_40200F2C;
 
+typedef union {
+    s32 i;
+    float f;
+} ChipWord;
+
+typedef union {
+    s32 i;
+    float f;
+} ChipWordO;
+
 float getAreaSize(void)
 {
     u8 *env = D_40130F88;
@@ -104,9 +114,27 @@ s32 *getSeamlessStageMiddleModelDispDistDefault(void)
     return &D_40130F70;
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0032_getAreaSize", getStageChipIDReal);
+/* getStageChipIDReal[pos, outX, outZ]: chip cell of a world pos, out words are int/float unions [alias view] */
+void getStageChipIDReal(float *pos, ChipWord *outX, ChipWord *outZ)
+{
+    u8 *env = D_40130F88;
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0032_getAreaSize", getStageChipIDWithOffset);
+    outX->i = (int)((-pos[0] - *(float *)(env + 0x50)) / *(float *)(env + 0x40));
+    outZ->i = (int)((-pos[2] - *(float *)(env + 0x54)) / *(float *)(env + 0x44));
+}
+
+/* getStageChipIDWithOffset[pos, ix, iz, fracX, fracZ]: chip cell plus fractional offset inside it, ix/iz are int/float unions [alias view] */
+void getStageChipIDWithOffset(float *pos, ChipWordO *ix, ChipWordO *iz, float *fracX, float *fracZ)
+{
+    u8 *env = D_40130F88;
+    float fx = (-pos[0] - *(float *)(env + 0x50)) / *(float *)(env + 0x40);
+    float fz = (-pos[2] - *(float *)(env + 0x54)) / *(float *)(env + 0x44);
+
+    ix->i = (int)fx;
+    iz->i = (int)fz;
+    *fracX = fx - (float)ix->i;
+    *fracZ = fz - (float)iz->i;
+}
 
 void getStageNormalizePosition(float *pos, float *outX, float *outZ)
 {
