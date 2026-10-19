@@ -537,8 +537,6 @@ void init_cameraman_manager(void)
 }
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0182_doit_camera_view_angle_cntrl", doit_cameraman_manager);
-/* NEARMISS-STUB doit_cameraman_manager */
-#if 0 /* NEARMISS 95.7% cat=branch-layout sub=- | loop bgezl with delay slot load | attempts=1 */
 void doit_camera_lws_animation_manager(s32 player, s32 boss, f32 value);
 void doit_cameraman(f32 value, u8 *cam);
 void doit_camera_region_manager(s32 boss, f32 value);
@@ -554,8 +552,6 @@ s32 GAMEUTIL_get_boss_obj(void);
 void doit_cameraman_manager(f32 value)
 {
     s32 i;
-    s32 *p;
-    s32 *base;
     s32 v;
     s32 player;
     s32 boss;
@@ -565,20 +561,14 @@ void doit_cameraman_manager(f32 value)
     doit_camera_lws_animation_manager(player, boss, value);
     boss = GAMEUTIL_get_boss_obj();
     doit_camera_region_manager(boss, value);
-    base = D_40218510;
-    p = base + 2;
-    v = *p;
-    i = 4;
-    do
+    for (i = 0; i < 5; i++)
     {
-        p++;
+        v = D_40218510[i + 2];
         if (v != 0)
         {
             doit_cameraman(value, (u8 *)v);
         }
-        i--;
-        v = *p;
-    } while (i >= 0);
+    }
     reset_main_type_camera_lws_animation_update_flag();
     if (get_main_cameraman() != 0)
     {
@@ -587,5 +577,3 @@ void doit_cameraman_manager(f32 value)
     }
     camdebug_for_monitortest();
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0182_doit_camera_view_angle_cntrl", doit_cameraman_manager);

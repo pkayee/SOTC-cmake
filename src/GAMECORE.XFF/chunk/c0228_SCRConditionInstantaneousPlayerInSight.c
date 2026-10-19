@@ -365,8 +365,6 @@ s32 SCRConditionMyselfPartsDamaged(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4, s32 a
     return getBossPartsCurDamage(a0, a5) != 0.0f;
 }
 
-/* NEARMISS-STUB SCRConditionExecGazeToPlayer */
-#if 0 /* NEARMISS 95.62% cat=regalloc sub=- | cmpA/cmpB and slti result regs differ (target v0/v1, ours v1/a0); bnel shape not reproduced | attempts=2 */
 s32 SCRConditionExecGazeToPlayer(s32 a0)
 {
     u8 *gcw;
@@ -382,32 +380,19 @@ s32 SCRConditionExecGazeToPlayer(s32 a0)
     p = gcw + 0x3CA0;
     chr = GetCharacterClass(a0);
     s2 = *(u8 **)(chr + 0x1064);
-    if (*(s32 *)(p + 0x14) != 0)
-    {
+    if (*(s32 *)(p + 0x14) != 0) {
         cmpB = *(s32 *)(p + 0x30);
         cmpA = *(s32 *)(gcw + 0x4058);
-    }
-    else
-    {
-        if (getPassageNum(gcw) >= 2)
-        {
-            return 0;
-        }
-        if (*(s32 *)(gcw + 0x39C) != 0)
-        {
-            return 0;
-        }
-        cmpB = *(s32 *)(gcw + 0x4058);
+    } else {
+        if (getPassageNum(gcw) >= 2) goto fail;
+        if (*(s32 *)(gcw + 0x39C) != 0) goto fail;
         cmpA = *(s32 *)(gcw + 0x94);
+        cmpB = *(s32 *)(gcw + 0x4058);
     }
-    if (cmpA != cmpB)
-    {
-        return 0;
-    }
-    return *(s32 *)(s2 + 0x68);
+    if (cmpA == cmpB) return *(s32 *)(s2 + 0x68);
+fail:
+    return 0;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0228_SCRConditionInstantaneousPlayerInSight", SCRConditionExecGazeToPlayer);
 
 s32 SCRConditionOverPlayerLife(f32 a0)
 {

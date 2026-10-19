@@ -39,26 +39,22 @@ float get_base_yaw_nico_sight_on(void *arg0)
     return (*(float *)((char *)(arg0) + 0x280));
 }
 
-/* NEARMISS-STUB get_object_local_base_yaw_nico_sight_on */
-#if 0 /* NEARMISS 90.48% cat=cse-hoist sub=- | zero-stores of yaw/pitch emitted before lw of p+4; target loads a1 first, stores pitch after it | attempts=1 */
 extern void GAMEUTIL_get_local_directionZ(float *, s32);
 extern void GAMEUTIL_get_yaw_pitch_by_direction(float *, float *, float *);
 extern float GAMEUTIL_get_move_radi_from_yaw1_to_yaw2(float, float);
 
-void get_object_local_base_yaw_nico_sight_on(char *p)
+float get_object_local_base_yaw_nico_sight_on(char *p)
 {
+    union { s32 i; float f; } *u = (void *)(p + 4);
+    s32 arg = u->i;
     float dir[4];
     float yaw = 0.0f;
     float pitch = 0.0f;
-    s32 arg = *(s32 *)(p + 4);
 
     GAMEUTIL_get_local_directionZ(dir, arg);
     GAMEUTIL_get_yaw_pitch_by_direction(&yaw, &pitch, dir);
-    GAMEUTIL_get_move_radi_from_yaw1_to_yaw2(yaw, *(float *)(p + 0x280));
-    return;
+    return GAMEUTIL_get_move_radi_from_yaw1_to_yaw2(yaw, *(float *)(p + 0x280));
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0093_begin_nico_sight_on", get_object_local_base_yaw_nico_sight_on);
 
 float get_base_pitch_nico_sight_on(void *arg0)
 {
