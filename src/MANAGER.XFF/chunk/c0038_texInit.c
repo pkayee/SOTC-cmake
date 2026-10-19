@@ -8,7 +8,61 @@ void isysAddGroupWithLinkParam(void *, void *, s32, s32);
 int strcmp(const char *, const char *);
 void texScaleClut(void *mop, float *rgba);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0038_texInit", texInit);
+extern s32 D_401AC5CC;
+extern s32 *D_401AC5C4;
+extern s32 *D_401AC5C8;
+extern s32 D_4012A698;
+extern float D_4012A69C;
+extern float D_4012A6A0;
+extern u8 D_401AC5C0[];
+extern s32 rootPtn;
+void isysInitGroup(void *);
+void *iosMallocAlign(void *, s32, s32);
+void *iosgluGetCameraContext(void);
+s32 getDrawScreenWidth(void);
+float iosGetATan2fExact(float, float);
+void vramReset(void);
+
+void func_40040E78(void *, float);
+
+void texInit(s32 count)
+{
+    char *ctx;
+    char *n;
+    char *m;
+    s32 i;
+
+    D_401AC5CC = count;
+    isysInitGroup(D_401AC5C0);
+    D_401AC5C4 = iosMallocAlign(&rootPtn, D_401AC5CC << 2, 0x10);
+    D_401AC5C8 = iosMallocAlign(&rootPtn, D_401AC5CC << 2, 0x10);
+    ctx = iosgluGetCameraContext();
+    if (ctx != 0)
+    {
+        float a;
+        a = iosGetATan2fExact(*(float *)(ctx + 0xC), (float)getDrawScreenWidth() * 0.5f);
+        D_4012A6A0 = a * D_4012A69C;
+    }
+    for (i = 0; i < D_401AC5CC; i++)
+    {
+        D_401AC5C4[i] = D_401AC5C8[i] = 0;
+    }
+    vramReset();
+    n = (char *)D_4012A6A4;
+    if (n != 0)
+    {
+        do
+        {
+            m = *(char **)(*(char **)(*(char **)(*(char **)(n + 4) + 0x28) + 0x20) + 0xC);
+            *(s32 *)(m + 0x14) = 0;
+            *(s32 *)(m + 0x10) = 0;
+            *(s32 *)(m + 0x1C) = 0;
+            *(s32 *)(m + 0x18) = 0;
+            n = (char *)*(s32 *)(n + 0xC);
+        } while (n != 0);
+    }
+    D_4012A698 = 1;
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0038_texInit", texScaleClutAlphaByName);
 
@@ -185,7 +239,45 @@ void texDelete(char *t)
     n->used = 0;
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0038_texInit", texReset);
+void texReset(s32 flag, float f)
+{
+    char *ctx;
+    TexDeleteNode *n;
+    char *m;
+    char *o;
+    s32 i;
+
+    ctx = iosgluGetCameraContext();
+    if (ctx != 0)
+    {
+        float a;
+        a = iosGetATan2fExact(*(float *)(ctx + 0xC), (float)getDrawScreenWidth() * 0.5f);
+        D_4012A6A0 = a * D_4012A69C;
+    }
+    for (i = 0; i < D_401AC5CC; i++)
+    {
+        D_401AC5C4[i] = D_401AC5C8[i] = 0;
+    }
+    vramReset();
+    n = D_4012A6A4;
+    if (n != 0)
+    {
+        do
+        {
+            o = *(char **)((char *)n->a + 0x28);
+            m = *(char **)(*(char **)(o + 0x20) + 0xC);
+            *(s32 *)(m + 0x14) = 0;
+            *(s32 *)(m + 0x10) = 0;
+            *(s32 *)(m + 0x1C) = 0;
+            *(s32 *)(m + 0x18) = 0;
+            if (flag != 0)
+            {
+                func_40040E78(o, f);
+            }
+            n = n->next;
+        } while (n != 0);
+    }
+}
 
 char *texSearchMopByName(char *name)
 {
