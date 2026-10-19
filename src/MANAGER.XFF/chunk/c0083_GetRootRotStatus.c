@@ -87,28 +87,16 @@ void *getDisableExtendWallFlag(void)
     return D_4012AF38;
 }
 
-/* NEARMISS-STUB func_40074BB8 */
-#if 0 /* NEARMISS 86.25% cat=branch-layout sub=- | compiler if-converts return 0/1 compare to xor+sltu; target uses bne with v0=1 in delay slot | attempts=1 */
-extern void *GetLayoutClass(void *);
-
-long func_40074BB8(void *arg0, void *arg1)
+s32 func_40074BB8(void *arg0, void *arg1)
 {
-    void *s0;
-    void *temp_v0;
-    s32 var_v0;
-
-    s0 = *(void **)((char *)(arg1) + 0x40);
-    var_v0 = 0;
+    void *s0 = *(void **)((char *)arg1 + 0x40);
     if (arg0 != s0) {
-        temp_v0 = GetLayoutClass(arg0);
-        if (*(s32 *)((char *)(temp_v0) + 0x194) != (s32) s0) {
-            var_v0 = 1;
+        if (*(void **)((char *)GetLayoutClass(arg0) + 0x194) != s0) {
+            return 1;
         }
     }
-    return var_v0;
+    return 0;
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0083_GetRootRotStatus", func_40074BB8);
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0083_GetRootRotStatus", func_40074BF8);
 

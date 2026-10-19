@@ -111,7 +111,16 @@ s32 func_400D20B8(s32 a) {
 }
 
 /* NEARMISS-STUB func_400D20C0 */
-#if 0 /* NEARMISS 97.59% cat=regalloc sub=- | no cause recorded | attempts=1 */
+#if 0 /* NEARMISS 99.64% cat=regalloc sub=- | d2 r94: CALLEE-ARG-PROTO isysGroupForNext(node, 0) + real prototypes 97.59->99.64; left: params p1/p2 swapped in s4/s7 (target p1=s4, p2=s7); voids32/s64 param  | attempts=2 */
+extern void GetGeometryPointerPosition(s32 *);
+extern s32 *isysGroupForFirst(s32 *, s32);
+extern s32 *isysGroupForNext(s32 *, s32);
+extern void isysGroupForExit(s32, s32);
+extern s32 *get_top_emitter_list_from_particle_geodisp(s32);
+extern s32 *create_and_boot_particle_geodisp(u8 *, u8 *, u8 *, u8 *, u8 *);
+extern void isysAddGroupWithLinkParam(s32 *, s32 *, s32, s32);
+s32 func_400D2320(s32 *, s32 *, u8 *, u8 *, u8 *, u8 *, u8 *);
+
 s32 func_400D20C0(u8 *p0, u8 *p1, u8 *p2, u8 *p3, u8 *p4) {
     s32 buf[4];
     s32 *node;
@@ -128,7 +137,7 @@ s32 func_400D20C0(u8 *p0, u8 *p1, u8 *p2, u8 *p3, u8 *p4) {
             if (ret != 0) {
                 break;
             }
-            node = isysGroupForNext();
+            node = isysGroupForNext(node, 0);
         }
         if (geo != 0) {
             isysGroupForExit(geo, 0);
