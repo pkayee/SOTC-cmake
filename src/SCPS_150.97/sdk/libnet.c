@@ -56,6 +56,23 @@ extern const char D_00138BF8[];
 s32 sceSifMCallRpc(void *, u32, u32, void *, s32, void *, s32, void *, void *);
 s32 scePrintf();
 
+extern s32 D_00163EC0[];
+extern s32 D_00135A44[];
+s32 sceDbcSendData3(s32, s32, void *, void *, void *);
+void func_00121158(void);
+s32 *func_00121030(void);
+
+typedef struct
+{
+    s32 lo;
+    s32 hi;
+} McClock8;
+
+typedef struct
+{
+    s32 w[196];
+} NetcnfResult;
+
 s32 CallRpc(void *cd, s32 cmd, void *buf, s32 ssize, s32 rsize)
 {
     s32 s0;
@@ -394,7 +411,51 @@ s32 sceInetRecv(void *cd, s32 *obj, s32 a2, void *dst, s32 a4, s32 *a5, s32 a6)
     return ret;
 }
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceInetRecvFrom);
+s32 sceInetRecvFrom(void *cd, s32 *net_buf, s32 a2, void *a3, s32 a4, s32 *a5, void *a6, s32 *a7, s32 a8)
+{
+    s32 ret;
+
+    net_buf[0] = a2;
+    if (a5 != NULL)
+    {
+        net_buf[1] = *a5;
+    }
+    else
+    {
+        net_buf[1] = 0;
+    }
+    net_buf[2] = a4;
+    net_buf[3] = a8;
+    ret = CallRpc(cd, 0xD, net_buf, 0x10, a4 + 0x1C);
+    if (ret < 0)
+    {
+        return -0x21E;
+    }
+    ret = net_buf[0];
+    if (ret < 0)
+    {
+        return ret;
+    }
+    if (a5 != NULL)
+    {
+        *a5 = net_buf[1];
+    }
+    ret = MemcpyS(cd, a6, net_buf, 2, 0x10);
+    if (ret < 0)
+    {
+        return ret;
+    }
+    if (a7 != NULL)
+    {
+        *a7 = net_buf[6];
+    }
+    ret = MemcpyS(cd, a3, net_buf, 7, net_buf[0]);
+    if (ret >= 0)
+    {
+        ret = net_buf[0];
+    }
+    return ret;
+}
 
 s32 sceInetSend(void *cd, s32 *net_buf, s32 a2, void *a3, s32 a4, s32 *a5, s32 a6)
 {
@@ -429,7 +490,44 @@ s32 sceInetSend(void *cd, s32 *net_buf, s32 a2, void *a3, s32 a4, s32 *a5, s32 a
     return net_buf[0];
 }
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceInetSendTo);
+s32 sceInetSendTo(void *cd, s32 *net_buf, s32 a2, void *a3, s32 a4, s32 *a5, void *a6, s32 a7, s32 a8)
+{
+    s32 ret;
+
+    net_buf[0] = a2;
+    if (a5 != NULL)
+    {
+        net_buf[1] = *a5;
+    }
+    else
+    {
+        net_buf[1] = 0;
+    }
+    net_buf[2] = a4;
+    net_buf[3] = a8;
+    net_buf[4] = a7;
+    ret = MemcpyD(cd, net_buf, 5, a6, 0x10);
+    if (ret < 0)
+    {
+        return ret;
+    }
+    ret = MemcpyD(cd, net_buf, 9, a3, a4);
+    if (ret < 0)
+    {
+        return ret;
+    }
+    ret = CallRpc(cd, 0xE, net_buf, a4 + 0x24, 8);
+    if (ret < 0)
+    {
+        return -0x21E;
+    }
+    if (a5 == NULL)
+    {
+        return net_buf[0];
+    }
+    *a5 = net_buf[1];
+    return net_buf[0];
+}
 
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceInetAbort);
 s32 sceInetAbort(void *cd, s32 *net_buf, s32 a2, s32 a3)
@@ -2505,15 +2603,94 @@ INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", _sceMcCoreSetCardSpec);
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", _sceMcCoreGetCardSpec);
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", _sceMcCoreCheckNewCard);
+s32 _sceMcCoreCheckNewCard(s32 port)
+{
+    s32 cmd[4];
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", _sceMcCoreClearNewCardFlag);
+    if (sceDbcGetConnection(D_00163E48[port].unk04) == 3)
+    {
+        return 0;
+    }
+    D_00163EC0[2] = D_00163E48[port].unk08[0];
+    D_00163EC0[3] = D_00163E48[port].unk08[1];
+    D_00163EC0[4] = D_00163E48[port].unk08[2];
+    D_00163EC0[5] = 0;
+    D_00163EC0[6] = 0;
+    cmd[0] = 0x2080;
+    memset(D_00165F40, 0, 0x100);
+    D_00135A44[0] = 4;
+    while (sceDbcSendData3(D_00163E48[port].unk04, D_00135A44[0], cmd, D_00163EC0, func_00121158) != 1)
+    {
+    }
+    return func_00121030()[2];
+}
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", _sceMcCoreAuthentication);
+s32 _sceMcCoreClearNewCardFlag(s32 port)
+{
+    s32 cmd[4];
+
+    if (sceDbcGetConnection(D_00163E48[port].unk04) == 3)
+    {
+        return 0;
+    }
+    D_00163EC0[5] = 0;
+    D_00163EC0[6] = 0;
+    cmd[0] = 0x2080;
+    memset(D_00165F40, 0, 0x100);
+    D_00135A44[0] = 0xD;
+    while (sceDbcSendData3(D_00163E48[port].unk04, D_00135A44[0], cmd, D_00163EC0, func_00121158) != 1)
+    {
+    }
+    return func_00121030()[2];
+}
+
+s32 _sceMcCoreAuthentication(s32 port)
+{
+    s32 cmd[4];
+
+    if (sceDbcGetConnection(D_00163E48[port].unk04) == 3)
+    {
+        return 0;
+    }
+    cmd[0] = 0x2080;
+    D_00163EC0[5] = 0;
+    D_00163EC0[6] = 0;
+    memset(D_00165F40, 0, 0x100);
+    SyncDCache(D_00165F40, (u8 *)D_00165F40 + 0xFF);
+    D_00135A44[0] = 0xC;
+    while (sceDbcSendData3(D_00163E48[port].unk04, D_00135A44[0], cmd, D_00163EC0, func_00121158) != 1)
+    {
+    }
+    return func_00121030()[2] != 0;
+}
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", _sceMcCoreWriteBack);
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", _sceMcCoreReadClock);
+s32 _sceMcCoreReadClock(s32 port, McClock8 *out)
+{
+    s32 cmd[4];
+    s32 *r;
+
+    if (sceDbcGetConnection(D_00163E48[port].unk04) == 3)
+    {
+        return 0;
+    }
+    D_00163EC0[5] = 0;
+    D_00163EC0[6] = 0;
+    cmd[0] = 0x2080;
+    memset(D_00165F40, 0, 0x100);
+    D_00135A44[0] = 10;
+    while (sceDbcSendData3(D_00163E48[port].unk04, D_00135A44[0], cmd, D_00163EC0, func_00121158) != 1)
+    {
+    }
+    r = func_00121030();
+    if (r[2] == 0)
+    {
+        return 0;
+    }
+    *out = *(McClock8 *)(r + 3);
+    return r[2];
+}
 
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", _sceMcCoreReadPage2);
 
@@ -2673,7 +2850,11 @@ s32 sceNetcnfifCheck(void)
     return sce_sync(1);
 }
 
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceNetcnfifGetResult);
+s32 sceNetcnfifGetResult(NetcnfResult *out)
+{
+    *out = *(NetcnfResult *)D_00168080;
+    return 0;
+}
 
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libnet", sceNetcnfifSetFNoDecode);
 s32 sceNetcnfifSetFNoDecode(s32 arg0)
