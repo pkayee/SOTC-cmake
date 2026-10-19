@@ -1,5 +1,67 @@
 #include "common.h"
 
+extern s32 DldSysUndefSymbol;
+extern u8 *GetSCRCharaAIWorkPtr();
+extern void isysRequestDeleteObj();
+extern s32 ScrParam_player_weapon_none;
+extern u8 *GetCharacterClass();
+extern s32 SCRSetupWeaponPlayer();
+extern s32 is_doing_nico_sight_on();
+extern void end_nico_sight_on();
+
+extern s32 SeList_hp_max;
+extern s32 SeList_grip_max;
+extern s32 ControlMode_GEX_TAIL_DEATH;
+extern u8 *GetScriptClass();
+extern void sePlaySystemSound();
+extern void addPlayerMaxHp(f32);
+extern void addPlayerMaxGrip(f32);
+extern void addPlayerHp(f32);
+extern void addPlayerGrip(f32);
+extern f32 getPlayerMaxHp();
+extern void nico_setFruitsFlag();
+extern u8 *getSObjNode();
+extern void SetLayoutObjAccessSwitch();
+extern void tailsFlagSet();
+extern void setTailCutTime();
+extern u8 *GetLayoutClass();
+extern f32 ZeroPoint[];
+extern void GAMEUTIL_get_1p_left_analog_input_extend(f32 *x, f32 *y, s32 mode, f32 dead);
+extern void func_4008B198();
+extern f32 GetWeaponRange();
+extern void doit_nico_sight_on(u8 *sight, f32 range, f32 x, f32 y);
+extern void get_predict_hit_position_nico_sight_on();
+extern void sprWeaponSetMarker();
+
+extern s32 SkelFocusDef_PLAYER_HAND_A_R;
+extern s32 SkelFocusDef_PLAYER_HAND_A_L;
+extern s32 ScriptAnimationObjDef_ARROW_START;
+extern s32 ScriptAnimationObjDef_ARROW_EXP_START;
+extern s32 ScriptAnimationObjDef_ARROW_SOUND_START;
+extern s32 ScriptAnimationObjDef_BOW_START;
+extern s32 _SCRSetupLWSWithTargetNodeParent();
+extern void _SCRStartLWS();
+extern void func_40088BC8();
+
+extern s32 ScriptAnimationObjDef_ARROW_LOOP;
+extern s32 ScriptAnimationObjDef_ARROW_EXP_LOOP;
+extern s32 ScriptAnimationObjDef_ARROW_SOUND_LOOP;
+extern s32 ScriptAnimationObjDef_BOW_LOOP;
+
+extern s32 ScriptAnimationObjDef_BOW_END;
+extern void func_4008B458();
+extern void SCRSetupArrow1ByPlayer2();
+
+extern s32 ScriptAnimationObjDef_HARPOON_START;
+
+static inline u8 *dldRef(u32 *lp, s32 fld) {
+    u8 *slot;
+    u32 off = *lp & 0x3FFFF;
+
+    slot = off ? *(u8 **)((u8 *)lp - off) : NULL;
+    return (slot != NULL && slot != (u8 *)DldSysUndefSymbol) ? *(u8 **)(slot + fld) : NULL;
+}
+
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0101_nico_createPlayerParachute", nico_createPlayerParachute);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0101_nico_createPlayerParachute", func_4008A5B0);
@@ -8,8 +70,6 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0101_nico_createPlayerParachut
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0101_nico_createPlayerParachute", SCRPlayerLandingRotateBounding);
 
-/* NEARMISS-STUB func_4008ADA8 */
-#if 0 /* NEARMISS 85.43% cat=regalloc sub=- | REA READY drop-in scored 85.43 in-TU (apply_ready) | attempts=1 */
 /* c0101 func_4008ADA8: player work teardown of the two LWS slots at +0x60, then end sight-on */
 void func_4008ADA8(s32 obj)
 {
@@ -18,9 +78,11 @@ void func_4008ADA8(s32 obj)
     u8 *sight;
 
     if (p[1] != 0) {
-        if (((u8 *)p)[0x15] != 0) {
-            isysRequestDeleteObj(p[1]);
-        } else if (p[3] == 0) {
+        if (((u8 *)p)[0x15] == 0) {
+            if (p[3] == 0) {
+                isysRequestDeleteObj(p[1]);
+            }
+        } else {
             isysRequestDeleteObj(p[1]);
         }
         p[1] = 0;
@@ -28,9 +90,11 @@ void func_4008ADA8(s32 obj)
         ((u8 *)p)[0x15] = 0;
     }
     if (p[0] != 0) {
-        if (((u8 *)p)[0x14] != 0) {
-            isysRequestDeleteObj(p[0]);
-        } else if (p[2] == 0) {
+        if (((u8 *)p)[0x14] == 0) {
+            if (p[2] == 0) {
+                isysRequestDeleteObj(p[0]);
+            }
+        } else {
             isysRequestDeleteObj(p[0]);
         }
         p[0] = 0;
@@ -48,11 +112,7 @@ void func_4008ADA8(s32 obj)
         end_nico_sight_on(sight);
     }
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0101_nico_createPlayerParachute", func_4008ADA8);
 
-/* NEARMISS-STUB func_4008AEF0 */
-#if 0 /* NEARMISS 94.2% cat=regalloc sub=- | REA READY drop-in scored 94.20 in-TU (apply_ready) | attempts=1 */
 /* c0101 fruit pickup: apply the sheet row (max hp/grip, hp, grip) then delete the fruit obj */
 void func_4008AEF0(void)
 {
@@ -61,6 +121,7 @@ void func_4008AEF0(void)
     f32 rem;
     u8 *node;
     u8 *cc;
+    s32 *mode;
 
     if (row != NULL) {
         if (row[0] != 0.0f) {
@@ -78,8 +139,9 @@ void func_4008AEF0(void)
         addPlayerHp(row[2]);
         addPlayerGrip(row[3]);
     }
+    mode = &ControlMode_GEX_TAIL_DEATH;
     cc = GetCharacterClass(*(s32 *)(w + 0x10C));
-    if (ControlMode_GEX_TAIL_DEATH != *(s32 *)(cc + 0x740)) {
+    if (*mode != *(s32 *)(cc + 0x740)) {
         nico_setFruitsFlag(*(s32 *)(w + 0x10C));
         isysRequestDeleteObj(*(s32 *)(w + 0x10C));
         *(s32 *)(w + 0x10C) = 0;
@@ -94,16 +156,11 @@ void func_4008AEF0(void)
     }
     *(s32 *)(w + 0x108) = 0;
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0101_nico_createPlayerParachute", func_4008AEF0);
 
-/* NEARMISS-STUB func_4008B070 */
-#if 0 /* NEARMISS 88.66% cat=regalloc sub=- | REA READY drop-in scored 88.66 in-TU (apply_ready) | attempts=1 */
 /* c0101 per-frame sight-on update: cache the old marker, read the stick, update or clear the marker */
 void func_4008B070(s32 obj, u8 *w)
 {
     u8 *sight = w + 0x290;
-    u8 *marker = w + 0x30;
     f32 in[2];
     s32 on;
 
@@ -116,10 +173,10 @@ void func_4008B070(s32 obj, u8 *w)
             func_4008B198(obj, w);
             doit_nico_sight_on(sight, GetWeaponRange(), in[0], in[1]);
         }
-        get_predict_hit_position_nico_sight_on(marker, sight);
+        get_predict_hit_position_nico_sight_on(w + 0x30, sight);
         w[0x50] = on;
         *(f32 *)(w + 0x3C) = 1.0f;
-        sprWeaponSetMarker(marker, *(s32 *)(GetLayoutClass(obj) + 0x134), 1);
+        sprWeaponSetMarker(w + 0x30, *(s32 *)(GetLayoutClass(obj) + 0x134), 1);
         *(s32 *)(w + 0x134) = on;
     } else {
         *(u128 *)(w + 0x30) = *(u128 *)ZeroPoint;
@@ -127,30 +184,26 @@ void func_4008B070(s32 obj, u8 *w)
         sprWeaponSetMarker(0, 0, 0);
     }
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0101_nico_createPlayerParachute", func_4008B070);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0101_nico_createPlayerParachute", func_4008B198);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0101_nico_createPlayerParachute", func_4008B458);
 
-/* NEARMISS-STUB func_4008B660 */
-#if 0 /* NEARMISS 78.72% cat=regalloc sub=- | REA READY drop-in scored 78.72 in-TU (apply_ready) | attempts=1 */
 /* c0101 bow start: restart the arrow and bow LWS pair */
 void func_4008B660(s32 obj)
 {
     u8 *w = GetSCRCharaAIWorkPtr(obj);
     s32 *p = (s32 *)(w + 0x60);
-    s32 a0;
-
     if (p[6] != 0) {
         isysRequestDeleteObj(p[6]);
         p[6] = 0;
     }
     if (p[1] != 0) {
-        if (((u8 *)p)[0x15] != 0) {
-            isysRequestDeleteObj(p[1]);
-        } else if (p[3] == 0) {
+        if (((u8 *)p)[0x15] == 0) {
+            if (p[3] == 0) {
+                isysRequestDeleteObj(p[1]);
+            }
+        } else {
             isysRequestDeleteObj(p[1]);
         }
         p[1] = 0;
@@ -158,49 +211,46 @@ void func_4008B660(s32 obj)
         ((u8 *)p)[0x15] = 0;
     }
     if (p[0] != 0) {
-        if (((u8 *)p)[0x14] != 0) {
-            isysRequestDeleteObj(p[0]);
-        } else if (p[2] == 0) {
+        if (((u8 *)p)[0x14] == 0) {
+            if (p[2] == 0) {
+                isysRequestDeleteObj(p[0]);
+            }
+        } else {
             isysRequestDeleteObj(p[0]);
         }
         p[0] = 0;
         p[2] = 1;
         ((u8 *)p)[0x14] = 0;
     }
-    if (*(s32 *)(w + 0x70) == 4) {
-        a0 = ScriptAnimationObjDef_ARROW_START;
-    } else if (*(s32 *)(w + 0x70) == 6) {
-        a0 = ScriptAnimationObjDef_ARROW_SOUND_START;
-    } else {
-        a0 = ScriptAnimationObjDef_ARROW_EXP_START;
-    }
 
-    *(s32 *)(w + 0x60) = _SCRSetupLWSWithTargetNodeParent(a0, obj, SkelFocusDef_PLAYER_HAND_A_R);
+    if (*(s32 *)(w + 0x70) == 4) {
+        *(s32 *)(w + 0x60) = _SCRSetupLWSWithTargetNodeParent(ScriptAnimationObjDef_ARROW_START, obj, SkelFocusDef_PLAYER_HAND_A_R);
+    } else if (*(s32 *)(w + 0x70) == 6) {
+        *(s32 *)(w + 0x60) = _SCRSetupLWSWithTargetNodeParent(ScriptAnimationObjDef_ARROW_SOUND_START, obj, SkelFocusDef_PLAYER_HAND_A_R);
+    } else {
+        *(s32 *)(w + 0x60) = _SCRSetupLWSWithTargetNodeParent(ScriptAnimationObjDef_ARROW_EXP_START, obj, SkelFocusDef_PLAYER_HAND_A_R);
+    }
     *(s32 *)(w + 0x64) = _SCRSetupLWSWithTargetNodeParent(ScriptAnimationObjDef_BOW_START, obj, SkelFocusDef_PLAYER_HAND_A_L);
     _SCRStartLWS(*(s32 *)(w + 0x60), -1, 3, w + 0x68);
     _SCRStartLWS(*(s32 *)(w + 0x64), -1, 3, w + 0x6C);
     func_40088BC8(w);
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0101_nico_createPlayerParachute", func_4008B660);
 
-/* NEARMISS-STUB func_4008B7E8 */
-#if 0 /* NEARMISS 79.34% cat=regalloc sub=- | REA READY drop-in scored 79.34 in-TU (apply_ready) | attempts=1 */
 /* c0101 bow loop: restart the arrow and bow LWS pair at looping level */
 void func_4008B7E8(s32 obj)
 {
     u8 *w = GetSCRCharaAIWorkPtr(obj);
     s32 *p = (s32 *)(w + 0x60);
-    s32 a0;
-
     if (p[6] != 0) {
         isysRequestDeleteObj(p[6]);
         p[6] = 0;
     }
     if (p[1] != 0) {
-        if (((u8 *)p)[0x15] != 0) {
-            isysRequestDeleteObj(p[1]);
-        } else if (p[3] == 0) {
+        if (((u8 *)p)[0x15] == 0) {
+            if (p[3] == 0) {
+                isysRequestDeleteObj(p[1]);
+            }
+        } else {
             isysRequestDeleteObj(p[1]);
         }
         p[1] = 0;
@@ -208,36 +258,33 @@ void func_4008B7E8(s32 obj)
         ((u8 *)p)[0x15] = 0;
     }
     if (p[0] != 0) {
-        if (((u8 *)p)[0x14] != 0) {
-            isysRequestDeleteObj(p[0]);
-        } else if (p[2] == 0) {
+        if (((u8 *)p)[0x14] == 0) {
+            if (p[2] == 0) {
+                isysRequestDeleteObj(p[0]);
+            }
+        } else {
             isysRequestDeleteObj(p[0]);
         }
         p[0] = 0;
         p[2] = 1;
         ((u8 *)p)[0x14] = 0;
     }
-    if (*(s32 *)(w + 0x70) == 4) {
-        a0 = ScriptAnimationObjDef_ARROW_LOOP;
-    } else if (*(s32 *)(w + 0x70) == 6) {
-        a0 = ScriptAnimationObjDef_ARROW_SOUND_LOOP;
-    } else {
-        a0 = ScriptAnimationObjDef_ARROW_EXP_LOOP;
-    }
 
-    *(s32 *)(w + 0x60) = _SCRSetupLWSWithTargetNodeParent(a0, obj, SkelFocusDef_PLAYER_HAND_A_R);
+    if (*(s32 *)(w + 0x70) == 4) {
+        *(s32 *)(w + 0x60) = _SCRSetupLWSWithTargetNodeParent(ScriptAnimationObjDef_ARROW_LOOP, obj, SkelFocusDef_PLAYER_HAND_A_R);
+    } else if (*(s32 *)(w + 0x70) == 6) {
+        *(s32 *)(w + 0x60) = _SCRSetupLWSWithTargetNodeParent(ScriptAnimationObjDef_ARROW_SOUND_LOOP, obj, SkelFocusDef_PLAYER_HAND_A_R);
+    } else {
+        *(s32 *)(w + 0x60) = _SCRSetupLWSWithTargetNodeParent(ScriptAnimationObjDef_ARROW_EXP_LOOP, obj, SkelFocusDef_PLAYER_HAND_A_R);
+    }
     *(s32 *)(w + 0x64) = _SCRSetupLWSWithTargetNodeParent(ScriptAnimationObjDef_BOW_LOOP, obj, SkelFocusDef_PLAYER_HAND_A_L);
     _SCRStartLWS(*(s32 *)(w + 0x60), -1, 5, w + 0x68);
     _SCRStartLWS(*(s32 *)(w + 0x64), -1, 5, w + 0x6C);
-    *(u8 *)(w + 0x75) = 1;
     *(u8 *)(w + 0x74) = 1;
+    *(u8 *)(w + 0x75) = 1;
     func_40088BC8(w);
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0101_nico_createPlayerParachute", func_4008B7E8);
 
-/* NEARMISS-STUB func_4008B980 */
-#if 0 /* NEARMISS 85.06% cat=regalloc sub=- | REA READY drop-in scored 85.06 in-TU (apply_ready) | attempts=1 */
 /* c0101 bow end: stop both LWS, start BOW_END on the left hand, then set up the arrow */
 void func_4008B980(s32 obj)
 {
@@ -248,9 +295,11 @@ void func_4008B980(s32 obj)
     func_4008B458(buf, obj, w);
     p = (s32 *)(w + 0x60);
     if (p[1] != 0) {
-        if (((u8 *)p)[0x15] != 0) {
-            isysRequestDeleteObj(p[1]);
-        } else if (p[3] == 0) {
+        if (((u8 *)p)[0x15] == 0) {
+            if (p[3] == 0) {
+                isysRequestDeleteObj(p[1]);
+            }
+        } else {
             isysRequestDeleteObj(p[1]);
         }
         p[1] = 0;
@@ -258,9 +307,11 @@ void func_4008B980(s32 obj)
         ((u8 *)p)[0x15] = 0;
     }
     if (p[0] != 0) {
-        if (((u8 *)p)[0x14] != 0) {
-            isysRequestDeleteObj(p[0]);
-        } else if (p[2] == 0) {
+        if (((u8 *)p)[0x14] == 0) {
+            if (p[2] == 0) {
+                isysRequestDeleteObj(p[0]);
+            }
+        } else {
             isysRequestDeleteObj(p[0]);
         }
         p[0] = 0;
@@ -274,11 +325,7 @@ void func_4008B980(s32 obj)
     func_40088BC8(w);
     SCRSetupArrow1ByPlayer2(obj, *(s32 *)(w + 0x70), buf, w + 0x150);
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0101_nico_createPlayerParachute", func_4008B980);
 
-/* NEARMISS-STUB func_4008BAC0 */
-#if 0 /* NEARMISS 84.27% cat=regalloc sub=- | REA READY drop-in scored 84.27 in-TU (apply_ready) | attempts=1 */
 /* c0101 harpoon start: weapon 5, restart the right-hand LWS */
 void func_4008BAC0(s32 obj)
 {
@@ -290,9 +337,11 @@ void func_4008BAC0(s32 obj)
         p[6] = 0;
     }
     if (p[1] != 0) {
-        if (((u8 *)p)[0x15] != 0) {
-            isysRequestDeleteObj(p[1]);
-        } else if (p[3] == 0) {
+        if (((u8 *)p)[0x15] == 0) {
+            if (p[3] == 0) {
+                isysRequestDeleteObj(p[1]);
+            }
+        } else {
             isysRequestDeleteObj(p[1]);
         }
         p[1] = 0;
@@ -300,9 +349,11 @@ void func_4008BAC0(s32 obj)
         ((u8 *)p)[0x15] = 0;
     }
     if (p[0] != 0) {
-        if (((u8 *)p)[0x14] != 0) {
-            isysRequestDeleteObj(p[0]);
-        } else if (p[2] == 0) {
+        if (((u8 *)p)[0x14] == 0) {
+            if (p[2] == 0) {
+                isysRequestDeleteObj(p[0]);
+            }
+        } else {
             isysRequestDeleteObj(p[0]);
         }
         p[0] = 0;
@@ -315,5 +366,3 @@ void func_4008BAC0(s32 obj)
     _SCRStartLWS(*(s32 *)(w + 0x60), -1, 3, w + 0x68);
     func_40088BC8(w);
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0101_nico_createPlayerParachute", func_4008BAC0);

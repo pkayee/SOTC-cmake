@@ -22,7 +22,55 @@ typedef struct {
 
 extern void GAMEUTIL_reset_interp_value_cntrl(void *, float);
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0069_init_expression", init_expression);
+#define LN(f) (((ExprNode *)((char *)p + 0xA0))->f)
+/* GAMECORE c0069: reset the whole expression work. layout: id, status mgr at +4, interp ratio at +0x14, a 0x34 byte head node at +0x34, a full node at +0x68 (its +0x34 word is the count at +0x9C), then 30 nodes from +0xA0 */
+typedef union {
+    int i;
+    float f;
+} ExprW;
+extern void GAMEUTIL_reset_status_manager(void *, int);
+extern void GAMEUTIL_constructor_interp_ratio_cntrl(void *);
+static inline void resetInterp0(void *p)
+{
+    GAMEUTIL_reset_interp_value_cntrl(p, 0.0f);
+}
+
+void init_expression(char *w, int id)
+{
+    ExprW *a = (ExprW *)(w + 0x34);
+    ExprNode *p;
+    int i;
+
+    *(int *)w = id;
+    GAMEUTIL_reset_status_manager(w + 4, 0);
+    GAMEUTIL_constructor_interp_ratio_cntrl(w + 0x14);
+    a[0].i = 0;
+    a[3].i = 0;
+    a[2].i = 0;
+    a[1].i = 0;
+    GAMEUTIL_reset_interp_value_cntrl(w + 0x44, a[3].f);
+    resetInterp0(w + 0x50);
+    resetInterp0(w + 0x5C);
+    a[0xD].i = 0;
+    a[0x10].i = 0;
+    a[0xF].i = 0;
+    a[0xE].i = 0;
+    GAMEUTIL_reset_interp_value_cntrl(w + 0x78, a[0x10].f);
+    resetInterp0(w + 0x84);
+    resetInterp0(w + 0x90);
+    *(int *)(w + 0x9C) = 0;
+    p = (ExprNode *)w;
+    for (i = 29; i >= 0; i--, p++) {
+        LN(xC.i) = 0;
+        LN(id) = 0;
+        LN(x8) = 0;
+        LN(x4) = 0;
+        GAMEUTIL_reset_interp_value_cntrl(LN(interp0), LN(xC.f));
+        resetInterp0(LN(interp1));
+        resetInterp0(LN(interp2));
+        LN(x34) = 0;
+    }
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0069_init_expression", doit_expression);
 
@@ -247,7 +295,10 @@ void SCRRockReset(void *character)
     RequestCharacterMotionShiftFunc(character, &func_40064C20);
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0069_init_expression", func_40064BF8);
+void func_40064BF8(void *character)
+{
+    *(int *)(*(char **)(GetScrLwsOriClass(character) + 0x1158) + 0x10) = 1;
+}
 
 //INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0069_init_expression", func_40064C20);
 
