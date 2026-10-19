@@ -197,7 +197,7 @@ void func_001170B0(void)
 INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libcdvd/cdvd000", func_001170B0);
 
 /* NEARMISS-STUB func_00117198 */
-#if 0 /* NEARMISS 90.75% cat=cse-hoist sub=- | store before SignalSema needs volatile; target has lui s0 B60 after the sw, ours hoists lui s0 above lui v1 BA0 (scheduling) | attempts=2 */
+#if 0 /* NEARMISS 96.0% cat=volatile-alias sub=- | volatile sema read in the then-arm gives the target order (store before lw) but a volatile lw never fills the jal slot (+nop); target needs a store->load depend | attempts=3 */
 extern s32 D_00133B54[];
 extern s32 D_00133B60[];
 extern s32 D_00133B68[];
@@ -211,7 +211,7 @@ void func_00117198(void)
     if (D_00133B54[0] != 0)
     {
         ((volatile s32 *)D_00133BA0)[0] = -1;
-        SignalSema(D_00133B60[0]);
+        SignalSema(((volatile s32 *)D_00133B60)[0]);
     }
     DeleteSema(D_00133B68[0]);
     DeleteSema(D_00133B6C[0]);

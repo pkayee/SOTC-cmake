@@ -571,8 +571,6 @@ s32 Sg2ExPcmInputGetRealPlayFrameCount(u32 arg0)
 
 
 extern u16 pan_tbl[];
-/* NEARMISS-STUB func_40040710 */
-#if 0 /* NEARMISS 88.48% cat=regalloc sub=- | target vol->a0 ph1->t0 ph0->v1 pan->a1; ours vol->a1 ph1->v0 pan->a0 | attempts=1 */
 void func_40040710(u32 idx)
 {
     if (idx < 4)
@@ -580,24 +578,11 @@ void func_40040710(u32 idx)
         s32 d = 127;
         s32 d2 = 127;
         PcmInSlot *p = &D_40115958[idx];
-        s32 vol = p->f[107];
-        s32 ph0 = p->f[108];
-        s32 ph1 = p->f[109];
-        s32 pan = p->f[112];
-        s32 l = vol * ph0;
-        s32 r = vol * ph1;
-        u16 tbl = pan_tbl[pan];
-        p->f[110] = l * (tbl >> 8) / d;
-        p->f[111] = r * (tbl & 0xFF) / d2;
+        u16 tbl;
+        p->f[110] = p->f[107] * p->f[108] * ((tbl = pan_tbl[p->f[112]]) >> 8) / d;
+        p->f[111] = p->f[107] * p->f[109] * (tbl & 0xFF) / d2;
     }
 }
-
-/* kR38 (repair, not matched): best 88.48% = kR31 form (vol,ph0,ph1,pan load order; d/d2 locals; pan_tbl extern).
-   Tried: ph1-before-ph0 declare order 87.97; pan-table-as-u8 two loads 79.52; lo/hi split order swap 81.76;
-   tbl read before l/r products 88.48 (no change). Residual: target allocs vol->a0, ph1->t0, ph0->v1, pan->a1;
-   ours vol->a1, ph1->v0, pan->a0; mult1 operands differ. Needs an idea (register allocation), not a mechanical fix. */
-#endif
-INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", func_40040710);
 
 //INCLUDE_ASM("asm/KERNEL.XFF/nonmatchings/Sg2/ex/pcm", Sg2ExPcmInputSetVol);
 void Sg2ExPcmInputSetVol(u32 arg0, s32 arg1)
