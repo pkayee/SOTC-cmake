@@ -73,6 +73,37 @@ INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0215_createHumanCtrlWork", cal
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0215_createHumanCtrlWork", calcAttainPosForDirExec);
 
+/* NEARMISS-STUB calcMoveAngle */
+#if 0 /* NEARMISS 93.81% cat=cse-hoist sub=- | d2 r105: goto-loop (no loop.c: target rematerialises K/DEG/1.0 in the loop, only tgt*r hoisted by hand) reproduces the body; left: t=K reuses the f24 copy of K  | attempts=1 */
+extern float fabsf(float);
+extern f32 getRatioFromInterp(f32, f32);
+
+f32 calcMoveAngle(f32 tgt, f32 cur, f32 dt, f32 *out, f32 x)
+{
+    f32 r = getRatioFromInterp(dt, 0.03333333135f);
+    f32 sum = 0.0f;
+    f32 t = 0.0f;
+
+    if (dt >= 0.03333333135f && fabsf(tgt - cur) > 0.017453292f) {
+        t = 0.03333333135f;
+        sum += cur * 0.03333333135f;
+        if (!(fabsf(sum + x) <= 0.017453292f)) {
+            f32 a = tgt * r;
+        loop:
+            cur = a + cur * (1.0f - r);
+            if (fabsf(tgt - cur) > 0.017453292f) {
+                t += 0.03333333135f;
+                sum += cur * 0.03333333135f;
+                if (!(fabsf(sum + x) <= 0.017453292f))
+                    goto loop;
+            }
+        }
+    }
+    if (out != 0)
+        *out = t;
+    return sum;
+}
+#endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0215_createHumanCtrlWork", calcMoveAngle);
 
 extern float fabsf(float);

@@ -74,7 +74,21 @@ float func_40116FB8(char *obj, float angle)
                          *(float *)(**(char ***)(obj + 0x1C) + 0x78));
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0219_setDashSlowLegCtrlWork", func_40116FE0);
+extern void PredictMotionGeometryPotentialWithScaleElem(void *, f32 *, s32, s32, f32, f32);
+
+void func_40116FE0(f32 s, u8 *o, f32 *v)
+{
+    u8 *w = *(u8 **)(o + 0xCC);
+    f32 d[4];
+    f32 pos[4];
+    f32 *m = *(f32 **)(o + 0x1C);
+
+    PredictMotionGeometryPotentialWithScaleElem(pos, d, *(s32 *)(o + 8), *(s32 *)m, m[3], -1.0f);
+    if ((d[0] >= 0.0f && *v >= 0.0f) || (d[0] <= 0.0f && *v <= 0.0f))
+        *(f32 *)(o + 0x160) = *(f32 *)(o + 0x154) / s;
+    else
+        *(f32 *)(o + 0x160) = *(f32 *)(w + 0x58);
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0219_setDashSlowLegCtrlWork", createWormCtrlWork);
 
