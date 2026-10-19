@@ -159,7 +159,7 @@ s32 glGetLineSmooth(void) {
 }
 
 /* NEARMISS-STUB func_40028860 */
-#if 0 /* NEARMISS 6.65% cat=sched sub=lq-sq-counter | three u128 copies via lq/sq: target stores the counter (sw t1,0x780) LAST, ours hoists it above the 2nd/3rd copy (s32 vs u128 no alias); on any of the  | attempts=1 */
+#if 0 /* NEARMISS 90.0% cat=no-c-form sub=vu0-copy-macro | three 16-byte copies as lq t0,0(rA)/sq t0,0(rB) with the addresses in registers (addiu base+0x180 first): a fixed t0 temp + register addresses = an inline-asm v | attempts=2 */
 void func_40028860(u8 *dst, u8 *src, s32 idx) {
     s32 n = *(s32 *)(dst + 0x780);
     u8 *d = dst + n * 16;
@@ -168,7 +168,7 @@ void func_40028860(u8 *dst, u8 *src, s32 idx) {
     *(u128 *)(d + 0x180) = *(u128 *)(s + 0x180);
     *(u128 *)(d + 0x480) = *(u128 *)(s + 0x480);
     *(u128 *)(d + 0x600) = *(u128 *)(s + 0x600);
-    *(s32 *)(dst + 0x780) = n + 1;
+    *(volatile s32 *)(dst + 0x780) = n + 1;
 }
 #endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0017_gluSetWrapMode", func_40028860);

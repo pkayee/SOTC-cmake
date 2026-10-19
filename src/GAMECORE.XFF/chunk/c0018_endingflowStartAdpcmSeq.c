@@ -404,6 +404,42 @@ s32 nico_checkTreeAllFruitsAlreadyTaken(s32 a0)
     return 1;
 }
 
+/* NEARMISS-STUB _omakeSelectFlagSet */
+#if 0 /* NEARMISS 82.42% cat=cse-hoist sub=sym-addr-hoist | search part = matched _omakeSelectFlagCls shape (inline search helper gives the early a2 copy of bit); left: the target re-forms D_401FD0A2 per use (lui at/addu | attempts=1 */
+typedef struct { u8 *p[4]; } OmGrp4_Set;
+extern OmGrp4_Set D_40132E88;
+extern u8 D_401FD0A2[];
+
+static inline u8 *omakeSelectGroup_inl(s32 bit)
+{
+    OmGrp4_Set grp = D_40132E88;
+    u8 **pp;
+    u8 *g;
+    s32 i;
+
+    for (pp = grp.p; (g = *pp) != 0; pp++) {
+        for (i = 0; g[i] != 0; i++) {
+            if (bit == g[i]) {
+                return g;
+            }
+        }
+    }
+    return 0;
+}
+
+void _omakeSelectFlagSet(s32 bit)
+{
+    u8 *found = omakeSelectGroup_inl(bit);
+    s32 i;
+
+    if (found != 0) {
+        for (i = 0; found[i] != 0; i++) {
+            D_401FD0A2[found[i] / 8] &= ~(1 << (found[i] & 7));
+        }
+    }
+    D_401FD0A2[bit / 8] |= 1 << (bit & 7);
+}
+#endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0018_endingflowStartAdpcmSeq", _omakeSelectFlagSet);
 
 /* NEARMISS-STUB omakeGetAndSelectCls */
