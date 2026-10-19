@@ -114,11 +114,82 @@ void DebugDispVolumeShape(void *shape)
     DebugDispVolumeShapeColor(shape, color.values);
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0123_ScriptAnimationObjCheckPositionInsideOfJ", DebugDispVolumeAll);
+extern s32 GetJudgeVolumeClass(s32);
+extern s32 GetJudgeVolumeClassObjectGroup(s32, s32);
+extern s32 *GetGlDebugSw(void);
+extern s32 *isysGroupForFirst(s32, s32);
+extern s32 *isysGroupForNext(s32 *, s32);
+extern void isysGroupForExit(s32, s32);
+extern DebugColor D_401338E0;
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0123_ScriptAnimationObjCheckPositionInsideOfJ", DebugDispVolumeAllColor);
+static inline void debugDispVolumeGroup(s32 arg0, s32 grp, float *col)
+{
+    u8 shape[0x60];
+    s32 g = GetJudgeVolumeClassObjectGroup(GetJudgeVolumeClass(arg0), grp);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0123_ScriptAnimationObjCheckPositionInsideOfJ", DeleteAllActiveScriptAnimationObj);
+    if (*GetGlDebugSw() != 0) {
+        s32 obj = 0;
+        s32 *it;
+
+        for (it = isysGroupForFirst(g, 0); it != NULL; it = isysGroupForNext(it, 0)) {
+            obj = *it;
+            if (ScriptAnimationObjOfJudgeVolumeObject((s32)shape, obj)) {
+                DebugDispVolumeShapeColor(shape, col);
+            }
+        }
+        if (obj != 0) {
+            isysGroupForExit(obj, 0);
+        }
+    }
+}
+
+void DebugDispVolumeAll(s32 arg0, s32 grp)
+{
+    DebugColor color = D_401338E0;
+
+    debugDispVolumeGroup(arg0, grp, color.values);
+}
+
+void DebugDispVolumeAllColor(s32 arg0, s32 grp, float *col)
+{
+    debugDispVolumeGroup(arg0, grp, col);
+}
+
+extern s32 D_4012B1EC;
+extern void isysRequestDeleteObj(s32);
+
+static inline u8 *GetScriptAnimClass(s32 obj)
+{
+    if (*(u8 *)(obj + 8) != 0xD) {
+        return 0;
+    }
+    return (u8 *)obj + 0x20;
+}
+
+void DeleteAllActiveScriptAnimationObj(void)
+{
+    s32 obj = 0;
+    s32 *it;
+
+    for (it = isysGroupForFirst(D_4012B1EC, 0); it != NULL; it = isysGroupForNext(it, 0)) {
+        u8 *c;
+        obj = *it;
+        c = GetScriptAnimClass(obj);
+        switch (*(s32 *)(c + 0x344)) {
+        case 3:
+        case 4:
+        case 6:
+            if (*(s32 **)(c + 0x358) != NULL) {
+                **(s32 **)(c + 0x358) = 1;
+            }
+            isysRequestDeleteObj(obj);
+            break;
+        }
+    }
+    if (obj != 0) {
+        isysGroupForExit(obj, 0);
+    }
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0123_ScriptAnimationObjCheckPositionInsideOfJ", func_400A08A0);
 
