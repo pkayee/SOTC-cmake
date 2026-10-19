@@ -262,25 +262,19 @@ s32 SCRSetLWSGeometry(void *a0, s32 a1, u128 *a2, u128 *a3)
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0058_SCRGetTargetObjXZDirOnMyCtrlGeo", SCRSetLWSGeometryWithZY);
 
 /* NEARMISS-STUB SCRGetCollision */
-#if 0 /* NEARMISS 92.4% cat=stack-frame sub=- | 80B out array placed lowest vs target sp+0x30 | attempts=1 */
+#if 0 /* NEARMISS 99.77% cat=stack-frame sub=- | d2 r85: out[80] declared FIRST makes &out a plain vsv REG (no pseudo, rematerialised after the call, as target) but puts out at sp+0x10 (target v1 0x10, v2 0x20 | attempts=2 */
 s32 ClipCollisionDirectCallBack();
 void CopyGeometryPointer();
+typedef union { u128 q; f32 f[4]; } SGVec;
 s32 SCRGetCollision(void *a0, u128 *a1, u128 *a2, s32 a3)
 {
-    u128 v1;
-    u128 v2;
-    u8 out[80];
-    s32 r;
-
-    v1 = *a1;
-    *(f32 *)((u8 *)&v1 + 12) = 1.0f;
-    v2 = *a2;
-    *(f32 *)((u8 *)&v2 + 12) = 1.0f;
+    u8 out[80]; SGVec v1; SGVec v2; s32 r;
+    v1.q = *a1;
+    v1.f[3] = 1.0f;
+    v2.q = *a2;
+    v2.f[3] = 1.0f;
     r = ClipCollisionDirectCallBack(out, &v1, &v2, a3, 0, 0, 0, 0, 0);
-    if (r != 0 && a0 != NULL)
-    {
-        CopyGeometryPointer(a0, out);
-    }
+    if (r != 0 && a0 != NULL) CopyGeometryPointer(a0, out);
     return r;
 }
 #endif
