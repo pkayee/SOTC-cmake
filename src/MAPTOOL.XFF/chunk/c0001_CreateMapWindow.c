@@ -35,42 +35,23 @@ INCLUDE_ASM("asm/MAPTOOL.XFF/nonmatchings/chunk/c0001_CreateMapWindow", func_400
 
 INCLUDE_ASM("asm/MAPTOOL.XFF/nonmatchings/chunk/c0001_CreateMapWindow", func_40014180);
 
-/* NEARMISS-STUB func_400142E8 */
-#if 0 /* NEARMISS 94.14% cat=regalloc sub=- | lw bound regs swapped: asm v1=0x4c a0=0x48, ours a0=0x4c v1=0x48 | attempts=1 */
+void setLoadMode(s32, s32, s32);
+
 void func_400142E8(void)
 {
     s32 i;
     s32 j;
     u8 *env;
 
-    s32 m;
-    s32 n;
-
-    i = 0;
     env = (u8 *)getSeamlessStageEnv();
-    m = *(s32 *)(env + 0x4c);
-    if (0 < m)
+    for (i = 0; i < *(s32 *)(env + 0x4c); i++)
     {
-        n = *(s32 *)(env + 0x48);
-        do
+        for (j = 0; j < *(s32 *)(env + 0x48); j++)
         {
-            j = 0;
-            if (0 < n)
-            {
-                do
-                {
-                    setLoadMode(j, i, 0);
-                    j++;
-                    n = *(s32 *)(env + 0x48);
-                } while (j < n);
-                m = *(s32 *)(env + 0x4c);
-            }
-            i++;
-        } while (i < m);
+            setLoadMode(j, i, 0);
+        }
     }
 }
-#endif
-INCLUDE_ASM("asm/MAPTOOL.XFF/nonmatchings/chunk/c0001_CreateMapWindow", func_400142E8);
 
 //INCLUDE_ASM("asm/MAPTOOL.XFF/nonmatchings/chunk/c0001_CreateMapWindow", func_40014378);
 void func_40014378(void)
