@@ -1,11 +1,12 @@
 #include "common.h"
 
 /* NEARMISS-STUB sceGsSetDefDBuff */
-#if 0 /* NEARMISS 97.35% cat=bitops sub=zbp-short-vs-int | zbp width: target keeps zbp int (sra 1 on full reg inside the GParam if, no sll16 after the call); best C uses short zbp so it narrows at the call and the shift | attempts=1 */
+#if 0 /* NEARMISS 99.46% cat=regalloc sub=cmp-const-reg | d2r97: libgraph.h includes + implicit-int sceGszbufaddr + int zbp + (short)zbp on the dispfb store: 97.35->99.46; only left: merged InterMode/FFMode compare reg | attempts=2 */
+/* needs at file top: #include "gcc/sys/types.h", "sdk/ee/eetypes.h", "sdk/ee/eestruct.h", "sdk/ee/libgraph.h"; sceGszbufaddr deliberately undeclared (implicit int return = no sll16 after the call) */
 void sceGsSetDefDBuff(sceGsDBuff *db, short psm, short w, short h, short ztest, short zpsm, short clear)
 {
     sceGsGParam *gp;
-    short zbp;
+    int zbp;
 
     gp = sceGsGetGParam();
     sceGsSetDefDispEnv(&db->disp[0], psm, w, h, 0, 0);
@@ -31,7 +32,7 @@ void sceGsSetDefDBuff(sceGsDBuff *db, short psm, short w, short h, short ztest, 
     if ((gp->sceGsInterMode == SCE_GS_INTERLACE && gp->sceGsFFMode == SCE_GS_FRAME) || gp->sceGsInterMode == SCE_GS_NOINTERLACE)
     {
         zbp >>= 1;
-        db->disp[1].dispfb.FBP = zbp;
+        db->disp[1].dispfb.FBP = (short)zbp;
         db->draw0.frame1.FBP = zbp;
     }
 }

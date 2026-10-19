@@ -29,8 +29,8 @@ void SetClothSingleFixedChainLeafFixNodeOffset(void *arg0, signed char arg1)
 }
 
 /* NEARMISS-STUB getClothDynamics */
-#if 0 /* NEARMISS 91.93% cat=regalloc sub=- | d2 r87: o[0x80] = (o[0x80]+1)&1; if (o[0x80]) (store then re-test = the move v1,v0 copy) fixes the head (90.30 -> 91.93); left: loop -1 const in a2 (target a3)  | attempts=1 */
-extern void func_400C8FA0(u8 *, s32, f32, f32);
+#if 0 /* NEARMISS 92.17% cat=regalloc sub=- | d2 r96: CALLEE-ARG-PROTO func_400C8FA0(o, a1, a2, dt, w) (callee tests a2 at entry; keeps a2 live, loop -1 const now a3 as target) 91.93->92.17; left: the n==-1 | attempts=2 */
+extern void func_400C8FA0(u8 *, s32, s32, f32, f32);
 extern void func_400C9710(u8 *, s32, s32);
 extern void func_400C94F8(u8 *, s32, f32, f32);
 
@@ -60,7 +60,7 @@ s32 getClothDynamics(f32 dt, f32 w, u8 *o, s32 a1, s32 unused, void (*cb)(u8 *, 
                 p += 6;
             }
         }
-        func_400C8FA0(o, a1, dt, w);
+        func_400C8FA0(o, a1, unused, dt, w);
         if (cb != 0) {
             cb(o, a1, cbarg);
         } else {

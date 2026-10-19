@@ -308,7 +308,7 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0172_FlushModifiedManager", fun
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0172_FlushModifiedManager", func_400D9E70);
 
 /* NEARMISS-STUB func_400DA5C0 */
-#if 0 /* NEARMISS 78.04% cat=regalloc sub=- | d2 r86: structure/control flow exact (count loop, 0.8f/cnt step, ChDir, inline mcSetFile172(port,slot,name,0x5400,w[5]*0x5800+0xC00) gives the pre-call ofs/size | attempts=1 */
+#if 0 /* NEARMISS 83.17% cat=regalloc sub=- | d2 r96 (REA ev_0882a993): a block-local 'float *prog = &D_4012BB38; McFile172 *f = &D_401B0660;' for the task loop gives fp = hi(D_401B16CC) reused for both lis | attempts=2 */
 /* memory card: run the save-task list D_401B16CC against the file descriptor D_401B0660, progress 0.1 -> 0.9 -> 1.0 */
 typedef struct { s32 id; s32 (*fn)(void *); } McTask172;
 typedef struct { char name[0x20]; s32 port; s32 slot; s32 size; s32 ofs; s32 x30; } McFile172;
@@ -345,11 +345,15 @@ void func_400DA5C0(s32 *w)
         return;
     D_4012BB38 = 0.1f;
     mcSetFile172(port, slot, D_401342F8, 0x5400, w[5] * 0x5800 + 0xC00);
-    for (t = D_401B16CC; t->fn != 0; t++) {
-        w[11] = t->fn(&D_401B0660);
-        if (w[11] != 0)
-            return;
-        D_4012BB38 += step;
+    {
+        float *prog = &D_4012BB38;
+        McFile172 *f = &D_401B0660;
+        for (t = D_401B16CC; t->fn != 0; t++) {
+            w[11] = t->fn(f);
+            if (w[11] != 0)
+                return;
+            *prog += step;
+        }
     }
     w[11] = 0;
     D_4012BB38 = 1.0f;

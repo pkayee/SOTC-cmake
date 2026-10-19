@@ -143,11 +143,10 @@ int scePad2DeleteSocket(int socket)
     return 1;
 }
 
-/* NEARMISS-STUB scePad2Read */
-#if 0 /* NEARMISS 93.3% cat=branch-layout sub=- | branch-layout: target loads ptr[2] straight into a2 for memcpy (ours copies via v0); ptr+0x1C!=0 check is beql with lw in delay slot; ternary return kept (if/el | attempts=2 */
 int scePad2Read(int socket, u8 *buf)
 {
     u8 *ptr;
+    u8 n;
 
     if (D_0014B718[socket].w[0] == 0)
     {
@@ -161,15 +160,17 @@ int scePad2Read(int socket, u8 *buf)
         }
     }
     ptr = func_001157A8(socket);
-    if (ptr[2] != 0 && ptr + 0x1C != 0)
+    n = ptr[2];
+    if (n != 0 && ptr + 0x1C != 0)
     {
-        memcpy(buf, ptr + 0x1C, ptr[2]);
-        func_001158D8(ptr + 0x1C + ptr[2], (s32 *)(D_0014B72C + socket * 0x334));
+        memcpy(buf, ptr + 0x1C, n);
+        func_001158D8(ptr + (ptr[2] + 0x1C), (s32 *)(D_0014B72C + socket * 0x334));
     }
-    return (*(s32 *)(ptr + 4) != 0) ? ptr[2] : -1;
+    if (*(s32 *)(ptr + 4) == 0)
+        return -1;
+    return ptr[2];
 }
-#endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libpad2", scePad2Read);
+
 
 //INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libpad2", scePad2GetButtonProfile);
 int scePad2GetButtonProfile(int socket, u8 *buf)
