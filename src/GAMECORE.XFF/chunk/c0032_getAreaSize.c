@@ -299,25 +299,35 @@ s32 GetStageChipNum(void)
 }
 
 /* NEARMISS-STUB DeleteSeamlessStageObject */
-#if 0 /* NEARMISS 60.0% cat=regalloc sub=- | REA READY drop-in scored 58.56 in-TU (apply_ready) | attempts=2 */
+#if 0 /* NEARMISS 68.18% cat=cse-hoist sub=- | d2 r83: SeamlessChip{obj[2];stat[2];pad[2]} 24B struct index via D_40130F88+8 (68.18); target reloads tbl and recomputes tbl+chip*24+layer*4 in the chip!=-1 arm | attempts=3 */
+typedef struct { s32 *obj[2]; u32 stat[2]; s32 pad[2]; } SeamlessChip;
+
 s32 DeleteSeamlessStageObject(s32 layer, s32 chip, s32 *out)
 {
-    s32 *ent = *(s32 **)(D_40130F88.tbl + chip * 24 + layer * 4);
-    s32 r = 0;
-    s32 stat;
-    if (ent != 0) {
+    s32 *ent;
+    s32 r;
+    u32 stat;
+
+    ent = (*(SeamlessChip **)(D_40130F88 + 8))[chip].obj[layer];
+    r = 0;
+    if (ent != 0)
+    {
         r = ent[3];
     }
-    if (chip == -1) {
+    if (chip == -1)
+    {
         stat = 7;
-    } else {
-        stat = *(u32 *)(D_40130F88.tbl + chip * 24 + layer * 4 + 8) & 0xF;
     }
-    if (stat == 5) {
+    else
+    {
+        stat = (*(SeamlessChip **)(D_40130F88 + 8))[chip].stat[layer] & 0xF;
+    }
+    if (stat == 5)
+    {
         *out = 0;
         return 0;
     }
-    *out = *(u32 *)(D_40130F88.tbl + chip * 24 + layer * 4 + 8) >> 4;
+    *out = (*(SeamlessChip **)(D_40130F88 + 8))[chip].stat[layer] >> 4;
     return r;
 }
 #endif

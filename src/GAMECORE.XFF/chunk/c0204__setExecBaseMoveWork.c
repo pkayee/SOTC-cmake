@@ -148,7 +148,29 @@ float adjustCurveAngleForCollision(float ang, float lim, float x)
     return ang;
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0204__setExecBaseMoveWork", calcDownSpeedRatio);
+f32 calcDownSpeedRatio(f32 a, f32 b, f32 c)
+{
+    f32 r;
+
+    a = a - 0.005f;
+    if (a > 0.0f)
+    {
+        r = a / (-b * c);
+        if (r >= 1.0f)
+        {
+            r = 1.0f;
+        }
+        else
+        {
+            r = r * 0.9f;
+        }
+    }
+    else
+    {
+        r = 0.0f;
+    }
+    return r;
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0204__setExecBaseMoveWork", getHitPosWayCollision);
 
