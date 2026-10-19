@@ -223,60 +223,85 @@ int GetTwoWayLinkData(void *arg0)
     return (*(int *)((char *)(arg0) + 8));
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0172_FlushModifiedManager", kbGetStatus);
+typedef struct KbKey {
+    u32 b0 : 1;
+    u32 b1 : 1;
+    u32 b2 : 1;
+    u32 b3 : 1;
+    u32 rest : 28;
+    s32 w1;
+    s32 w2;
+} KbKey;
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0172_FlushModifiedManager", func_400D96A0);
+/* keyboard state: cur = keys of the last USB report, buf = double-buffered latched keys indexed by idx */
+typedef struct KbState {
+    KbKey cur[256];
+    s32 mod;
+    KbKey buf[2][256];
+    s32 latchedMod;
+    s32 idx;
+} KbState;
 
-/* NEARMISS-STUB kbInit */
-#if 0 /* NEARMISS 94.75% cat=regalloc sub=- | REA READY drop-in scored 94.75 in-TU (apply_ready) | attempts=1 */
-/* keyboard state tables: 256 entries of 3 words, low 4 flag bits cleared in the three tables */
-void kbInit(void)
+extern KbState D_401AE250;
+extern KbKey D_401AFA54[];
+s32 func_400D96A0();
+void usbdevAddCallbackFunc();
+
+/* latch: out.b0 = held, b1 = pressed (held now, not before), b2 = released; then flip the latch buffer and seed it with cur */
+void kbGetStatus(KbKey *out, s32 *mod)
 {
-    u8 *g = (u8 *)D_401AE250;
-    u32 *q;
-    u32 v;
     s32 i;
 
-    *(s32 *)(g + 0x2408) = 0;
-    *(s32 *)(g + 0x2404) = 0;
-    *(s32 *)(g + 0xC00) = 0;
-    q = (u32 *)(g + 0xC04);
-    for (i = 0xFF; i >= 0; i--)
-    {
-        v = *q;
-        v &= ~8;
-        v &= ~4;
-        v &= ~2;
-        v &= ~1;
-        *q = v;
-        q += 3;
+    *mod = D_401AE250.latchedMod;
+    for (i = 0; i < 256; i++) {
+        out[i].b0 = D_401AE250.buf[D_401AE250.idx][i].b0;
+        out[i].b1 = D_401AE250.buf[D_401AE250.idx ? 0 : 1][i].b0 ? 0 : D_401AE250.buf[D_401AE250.idx][i].b0;
+        out[i].b2 = D_401AE250.buf[D_401AE250.idx][i].b0 ? 0 : D_401AE250.buf[D_401AE250.idx ? 0 : 1][i].b0;
     }
-    q = D_401AFA54;
-    for (i = 0xFF; i >= 0; i--)
-    {
-        v = *q;
-        v &= ~8;
-        v &= ~4;
-        v &= ~2;
-        v &= ~1;
-        *q = v;
-        q += 3;
+    D_401AE250.idx ^= 1;
+    for (i = 0; i < 256; i++)
+        D_401AE250.buf[D_401AE250.idx][i].b0 = D_401AE250.cur[i].b0;
+    D_401AE250.latchedMod = D_401AE250.mod;
+}
+
+/* USB keyboard report callback: rebuild cur from the report key list, OR it into the active latch buffer */
+s32 func_400D96A0(u8 *rep)
+{
+    s32 i;
+
+    for (i = 0; i < 256; i++)
+        D_401AE250.cur[i].b0 = 0;
+    for (i = 0; i < rep[1] - 2; i++)
+        D_401AE250.cur[rep[4 + i]].b0 = 1;
+    D_401AE250.mod = rep[2] & 0xF;
+    for (i = 0; i < 256; i++)
+        D_401AE250.buf[D_401AE250.idx][i].b0 |= D_401AE250.cur[i].b0;
+    D_401AE250.latchedMod |= D_401AE250.mod;
+    return 1;
+}
+
+static inline void kbClearTable(KbKey *k)
+{
+    s32 i;
+
+    for (i = 0; i < 256; i++) {
+        k[i].b3 = 0;
+        k[i].b2 = 0;
+        k[i].b1 = 0;
+        k[i].b0 = 0;
     }
-    q = D_401AE250;
-    for (i = 0xFF; i >= 0; i--)
-    {
-        v = *q;
-        v &= ~8;
-        v &= ~4;
-        v &= ~2;
-        v &= ~1;
-        *q = v;
-        q += 3;
-    }
+}
+
+void kbInit(void)
+{
+    D_401AE250.idx = 0;
+    D_401AE250.latchedMod = 0;
+    D_401AE250.mod = 0;
+    kbClearTable(D_401AE250.buf[0]);
+    kbClearTable(D_401AFA54);
+    kbClearTable(D_401AE250.cur);
     usbdevAddCallbackFunc(func_400D96A0, 1);
 }
-#endif
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0172_FlushModifiedManager", kbInit);
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0172_FlushModifiedManager", func_400D98A8);
 
@@ -284,7 +309,53 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0172_FlushModifiedManager", fun
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0172_FlushModifiedManager", func_400DA5C0);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0172_FlushModifiedManager", func_400DA750);
+/* memory card: write the MCSTAT044 header (10 bytes, copied to +0 and +0x88) of entry w[5] into the save image */
+typedef struct { u8 b[0x38]; } McDirParam172;
+typedef struct { s64 a; u16 b; } McStat172;
+extern s32 iosMcChDir(s32, s32, char *);
+extern s32 iosMcWriteFile(s32, s32, char *, void *, s32, s32);
+extern void *memset(void *, int, unsigned int);
+extern char D_40134310[];
+extern char D_401342D0[];
+extern char D_401342F8[];
+extern McStat172 D_401342E8;
+
+void func_400DA750(s32 *w)
+{
+    const s32 n = 0x12;
+    s32 cnt;
+    McDirParam172 dir[n];
+    s32 port = w[1];
+    s32 slot = w[2];
+    u8 *e;
+    s32 i;
+    s32 ofs;
+    char *name;
+    s64 a;
+    u16 b;
+
+    w[11] = iosMcGetDir(port, slot, D_40134310, 0, n, dir, &cnt);
+    if (w[11] != 0)
+        return;
+    w[11] = iosMcChDir(port, slot, D_401342D0);
+    name = D_401342F8;
+    if (w[11] != 0)
+        return;
+    i = w[5];
+    e = (u8 *)(i * 0x98 + w[10]) + 0xD8;
+    ofs = i * 0x5800 + 0x800;
+    memset(e, 0, 0x98);
+    a = D_401342E8.a;
+    b = D_401342E8.b;
+    *(s64 *)e = a;
+    *(u16 *)(e + 8) = b;
+    *(s64 *)(e + 0x88) = a;
+    *(u16 *)(e + 0x90) = b;
+    w[11] = iosMcWriteFile(port, slot, name, e, ofs, 0x98);
+    if (w[11] != 0)
+        return;
+    w[11] = 0;
+}
 
 /* memory card: create the file named at +0xC (making its directory), then read back the dir entry size into +0x18 */
 void func_400DA8B0(s32 *w)

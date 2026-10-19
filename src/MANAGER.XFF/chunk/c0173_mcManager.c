@@ -69,6 +69,52 @@ found:
     D_4012BB4C = 1;
     return r->f[11];
 }
+/* NEARMISS-STUB mcGetMainDataInfo */
+#if 0 /* NEARMISS 94.62% cat=sched sub=- | family shape (EXPECT-GUARD wait loop) matches; left: after iosStartThread the target schedules li v1,cmd before lui v0,%hi(D_4012BB38) and both lui before the B | attempts=1 */
+extern s32 rootPtn;
+extern float D_401B1740;
+void func_400DBD38(void);
+void iosStartThread(void *, s32);
+s32 mcGetMainDataInfo(s32 a, s32 b, s32 c)
+{
+    McReq *r;
+    McReq *p;
+    s32 i;
+    void (*fn)(void);
+
+    i = 0;
+    p = D_401B16E0;
+    do {
+        if (p->f[0] == 0) {
+            r = p;
+            goto found;
+        }
+        p++;
+        i++;
+    } while (i < 2);
+    r = 0;
+    LoaderSysPrintf(D_401342B0);
+found:
+    r->f[1] = a;
+    r->f[2] = b;
+    r->f[10] = c;
+    D_401B1740 = 0.1f;
+    D_4012BB4C = 0;
+    iosStartThread(iosCreateThreadS(func_400DBD38, 0, &rootPtn, 0x1000, 0x2F, 0), 0);
+    D_4012BB38 = 0;
+    r->f[0] = 2;
+    iosSendMsg(D_401B16A0, r, 1);
+    if (__builtin_expect(r->f[0], 0)) {
+        fn = D_401B1744;
+        do {
+            fn();
+            fn = D_401B1744;
+        } while (r->f[0] != 0);
+    }
+    D_4012BB4C = 1;
+    return r->f[11];
+}
+#endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0173_mcManager", mcGetMainDataInfo);
 
 s32 mcSaveGameData(s32 a, s32 b, s32 c, s32 d, s32 e)
@@ -231,6 +277,51 @@ found:
     return r->f[11];
 }
 
+/* NEARMISS-STUB mcFormat */
+#if 0 /* NEARMISS 94.26% cat=sched sub=- | family shape (EXPECT-GUARD wait loop) matches; left: after iosStartThread the target schedules li v1,cmd before lui v0,%hi(D_4012BB38) and both lui before the B | attempts=1 */
+extern s32 rootPtn;
+extern float D_401B1740;
+void func_400DBD38(void);
+void iosStartThread(void *, s32);
+s32 mcFormat(s32 a, s32 b)
+{
+    McReq *r;
+    McReq *p;
+    s32 i;
+    void (*fn)(void);
+
+    i = 0;
+    p = D_401B16E0;
+    do {
+        if (p->f[0] == 0) {
+            r = p;
+            goto found;
+        }
+        p++;
+        i++;
+    } while (i < 2);
+    r = 0;
+    LoaderSysPrintf(D_401342B0);
+found:
+    r->f[1] = a;
+    r->f[2] = b;
+    D_401B1740 = 17.0f;
+    D_4012BB4C = 0;
+    iosStartThread(iosCreateThreadS(func_400DBD38, 0, &rootPtn, 0x1000, 0x2F, 0), 0);
+    D_4012BB38 = 0;
+    r->f[0] = 7;
+    iosSendMsg(D_401B16A0, r, 1);
+    if (__builtin_expect(r->f[0], 0)) {
+        fn = D_401B1744;
+        do {
+            fn();
+            fn = D_401B1744;
+        } while (r->f[0] != 0);
+    }
+    D_4012BB4C = 1;
+    return r->f[11];
+}
+#endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0173_mcManager", mcFormat);
 
 s32 mcUnformat(s32 a, s32 b)
