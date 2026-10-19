@@ -92,18 +92,16 @@ void func_4002E650(s32 flag)
     }
 }
 
-/* NEARMISS-STUB gStatChekcPointSaveHookPlayerHorsePos */
-#if 0 /* NEARMISS 99.78% cat=regalloc sub=- | gstatTimeAttackMode addr lui in v0 vs expected v1 (hoisted lui in beqz delay slot) | attempts=1 */
 void *SCRGetFirstObj(void *p);
 void *GetLayoutClass(void *o);
 void SaveLayoutObjGroupAllGeo(void);
 void backStageGobjSaveWithPos(s32 a, s32 b, s32 c);
 
-void *gStatChekcPointSaveHookPlayerHorsePos(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4)
+void gStatChekcPointSaveHookPlayerHorsePos(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4)
 {
     void *first = SCRGetFirstObj(gcGlobalVar + 0x2B0);
     void *second = SCRGetFirstObj(gcGlobalVar + 0x2B4);
-    void *pvVar2;
+
     s32 has;
     SaveLayoutObjGroupAllGeo();
     backStageGobjSaveWithPos(*(s32 *)((u8 *)GetLayoutClass(first) + 0x1A4), a0, a1);
@@ -111,7 +109,7 @@ void *gStatChekcPointSaveHookPlayerHorsePos(s32 a0, s32 a1, s32 a2, s32 a3, s32 
         backStageGobjSaveWithPos(*(s32 *)((u8 *)GetLayoutClass(second) + 0x1A4), a2, a3);
     }
     has = second != 0;
-    pvVar2 = (void *)gstatTimeAttackMode;
+    
     if (gstatTimeAttackMode == 0) {
         if (has == 0) {
             _gameFlagSet(0x1C);
@@ -121,13 +119,11 @@ void *gStatChekcPointSaveHookPlayerHorsePos(s32 a0, s32 a1, s32 a2, s32 a3, s32 
         gameFlagCheckPointSave(D_401FD1D0, D_401FD1D0 + 0x64, D_401FD1D0 + 0x1F4, D_401FD1D0 + 0x384, D_401FD1D0 + 0x6A4, D_401FD1D0 + 0x3C20);
         backStageCheckPointSave(D_401FD1D0 + 0x9C4);
         memcpy(D_401FD1D0 + 0xC10, getSprLogWorkAddress(), getSprLogWorkSize());
-        pvVar2 = memcpy(D_401FD1D0 + 0x3C10, getSprLogStatusAddress(), getSprLogStatusSize());
+        memcpy(D_401FD1D0 + 0x3C10, getSprLogStatusAddress(), getSprLogStatusSize());
         D_401FD1D0[0x3C1C] = a4;
     }
-    return pvVar2;
+
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0023_func_4002E650", gStatChekcPointSaveHookPlayerHorsePos);
 
 SavePointEnt *gStatPlaceIdToSavePoint(s32 id)
 {

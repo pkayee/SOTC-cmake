@@ -94,13 +94,13 @@ void nico_UnparentObject(void *obj)
     ForceUnparentLayoutObj(obj);
 }
 
-/* NEARMISS-STUB nico_SendAttackMailToVCol */
-#if 0 /* NEARMISS 97.58% cat=call-abi sub=- | in-TU: SendCharaAttackMsg prototype clash (exp (void*,void*,void*,int,float) vs TU f32-first decl); 5th float arg missing | attempts=2 */
+void SendCharaAttackMsg(f32 f, void *a, void *b, void *c, s32 d);
+
 void nico_SendAttackMailToVCol(void *obj)
 {
     u8 *cls = GetCharacterClass(obj);
     u8 buf[0x40];
-    s32 sel;
+    void *tgt;
     if (getCurWeapon(obj) == 9)
     {
         return;
@@ -110,12 +110,9 @@ void nico_SendAttackMailToVCol(void *obj)
         return;
     }
     ConvertGeometryPointerZNormalMode(buf, cls + 0xDD0);
-    GetGeometryPointerObject(buf);
-    sel = getSelectWeapon();
-    SendCharaAttackMsg((f32)sel, obj, (void *)sel, buf, 0);
+    tgt = GetGeometryPointerObject(buf);
+    SendCharaAttackMsg((f32)getSelectWeapon(), obj, tgt, buf, 0);
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0017_CancelCaptionSubThreadAll", nico_SendAttackMailToVCol);
 
 extern s32 InitialGeometryPointer;
 void SendCharaAttackMsg(f32 f, void *a, void *b, void *c, s32 d);
