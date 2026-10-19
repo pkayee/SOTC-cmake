@@ -5,6 +5,8 @@ extern int iosCdStSkip();
 extern int iosCdStSectorAlignSkip();
 extern int IosGetMergeDataFileName();
 extern void iosCdStInit(int);
+extern void iosCdStStart(int);
+extern void iosCdStStop(void);
 extern void func_400EC808();
 
 typedef struct {
@@ -21,7 +23,21 @@ typedef struct { int n; SpecialFs *tab; } SpecialFsTab;
 extern SpecialFsTab D_401B5390;
 extern int strcmp(const char *, const char *);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0190_sheetFsLoadDirectFile", sheetFsLoadDirectFile);
+void sheetFsLoadDirectFile(int i, int off, char *dst, int size)
+{
+    FileEntry *f = &D_401B538C[i];
+    int sec = off / 0x800;
+    int rem = off % 0x800;
+    iosCdStStart(f->offset + sec);
+    if (rem != 0) {
+        char buf[rem];
+
+        iosCdStRead(buf, rem);
+    }
+    iosCdStRead(dst, size);
+    iosCdStStop();
+}
+
 
 void sheetFsInit(void)
 {
@@ -91,8 +107,6 @@ int sheetFsSectorAlignSkip(int a, int b, int c, int d)
 }
 
 extern int D_401B5358;
-extern void iosCdStStart(int);
-extern void iosCdStStop(void);
 
 void sheetFsLoadBootData(void (*cb)(int, int))
 {
@@ -110,6 +124,63 @@ void sheetFsLoadRootSegment(void (*cb)(int, int))
     iosCdStStop();
 }
 
+/* NEARMISS-STUB sheetFsLoadSegmentIndex */
+#if 0 /* NEARMISS 97.79% cat=regalloc sub=- | d2 r84: tabB arm = typedef struct{int a,b;}P8; v &= 0x7FFF; off = ((P8 *)e->tabB + v)[sheetFsLanguageCode - 1].a; (96.58 -> 97.79). Left: tabB lands in v1 and l | attempts=1 */
+typedef struct { char c[6]; } Str6;
+typedef struct { char *name; int a; short *idx; int c; int d; int *tabA; int *tabB; } SegIdxDef;
+extern Str6 D_40134FF0;
+extern char D_40134FF8[];
+extern int D_4012E324;
+extern int D_401B5368;
+extern SegIdxDef *D_401B5370;
+extern int sheetFsLanguageCode;
+extern int strcmp(const char *, const char *);
+extern void iosJumpRecoverPoint();
+extern void iosCdStStart(int);
+extern void iosCdStStop(void);
+extern int func_400ED988();
+
+void sheetFsLoadSegmentIndex(char *name, int unused, int idx, void (*cb)(int, int))
+{
+    int off = -1;
+    SegIdxDef *e;
+    int i;
+    short v;
+
+    if (D_4012E324 != 0) {
+        char key[8];
+        Str6 str = D_40134FF0;
+
+        *(short *)(key + 4) = idx;
+        if (strcmp((char *)&str, name) == 0) {
+            key[0] = 0;
+        } else {
+            key[0] = 1;
+        }
+        off = func_400ED988(D_4012E324, key);
+    }
+    if (off < 0) {
+        e = 0;
+        for (i = 0; i < D_401B5368; i++) {
+            e = &D_401B5370[i];
+            if (strcmp(name, e->name) == 0) {
+                goto found;
+            }
+        }
+        iosJumpRecoverPoint(D_40134FF8, name);
+found:
+        v = e->idx[idx];
+        if ((v & 0x8000) == 0) {
+            off = e->tabA[v * 2];
+        } else {
+            typedef struct { int a, b; } P8; v &= 0x7FFF; off = ((P8 *)e->tabB + v)[sheetFsLanguageCode - 1].a;
+        }
+    }
+    iosCdStStart(off);
+    cb(0, 0);
+    iosCdStStop();
+}
+#endif
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0190_sheetFsLoadDirectFile", sheetFsLoadSegmentIndex);
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0190_sheetFsLoadDirectFile", sheetFsLoadMap);
