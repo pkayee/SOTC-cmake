@@ -10,8 +10,9 @@ extern s32 D_00138608[];
 extern sceDmaEnv D_0014B700[];
 void memclr(void *ptr, int size);
 
-/* NEARMISS-STUB WaitDma */
-#if 0 /* NEARMISS 99.29% cat=regalloc sub=- | count preload and string hoist differ, const folded | attempts=1 */
+//INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libdma", WaitDma);
+extern char D_001385F0[];
+
 void WaitDma(sceDmaChan *d)
 {
     int count;
@@ -20,15 +21,11 @@ void WaitDma(sceDmaChan *d)
     while (*(volatile u_int *)d & 0x100) {
         count--;
         if (count < 0) {
-            scePrintf("libdma: sync timeout\n");
+            scePrintf(D_001385F0);
             sceDmaPause(d);
         }
     }
 }
-#endif
-INCLUDE_ASM("asm/SCPS_150.97/nonmatchings/sdk/libdma", WaitDma);
-
-extern char D_001385F0[];
 
 void WatchDma(sceDmaChan *d, void *addr, int timeout)
 {

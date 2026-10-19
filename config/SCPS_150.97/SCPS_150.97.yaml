@@ -12,7 +12,9 @@ options:
     build_path: build/SCPS_150.97
     
     extensions_path: tools/splat_ext
-    symbol_addrs_path: config/SCPS_150.97/loader_symbols.txt
+    symbol_addrs_path:
+        - config/SCPS_150.97/loader_symbols.txt
+        - config/SCPS_150.97/SCPS_150.97_ignore_symbols.txt
 
     create_undefined_funcs_auto: True
     undefined_funcs_auto_path: config/SCPS_150.97/SCPS_150.97_undefined_funcs_auto.txt
