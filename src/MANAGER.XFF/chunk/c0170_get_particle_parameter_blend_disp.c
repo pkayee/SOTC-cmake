@@ -83,7 +83,34 @@ void init_wind_manager(void)
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0170_get_particle_parameter_blend_disp", doit_wind_manager);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0170_get_particle_parameter_blend_disp", get_wind_effect_data);
+extern s32 DldSysUndefSymbol;
+extern int strcmp(const char *, const char *);
+
+static inline u8 *dldRef_c0170(u32 *lp, s32 fld) {
+    u8 *slot;
+    u32 off = *lp & 0x3FFFF;
+
+    slot = off ? *(u8 **)((u8 *)lp - off) : NULL;
+    return (slot != NULL && slot != (u8 *)DldSysUndefSymbol) ? *(u8 **)(slot + fld) : NULL;
+}
+
+u8 *get_wind_effect_data(u32 *lp, const char *name)
+{
+    s32 i;
+    s32 cnt;
+    u8 *p;
+
+    if (lp != NULL) {
+        cnt = (s32)dldRef_c0170(lp, 0xC);
+        p = dldRef_c0170(lp, 0x10);
+        for (i = 0; i < cnt; i++) {
+            if (strcmp(*(const char **)(p + i * 0x18 + 0x14), name) == 0) {
+                return p + i * 0x18;
+            }
+        }
+    }
+    return NULL;
+}
 
 int is_eternal_wind(void *arg0)
 {

@@ -133,7 +133,35 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0067_SendCharaAttackMsg", func_
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0067_SendCharaAttackMsg", ForceAcceptMotion);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0067_SendCharaAttackMsg", ResetCharacterClassAnimeFrameTableInfo);
+static inline s32 dldElem_c0067(u8 *q)
+{
+    u32 word = *(u32 *)q;
+    s32 *p;
+
+    if ((word & 0x3FFFF) != 0)
+    {
+        p = *(s32 **)(q - (word & 0x3FFFF));
+    }
+    else
+    {
+        p = 0;
+    }
+    if (p != 0 && (s32)p != DldSysUndefSymbol)
+    {
+        return p[4] + ((word >> 18) & 0xFFF) * ((s32 *)p[2])[3];
+    }
+    return 0;
+}
+
+void ResetCharacterClassAnimeFrameTableInfo(s32 obj)
+{
+    u8 *arg = *(u8 **)(obj + 0x1C0);
+
+    if (arg != 0)
+    {
+        ResetAnimeFrameTableInfo((void *)(obj + 0x1F0), dldElem_c0067(arg + 0x48), dldElem_c0067(arg + 0x4C));
+    }
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0067_SendCharaAttackMsg", func_40063898);
 

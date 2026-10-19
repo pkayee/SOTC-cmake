@@ -149,6 +149,58 @@ float GetWeaponRange(void)
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0164_SCRSetupWeaponPlayer", func_400D9E98);
 
+/* NEARMISS-STUB nico_yamori2Start */
+#if 0 /* NEARMISS 96.23% cat=sched sub=float-store-order | mammosBossStart shape; only the lui/lwc1 of D_40136F94 is scheduled one store later. 15 store orders + float-local placements tried | attempts=1 */
+extern char rootPtn[];
+extern void *isysGetThisSubThread(void);
+extern s32 SCRGetSizeOfBossWork(void *);
+extern void *iosCreatePartition(void *, s32);
+extern u8 *GetScriptCharacterClass(void *);
+extern void CharaCtrlResetCtrlStatus(void *);
+extern void CharaCtrlResetAllScriptCtrlStatus(void *);
+extern void *_SCRMallocAlign(void *, s32, s32);
+extern void *SCRCharaInitBossWork(void *, void *);
+extern void SCRReleaseBossWork();
+extern void SetScriptCharacterObjReleaseCallBackFunc(void *, void (*)(), void *);
+extern u8 *GetScriptClass(void *);
+extern void initScriptDataSystem(void *, void *);
+extern void isysJumpSubThread(void (*)(), void *);
+extern void func_400D9E98();
+extern f32 D_40136F94;
+
+void nico_yamori2Start(void)
+{
+    void *thread = isysGetThisSubThread();
+    s32 size = SCRGetSizeOfBossWork(thread);
+    void *part = iosCreatePartition(rootPtn, size + 0x4213);
+    u8 *cls = GetScriptCharacterClass(thread);
+    u8 *mem;
+    void *boss;
+
+    *(void **)(cls + 0x114C) = part;
+    CharaCtrlResetCtrlStatus(thread);
+    CharaCtrlResetAllScriptCtrlStatus(thread);
+    cls = GetScriptCharacterClass(thread);
+    mem = _SCRMallocAlign(part, 0x41E0, 0x10);
+    *(void **)(cls + 0x1150) = mem;
+    boss = SCRCharaInitBossWork(part, thread);
+    *(void **)mem = boss;
+    SetScriptCharacterObjReleaseCallBackFunc(thread, SCRReleaseBossWork, boss);
+    CharaCtrlResetCtrlStatus(thread);
+    *(s32 *)(mem + 0x41AC) = 0;
+    *(s32 *)(mem + 0x41A4) = 0;
+    *(f32 *)(mem + 0x41C4) = D_40136F94;
+    *(s32 *)(mem + 0x41B8) = 0;
+    *(s32 *)(mem + 0x41BC) = 0;
+    *(s32 *)(mem + 0x41B0) = 0;
+    *(s32 *)(mem + 0x41B4) = 0;
+    *(s32 *)(mem + 0x41C0) = 0;
+    *(s32 *)(mem + 0x41C8) = 0;
+    cls = GetScriptClass(thread);
+    initScriptDataSystem(thread, *(void **)(cls + 0x48));
+    isysJumpSubThread(func_400D9E98, mem);
+}
+#endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0164_SCRSetupWeaponPlayer", nico_yamori2Start);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0164_SCRSetupWeaponPlayer", func_400DA118);

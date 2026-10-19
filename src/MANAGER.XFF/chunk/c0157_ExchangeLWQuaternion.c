@@ -2,7 +2,17 @@
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0157_ExchangeLWQuaternion", ExchangeLWQuaternion);
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0157_ExchangeLWQuaternion", GetQuaternionAxisRot);
+extern void SetQuaternionByAxisRotateV(void *, s16, void *);
+extern void SetQuaternionByAxisRotateVWithNoRegularize(void *, s16, void *);
+
+void GetQuaternionAxisRot(void *q, void *axis, s32 noreg, f32 rad)
+{
+    if (noreg) {
+        SetQuaternionByAxisRotateVWithNoRegularize(q, -(s32)((rad * 32768.0f) / 3.14159253f), axis);
+        return;
+    }
+    SetQuaternionByAxisRotateV(q, -(s32)((rad * 32768.0f) / 3.14159253f), axis);
+}
 
 INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0157_ExchangeLWQuaternion", GetQuaternionFromDir);
 

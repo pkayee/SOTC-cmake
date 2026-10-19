@@ -47,6 +47,42 @@ void nico_SmallKiteStart(void)
     isysJumpSubThread(func_400B7308, w);
 }
 
+/* NEARMISS-STUB nico_SmallKiteSpecialStart */
+#if 0 /* NEARMISS 92.62% cat=regalloc sub=path-copy | SmallKiteStart shape + loop Kite_SetEventIDList(path,7,i) i<10; target keeps a second copy of path (daddu s2,s1) for the loop and 5 saved regs, ours coalesces i | attempts=1 */
+extern void Kite_SetEventIDList(void *, int, int);
+
+void nico_SmallKiteSpecialStart(void)
+{
+    void *th = isysGetThisSubThread();
+    int part = iosCreatePartition(rootPtn, 0x853);
+    char *c;
+    char *w;
+    char *path;
+    int i;
+
+    *(int *)(GetScriptCharacterClass(th) + 0x114C) = part;
+    CharaCtrlResetCtrlStatus(th);
+    CharaCtrlResetAllScriptCtrlStatus(th);
+    c = GetScriptCharacterClass(th);
+    w = _SCRMallocAlign(part, 0x820, 0x10);
+    *(char **)(c + 0x1150) = w;
+    path = w + 0x310;
+    CharaCtrlResetCtrlStatus(th);
+    *(char **)(w + 0x20) = getEditWorkInitData(*(int *)(GetScriptClass(th) + 0x40));
+    AI_InitAnimalWork(w, 8);
+    func_400B79B8(w);
+    Kite_InitKitePathWork(path, isysGetThisSubThread(), *(float *)(*(char **)(w + 0x20) + 0xE8), *(float *)(*(char **)(w + 0x20) + 0xE4));
+    Kite_SetAnimalID_KitePathWork(path, 8);
+    func_400B75A8(w);
+    *(int *)(w + 0x300) = 0;
+    func_400B7810(w);
+    for (i = 0; i < 10; i++) {
+        Kite_SetEventIDList(path, 7, i);
+    }
+    SetScriptObjDeleteCallBackFunc(isysGetThisSubThread(), func_400B8390, w);
+    isysJumpSubThread(func_400B7308, w);
+}
+#endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0136_nico_SmallKiteStart", nico_SmallKiteSpecialStart);
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0136_nico_SmallKiteStart", nico_SmallKiteAdvertiseStart);

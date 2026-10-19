@@ -62,7 +62,25 @@ void player_setDangerEdgePoint(void *a, char *b)
     CopyGeometryPointer(c + 0xDD0, g);
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0106_player_HellDangerDetect", player_setDangerEdgeOtherSidePlanePoint);
+extern int ExchangeGeometryPointerCollisionEdgeOtherSideInfo(void *, void *);
+extern void iosJumpRecoverPoint(void *);
+extern char D_40134750[];
+
+void player_setDangerEdgeOtherSidePlanePoint(void *a, char *b)
+{
+    char *g = b + 0x10;
+    char *c;
+    if (ExchangeGeometryPointerCollisionEdgeOtherSideInfo(g, g) == 0) {
+        iosJumpRecoverPoint(D_40134750);
+    }
+    c = GetCharacterClass(a);
+    charrootdyn_setVColFindFlag(c, g, 0.0f);
+    charrootdyn_resetVColEdgeFindFlag(c);
+    AddTwoWayLinkNext(GetLayoutClass(GetGeometryPointerObject(g)) + 0x118, c + 0xEC0);
+    *(int *)(c + 0xE30) = 1;
+    CopyGeometryPointer(c + 0xE50, g);
+    CopyGeometryPointer(c + 0xDD0, g);
+}
 
 extern int ParentLayoutObj();
 

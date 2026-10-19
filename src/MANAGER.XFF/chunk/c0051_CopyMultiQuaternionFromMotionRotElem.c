@@ -59,7 +59,19 @@ INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0051_CopyMultiQuaternionFromMot
 void InitAnimationData(void) {
 }
 
-INCLUDE_ASM("asm/MANAGER.XFF/nonmatchings/chunk/c0051_CopyMultiQuaternionFromMotionRotElem", getBlendFirstMotion);
+extern s32 DldSysUndefSymbol;
+
+char *getBlendFirstMotion(u32 *h)
+{
+    u32 v = *h;
+    s32 off = v & 0x3FFFF;
+    char *t = off != 0 ? *(char **)((char *)h - off) : 0;
+    u32 *h2 = (u32 *)((t != 0 && t != (char *)DldSysUndefSymbol) ? *(char **)(t + 0x10) + ((v >> 18) & 0xFFF) * *(s32 *)(*(char **)(t + 8) + 0xC) : 0);
+    s32 off2 = *(volatile u32 *)h2 & 0x3FFFF;
+    char *t2 = off2 != 0 ? *(char **)((char *)h2 - off2) : 0;
+    char *p = (t2 != 0 && t2 != (char *)DldSysUndefSymbol) ? *(char **)(t2 + 0x10) + ((*(volatile u32 *)h2 >> 18) & 0xFFF) * *(s32 *)(*(char **)(t2 + 8) + 0xC) : 0;
+    return p + 0x50;
+}
 
 typedef struct { char a, b, c; } Bool3;
 extern void func_40045C30(void *, void *, int);
