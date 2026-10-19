@@ -42,6 +42,88 @@ static inline s32 isLegalGeoParent(u8 *obj) /* inline helper */
     return 0;
 }
 
+/* NEARMISS-STUB execObjectWithNonTaskSwitch */
+#if 0 /* NEARMISS 97.81% cat=regalloc sub=- | d2 r85: switch with default FIRST (makes default j-sibcall and last case 0x16 jal, as target) + isLegalGeoParent inline; only regalloc left: target gc-base/r ps | attempts=1 */
+/* needs the TU struct OrientationGlobalsView widened (0x178 f178, 0x1AC flag, 0x370 context) and moved above; existing extern of this fn is (int) */
+struct OrientationGlobalsView {
+    char pad00[0x178];
+    float f178;
+    char pad17C[0xC];
+    float interval;
+    char pad18C[0x20];
+    s32 flag;
+    char pad1B0[0x1C0];
+    char context[0];
+};
+extern struct OrientationGlobalsView gcGlobalVar;
+extern void ExecScriptLwsOrientClass(void *, void *, void *, float, float);
+extern float ViewIntervalClip(void *, void *, float);
+extern void *get_main_cameraman_camera_obj(void);
+extern void FlushRequestViewIntervalClip(void);
+extern void isysLetterObjDiscardLetterAll(u8 *);
+extern void iosJumpRecoverPoint(void *);
+extern u8 D_40135CD0[];
+
+static inline void execLwsOriNonTaskSwitch(u8 *obj)
+{
+    float interval;
+
+    if (gcGlobalVar.flag != 0) {
+        FlushRequestViewIntervalClip();
+        ViewIntervalClip(obj, get_main_cameraman_camera_obj(), gcGlobalVar.interval);
+    } else {
+        interval = ViewIntervalClip(obj, get_main_cameraman_camera_obj(), gcGlobalVar.interval);
+        ExecScriptLwsOrientClass(obj, get_main_cameraman_camera_obj(), gcGlobalVar.context, interval, 1.0f / interval);
+    }
+    isysLetterObjDiscardLetterAll(obj);
+}
+
+void execObjectWithNonTaskSwitch(int a)
+{
+    u8 *obj = (u8 *)a;
+    u8 *cc;
+    float interval;
+    s32 r;
+
+    switch (obj[8]) {
+    default:
+        iosJumpRecoverPoint(D_40135CD0);
+        break;
+    case 9:
+        if (gcGlobalVar.flag != 0) {
+            FlushRequestViewIntervalClip();
+            ViewIntervalClip(obj, get_main_cameraman_camera_obj(), gcGlobalVar.interval);
+        } else {
+            cc = GetCharacterClass(obj);
+            r = 0;
+            interval = ViewIntervalClip(obj, get_main_cameraman_camera_obj(), gcGlobalVar.interval);
+            if (*(s8 *)(cc + 0x524) != 0) {
+                if (*(s32 *)(GetCharacterClass(obj) + 0x10C0) != 0
+                    && StageManagerCheckAreaExist(*(s32 *)(GetLayoutClass(obj) + 0x134)) == 0
+                    && *(s16 *)(cc + 0x360) != 4
+                    && !isLegalGeoParent(obj)
+                    && cc[0xD00] != 1
+                    && *(s32 *)(cc + 0xFD0) != 1
+                    && *(s16 *)(cc + 0x360) != 0xB) {
+                } else {
+                    r = ExecCharaGeometryPreprocess(obj, gcGlobalVar.f178, interval, 1.0f / interval);
+                }
+            }
+            if (r != 0) {
+                cc = GetCharacterClass(obj);
+                ExecCharaGeometry(obj, gcGlobalVar.context);
+                cc[0x529] = StageManagerCheckAreaExist(*(s32 *)(GetLayoutClass(obj) + 0x134));
+            }
+            ExecCharaGeometryPostprocess(obj);
+        }
+        isysLetterObjDiscardLetterAll(obj);
+        break;
+    case 0x16:
+        execLwsOriNonTaskSwitch(obj);
+        break;
+    }
+}
+#endif
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0121_execObjectWithNonTaskSwitch", execObjectWithNonTaskSwitch);
 
 extern int isysGetThisSubThread();

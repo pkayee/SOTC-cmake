@@ -375,63 +375,70 @@ void func_4008C7C8(s32 obj)
     }
 }
 
-/* NEARMISS-STUB func_4008C920 */
-#if 0 /* NEARMISS 69.14% cat=regalloc sub=- | REA READY drop-in scored 69.14 in-TU (apply_ready) | attempts=2 */
-void func_4008C920(s32 obj, u32 *tbl, s32 cnt, u64 flag)
-{
-    u8 *lay = GetLayoutClass(obj);
-    s32 found;
-    s32 *p;
-    u8 *link;
-    s32 q;
-    u32 word;
-    u32 *e;
-    s32 i;
+typedef struct {
+    u64 b0 : 5;
+    u64 b5 : 1;
+    u64 b6 : 1;
+    u64 b7 : 1;
+    u64 rest : 56;
+} C920Bits;
+typedef struct C920Obj {
+    u8 pad0[0x144];
+    struct C920Obj *sub;
+    u8 pad148[0x280 - 0x148];
+    C920Bits bits;
+} C920Obj;
+extern void SetClothAccessSwitch(s32, s32);
+extern u8 *GetTwoWayLinkNext(u8 *);
+extern s32 GetTwoWayLinkData(u8 *);
 
-    if (lay != 0) {
-        found = 0;
-        if (cnt != 0) {
-            i = cnt - 1;
-            e = tbl;
-            do {
-                word = *e;
-                p = (s32 *)((u8 *)e - (word & 0x3FFFF));
-                e += 2;
-                if ((word & 0x3FFFF) == 0) {
-                    p = 0;
-                } else {
-                    p = (s32 *)*p;
-                }
-                q = 0;
-                if (p != 0) {
-                    if ((s32)p == DldSysUndefSymbol) {
-                        q = 0;
-                    } else {
-                        q = p[4] + ((word >> 18) & 0xFFF) * ((s32 *)p[2])[3];
-                    }
-                }
-                if (q != 0 && ((s32 *)q)[2] == obj) {
-                    found = 1;
-                    break;
-                }
-                i--;
-            } while (i != -1);
+void func_4008C920(s32 obj, u32 *tbl, s32 cnt, s32 flag)
+{
+    C920Obj *lay = (C920Obj *)GetLayoutClass(obj);
+    u8 *link;
+    s32 found;
+    s32 i;
+    u32 word;
+    s32 *p;
+    s32 r;
+    u32 *e;
+
+    if (lay == 0) {
+        return;
+    }
+    e = tbl;
+    i = cnt;
+    while (i-- != 0) {
+        word = *e;
+        p = (s32 *)((u8 *)e - (word & 0x3FFFF));
+        e += 2;
+        if ((word & 0x3FFFF) != 0) {
+            p = (s32 *)*p;
+        } else {
+            p = 0;
         }
-        if (found) {
-            u8 *x = *(u8 **)(lay + 0x144);
-            if (x != 0) {
-                *(u64 *)(x + 0x280) = (*(u64 *)(x + 0x280) & ~0x20ULL) | ((flag & 1) << 5);
-                *(u64 *)(*(u8 **)(lay + 0x144) + 0x280) = (*(u64 *)(*(u8 **)(lay + 0x144) + 0x280) & ~0x80ULL) | ((flag & 1) << 7);
-            }
-            if (*(s32 *)(lay + 0x180) != 0) {
-                SetClothAccessSwitch(*(s32 *)(lay + 0x178), flag);
-            }
+        if (p != 0 && (s32)p != DldSysUndefSymbol) {
+            r = p[4] + ((word >> 18) & 0xFFF) * ((s32 *)p[2])[3];
+        } else {
+            r = 0;
         }
-        link = lay + 0x10C;
-        while ((link = GetTwoWayLinkNext(link)) != 0) {
-            func_4008C920(GetTwoWayLinkData(link), tbl, cnt, flag);
+        if (r != 0 && *(s32 *)(r + 8) == obj) {
+            found = 1;
+            goto done;
         }
     }
+    found = 0;
+done:
+    if (found) {
+        if (lay->sub != 0) {
+            lay->sub->bits.b5 = flag;
+            lay->sub->bits.b7 = flag;
+        }
+        if (*(s32 *)((u8 *)lay + 0x180) != 0) {
+            SetClothAccessSwitch(*(s32 *)((u8 *)lay + 0x178), flag);
+        }
+    }
+    for (link = GetTwoWayLinkNext((u8 *)lay + 0x10C); link != 0; link = GetTwoWayLinkNext(link)) {
+        func_4008C920(GetTwoWayLinkData(link), tbl, cnt, flag);
+    }
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0102_func_4008BBF0", func_4008C920);

@@ -672,7 +672,20 @@ void func_400F4F30(u8* a0, u8* a1)
     *(s32*)(a1 + 0x94) = 1;
 }
 
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0189_begin_check_and_boot_boss_subjective_cam", func_400F4FA8);
+typedef struct { f32 f[4]; } __attribute__((aligned(8))) F4FA8Vec;
+void reset_double_spring_interp_cntrl3D(u8 *, F4FA8Vec *);
+
+void func_400F4FA8(u8 *a, u8 *b)
+{
+    u8 *p = b + 4;
+    F4FA8Vec v = { { *(f32 *)(a + 0xD0), *(f32 *)(a + 0xD4), 0.0f, 0.0f } };
+    CAM_init_aim_angle_rot(p, 0);
+    CAM_init_aim_angle_rot(b + 0x48, 1);
+    *(s32 *)(p + 0x88) = 0;
+    *(s32 *)(p + 0x8C) = 0;
+    CAM_init_camera_warp_cntrl(a + 0x18C0, 2, 3, 0);
+    reset_double_spring_interp_cntrl3D(b + 0xA0, &v);
+}
 
 INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0189_begin_check_and_boot_boss_subjective_cam", func_400F5048);
 
