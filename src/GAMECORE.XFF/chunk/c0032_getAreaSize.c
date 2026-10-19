@@ -17,28 +17,28 @@ float getAreaSize(void)
     return *(float *)(env + 0x40) * (float)*(s32 *)(env + 0x38);
 }
 
-/* NEARMISS-STUB getStageAreaID */
-#if 0 /* NEARMISS 73.41% cat=regalloc sub=- | REA READY drop-in scored 73.41 in-TU (apply_ready) | attempts=1 */
-/* getStageAreaID(pos, outX, outZ): area index from world pos; env = D_40130F88 */
+/* getStageAreaID(pos, outX, outZ): area index from world pos; env = D_40130F88. second pointer env2 assigned right before the z clip keeps the target move copy */
 void getStageAreaID(float *pos, int *outX, int *outZ)
 {
     u8 *env = D_40130F88;
-    int ix = (int)((-pos[0] - *(float *)(env + 0x50)) / *(float *)(env + 0x40)) / *(s32 *)(env + 0x38);
-    int iz = *(s32 *)(env + 0x34) - (int)((-pos[2] - *(float *)(env + 0x54)) / *(float *)(env + 0x44)) / *(s32 *)(env + 0x3C) - 1;
+    float fz = (-pos[2] - *(float *)(env + 0x54)) / *(float *)(env + 0x44);
+    float fx = (-pos[0] - *(float *)(env + 0x50)) / *(float *)(env + 0x40);
+    int ix = (int)fx / *(s32 *)(env + 0x38);
+    u8 *env2;
+    int iz = *(s32 *)(env + 0x34) - (int)fz / *(s32 *)(env + 0x3C) - 1;
 
     if (ix < 0 || ix > *(s32 *)(env + 0x30) - 1) {
         *outX = -1;
     } else {
         *outX = ix;
     }
-    if (iz < 0 || iz > *(s32 *)(env + 0x34) - 1) {
+    env2 = D_40130F88;
+    if (iz < 0 || iz > *(s32 *)(env2 + 0x34) - 1) {
         *outZ = -1;
     } else {
         *outZ = iz;
     }
 }
-#endif
-INCLUDE_ASM("asm/GAMECORE.XFF/nonmatchings/chunk/c0032_getAreaSize", getStageAreaID);
 
 /* NEARMISS-STUB getStageAreaName */
 #if 0 /* NEARMISS 60.08% cat=regalloc sub=- | REA READY drop-in scored 60.08 in-TU (apply_ready) | attempts=1 */
