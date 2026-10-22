@@ -6,6 +6,7 @@ Linux or WSL2. Everything below was run on Debian testing (binutils 2.46 system 
 ```sh
 sudo apt install gcc-mipsel-linux-gnu binutils-mips-linux-gnu ninja-build python3-pip python3-venv
 ```
+`gcc-mipsel-linux-gnu` is what upstream lists; a validation build on a machine without it succeeded, because the build only calls `mips-linux-gnu-*` binutils and the bundled `ee-gcc`, so treat it as optional.
 If compiling fails with 32-bit related errors, also install `gcc-multilib`: the bundled `ee-gcc` binaries are 32-bit i386 executables and need the i386 C library (`libc6-i386`).
 Optional: `p7zip-full` or `xorriso` to extract files from the disc image ([BASEROM.md](BASEROM.md)), `jq` (used by `tools/score`).
 
@@ -19,7 +20,7 @@ python3 -m pip install -U -r requirements.txt
 
 ## 3. Compilers
 ```sh
-scripts/setup_compiler.sh
+scripts/setup_compiler.sh      # run from the repository root: paths are relative to the current directory
 ```
 Downloads two tarballs from the public [decompme/compilers](https://github.com/decompme/compilers/releases/tag/compilers) release and unpacks them to `tools/cc/`:
 - `ee-gcc2.96.tar.xz` -> `tools/cc/ee-gcc2.96` (default compiler: game code, KERNEL/loader non-SDK code)

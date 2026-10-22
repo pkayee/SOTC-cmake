@@ -7,10 +7,12 @@ A function is **matched** when real C compiled with the module's compiler reprod
 2. Open the C file (`src/<MODULE>/<file>.c`; chunked modules: `src/<MODULE>/chunk/cNNNN_<name>.c`). The function is an `INCLUDE_ASM("asm/<MODULE>/nonmatchings/<file>", name);` line. The original assembly is that `.s` file (created by `make`).
 3. Write C above the line, comment the `INCLUDE_ASM` out (`//INCLUDE_ASM(...)`, upstream style: "replace the `INCLUDE_ASM` line with the reversed C").
 4. Make sure `expected/` exists: after a green `make`, `cp -r build expected`.
-5. Score: `tools/score <MODULE> <file-rel> <function> --build` (e.g. `tools/score KERNEL.XFF sdk/scalbnf scalbnf --build`). It recompiles only that translation unit and prints `SCORE <module>/<file>/<fn> NN.N%` plus the differing instructions; the full diff is in `.score/<fn>.json`. Never hand-run a compiler.
+5. Score (`OBJDIFF` must point at objdiff-cli if it is not on `PATH`, see SETUP.md): `tools/score <MODULE> <file-rel> <function> --build` (e.g. `tools/score KERNEL.XFF sdk/scalbnf scalbnf --build`). It recompiles only that translation unit and prints `SCORE <module>/<file>/<fn> NN.N%` plus the differing instructions; the full diff is in `.score/<fn>.json`. Never hand-run a compiler.
 6. Iterate until 100.0%. [PATTERNS.md](PATTERNS.md) lists what usually decides a mismatch. [decomp.me](https://decomp.me) works too (preset: `Shadow of the Colossus`; `permuter_settings.toml` and `tools/decomp-permuter` for permutation search: `git submodule update --init tools/decomp-permuter`).
 7. `make && for f in checksum-*.sha1; do sha1sum -c $f; done` must stay green. Then `tools/lint --worktree` (no rule violations).
 8. Not reaching 100? Leave the `INCLUDE_ASM` live and, optionally, park the best attempt as a disabled stub ([NEAR_MISSES.md](NEAR_MISSES.md)).
+
+Tip: `grep '"name": "scalbnf"' build/functions.jsonl` (after `tools/build_queue.py . build/functions.jsonl`) shows a function's `status`; a `matched` row scores 100 against `expected/`.
 
 ## House rules
 1. **No assembly in C.** Not one instruction, no register-pinned variables (`register T x asm("v1")`), no file-level `asm()`, no pasted `.s`. If a function has no C form (live `$ra` reads, VU0/MMI vector code, COP0 access) it stays `INCLUDE_ASM`; that is a correct outcome. `tools/lint` rejects asm; only the two upstream spin loops in `tools/asm_allow.txt` are exempt.

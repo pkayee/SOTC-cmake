@@ -7,6 +7,8 @@ for f in checksum-*.sha1; do sha1sum -c $f; done
 ```
 A clean full build takes about 25 s on 8 cores (the last run: `make` from scratch, 23 s). Every module's last ninja step is `sha1sum checksum-<MODULE>.sha1`, so a red module shows at the end of its build.
 
+Expect a few linker warnings of the form `mips-linux-gnu-ld: ... can't find matching LO16 reloc against 'D_xxxx' for R_MIPS_HI16`: they are harmless here (a `%hi` whose `%lo` partner lives in another instruction group); the checksums are the judge.
+
 ## Targets
 `make` = `make all`. One module: `make <alias>`.
 | alias | module | what it is |
