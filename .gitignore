@@ -80,3 +80,7 @@ permuter_settings.toml
 compile_commands.json
 /__pycache__
 .score/
+/expected
+.vscode/
+__pycache__/
+tools/__pycache__/

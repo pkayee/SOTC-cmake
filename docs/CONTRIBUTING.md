@@ -36,3 +36,9 @@ void function()
 When you have followed the setup instructions and run the ``configure.py`` script, an ``asm`` directory will be generated, which contains a ``nonmatchings`` directory. Any assembly functions in any of its subdirectories are ready to be reversed. When you have chosen a function, select and copy the entire contents of the ``.s`` file, 
 open https://decomp.me/new, select the ``Shadow of the Colossus`` preset and paste the assembly into ``Target assembly``. When the function is successfully matched, open the corresponding C source file in ``src`` and look for an ``INCLUDE_ASM`` macro. Delete the corresponding line of code, and insert the reversed function in its place.
 If the function references rodata, delete the corresponding ``INCLUDE_RODATA`` macro and define the data in the function. Run ``ninja`` to ensure that the generated binary matches the original and submit a pull request.
+
+## Additions in this fork
+- Build and check: [BUILDING.md](BUILDING.md). All 10 module checksums must stay green: `make && for f in checksum-*.sha1; do sha1sum -c $f; done`.
+- Scoring locally instead of decomp.me: `tools/score <MODULE> <file> <function> --build` ([MATCHING.md](MATCHING.md)).
+- Rules of the house (no assembly in C, 100% or `INCLUDE_ASM`, `volatile` only for hardware and shared words, per-segment compilers): [MATCHING.md](MATCHING.md). Run `tools/lint --worktree` before sending a pull request.
+- Modules other than `SCPS_150.97` and `KERNEL.XFF` use chunked files (`src/<MODULE>/chunk/cNNNN_<name>.c`); a function whose rodata is needed lives with its chunk's `.rodata.s` slice ([MODULES.md](MODULES.md)).
