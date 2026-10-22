@@ -1,0 +1,33 @@
+#!/usr/bin/env python3
+"""relsort.py in.o out.o : stable-sort every SHT_REL section by r_offset (ELF32 LE) and strip .NON_MATCHING from undefined symbol names.
+Why: objdiff pairs a HI16 with the LO16 that FOLLOWS it in the reloc table to compute the HI16 addend.
+gas keeps `lui %hi(sym)` + `lw %lo(sym+off)` (splat text, unpaired) in a different table order than
+`lui %hi(sym+off)` + `lw %lo(sym+off)` (gcc text, paired), so objdiff reports arg_mism on the lui although bytes
+and relocs are semantically identical. Sorting both objects makes the tables comparable."""
+import struct, sys
+d = bytearray(open(sys.argv[1], 'rb').read())
+assert d[:4] == b'\x7fELF' and d[4] == 1 and d[5] == 1
+shoff, = struct.unpack_from('<I', d, 0x20)
+shentsize, shnum = struct.unpack_from('<HH', d, 0x2E)
+for i in range(shnum):
+    o = shoff + i * shentsize
+    name, typ, flags, addr, off, size, link, info, align, entsize = struct.unpack_from('<IIIIIIIIII', d, o)
+    if typ == 9:  # SHT_REL
+        ents = [bytes(d[off + j:off + j + 8]) for j in range(0, size, 8)]
+        ents.sort(key=lambda e: struct.unpack('<I', e[:4])[0])
+        d[off:off + size] = b''.join(ents)
+# v4.5c: splat's expected objects reference some callees as `func_XXXX.NON_MATCHING` (undefined symbols); the built C object references plain `func_XXXX`
+# (kR/MANAGER c0198: update_clip_screen 99.76, jal arg_mism on the NAME only). Blank the suffix on UNDEFINED symbols only (never merges two defined symbols).
+SUF = b'.NON_MATCHING'
+for i in range(shnum):
+    o = shoff + i * shentsize
+    name, typ, flags, addr, off, size, link, info, align, entsize = struct.unpack_from('<IIIIIIIIII', d, o)
+    if typ != 2: continue   # SHT_SYMTAB
+    so = shoff + link * shentsize
+    stroff, = struct.unpack_from('<I', d, so + 16)
+    for j in range(0, size, 16):
+        st_name, st_value, st_size, st_info, st_other, st_shndx = struct.unpack_from('<IIIBBH', d, off + j)
+        if st_shndx != 0 or st_name == 0: continue
+        a = stroff + st_name; e = d.index(b'\0', a)
+        if d[a:e].endswith(SUF): d[e - len(SUF):e] = b'\0' * len(SUF)
+open(sys.argv[2], 'wb').write(d)

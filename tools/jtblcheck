@@ -1,0 +1,512 @@
+#!/usr/bin/env python3
+"""jtblcheck <built.o> <expected.o | asm/<mod>/data/chunk/<chunk>.rodata.s> <func> [--json] [--rodata FILE.s] [--expected-obj FILE.o] [--symbols FILE] [--judge objdiff.json]
+
+Content check for jump-table switches (v4.5c, starter ruling). Our compiled table is referenced as `[.rodata]+off` while the expected object
+references a blob symbol `D_40132xxx`, so objdiff scores ~99.7 even when the table is right. This tool proves the table is right:
+
+  * finds every jump table of <func> in BOTH objects: a lui %hi / (addiu|lw) %lo relocation pair whose target is a table of code
+    addresses, feeding a `jr $reg` ($reg != $ra) through an lw (looked for in the 12 instructions before each such jr);
+  * resolves every table word on both sides to an offset RELATIVE TO THE FUNCTION START;
+  * requires the same table count, the same entry count and order, identical relative offsets, every target inside the function.
+
+Where the data comes from (document of record):
+  built    : .rodata + .rel.rodata of <built.o> (gcc: `.word $Lnn` => R_MIPS_32 vs .text, addend in the word). Reliable.
+  expected : SHT_REL of expected objects carry NO .rodata (chunked modules: the table lives in the module's rodata blob, the expected .o only
+             has `lui/lw %hi/%lo(D_40132xxx)` undefined symbols). So the table WORDS come from the splat per-chunk slice
+             asm/<mod>/data/chunk/<chunk>.rodata.s (lines `/* off vaddr word */ .word func_40087978 | .L400xxxxx | name+0x10`). A symbolic .word
+             is resolved to an absolute address (func_XXXXXXXX / .LXXXXXXXX / D_XXXXXXXX hex name, name+off via <mod>_symbols.txt or the .o symtab)
+             and the function's absolute address comes from the expected .o (chunk text base voted from func_XXXXXXXX / symbols.txt names).
+             If the expected .o does have its own .rodata (non-chunked modules) that is used instead.
+             Raw word bytes in the .s are NOT used (they are pre-link file offsets, not addresses).
+  Trailing all-zero words after the built table's last entry in the expected slice (alignment padding up to the next glabel) are ignored;
+  anything else beyond the built entry count is a mismatch, EXCEPT (v4.5d) when the word right after the n-th entry is zero: a table word is a
+  code address and never 0, so that zero ends the expected table at exactly n entries and the data behind the padding is not the table's.
+  v4.5d: a chunked TU whose expected .o carries its own .rodata (constants of other C functions) but references THIS function's table through
+  the module blob symbol (D_401329B0) falls back to the splat slice when the own-.rodata reader finds no table.
+
+--judge <objdiff json from tools/score (.score/<func>.json)>: additionally require that EVERY differing instruction of the function is a
+table-address instruction (lui/addiu/lw, relocation operand only differs, same registers, function offset in the table-pair set). score uses this.
+
+Exit 0 only if every table of the function is identical (and the function has >= 1 table). Exit 1 otherwise, one reason line on stdout.
+Exit 2 on usage / unreadable input (never normalise). With --json, stdout is one JSON line:
+  {"ok":bool,"reason":str,"func":str,"tables":N,"entries":[...],"insn_built":[func-relative byte offsets of the table hi/lo instructions],"insn_expected":[...]}
+"""
+import json, os, re, struct, sys
+
+# ---------------------------------------------------------------- ELF32 LE
+class Elf:
+    def __init__(self, path):
+        self.path = path
+        d = self.d = open(path, 'rb').read()
+        if d[:4] != b'\x7fELF' or d[4] != 1 or d[5] != 1:
+            raise ValueError('%s: not ELF32 little-endian' % path)
+        shoff, = struct.unpack_from('<I', d, 0x20)
+        shentsize, shnum, shstrndx = struct.unpack_from('<HHH', d, 0x2E)
+        self.sec = []
+        for i in range(shnum):
+            o = shoff + i * shentsize
+            nm, typ, fl, addr, off, size, link, info, al, es = struct.unpack_from('<IIIIIIIIII', d, o)
+            self.sec.append(dict(nm=nm, typ=typ, off=off, size=size, link=link, info=info, name=''))
+        so = self.sec[shstrndx]
+        for s in self.sec:
+            s['name'] = self._cstr(so['off'] + s['nm'])
+        self.byname = {s['name']: i for i, s in enumerate(self.sec)}
+        self.syms = []
+        for s in self.sec:
+            if s['typ'] == 2:
+                strsec = self.sec[s['link']]
+                for j in range(0, s['size'], 16):
+                    n, v, sz, info, other, shndx = struct.unpack_from('<IIIBBH', d, s['off'] + j)
+                    self.syms.append(dict(name=self._cstr(strsec['off'] + n), value=v, size=sz, type=info & 15, shndx=shndx))
+                break
+
+    def _cstr(self, a):
+        return self.d[a:self.d.index(b'\0', a)].decode('latin1')
+
+    def data(self, name):
+        i = self.byname.get(name)
+        if i is None:
+            return None
+        s = self.sec[i]
+        return self.d[s['off']:s['off'] + s['size']]
+
+    def rels(self, target_name):
+        """[(r_offset, sym_index, type)] of the SHT_REL section applying to section target_name, in file order"""
+        ti = self.byname.get(target_name)
+        out = []
+        if ti is None:
+            return out
+        for s in self.sec:
+            if s['typ'] == 9 and s['info'] == ti:
+                for j in range(0, s['size'], 8):
+                    ro, ri = struct.unpack_from('<II', self.d, s['off'] + j)
+                    out.append((ro, ri >> 8, ri & 0xff))
+        return out
+
+    def func(self, name):
+        ti = self.byname.get('.text')
+        for s in self.syms:
+            if s['name'] == name and s['shndx'] == ti and s['type'] in (0, 2):
+                return s
+        return None
+
+class Fail(Exception):
+    pass
+
+def u32(b, o):
+    return struct.unpack_from('<I', b, o)[0]
+
+def s16(x):
+    x &= 0xffff
+    return x - 0x10000 if x & 0x8000 else x
+
+# ---------------------------------------------------------------- code scan shared by both sides
+def code_pairs(elf, fn, text):
+    """HI16/LO16 pairs inside the function: [(hi_off, lo_off, sym_index, addend)] (offsets relative to function start).
+    HI16 pairs with the next LO16 (table order, then file order) on the same symbol (MIPS ABI)."""
+    lo_, hi_ = fn['value'], fn['value'] + fn['size']
+    rl = sorted([r for r in elf.rels('.text') if lo_ <= r[0] < hi_], key=lambda r: r[0])
+    pairs = []
+    for i, (ro, si, ty) in enumerate(rl):
+        if ty != 5:
+            continue
+        for ro2, si2, ty2 in rl[i + 1:]:
+            if ty2 == 6 and si2 == si:
+                imm_hi = u32(text, ro) & 0xffff
+                imm_lo = s16(u32(text, ro2))
+                pairs.append((ro - lo_, ro2 - lo_, si, (imm_hi << 16) + imm_lo))
+                break
+    return pairs
+
+def jr_loads(text, fn):
+    """[(jr_off, lw_off)] for every `jr $reg` ($reg != $ra) with an lw into that reg in the previous 12 instructions (function-relative)."""
+    out = []
+    for o in range(fn['value'], fn['value'] + fn['size'], 4):
+        w = u32(text, o)
+        if (w >> 26) == 0 and (w & 0x3f) == 8 and ((w >> 21) & 31) != 31:   # jr rs
+            reg = (w >> 21) & 31
+            for k in range(1, 13):
+                p = o - 4 * k
+                if p < fn['value']:
+                    break
+                v = u32(text, p)
+                if (v >> 26) == 0x23 and ((v >> 16) & 31) == reg:           # lw rt=reg
+                    out.append((o - fn['value'], p - fn['value']))
+                    break
+    return out
+
+def select_table_pairs(pairs, jrl, is_table):
+    """pairs whose target is a table (is_table(sym,addend)) and whose LO16 lies within 10 instructions before the lw feeding a jr (or on it)."""
+    chosen = []
+    for jr, lw in jrl:
+        for hi, lo, si, ad in pairs:
+            if is_table(si, ad) and lw - 40 <= lo <= lw and (hi, lo, si, ad) not in chosen:
+                chosen.append((hi, lo, si, ad))
+    return chosen
+
+# ---------------------------------------------------------------- built side
+def built_tables(path, func):
+    e = Elf(path)
+    fn = e.func(func)
+    if not fn or not fn['size']:
+        raise Fail('built: function %s not found in .text (or size 0)' % func)
+    text = e.data('.text'); ro = e.data('.rodata')
+    if ro is None:
+        raise Fail('built: no .rodata section (no table emitted)')
+    relro = {r[0]: r for r in e.rels('.rodata')}
+    tix = e.byname['.text']; rix = e.byname['.rodata']
+    def symaddr_ro(si, ad):          # rodata offset of the reference, or None
+        s = e.syms[si]
+        if s['shndx'] == rix:
+            return s['value'] + ad
+        return None
+    ro_start = {}
+    pairs = code_pairs(e, fn, text)
+    def is_table(si, ad):
+        a = symaddr_ro(si, ad)
+        return a is not None and a in relro and relro[a][2] == 2
+    chosen = select_table_pairs(pairs, jr_loads(text, fn), is_table)
+    # every rodata address referenced anywhere in the TU (hi/lo pair of any function) bounds a table: a neighbour's table must not be swallowed
+    starts = set()
+    rl = sorted(e.rels('.text'), key=lambda r: r[0])
+    for i, (r0, si, ty) in enumerate(rl):
+        if ty == 5 and e.syms[si]['shndx'] == rix:
+            for r1, si1, ty1 in rl[i + 1:]:
+                if ty1 == 6 and si1 == si:
+                    starts.add(e.syms[si]['value'] + (((u32(text, r0) & 0xffff) << 16) + s16(u32(text, r1))))
+                    break
+    tabs = {}
+    for hi, lo, si, ad in chosen:
+        a = symaddr_ro(si, ad)
+        if a in tabs:
+            tabs[a]['insn'] += [hi, lo]
+            continue
+        ents = []
+        o = a
+        while o in relro and relro[o][2] == 2 and (o == a or o not in starts):
+            r = relro[o]
+            s = e.syms[r[1]]
+            if s['shndx'] != tix:
+                raise Fail('built: table entry at .rodata+0x%x is not a .text reference' % o)
+            ents.append(s['value'] + u32(ro, o) - fn['value'])
+            o += 4
+        tabs[a] = dict(addr=a, entries=ents, insn=[hi, lo])
+    for t in tabs.values():
+        for x in t['entries']:
+            if not 0 <= x < fn['size']:
+                raise Fail('built: table at .rodata+0x%x entry %+d outside the function (size %d): not a jump table' % (t['addr'], x, fn['size']))
+    return [tabs[k] for k in sorted(tabs)]
+
+# ---------------------------------------------------------------- expected side
+HEXNAME = re.compile(r'^(?:func_|D_|\.L|L|jtbl_|jpt_)([0-9A-Fa-f]{8})(?:\.NON_MATCHING)?$')
+
+def load_symbols(path):
+    out = {}
+    if path and os.path.isfile(path):
+        for ln in open(path, errors='replace'):
+            m = re.match(r'\s*([A-Za-z_.$][\w.$]*)\s*=\s*(0x[0-9A-Fa-f]+)', ln)
+            if m:
+                out[m.group(1)] = int(m.group(2), 16)
+    return out
+
+def find_paths(args_built, args_exp, opt):
+    """(expected_obj, rodata_s, symbols_txt) from whichever of .o / .rodata.s the caller named, using EXPECTED_DIR/DECOMP_DIR/path layout."""
+    exp_obj = opt.get('expected-obj'); rod = opt.get('rodata'); sym = opt.get('symbols')
+    p = os.path.abspath(args_exp)
+    if p.endswith('.rodata.s'):
+        rod = rod or p
+        m = re.search(r'^(.*)/asm/([^/]+)/data/(chunk/.+)\.rodata\.s$', p)
+        if m and not exp_obj:
+            root, mod, tu = m.groups()
+            cands = [os.path.join(os.environ.get('EXPECTED_DIR', root + '/expected'), mod, 'src', mod, tu + '.c.o'),
+                     os.path.join(root, 'expected', mod, 'src', mod, tu + '.c.o')]
+            exp_obj = next((c for c in cands if os.path.isfile(c)), None)
+    else:
+        exp_obj = exp_obj or p
+        m = re.search(r'^(.*)/([^/]+)/src/([^/]+)/(chunk/.+)\.c\.o$', p)
+        if m and not rod:
+            base, _, mod, tu = m.groups()
+            roots = [os.environ.get('DECOMP_DIR', ''), os.path.dirname(base), os.getcwd()]
+            for r in roots:
+                c = os.path.join(r, 'asm', mod, 'data', tu + '.rodata.s')
+                if r and os.path.isfile(c):
+                    rod = c; break
+    if not sym:
+        m = re.search(r'/(?:expected|asm)/([^/]+)/', exp_obj or rod or '')
+        mod = None
+        for s in (exp_obj, rod):
+            mm = re.search(r'/(?:expected|asm)/([A-Za-z0-9_.]+)/', s or '')
+            if mm:
+                mod = mm.group(1); break
+        if mod:
+            for r in [os.environ.get('DECOMP_DIR', ''), os.getcwd()] + ([re.split(r'/(?:expected|asm)/', rod or exp_obj)[0]] if (rod or exp_obj) else []):
+                c = os.path.join(r, 'config', mod, mod + '_symbols.txt')
+                if r and os.path.isfile(c):
+                    sym = c; break
+    return exp_obj, rod, sym
+
+def parse_rodata_s_full(path):
+    """returns (words {vaddr: operand}, boundaries set of vaddrs where a glabel starts)"""
+    words = {}; bounds = set(); want_bound = False
+    for ln in open(path, errors='replace'):
+        if re.match(r'\s*(glabel|jlabel|dlabel|label)\s+\S+', ln):
+            want_bound = True
+            continue
+        m = re.match(r'\s*/\*\s*[0-9A-Fa-f]+\s+([0-9A-Fa-f]{8})\s+[0-9A-Fa-f]{8}\s*\*/\s*(\S+)\s*(.*)$', ln)
+        if m:
+            va = int(m.group(1), 16)
+            if want_bound:
+                bounds.add(va); want_bound = False
+            if m.group(2) == '.word':
+                words[va] = m.group(3).split('/*')[0].strip()
+            else:
+                words[va] = None          # .byte/.float/.asciz etc: not a code pointer
+    return words, bounds
+
+def expected_tables(exp_obj, rodata_s, symtxt, func, force_slice=False):
+    if not exp_obj:
+        raise Fail('expected: object not found (pass --expected-obj)')
+    e = Elf(exp_obj)
+    fn = e.func(func)
+    if not fn or not fn['size']:
+        raise Fail('expected: function %s not found in .text (or size 0)' % func)
+    text = e.data('.text')
+    gsyms = load_symbols(symtxt)
+    # chunk text base: vote  abs(sym) - value  over defined .text symbols whose absolute address is knowable
+    tix = e.byname['.text']
+    votes = {}
+    for s in e.syms:
+        if s['shndx'] != tix:
+            continue
+        a = None
+        m = HEXNAME.match(s['name'])
+        if m and not s['name'].startswith('D_'):
+            a = int(m.group(1), 16)
+        elif s['name'] in gsyms:
+            a = gsyms[s['name']]
+        if a is not None:
+            votes[a - s['value']] = votes.get(a - s['value'], 0) + 1
+    if not votes:
+        raise Fail('expected: cannot derive the text base address (no func_XXXXXXXX / symbols.txt names)')
+    base, n = max(votes.items(), key=lambda kv: kv[1])
+    if len(votes) > 1 and n < 2 * sorted(votes.values())[-2] and len(votes) > 1 and n < 3:
+        raise Fail('expected: ambiguous text base %s' % votes)
+    fabs = base + fn['value']
+    # own rodata (non-chunked modules)?
+    ro = e.data('.rodata')
+    pairs = code_pairs(e, fn, text)
+    words = bounds = None
+    if ro is not None and len(ro) and '.rel.rodata' in e.byname and not force_slice:
+        return None, fn          # caller reads the expected object like the built one
+    if not rodata_s:
+        raise Fail('expected: no .rodata.s slice and no .rodata section: table words unavailable')
+    words, bounds = parse_rodata_s_full(rodata_s)
+
+    def sym_abs(si, ad):
+        s = e.syms[si]
+        if s['shndx'] == 0:
+            m = HEXNAME.match(s['name'])
+            if m:
+                return int(m.group(1), 16) + ad
+            if s['name'] in gsyms:
+                return gsyms[s['name']] + ad
+            return None
+        if s['shndx'] == tix:
+            return base + s['value'] + ad
+        return None
+
+    def resolve(op):
+        if op is None:
+            return None
+        m = re.match(r'^(\S+?)(?:\s*\+\s*(0x[0-9A-Fa-f]+|\d+))?$', op)
+        if not m:
+            return None
+        nm, off = m.group(1), int(m.group(2), 0) if m.group(2) else 0
+        if re.match(r'^0x[0-9A-Fa-f]+$', nm) and not m.group(2):
+            return int(nm, 16)
+        nm0 = nm.replace('.NON_MATCHING', '')
+        h = HEXNAME.match(nm0)
+        if h:
+            return int(h.group(1), 16) + off
+        if nm in gsyms:
+            return gsyms[nm] + off
+        for s in e.syms:
+            if s['name'] == nm and s['shndx'] == tix:
+                return base + s['value'] + off
+        return None
+
+    def target_abs(si, ad):
+        return sym_abs(si, ad)
+    def is_table(si, ad):
+        a = target_abs(si, ad)
+        if a is None or a not in words:
+            return False
+        t = resolve(words[a])
+        return t is not None and fabs <= t < fabs + fn['size']
+    chosen = select_table_pairs(pairs, jr_loads(text, fn), is_table)
+    # the expected slice is ONE glabel for the whole TU, so table extents come from every address the TU's code references (hi/lo pairs of any
+    # function): a table ends where the next referenced address starts. Alignment padding (zero words) before that boundary is tolerated.
+    rl = sorted(e.rels('.text'), key=lambda r: r[0])
+    for i, (r0, si, ty) in enumerate(rl):
+        if ty == 5:
+            for r1, si1, ty1 in rl[i + 1:]:
+                if ty1 == 6 and si1 == si:
+                    a = sym_abs(si, ((u32(text, r0) & 0xffff) << 16) + s16(u32(text, r1)))
+                    if a is not None:
+                        bounds.add(a)
+                    break
+    tabs = {}
+    for hi, lo, si, ad in chosen:
+        a = target_abs(si, ad)
+        if a in tabs:
+            tabs[a]['insn'] += [hi, lo]
+            continue
+        ents = []
+        o = a
+        while o in words and (o == a or o not in bounds):
+            ents.append(words[o]); o += 4
+        tabs[a] = dict(addr=a, raw=ents, insn=[hi, lo])
+    for t in tabs.values():
+        rel = []
+        for op in t['raw']:
+            x = resolve(op)
+            if x is None:
+                raise Fail('expected: cannot resolve table word %r at 0x%08X' % (op, t['addr']))
+            rel.append(x - fabs)
+        t['entries_all'] = rel
+    return [tabs[k] for k in sorted(tabs)], fn
+
+# ---------------------------------------------------------------- compare
+def check(built, exp, func, opt):
+    exp_obj, rod, sym = find_paths(built, exp, opt)
+    bt = built_tables(built, func)
+    info = dict(func=func, tables=len(bt), entries=[], insn_built=[], insn_expected=[])
+    if not bt:
+        raise Fail('built: no jump table found for %s (need lui/lo pair -> table of .text refs -> lw -> jr)' % func)
+    et, efn = expected_tables(exp_obj, rod, sym, func)
+    if et is None:               # expected object carries its own .rodata (non-chunked module): same reader as for the built object
+        et = built_tables(exp_obj, func)
+        for t in et:
+            t['raw'] = []; t['entries_all'] = t['entries']
+        if not et and rod:
+            # v4.5d: a chunked TU whose expected .o has its own .rodata (other C functions' constants) while THIS function's table is still
+            # referenced through the module blob symbol (D_401329B0): the own-.rodata reader finds no table, so read the splat slice instead.
+            et, efn = expected_tables(exp_obj, rod, sym, func, force_slice=True)
+    if len(et) != len(bt):
+        raise Fail('table count differs: built %d expected %d' % (len(bt), len(et)))
+    for i, (b, x) in enumerate(zip(bt, et)):
+        n = len(b['entries'])
+        ex = x['entries_all']
+        if len(ex) < n:
+            raise Fail('table %d: expected has %d words, built has %d entries' % (i, len(ex), n))
+        rest = x['raw'][n:]
+        if rest and rest[0] in ('0x00000000', '0'):
+            # v4.5d: a jump-table word is a code address and never 0, so a zero word right after the n-th entry proves the expected table has
+            # exactly n entries; what follows the padding (other TU data no hi/lo pair of this TU bounds, e.g. strings) is not part of the table.
+            k = 0
+            while k < len(rest) and rest[k] in ('0x00000000', '0'):
+                k += 1
+            rest = rest[:k][:4]
+        if any(op not in ('0x00000000', '0') for op in rest) or len(rest) > 4:
+            raise Fail('table %d: expected has extra non-padding words beyond the built %d entries (%s)' % (i, n, ' '.join(rest[:4])))
+        for k in range(n):
+            if b['entries'][k] != ex[k]:
+                raise Fail('table %d entry %d: built target func%+d != expected func%+d' % (i, k, b['entries'][k], ex[k]))
+            if not 0 <= ex[k] < efn['size']:
+                raise Fail('table %d entry %d: expected target func%+d outside the function' % (i, k, ex[k]))
+        info['entries'].append(n)
+        info['insn_built'] += b['insn']; info['insn_expected'] += x['insn']
+    info['insn_built'] = sorted(set(info['insn_built'])); info['insn_expected'] = sorted(set(info['insn_expected']))
+    if info['insn_built'] != info['insn_expected']:
+        raise Fail('table address instructions are at different function offsets: built %s expected %s' % (info['insn_built'], info['insn_expected']))
+    return info
+
+def judge(json_path, func, insn_off):
+    """--judge: objdiff's JSON for <func>; every differing instruction must be a table-address instruction (lui/addiu/lw on the table symbol, only the
+    relocation operand differs, same mnemonic and registers on both sides, function-relative offset in insn_off). Returns None if so, else a reason."""
+    j = json.load(open(json_path))
+    def sym(side):
+        c = [s for s in (j.get(side, {}).get('symbols') or []) if s.get('name') == func or s.get('demangled_name') == func]
+        return c[0] if c else None
+    L, R = sym('left'), sym('right')
+    if not L or not R:
+        return 'objdiff json lacks the symbol on one side'
+    li, ri = L.get('instructions') or [], R.get('instructions') or []
+    if len(li) != len(ri):
+        return 'instruction counts differ (%d vs %d)' % (len(li), len(ri))
+    nd = 0
+    for k, (a, b) in enumerate(zip(li, ri)):
+        if a.get('diff_kind') is None and b.get('diff_kind') is None:
+            continue
+        nd += 1
+        if 'instruction' not in a or 'instruction' not in b:
+            return 'instruction inserted/deleted (code differs beyond the table address)'
+        ia, ib = a['instruction'], b['instruction']
+        what = '%s' % ib.get('formatted')
+        if a.get('diff_kind') != 'DIFF_ARG_MISMATCH' or b.get('diff_kind') != 'DIFF_ARG_MISMATCH':
+            return 'differing instruction is not an operand-only mismatch: %s' % what
+        offa = int(ia.get('address', 0)) - int(L.get('address', 0)); offb = int(ib.get('address', 0)) - int(R.get('address', 0))   # v4.5d: protobuf JSON omits zero
+        if offa != offb or offb not in insn_off:
+            return 'differing instruction at func+%d is not a jump-table address instruction: %s' % (offb, what)
+        def args(i):
+            return [p for p in i.get('parts', []) if 'arg' in p], (i.get('parts') or [{}])[0].get('opcode', {}).get('mnemonic')
+        pa, ma = args(ia); pb, mb = args(ib)
+        if ma != mb or ma not in ('lui', 'addiu', 'lw'):
+            return 'differing instruction func+%d is %s/%s, not lui/addiu/lw: %s' % (offb, ma, mb, what)
+        ra, rb = ia.get('relocation') or {}, ib.get('relocation') or {}
+        if ra.get('type') != rb.get('type') or rb.get('type') not in (5, 6):
+            return 'differing instruction func+%d has no matching HI16/LO16 relocation: %s' % (offb, what)
+        if len(pa) != len(pb) or any(x != y for x, y in zip(pa, pb) if not x['arg'].get('reloc')):
+            return 'differing instruction func+%d differs in a register/immediate, not only the table symbol: %s' % (offb, what)
+    if nd == 0:
+        return 'no differing instruction'
+    return None
+
+def main(argv):
+    opt = {}; pos = []; js = False
+    i = 0
+    while i < len(argv):
+        a = argv[i]
+        if a == '--json':
+            js = True
+        elif a in ('--rodata', '--expected-obj', '--symbols', '--judge') and i + 1 < len(argv):
+            opt[a[2:]] = argv[i + 1]; i += 1
+        elif a.startswith('--'):
+            print('jtblcheck: unknown option %s' % a, file=sys.stderr); return 2
+        else:
+            pos.append(a)
+        i += 1
+    if len(pos) != 3:
+        print(__doc__.split('\n')[0], file=sys.stderr); return 2
+    built, exp, func = pos
+    for p in (built, exp):
+        if not os.path.isfile(p):
+            print('JTBL FAIL %s: input not found: %s' % (func, p)); return 2
+    try:
+        info = check(built, exp, func, opt)
+        info.update(ok=True, reason='identical')
+        if 'judge' in opt:
+            why = judge(opt['judge'], func, set(info['insn_built']))
+            if why:
+                raise Fail('tables identical but not normalisable: ' + why)
+            info['reason'] = 'identical; every differing instruction is a table-address instruction'
+        if js:
+            print(json.dumps(info))
+        else:
+            print('JTBL OK %s: %d table(s), entries %s, every target identical relative to the function start' % (func, info['tables'], info['entries']))
+        return 0
+    except Fail as ex:
+        if js:
+            print(json.dumps(dict(ok=False, reason=str(ex), func=func)))
+        else:
+            print('JTBL FAIL %s: %s' % (func, ex))
+        return 1
+    except (ValueError, OSError, struct.error, KeyError, IndexError) as ex:
+        if js:
+            print(json.dumps(dict(ok=False, reason='parse error: %r' % (ex,), func=func)))
+        else:
+            print('JTBL FAIL %s: parse error: %r' % (func, ex))
+        return 2
+
+if __name__ == '__main__':
+    sys.exit(main(sys.argv[1:]))

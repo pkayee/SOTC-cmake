@@ -1,0 +1,4 @@
+@c:
+cc1 -lang-c %{ansi:-std=c89} %(cpp_options) -DPREPROCESS_ASM %(cc1_options) -o %{|!pipe:%g.si} |
+ %(trad_capable_cpp) -lang-asm %{v} %I -I./ %{|!pipe:%g.si} -o %{|!pipe:%g.s} |
+ as %(asm_options) %{!pipe:%g.s} %A

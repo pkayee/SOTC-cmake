@@ -1,0 +1,56 @@
+#!/usr/bin/env python3
+"""nearmiss — park a near-miss attempt as a disabled stub next to the live INCLUDE_ASM, or list/clear stubs.
+
+  nearmiss stub  <src/MODULE/file.c> <func> <attempt.c> --pct N [--cat CAT] [--cause TEXT]
+  nearmiss list  [src-dir]          list every stub in the tree (file, function, pct, cat)
+  nearmiss clear <src/MODULE/file.c> <func>   remove the stub of <func>
+
+The result looks like
+    /* NEARMISS-STUB func */
+    #if 0 /* NEARMISS 97.4% cat=regalloc | cause text */
+    <the C attempt, one function, no asm>
+    #endif
+    INCLUDE_ASM("...", func);     <- stays live, the module match stays perfect
+See docs/NEAR_MISSES.md. Categories: regalloc sched stack-frame struct-layout branch-layout rodata-const call-abi
+inline-unroll cse-hoist bitops float-ops volatile-alias linker-pad sdk-compiler vu0-mmi no-c-form uncategorized."""
+import argparse, re, sys
+from pathlib import Path
+
+CATS = "regalloc sched stack-frame struct-layout branch-layout rodata-const call-abi inline-unroll cse-hoist bitops float-ops volatile-alias linker-pad sdk-compiler vu0-mmi no-c-form uncategorized".split()
+STUB_RE = re.compile(r"#if 0 /\* NEARMISS[^\n]*\*/\n.*?#endif\n", re.S)
+
+def validate(func, body):
+    if re.search(r"\b(asm|__asm__|__asm)\b", body): return "contains asm (no asm anywhere, not even in stubs)"
+    if re.search(r"^\s*#\s*include|INCLUDE_ASM", body, re.M): return "contains #include/INCLUDE_ASM (attempt must be the single function)"
+    defs = re.findall(r"(?m)^[A-Za-z_][\w\s\*]*?\b([A-Za-z_]\w*)\s*\([^;{]*\)\s*\n?\{", body)
+    if defs.count(func) != 1 or len(defs) > 3: return f"expected exactly one definition of {func} (plus at most 2 helpers); found {defs}"
+
+def clear(s, func):
+    marker = f"/* NEARMISS-STUB {func} */\n"
+    return re.sub(re.escape(marker) + STUB_RE.pattern, "", s, flags=re.S)
+
+def main():
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    sp = ap.add_subparsers(dest="cmd", required=True)
+    a = sp.add_parser("stub"); a.add_argument("file"); a.add_argument("func"); a.add_argument("attempt"); a.add_argument("--pct", required=True, type=float); a.add_argument("--cat", default="uncategorized", choices=CATS); a.add_argument("--cause", default="no cause recorded")
+    l = sp.add_parser("list"); l.add_argument("dir", nargs="?", default="src")
+    c = sp.add_parser("clear"); c.add_argument("file"); c.add_argument("func")
+    o = ap.parse_args()
+    if o.cmd == "list":
+        for f in sorted(Path(o.dir).rglob("*.c")):
+            for m in re.finditer(r"/\* NEARMISS-STUB (\w+) \*/\n#if 0 /\* NEARMISS ([\d.]+)% cat=(\S+)", f.read_text(errors="replace")):
+                print(f"{f}\t{m.group(1)}\t{m.group(2)}%\t{m.group(3)}")
+        return
+    f = Path(o.file); s = f.read_text()
+    if o.cmd == "clear":
+        f.write_text(clear(s, o.func)); return
+    body = Path(o.attempt).read_text().rstrip() + "\n"
+    err = validate(o.func, body)
+    if err: sys.exit(f"nearmiss: {err}")
+    s = clear(s, o.func)
+    m = re.search(r'^INCLUDE_ASM\("[^"]+",\s*' + re.escape(o.func) + r"\);", s, re.M)
+    if not m: sys.exit(f"nearmiss: live INCLUDE_ASM for {o.func} not found in {f} (already matched?)")
+    cause = o.cause.replace("*/", "").replace("\n", " ")[:160]
+    stub = f"/* NEARMISS-STUB {o.func} */\n#if 0 /* NEARMISS {o.pct}% cat={o.cat} | {cause} */\n{body}#endif\n"
+    f.write_text(s[:m.start()] + stub + s[m.start():])
+main()

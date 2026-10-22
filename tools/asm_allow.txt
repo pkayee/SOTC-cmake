@@ -1,0 +1,2 @@
+iosWaitDMA   # upstream spin loop (baseline)
+iosWaitVU1   # upstream spin loop (baseline)

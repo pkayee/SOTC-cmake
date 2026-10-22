@@ -1,0 +1,25 @@
+#!/usr/bin/env python3
+"""modules [decomp-dir] [--aliases|--names|--checksums] -- the module list of a decomp checkout (v4: N modules, not 2).
+
+Parses the alias dict in <decomp>/configure.py (TARGET_ALIASES, or the older target_aliases literal), so it works on any
+revision, including the one before Phase 2 (2 modules). Default output: one `alias module` line per module, build order.
+  --aliases    just the aliases (configure -t <alias>)      --names     just the module names (KERNEL.XFF ...)
+  --checksums  the checksum-<module>.sha1 file names (only those that exist)
+Single source of truth for merge, mkworktree, score, overwatch. Read-only.
+"""
+import os, re, sys
+from pathlib import Path
+args = [a for a in sys.argv[1:] if not a.startswith("--")]
+flags = [a for a in sys.argv[1:] if a.startswith("--")]
+d = Path(args[0]) if args else Path(os.environ.get("DECOMP_DIR", "."))
+if (Path.cwd() / "configure.py").exists() and not args and (Path.cwd() / "makefile").exists(): d = Path.cwd()
+txt = (d / "configure.py").read_text()
+m = re.search(r"(?:TARGET_ALIASES|target_aliases)\s*=\s*\{(.*?)\}", txt, re.S)
+if not m: sys.exit(f"modules: no alias dict in {d}/configure.py")
+pairs = re.findall(r"""["'](\w+)["']\s*:\s*["']([\w.]+)["']""", m.group(1))
+for a, n in pairs:
+    if "--aliases" in flags: print(a)
+    elif "--names" in flags: print(n)
+    elif "--checksums" in flags:
+        if (d / f"checksum-{n}.sha1").exists(): print(f"checksum-{n}.sha1")
+    else: print(a, n)

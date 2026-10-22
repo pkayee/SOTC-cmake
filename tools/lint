@@ -1,0 +1,209 @@
+#!/usr/bin/env python3
+"""lint — hard-rule gate: matched functions must be real C (decomp/RULES.md, upstream docs/CONTRIBUTING.md).
+
+  lint --branch batch/<id>   changed functions on that branch vs its merge-base with main 
+  lint --worktree [DIR]      uncommitted + committed changes in a worktree vs main (orchestrators run before every commit)
+  lint --audit               what is already in main: functions new/changed since the baseline commit that break the rules
+
+Exit 1 with `LINT REJECT <file>:<function>: <rule> <why>` lines when a rule is broken.
+
+Rules (v3.14, human order: NO asm statement of any kind in a swarm-written function; if C cannot express it the function stays INCLUDE_ASM):
+  A  no asm statement with 3+ instructions                         (a function is not an asm sequence; VU0/MMI loops need real C or stay INCLUDE_ASM)
+  B  no hard-coded registers: asm clobbers ("$8", "$t0") or `register T x asm("v1")` variables  (let the compiler allocate: use operand constraints)
+  C  no assembler directives or labels inside asm, no file-level asm()  (.set/.globl/.align/.type/.word/..., `name:`)
+  D  at most 4 asm statements per function
+  E  no NON_MATCHING / #pragma / hack text
+  F  no volatile scalar/struct LOCAL (human 2026-10-18, relaxed: volatile is allowed for hardware registers and shared words; asm volatile is covered by A)
+Allowed: only the upstream spin loops listed in tools/asm_allow.txt (functions already asm in the baseline).
+"""
+import os, re, subprocess, sys
+from pathlib import Path
+
+TOOLS = Path(__file__).resolve().parent
+MAIN = Path(os.environ.get("SOTC_ROOT", TOOLS.parent))
+BASELINE = "59b47f6"
+try: ALLOW = {l.split("#")[0].strip() for l in (TOOLS / "asm_allow.txt").read_text().splitlines() if l.split("#")[0].strip()}
+except OSError: ALLOW = {"iosWaitDMA", "iosWaitVU1"}
+ASM_RE = re.compile(r"\b(?:__asm__|__asm|asm)\b\s*(?:volatile|__volatile__)?\s*\(")
+DIRECTIVE = re.compile(r"(^|[;\\n\s])\.(set|globl|global|type|size|align|word|half|byte|ent|end|section|text|data|ascii|space|balign|p2align)\b")
+LABEL = re.compile(r"(^|[;\s])[A-Za-z_.$][\w.$]*:\s*(?:$|[a-z])")
+REGCLOB = re.compile(r"^\$[0-9a-z]+$|^\$f\d+$", re.I)
+
+def git(root, *a):
+    return subprocess.run(["git", "-C", str(root), *a], capture_output=True, text=True).stdout
+
+def scan(src):
+    """yield (kind, text, start) tokens: code chars with comments removed, strings kept intact"""
+    out, i, n = [], 0, len(src)
+    while i < n:
+        c = src[i]
+        if src.startswith("//", i):
+            j = src.find("\n", i); i = n if j < 0 else j; continue
+        if src.startswith("/*", i):
+            j = src.find("*/", i + 2); i = n if j < 0 else j + 2; out.append(" "); continue
+        if c == '"':
+            j = i + 1
+            while j < n and src[j] != '"': j += 2 if src[j] == "\\" else 1
+            out.append(src[i:j + 1]); i = j + 1; continue
+        if c == "'":
+            j = i + 1
+            while j < n and src[j] != "'": j += 2 if src[j] == "\\" else 1
+            out.append(src[i:j + 1]); i = j + 1; continue
+        out.append(c); i += 1
+    return "".join(out)
+
+def functions(src):
+    """[(name, body, header_start)] for top-level function definitions; also returns the text outside bodies"""
+    s, funcs, outside = scan(src), [], []
+    depth, i, last, n = 0, 0, 0, len(s)
+    while i < n:
+        c = s[i]
+        if c == '"':
+            j = i + 1
+            while j < n and s[j] != '"': j += 2 if s[j] == "\\" else 1
+            i = j + 1; continue
+        if c == "{":
+            if depth == 0:
+                header = s[last:i]
+                start = i
+            depth += 1
+        elif c == "}":
+            depth -= 1
+            if depth == 0:
+                body = s[start:i + 1]
+                m = re.findall(r"([A-Za-z_]\w*)\s*\(", header)
+                if header.rstrip().endswith(")") and m and not re.search(r"\b(struct|union|enum|typedef)\b[^()]*$", header): funcs.append((m[-1], body))
+                else: outside.append(body)
+                last = i + 1
+        elif c == ";" and depth == 0:
+            outside.append(s[last:i + 1]); last = i + 1
+        i += 1
+    outside.append(s[last:])
+    return funcs, "\n".join(outside)
+
+def asm_statements(text):
+    """full asm( ... ) argument texts found in text"""
+    res = []
+    for m in ASM_RE.finditer(text):
+        depth, j, n = 1, m.end(), len(text)
+        while j < n and depth:
+            if text[j] == '"':
+                j += 1
+                while j < n and text[j] != '"': j += 2 if text[j] == "\\" else 1
+            elif text[j] == "(": depth += 1
+            elif text[j] == ")": depth -= 1
+            j += 1
+        res.append(text[m.end():j - 1])
+    return res
+
+def split_sections(arg):
+    secs, cur, j, n = [], "", 0, len(arg)
+    while j < n:
+        if arg[j] == '"':
+            k = j + 1
+            while k < n and arg[k] != '"': k += 2 if arg[k] == "\\" else 1
+            cur += arg[j:k + 1]; j = k + 1; continue
+        if arg[j] == ":": secs.append(cur); cur = ""
+        else: cur += arg[j]
+        j += 1
+    secs.append(cur); return secs
+
+def strings(t): return re.findall(r'"((?:\\.|[^"\\])*)"', t)
+
+def macro_asm(text):
+    """asm statements inside #define bodies (backslash continuations joined)"""
+    t = scan(text).replace("\\\n", " ")
+    res = []
+    for m in re.finditer(r"(?m)^[ \t]*#[ \t]*define\b[^\n]*", t):
+        res += asm_statements(m.group(0))
+    return res
+
+def check_function(name, body):
+    why = []
+    stm = asm_statements(body)
+    if name in ALLOW: return why
+    if stm: why.append(f"A {len(stm)} asm statement(s): NO asm of any kind in swarm-written functions (v3.14 human order: real C only; leave INCLUDE_ASM if C cannot express it)")
+    if re.search(r"\bregister\b[^;{}]*\b(?:__asm__|asm)\s*\(\s*\"", body): why.append("B register-asm variable (hard-coded register: use operand constraints)")
+    if len(stm) > 4: why.append(f"D {len(stm)} asm statements in one function")
+    # F (human 2026-10-18, relaxed): volatile is allowed for hardware registers and interrupt/thread-shared words (casts, externs, pointers-to-volatile, params);
+    # REJECTED: a volatile scalar/struct LOCAL (dummy, padding or dead-copy local, e.g. `volatile s32 unused;`, `u128 volatile pos = ...;` - the SSB ovl8 trick).
+    _nc = re.sub(r"/\*.*?\*/|//[^\n]*", "", body, flags=re.S)
+    for _l in _nc.split("\n")[1:]:
+        _t = _l.strip()
+        if re.match(r"^(?:static\s+)?(?:const\s+)?(?:\w+\s+)*\bvolatile\b[^;(){}*]*\w\s*(?:\[[^\]]*\])?\s*(?:=[^;]*)?;$", _t) and "*" not in _t.split("=")[0] and "asm" not in _t:
+            why.append("F volatile local (dummy/padding/dead-copy locals are rejected; volatile is allowed only for hardware registers and shared words via casts, pointers, externs): " + _t[:60]); break
+    for a in stm:
+        secs = split_sections(a)
+        tmpl = " ".join(strings(secs[0])).replace("\\n", ";").replace("\\t", " ")
+        ins = [x for x in re.split(r"[;\n]", tmpl) if x.strip()]
+        if len(ins) >= 3: why.append(f"A asm statement with {len(ins)} instructions (write the function in C; if C cannot express it, leave INCLUDE_ASM)")
+        if DIRECTIVE.search(tmpl) or any(LABEL.match(x.strip()) for x in ins): why.append("C assembler directive/label inside asm")
+        if len(secs) >= 4:
+            regs = [c for c in strings(secs[3]) if REGCLOB.match(c)]
+            if regs and len(ins) >= 2: why.append(f"B hard-coded registers in clobbers {regs[:3]} (use operand constraints)")
+    return list(dict.fromkeys(why))
+
+def check_source(path, new, old=None, audit_base=None):
+    """returns list of (func, why) for functions that are new/changed vs old"""
+    f_new, out_new = functions(new)
+    old_f = dict(functions(old)[0]) if old else {}
+    bad = []
+    for name, body in f_new:
+        if old and old_f.get(name) == body: continue
+        for w in check_function(name, body): bad.append((name, w))
+    old_macros = "".join(macro_asm(old or ""))
+    for a in macro_asm(new):
+        if a not in old_macros: bad.append(("<macro>", "A asm inside a #define body (v3.14: no asm at all, also not hidden in macros)"))
+    for a in asm_statements(out_new):
+        if not (old and a in "".join(asm_statements(functions(old)[1]))):
+            bad.append(("<file-level>", "C file-level asm() block (hand-written assembly outside any function)"))
+    return bad
+
+def added_text_checks(diff):
+    bad = []
+    for line in diff.splitlines():
+        if line.startswith("+") and not line.startswith("+++") and re.search(r"NON_MATCHING|#pragma|\bHACK\b|\bhack\b|FIXME", line):
+            bad.append(("<text>", "E " + line[1:60].strip()))
+    return bad
+
+def run(base, head_ref, root, worktree=False):
+    files = git(root, "diff", "--name-only", base, *( [] if worktree else [head_ref]), "--", "src", "include").split()
+    bad = []
+    for f in files:
+        if not re.search(r"\.(c|h)$", f) or f.startswith(("include/sdk/", "include/gcc/")) or f.endswith("include_asm.h"): continue
+        try: new = (Path(root) / f).read_text(errors="replace") if worktree else git(root, "show", f"{head_ref}:{f}")
+        except OSError: continue
+        old = git(root, "show", f"{base}:{f}") or None
+        if f.endswith(".c"): bad += [(f, n, w) for n, w in check_source(f, new, old)]
+        elif f.endswith(".h"):   # headers/macros: any new asm text is rejected (v3.14)
+            old_asm = "".join(asm_statements(scan(old or "")))
+            for a in asm_statements(scan(new)):
+                if a not in old_asm: bad.append((f, "<macro/header>", "A asm in a header or #define body (v3.14: no asm at all)"))
+    diff = git(root, "diff", "-U0", base, *( [] if worktree else [head_ref]), "--", "src", "include")
+    bad += [("(diff)", n, w) for n, w in added_text_checks(diff)]
+    return bad
+
+def audit():
+    bad = []
+    for f in git(MAIN, "ls-files", "src").split():
+        if not f.endswith(".c"): continue
+        new = (MAIN / f).read_text(errors="replace"); old = git(MAIN, "show", f"{BASELINE}:{f}") or None
+        for n, w in check_source(f, new, old): bad.append((f, n, w))
+    return bad
+
+def main():
+    a = sys.argv[1:]
+    if "--audit" in a: bad = audit()
+    elif "--branch" in a:
+        br = a[a.index("--branch") + 1]; base = git(MAIN, "merge-base", "HEAD", br).strip()
+        bad = run(base, br, MAIN)
+    elif "--worktree" in a:
+        d = Path(a[a.index("--worktree") + 1]) if len(a) > a.index("--worktree") + 1 else Path.cwd()
+        base = git(d, "merge-base", "HEAD", "main").strip() or "main"
+        bad = run(base, "HEAD", d, worktree=True)
+    else: print(__doc__); sys.exit(2)
+    for f, n, w in bad: print(f"LINT REJECT {f}:{n}: {w}")
+    if "--audit" in a: print(f"AUDIT: {len(bad)} violations in {len({(f, n) for f, n, _ in bad})} functions/blocks", file=sys.stderr)
+    sys.exit(1 if bad else 0)
+
+if __name__ == "__main__": main()

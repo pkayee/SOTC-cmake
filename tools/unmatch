@@ -1,0 +1,23 @@
+#!/usr/bin/env python3
+"""unmatch — mechanically put a function back to INCLUDE_ASM (no LLM needed). Run INSIDE a batch worktree, then build + merge via make + tools/lint.
+  unmatch <src/…/file.c> <func> [<func> ...]
+Finds `//INCLUDE_ASM("…", func);` above the C definition, deletes the C definition, un-comments the INCLUDE_ASM line.
+The assembled bytes are the same as before, so the module SHA1 still holds. Used for hand-written-asm functions listed in your audit list."""
+import re, sys
+path, names = sys.argv[1], sys.argv[2:]
+src = open(path).read().split("\n")
+for name in names:
+    idx = next((i for i, l in enumerate(src) if re.match(r'\s*//\s*INCLUDE_ASM\(.*,\s*%s\)\s*;' % re.escape(name), l)), None)
+    if idx is None: print(f"unmatch: no commented INCLUDE_ASM line for {name} in {path}", file=sys.stderr); sys.exit(1)
+    j = idx + 1
+    while j < len(src) and not src[j].strip(): j += 1
+    depth, k, seen = 0, j, False
+    while k < len(src):
+        line = re.sub(r'"(?:\\.|[^"\\])*"', '""', src[k])
+        depth += line.count("{") - line.count("}"); seen |= "{" in line
+        k += 1
+        if seen and depth == 0: break
+    if not seen: print(f"unmatch: no body found after {name}", file=sys.stderr); sys.exit(1)
+    src[idx:k] = [re.sub(r'^(\s*)//\s*', r'\1', src[idx])]
+    print(f"unmatch: {name} restored to INCLUDE_ASM ({k - idx - 1} body lines removed)")
+open(path, "w").write("\n".join(src))

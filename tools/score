@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+# Score one function's C against the original object with objdiff.
+#   env: SOTC_ROOT (default: repo root), OBJDIFF (default: objdiff-cli on PATH), EXPECTED_DIR
+#   score <module> <file-rel> <function> [--build]
+#     module    any module of the checkout (tools/modules): SCPS_150.97 KERNEL.XFF GAMECORE.XFF MANAGER.XFF ...
+#     file-rel  path under src/<module>/ without .c   (e.g. ios/sched)
+#     function  symbol name
+#     --build   rebuild just that translation unit first (ninja)
+#     --json    also print objdiff's full JSON diff on stdout (otherwise it is saved to
+#               .score/<func>.json in the checkout and only a summary is shown)
+# Prints: "SCORE <module>/<file>/<func> <pct>%" — that line is the truth. v4.5c: a jump-table switch whose only differences are the table-address
+# instructions and whose tables pass `tools/jtblcheck` prints "SCORE .../<func> 100.0% (jtbl-normalised from 99.73)". The TU-level
+# match_percent inside the JSON covers the whole file; ignore it.
+# Run inside the worktree you are scoring (DECOMP_DIR defaults to $PWD if it has a makefile).
+set -euo pipefail
+TOOLS="$(cd "$(dirname "$0")" && pwd)"
+if [ "${1:-}" = "-h" ] || [ "${1:-}" = "--help" ]; then sed -n 2,12p "$0"; exit 0; fi
+DECOMP_DIR="${SOTC_ROOT:-$(cd "$TOOLS/.." && pwd)}"
+OBJDIFF="${OBJDIFF:-$(command -v objdiff-cli || echo objdiff-cli)}"
+mod="${1:?module}"; file="${2:?file-rel}"; func="${3:?function}"; shift 3
+want_json=0; for a in "$@"; do [[ "$a" == "--json" ]] && want_json=1; done
+cd "$DECOMP_DIR"
+obj="build/$mod/src/$mod/$file.c.o"
+target="${EXPECTED_DIR:-$DECOMP_DIR/expected}/$mod/src/$mod/$file.c.o"
+if [[ "${1:-}" == "--build" ]]; then
+  if [ ! -f "$mod.ninja" ]; then
+    alias="$("$TOOLS/modules" "$DECOMP_DIR" | awk -v m="$mod" '$2==m {print $1}')"
+    [ -n "$alias" ] || { echo "score: unknown module '$mod' (known: $("$TOOLS/modules" "$DECOMP_DIR" --names | tr '\n' ' '))" >&2; exit 2; }
+    ./configure.py -c -t "$alias" >/dev/null
+  fi
+  # v4.5: always recompile this one TU. ninja said "no work to do" with an object older than its edited .c (kX2/tty.c), so the score was for OLD code.
+  rm -f "$obj"
+  ninja -f "$mod.ninja" "$obj" >&2 || { echo "score: build of $obj FAILED" >&2; exit 2; }
+  [ -f "$obj" ] || { echo "score: $obj was not produced" >&2; exit 2; }
+fi
+# v4.9 (kS21 INFRA): a freshly split segment has only the old asm object in expected/ until merge refreshes it: fall back to the same path's asm .s.o (same bytes by construction; SHA1 at merge stays the judge)
+if [ ! -f "$target" ]; then alt="${EXPECTED_DIR:-$DECOMP_DIR/expected}/$mod/asm/$mod/$file.s.o"; [ -f "$alt" ] && { target="$alt"; echo "score: note: no expected .c.o, using asm object $alt" >&2; }; fi
+[ -f "$target" ] || { echo "no expected object: $target (run: cp -r build expected after a green make)" >&2; exit 2; }
+# v4.5 (starter ruling): scoring-only normalisation. objdiff derives a HI16 addend from the LO16 that FOLLOWS it in .rel.text order, and splat's asm keeps
+# unpaired `lui %hi(sym)` + `lw %lo(sym+off)` in a different table order than gcc's paired entries, so equal code scored ~98% (arg_mism on the lui).
+# Both objects get every SHT_REL stably sorted by r_offset into private copies; no bytes change, the the module SHA1 (make) stays the final judge.
+target_orig="$target"
+nrm="$(mktemp -d "${TMPDIR:-/tmp}/score.XXXXXX")"; trap 'rm -rf "$nrm"' EXIT
+"$TOOLS/relsort" "$target" "$nrm/target.o" && "$TOOLS/relsort" "$obj" "$nrm/base.o" && { target="$nrm/target.o"; objn="$nrm/base.o"; } || objn="$obj"
+json="$("$OBJDIFF" diff -1 "$target" -2 "$objn" -o - --format json "$func")"
+# objdiff reports .left/.right (target/base) each with top-level `symbols`; pick ours by name —
+# never take the max over the whole TU, other functions in the file would mask a mismatch.
+pct="$(printf '%s' "$json" | jq -r --arg f "$func" \
+  '[.left.symbols[]?, .right.symbols[]? | select(.name==$f or .demangled_name==$f) | .match_percent // empty] | max // "nosym"')"
+[[ "$pct" == "nosym" ]] && { echo "symbol $func not found in either object" >&2; exit 3; }
+mkdir -p .score; printf '%s\n' "$json" > ".score/$func.json"
+# v4.5c (starter ruling): jump-table normalisation. A switch table we compile is referenced as `[.rodata]+off`, the expected object names a blob symbol
+# `D_40132xxx`, so a correct function scores ~99.7. Normalise to 100 ONLY when (a) pct < 100, (b) EVERY differing instruction is a lui/addiu/lw table-address
+# instruction whose only difference is the relocation symbol, and (c) `jtblcheck` proves every jump table of the function has the same entries, count and
+# order relative to the function start (it reads the expected table from asm/<mod>/data/chunk/*.rodata.s). Anything else: the raw score stands.
+jt_note=""
+if [[ "$pct" != "100" && "$pct" != "100.0" ]]; then
+  jt_out="$("$TOOLS/jtblcheck" "$obj" "$target_orig" "$func" --judge ".score/$func.json" 2>&1)" && jt_rc=0 || jt_rc=$?
+  if [[ $jt_rc -eq 0 ]]; then
+    rawpct="$(LC_ALL=C printf '%.2f' "$pct")"
+    echo "SCORE $mod/$file/$func 100.0% (jtbl-normalised from $rawpct)"
+    echo "  $jt_out"
+    echo "  (raw objdiff diff: .score/$func.json; the module SHA1 (make) stays the final judge)"
+    [[ $want_json == 1 ]] && printf '%s\n' "$json"
+    exit 0
+  fi
+  # only worth a line when the function really has a table (jtblcheck found one or the tables differ)
+  case "$jt_out" in *"not normalisable"*|*"FAIL $func: table "*|*"expected:"*) jt_note="  jtbl: NOT normalised: ${jt_out#JTBL FAIL $func: }";; esac
+fi
+echo "SCORE $mod/$file/$func ${pct}%"
+[ -n "$jt_note" ] && echo "$jt_note"
+if [[ "$pct" != "100" && "$pct" != "100.0" ]]; then
+  # compact instruction diff for the symbol: what the base (yours) has vs the target (original)
+  printf '%s' "$json" | jq -r --arg f "$func" '
+    (.right.symbols[]? | select(.name==$f) | .instructions // []) as $ins
+    | $ins[] | select(.diff_kind != null)
+    | "  \(.diff_kind | ltrimstr("DIFF_") | ascii_downcase | .[0:8] | . + " " * (8 - length)) \(.instruction.address // "") \(.instruction.formatted // "")"' | head -40
+  echo "  (full diff: .score/$func.json)"
+fi
+[[ $want_json == 1 ]] && printf '%s\n' "$json"
+exit 0
