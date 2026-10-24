@@ -164,21 +164,21 @@ extern "C" {
 #define	SCE_EVERSIONMISS	0x10004
 
 struct sce_stat {
-        unsigned int    st_mode;        /* ¥Õ¥¡¥¤¥ë¤Î¼ïÎà(file/dir) */
-                                        /* ¤È¥â¡¼¥É(R/W/X) */
-        unsigned int    st_attr;        /* ¥Ç¥Ð¥¤¥¹°ÍÂ¸¤ÎÂ°À­ */
-        unsigned int    st_size;        /* ¥Õ¥¡¥¤¥ë¥µ¥¤¥º ²¼°Ì 32 bit */
-        unsigned char   st_ctime[8];    /* ºîÀ®»þ´Ö */
-        unsigned char   st_atime[8];    /* ºÇ½ª»²¾È»þ´Ö */
-        unsigned char   st_mtime[8];    /* ºÇ½ªÊÑ¹¹»þ´Ö */
-        unsigned int    st_hisize;      /* ¥Õ¥¡¥¤¥ë¥µ¥¤¥º ¾å°Ì 32bit */
-        unsigned int    st_private[6];  /* ¤½¤ÎÂ¾ */
+        unsigned int    st_mode;        /* ï¿½Õ¥ï¿½ï¿½ï¿½ï¿½ï¿½Î¼ï¿½ï¿½ï¿½(file/dir) */
+                                        /* ï¿½È¥â¡¼ï¿½ï¿½(R/W/X) */
+        unsigned int    st_attr;        /* ï¿½Ç¥Ð¥ï¿½ï¿½ï¿½ï¿½ï¿½Â¸ï¿½ï¿½Â°ï¿½ï¿½ */
+        unsigned int    st_size;        /* ï¿½Õ¥ï¿½ï¿½ï¿½ï¿½ë¥µï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ 32 bit */
+        unsigned char   st_ctime[8];    /* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
+        unsigned char   st_atime[8];    /* ï¿½Ç½ï¿½ï¿½ï¿½ï¿½È»ï¿½ï¿½ï¿½ */
+        unsigned char   st_mtime[8];    /* ï¿½Ç½ï¿½ï¿½Ñ¹ï¿½ï¿½ï¿½ï¿½ï¿½ */
+        unsigned int    st_hisize;      /* ï¿½Õ¥ï¿½ï¿½ï¿½ï¿½ë¥µï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ 32bit */
+        unsigned int    st_private[6];  /* ï¿½ï¿½ï¿½ï¿½Â¾ */
 };
 
 struct sce_dirent {
-        struct sce_stat d_stat; /* ¥Õ¥¡¥¤¥ë¤Î¥¹¥Æ¡¼¥¿¥¹ */
-        char d_name[256];       /* ¥Õ¥¡¥¤¥ëÌ¾(¥Õ¥ë¥Ñ¥¹¤Ç¤Ï¤Ê¤¤) */
-        void    *d_private;     /* ¤½¤ÎÂ¾ */
+        struct sce_stat d_stat; /* ï¿½Õ¥ï¿½ï¿½ï¿½ï¿½ï¿½Î¥ï¿½ï¿½Æ¡ï¿½ï¿½ï¿½ï¿½ï¿½ */
+        char d_name[256];       /* ï¿½Õ¥ï¿½ï¿½ï¿½ï¿½ï¿½Ì¾(ï¿½Õ¥ï¿½Ñ¥ï¿½ï¿½Ç¤Ï¤Ê¤ï¿½) */
+        void    *d_private;     /* ï¿½ï¿½ï¿½ï¿½Â¾ */
 };
 
 #define SCE_CST_MODE    0x0001

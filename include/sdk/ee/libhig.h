@@ -438,13 +438,13 @@ typedef struct {
     u_short fbp[2];
     u_short validregs;
     u_char clearmode;
-    u_char ctxt;			/* İ’è‚·‚éƒRƒ“ƒeƒLƒXƒg */
-    u_char swap;			/* double buffer : •`‰æ’†‚Ìƒoƒbƒtƒ@C‘¼: í‚É 0 */
+    u_char ctxt;			/* ï¿½İ’è‚·ï¿½ï¿½Rï¿½ï¿½ï¿½eï¿½Lï¿½Xï¿½g */
+    u_char swap;			/* double buffer ï¿½ï¿½: ï¿½`ï¿½æ’†ï¿½Ìƒoï¿½bï¿½tï¿½@ï¿½Cï¿½ï¿½: ï¿½ï¿½ï¿½ 0 */
     u_char field;
-    u_char isDbuf;			/* double buffer ‚·‚é‚© */
-    u_char isSync;			/* sceHiGsDisplaySwap() ‚Å swap ‚·‚é‚© */
+    u_char isDbuf;			/* double buffer ï¿½ï¿½ï¿½é‚© */
+    u_char isSync;			/* sceHiGsDisplaySwap() ï¿½ï¿½ swap ï¿½ï¿½ï¿½é‚© */
     u_char isInterlace;
-    u_char isZbuf;			/* Zbuf ‚Â‚«‚© */
+    u_char isZbuf;			/* Zbuf ï¿½Â‚ï¿½ï¿½ï¿½ */
     char ppos[2];				/* positions in packed[] of xyoffset, frame */
 } sceHiGsCtx  __attribute__((aligned(64)));
 
@@ -454,7 +454,7 @@ typedef  struct {
     u_int validregs;
 } sceHiGsEnv  __attribute__((aligned(16)));
 
-typedef enum _sceHiGsEnvValidRegs_t {  /* sceHiGsGeneral ‚Æ“¯‚¶‚È‚ç‚Ñ‡ */
+typedef enum _sceHiGsEnvValidRegs_t {  /* sceHiGsGeneral ï¿½Æ“ï¿½ï¿½ï¿½ï¿½È‚ï¿½Ñï¿½ */
 	SCE_HIGS_VALID_COLCLAMP	= (1<<0),
 	SCE_HIGS_VALID_DIMX	= (1<<1),
 	SCE_HIGS_VALID_DTHE	= (1<<2),

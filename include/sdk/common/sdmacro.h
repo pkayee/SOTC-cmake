@@ -27,12 +27,12 @@
 #define SCESD_TRANSFER_FINISHED		1
 #define SCESD_TRANSFER_CONTINUE		0
 
-/* ƒRƒAİ’è */
+/* ï¿½Rï¿½Aï¿½İ’ï¿½ */
 #define SD_CORE_0	0
 #define SD_CORE_1	1
 #define SD_CORE_MAX	2
 
-/* ƒ{ƒCƒXİ’è */
+/* ï¿½{ï¿½Cï¿½Xï¿½İ’ï¿½ */
 #define SD_MAX_VOICE   24
 #define SD_VOICE_MAX   24
 
@@ -171,7 +171,7 @@
 #define SD_ADSR2( x, y, z, w )  ((x)|SD_ADSR_SRATE(y)|(z)|SD_ADSR_RRATE(w))
 
 
-/* ƒoƒbƒ`ƒRƒ}ƒ“ƒh—p */
+/* ï¿½oï¿½bï¿½`ï¿½Rï¿½}ï¿½ï¿½ï¿½hï¿½p */
 #define SD_BSET_PARAM	0x01
 #define SD_BGET_PARAM	0x11
 #define SD_BSET_SWITCH	0x02
@@ -185,7 +185,7 @@
 #define SD_RETURN_EE	0x07
 
 
-/* “]‘—ŠÖŒW */
+/* ï¿½]ï¿½ï¿½ï¿½ÖŒW */
 #define SD_TRANS_MODE_WRITE 0
 #define SD_TRANS_MODE_READ  1
 #define SD_TRANS_MODE_STOP  2
@@ -218,7 +218,7 @@
 #define SD_TRANS_STATUS_WAIT  1
 #define SD_TRANS_STATUS_CHECK 0
 
-/* ƒGƒtƒFƒNƒgŠÖŒW */
+/* ï¿½Gï¿½tï¿½Fï¿½Nï¿½gï¿½ÖŒW */
 #define SD_REV_MODE_OFF  	   0
 #define SD_REV_MODE_ROOM	   1
 #define SD_REV_MODE_STUDIO_A	   2
@@ -246,16 +246,16 @@
 #define SD_REV_SIZE_DELAY	   0x18040
 #define SD_REV_SIZE_PIPE	   0x3c00
 
-/* SPU2ƒ[ƒJƒ‹ƒƒ‚ƒŠƒAƒhƒŒƒXŠÖŒW */
+/* SPU2ï¿½ï¿½ï¿½[ï¿½Jï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Aï¿½hï¿½ï¿½ï¿½Xï¿½ÖŒW */
 #define SD_SOUNDOUT_TOPADDR        0x0
 #define SD_SOUNDIN_TOPADDR         0x4000
 #define SD_USERAREA_TOPADDR        0x5010
 
-/* ‰Šú‰»ƒ‚[ƒh */
+/* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½h */
 #define SD_INIT_COLD	0
 #define SD_INIT_HOT	1
 
-/* Œ^’è‹` */
+/* ï¿½^ï¿½ï¿½` */
 #define SD_TRANS_CBProc   void*
 #define SD_IRQ_CBProc     void*
 
@@ -263,7 +263,7 @@ typedef int (*sceSdTransIntrHandler)(int, void *);
 typedef int (*sceSdSpu2IntrHandler)(int, void *);
 typedef int (*sceSdBlockTransHandler)(int ch, void *data, void **addr, int *size);
 
-/* \‘¢‘Ì’è‹` */
+/* ï¿½\ï¿½ï¿½ï¿½Ì’ï¿½` */
 typedef struct {
 	unsigned short func;
 	unsigned short entry;

@@ -28,7 +28,7 @@
 #include <eetypes.h>
 #include <sceerrno.h>
 
-/* ’è”ƒ}ƒNƒ */
+/* ï¿½è”ï¿½}ï¿½Nï¿½ï¿½ */
 
 #define SCE_MC2_DMA_BUFFER_MAX	(16)
 #define SCE_MC2_MAX_DEVICE_NAME	(16)
@@ -40,15 +40,15 @@
 #define SCE_MC2_SPECIFIC_DRIVER_NUMBER	( 1 << 2 )
 #define SCE_MC2_SPECIFIC_DEVICE_NAME	( 1 << 3 )
 
-/* ƒƒ‚ƒŠ[ƒJ[ƒhî•ñ \‘¢‘Ì */
+/* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½Jï¿½[ï¿½hï¿½ï¿½ï¿½ ï¿½\ï¿½ï¿½ï¿½ï¿½ */
 
 typedef struct {
-	int type;		/* ƒƒfƒBƒAƒ^ƒCƒv 1:PS1/PDA, 2:PS2 */
-	int isFormat;		/* 1:ƒtƒH[ƒ}ƒbƒgÏ‚İ 0:–¢ƒtƒH[ƒ}ƒbƒg */
-	int freeClust;		/* ‹ó‚«ƒNƒ‰ƒXƒ^” */
+	int type;		/* ï¿½ï¿½ï¿½fï¿½Bï¿½Aï¿½^ï¿½Cï¿½v 1:PS1/PDA, 2:PS2 */
+	int isFormat;		/* 1:ï¿½tï¿½Hï¿½[ï¿½}ï¿½bï¿½gï¿½Ï‚ï¿½ 0:ï¿½ï¿½ï¿½tï¿½Hï¿½[ï¿½}ï¿½bï¿½g */
+	int freeClust;		/* ï¿½ó‚«ƒNï¿½ï¿½ï¿½Xï¿½^ï¿½ï¿½ */
 } SceMc2InfoParam;
 
-/* “ú•t \‘¢‘Ì */
+/* ï¿½ï¿½ï¿½t ï¿½\ï¿½ï¿½ï¿½ï¿½ */
 
 typedef struct {
 	unsigned char reserved;
@@ -60,7 +60,7 @@ typedef struct {
 	unsigned short year;
 } SceMc2DateParam;
 
-/* ƒfƒBƒŒƒNƒgƒŠ,ƒtƒ@ƒCƒ‹î•ñ \‘¢‘Ì */
+/* ï¿½fï¿½Bï¿½ï¿½ï¿½Nï¿½gï¿½ï¿½,ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½\ï¿½ï¿½ï¿½ï¿½ */
 
 typedef struct {
 	SceMc2DateParam creation;
@@ -71,7 +71,7 @@ typedef struct {
 	char name[SCE_MC2_MAX_NAME_LEN];
 } SceMc2DirParam;
 
-/* ƒo[ƒ`ƒƒƒ‹ƒ\ƒPƒbƒg\‘¢‘Ì */
+/* ï¿½oï¿½[ï¿½`ï¿½ï¿½ï¿½ï¿½ï¿½\ï¿½Pï¿½bï¿½gï¿½\ï¿½ï¿½ï¿½ï¿½ */
 typedef struct {
 	unsigned int option;
 	int port;
@@ -80,14 +80,14 @@ typedef struct {
 	char name[SCE_MC2_MAX_DEVICE_NAME];
 } SceMc2SocketParam;
 
-/* ƒƒfƒBƒAƒ^ƒCƒv */
+/* ï¿½ï¿½ï¿½fï¿½Bï¿½Aï¿½^ï¿½Cï¿½v */
 
 #define SCE_MC2_TYPE_NO_CARD	(0)
 #define SCE_MC2_TYPE_PS1	(1)
 #define SCE_MC2_TYPE_PS2	(2)
 #define SCE_MC2_TYPE_PDA	(3)
 
-/* ŠÖ”ƒR[ƒh */
+/* ï¿½Öï¿½ï¿½Rï¿½[ï¿½h */
 
 #define SCE_MC2_FUNC_NONE	(0)
 #define SCE_MC2_FUNC_GETINFO	(2)
@@ -115,13 +115,13 @@ typedef struct {
 
 
 
-/* ”ñ“¯ŠúŠÖ”ˆ—ó‘Ôƒ}ƒNƒ */
+/* ï¿½ñ“¯Šï¿½ï¿½Öï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ôƒ}ï¿½Nï¿½ï¿½ */
 
 #define SCE_MC2_STAT_EXEC_RUN		(0)
 #define SCE_MC2_STAT_EXEC_FINISH	(1)
 #define SCE_MC2_STAT_EXEC_IDLE		(-1)
 
-/* ƒtƒ@ƒCƒ‹‘®« */
+/* ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
 
 #define SCE_MC2_FILE_ATTR_PS1		0x1000
 #define SCE_MC2_FILE_ATTR_PDA_EXEC	0x0800
@@ -140,38 +140,38 @@ typedef struct {
 #define SCE_ENEWCARD		SCE_ENEW_DEVICE
 #define SCE_EDFORMAT		(47)
 #define SCE_ENODIRENT		0x9fff
-/* ƒGƒ‰[ƒR[ƒh */
-#define	sceMc2ErrNone			SCE_OK	/* ³íI—¹ */
-#define	sceMc2ErrCardNotExist		SCE_ERROR_ENCODE(SCE_ERROR_PREFIX_MC2,ENODEV)		/* ƒJ[ƒh‚È‚µ */
-#define	sceMc2ErrCardBroken		SCE_ERROR_ENCODE(SCE_ERROR_PREFIX_MC2,SCE_EDEVICE_BROKEN) /* ƒJ[ƒh”j‘¹‚Ì‰Â”\« */
-#define	sceMc2ErrNewCard		SCE_ERROR_ENCODE(SCE_ERROR_PREFIX_MC2,SCE_ENEW_DEVICE)	/* V‹KƒJ[ƒhŒŸo */
-#define	sceMc2ErrNotFormat		SCE_ERROR_ENCODE(SCE_ERROR_PREFIX_MC2,EFORMAT)		/* –¢ƒtƒH[ƒ}ƒbƒg */
-#define	sceMc2ErrNoSpace		SCE_ERROR_ENCODE(SCE_ERROR_PREFIX_MC2,ENOSPC)		/* ‹ó‚«—e—Ê•s‘« */
-#define	sceMc2ErrAccessFaild		SCE_ERROR_ENCODE(SCE_ERROR_PREFIX_MC2,ECONNREFUSED)	/* ƒƒ‚ƒŠƒJ[ƒh‚ÉƒAƒNƒZƒX‚Å‚«‚È‚¢ */
-#define	sceMc2ErrFileNotExist		SCE_ERROR_ENCODE(SCE_ERROR_PREFIX_MC2,ENOENT)		/* ƒtƒ@ƒCƒ‹‚ª‘¶İ‚µ‚È‚¢ */
-#define	sceMc2ErrFileExist		SCE_ERROR_ENCODE(SCE_ERROR_PREFIX_MC2,EEXIST)		/* Šù‚É“¯–¼‚Ìƒtƒ@ƒCƒ‹‚©ƒfƒBƒŒƒNƒgƒŠ‚ª‘¶İ‚µ‚Ä‚¢‚é */
-#define	sceMc2ErrFileBroken		SCE_ERROR_ENCODE(SCE_ERROR_PREFIX_MC2,SCE_EFILE_BROKEN)	/* ƒtƒ@ƒCƒ‹”j‘¹‚Ì‰Â”\« */
-#define	sceMc2ErrFileReadProtected	SCE_ERROR_ENCODE(SCE_ERROR_PREFIX_MC2,EACCES)		/* “Ç‚İ‹Ö~‘®«‚Å‚ ‚é */
-#define	sceMc2ErrFileWriteProtected	SCE_ERROR_ENCODE(SCE_ERROR_PREFIX_MC2,EACCES)		/* ‘‚İ‹Ö~‘®«‚Å‚ ‚é */
-#define	sceMc2ErrFileCopyProtected	SCE_ERROR_ENCODE(SCE_ERROR_PREFIX_MC2,EACCES)		/* ƒRƒs[‹Ö~‘®«‚Å‚ ‚é */
-#define	sceMc2ErrPermissionDenied	SCE_ERROR_ENCODE(SCE_ERROR_PREFIX_MC2,EACCES)		/* ‚»‚Ì‘¼ƒAƒNƒZƒXŒ ‚É‚Ü‚Â‚í‚éƒGƒ‰[ */
-#define	sceMc2ErrDirNotExist		SCE_ERROR_ENCODE(SCE_ERROR_PREFIX_MC2,SCE_ENODIRENT)	/* ƒfƒBƒŒƒNƒgƒŠ‚ª‘¶İ‚µ‚È‚¢ */
-#define	sceMc2ErrNotDir			SCE_ERROR_ENCODE(SCE_ERROR_PREFIX_MC2,ENOTDIR)		/* ƒfƒBƒŒƒNƒgƒŠ‚Å‚Í‚È‚¢iƒtƒ@ƒCƒ‹‚Å‚ ‚éj*/
-#define	sceMc2ErrDirBroken		SCE_ERROR_ENCODE(SCE_ERROR_PREFIX_MC2,SCE_EFILE_BROKEN)	/* ƒfƒBƒŒƒNƒgƒŠƒGƒ“ƒgƒŠ”j‘¹‚Ì‰Â”\« */
-#define	sceMc2ErrDirNotEmpty		SCE_ERROR_ENCODE(SCE_ERROR_PREFIX_MC2,ENOTEMPTY)	/* ƒfƒBƒŒƒNƒgƒŠ“à‚ª‹ó‚É‚È‚Á‚Ä‚¢‚È‚¢ */
-#define	sceMc2ErrNoDirSpace		SCE_ERROR_ENCODE(SCE_ERROR_PREFIX_MC2,ENFILE)		/* ƒfƒBƒŒƒNƒgƒŠƒGƒ“ƒgƒŠ•s‘« */
-#define	sceMc2ErrInvidParam		SCE_ERROR_ENCODE(SCE_ERROR_PREFIX_MC2,EINVAL)		/* w’è‚³‚ê‚½”’l‚ª•s³ */
-#define sceMc2ErrTooLongName		SCE_ERROR_ENCODE(SCE_ERROR_PREFIX_MC2,ENAMETOOLONG)	/* ƒtƒ@ƒCƒ‹‚Ü‚½‚ÍƒfƒBƒŒƒNƒgƒŠ–¼‚ª’·‚·‚¬‚é */
-#define sceMc2ErrTooManyDepth		SCE_ERROR_ENCODE(SCE_ERROR_PREFIX_MC2,SCE_EMDEPTH)	/* ƒfƒBƒŒƒNƒgƒŠ‚ª[‚·‚¬‚é */
-#define	sceMc2ErrSema			SCE_ERROR_ENCODE(SCE_ERROR_PREFIX_MC2,SCE_ESEMA)	/* ƒZƒ}ƒtƒH‚Ìì¬‚É¸”s‚µ‚½ */
-#define sceMc2ErrThread			SCE_ERROR_ENCODE(SCE_ERROR_PREFIX_MC2,SCE_ETHREAD)	/* ƒXƒŒƒbƒh‚Ìì¬‚É¸”s‚µ‚½ */
-#define	sceMc2ErrSocket			SCE_ERROR_ENCODE(SCE_ERROR_PREFIX_MC2,ENFILE)		/* ƒ\ƒPƒbƒgŠÇ—ƒe[ƒuƒ‹‚ªˆê”t‚Åì¬‚É¸”s‚µ‚½ */
-#define	sceMc2ErrSocketId		SCE_ERROR_ENCODE(SCE_ERROR_PREFIX_MC2,SCE_EID)		/* ƒ\ƒPƒbƒgID‚ª•s³ */
+/* ï¿½Gï¿½ï¿½ï¿½[ï¿½Rï¿½[ï¿½h */
+#define	sceMc2ErrNone			SCE_OK	/* ï¿½ï¿½ï¿½ï¿½Iï¿½ï¿½ */
+#define	sceMc2ErrCardNotExist		SCE_ERROR_ENCODE(SCE_ERROR_PREFIX_MC2,ENODEV)		/* ï¿½Jï¿½[ï¿½hï¿½È‚ï¿½ */
+#define	sceMc2ErrCardBroken		SCE_ERROR_ENCODE(SCE_ERROR_PREFIX_MC2,SCE_EDEVICE_BROKEN) /* ï¿½Jï¿½[ï¿½hï¿½jï¿½ï¿½ï¿½Ì‰Â”\ï¿½ï¿½ */
+#define	sceMc2ErrNewCard		SCE_ERROR_ENCODE(SCE_ERROR_PREFIX_MC2,SCE_ENEW_DEVICE)	/* ï¿½Vï¿½Kï¿½Jï¿½[ï¿½hï¿½ï¿½ï¿½o */
+#define	sceMc2ErrNotFormat		SCE_ERROR_ENCODE(SCE_ERROR_PREFIX_MC2,EFORMAT)		/* ï¿½ï¿½ï¿½tï¿½Hï¿½[ï¿½}ï¿½bï¿½g */
+#define	sceMc2ErrNoSpace		SCE_ERROR_ENCODE(SCE_ERROR_PREFIX_MC2,ENOSPC)		/* ï¿½ó‚«—eï¿½Ê•sï¿½ï¿½ */
+#define	sceMc2ErrAccessFaild		SCE_ERROR_ENCODE(SCE_ERROR_PREFIX_MC2,ECONNREFUSED)	/* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Jï¿½[ï¿½hï¿½ÉƒAï¿½Nï¿½Zï¿½Xï¿½Å‚ï¿½ï¿½È‚ï¿½ */
+#define	sceMc2ErrFileNotExist		SCE_ERROR_ENCODE(SCE_ERROR_PREFIX_MC2,ENOENT)		/* ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½İ‚ï¿½ï¿½È‚ï¿½ */
+#define	sceMc2ErrFileExist		SCE_ERROR_ENCODE(SCE_ERROR_PREFIX_MC2,EEXIST)		/* ï¿½ï¿½ï¿½É“ï¿½ï¿½ï¿½ï¿½Ìƒtï¿½@ï¿½Cï¿½ï¿½ï¿½ï¿½ï¿½fï¿½Bï¿½ï¿½ï¿½Nï¿½gï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½İ‚ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½ */
+#define	sceMc2ErrFileBroken		SCE_ERROR_ENCODE(SCE_ERROR_PREFIX_MC2,SCE_EFILE_BROKEN)	/* ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½jï¿½ï¿½ï¿½Ì‰Â”\ï¿½ï¿½ */
+#define	sceMc2ErrFileReadProtected	SCE_ERROR_ENCODE(SCE_ERROR_PREFIX_MC2,EACCES)		/* ï¿½Çï¿½ï¿½İ‹Ö~ï¿½ï¿½ï¿½ï¿½ï¿½Å‚ï¿½ï¿½ï¿½ */
+#define	sceMc2ErrFileWriteProtected	SCE_ERROR_ENCODE(SCE_ERROR_PREFIX_MC2,EACCES)		/* ï¿½ï¿½ï¿½ï¿½ï¿½İ‹Ö~ï¿½ï¿½ï¿½ï¿½ï¿½Å‚ï¿½ï¿½ï¿½ */
+#define	sceMc2ErrFileCopyProtected	SCE_ERROR_ENCODE(SCE_ERROR_PREFIX_MC2,EACCES)		/* ï¿½Rï¿½sï¿½[ï¿½Ö~ï¿½ï¿½ï¿½ï¿½ï¿½Å‚ï¿½ï¿½ï¿½ */
+#define	sceMc2ErrPermissionDenied	SCE_ERROR_ENCODE(SCE_ERROR_PREFIX_MC2,EACCES)		/* ï¿½ï¿½ï¿½Ì‘ï¿½ï¿½Aï¿½Nï¿½Zï¿½Xï¿½ï¿½ï¿½É‚Ü‚Â‚ï¿½ï¿½Gï¿½ï¿½ï¿½[ */
+#define	sceMc2ErrDirNotExist		SCE_ERROR_ENCODE(SCE_ERROR_PREFIX_MC2,SCE_ENODIRENT)	/* ï¿½fï¿½Bï¿½ï¿½ï¿½Nï¿½gï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½İ‚ï¿½ï¿½È‚ï¿½ */
+#define	sceMc2ErrNotDir			SCE_ERROR_ENCODE(SCE_ERROR_PREFIX_MC2,ENOTDIR)		/* ï¿½fï¿½Bï¿½ï¿½ï¿½Nï¿½gï¿½ï¿½ï¿½Å‚Í‚È‚ï¿½ï¿½iï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½Å‚ï¿½ï¿½ï¿½j*/
+#define	sceMc2ErrDirBroken		SCE_ERROR_ENCODE(SCE_ERROR_PREFIX_MC2,SCE_EFILE_BROKEN)	/* ï¿½fï¿½Bï¿½ï¿½ï¿½Nï¿½gï¿½ï¿½ï¿½Gï¿½ï¿½ï¿½gï¿½ï¿½ï¿½jï¿½ï¿½ï¿½Ì‰Â”\ï¿½ï¿½ */
+#define	sceMc2ErrDirNotEmpty		SCE_ERROR_ENCODE(SCE_ERROR_PREFIX_MC2,ENOTEMPTY)	/* ï¿½fï¿½Bï¿½ï¿½ï¿½Nï¿½gï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É‚È‚ï¿½ï¿½Ä‚ï¿½ï¿½È‚ï¿½ */
+#define	sceMc2ErrNoDirSpace		SCE_ERROR_ENCODE(SCE_ERROR_PREFIX_MC2,ENFILE)		/* ï¿½fï¿½Bï¿½ï¿½ï¿½Nï¿½gï¿½ï¿½ï¿½Gï¿½ï¿½ï¿½gï¿½ï¿½ï¿½sï¿½ï¿½ */
+#define	sceMc2ErrInvidParam		SCE_ERROR_ENCODE(SCE_ERROR_PREFIX_MC2,EINVAL)		/* ï¿½wï¿½è‚³ï¿½ê‚½ï¿½ï¿½ï¿½lï¿½ï¿½ï¿½sï¿½ï¿½ */
+#define sceMc2ErrTooLongName		SCE_ERROR_ENCODE(SCE_ERROR_PREFIX_MC2,ENAMETOOLONG)	/* ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½Ü‚ï¿½ï¿½Íƒfï¿½Bï¿½ï¿½ï¿½Nï¿½gï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
+#define sceMc2ErrTooManyDepth		SCE_ERROR_ENCODE(SCE_ERROR_PREFIX_MC2,SCE_EMDEPTH)	/* ï¿½fï¿½Bï¿½ï¿½ï¿½Nï¿½gï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
+#define	sceMc2ErrSema			SCE_ERROR_ENCODE(SCE_ERROR_PREFIX_MC2,SCE_ESEMA)	/* ï¿½Zï¿½}ï¿½tï¿½Hï¿½Ìì¬ï¿½Éï¿½ï¿½sï¿½ï¿½ï¿½ï¿½ */
+#define sceMc2ErrThread			SCE_ERROR_ENCODE(SCE_ERROR_PREFIX_MC2,SCE_ETHREAD)	/* ï¿½Xï¿½ï¿½ï¿½bï¿½hï¿½Ìì¬ï¿½Éï¿½ï¿½sï¿½ï¿½ï¿½ï¿½ */
+#define	sceMc2ErrSocket			SCE_ERROR_ENCODE(SCE_ERROR_PREFIX_MC2,ENFILE)		/* ï¿½\ï¿½Pï¿½bï¿½gï¿½Ç—ï¿½ï¿½eï¿½[ï¿½uï¿½ï¿½ï¿½ï¿½ï¿½ï¿½tï¿½Åì¬ï¿½Éï¿½ï¿½sï¿½ï¿½ï¿½ï¿½ */
+#define	sceMc2ErrSocketId		SCE_ERROR_ENCODE(SCE_ERROR_PREFIX_MC2,SCE_EID)		/* ï¿½\ï¿½Pï¿½bï¿½gIDï¿½ï¿½ï¿½sï¿½ï¿½ */
 #define sceMc2ErrNotInitialize		SCE_ERROR_ENCODE(SCE_ERROR_PREFIX_MC2,SCE_EINIT)	/*  */
 #define sceMc2ErrSystemBusy		SCE_ERROR_ENCODE(SCE_ERROR_PREFIX_MC2,EBUSY)		/*  */
 #define sceMc2ErrNotSupport		SCE_ERROR_ENCODE(SCE_ERROR_PREFIX_MC2,ENOTSUP)		/*  */
 #define	sceMc2ErrExtend			(0x8000)
-/* ŠÖ”ƒR[ƒh */
+/* ï¿½Öï¿½ï¿½Rï¿½[ï¿½h */
 #define sceMc2FuncNone			SCE_MC2_FUNC_NONE
 #define sceMc2FuncGetInfo		SCE_MC2_FUNC_GETINFO
 #define sceMc2FuncFormat		SCE_MC2_FUNC_FORMAT
@@ -195,7 +195,7 @@ typedef struct {
 #define sceMc2FuncWrite			SCE_MC2_FUNC_WRITE
 #define sceMc2FuncSeek			SCE_MC2_FUNC_SEEK
 #define sceMc2FuncGetDirAll		SCE_MC2_FUNC_GETDIRALL
-/* ƒtƒ@ƒCƒ‹‘®« */
+/* ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
 #define sceMc2FileAttrPS1		SCE_MC2_FILE_ATTR_PS1
 #define sceMc2FileAttrPDAExec		SCE_MC2_FILE_ATTR_PDA_EXEC
 #define sceMc2FileAttrClosed		SCE_MC2_FILE_ATTR_CLOSED
@@ -204,12 +204,12 @@ typedef struct {
 #define sceMc2FileAttrExecutable	SCE_MC2_FILE_ATTR_EXECUTABLE
 #define sceMc2FileAttrWriteable		SCE_MC2_FILE_ATTR_WRITEABLE
 #define sceMc2FileAttrReadable		SCE_MC2_FILE_ATTR_READABLE
-/* ƒƒfƒBƒA */
+/* ï¿½ï¿½ï¿½fï¿½Bï¿½A */
 #define sceMc2TypeNoCard		SCE_MC2_TYPE_NO_CARD
 #define sceMc2TypePS1			SCE_MC2_TYPE_PS1
 #define sceMc2TypePS2			SCE_MC2_TYPE_PS2
 #define sceMc2TypePDA			SCE_MC2_TYPE_PDA
-/* ”ñ“¯ŠúŠÖ”ˆ—ó‘Ôƒ}ƒNƒ */
+/* ï¿½ñ“¯Šï¿½ï¿½Öï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ôƒ}ï¿½Nï¿½ï¿½ */
 #define sceMc2StatExecRun		SCE_MC2_STAT_EXEC_RUN
 #define sceMc2StatExecFinish		SCE_MC2_STAT_EXEC_FINISH
 #define sceMc2StatExecIdle		SCE_MC2_STAT_EXEC_IDLE

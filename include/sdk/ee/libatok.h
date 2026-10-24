@@ -24,177 +24,177 @@
 extern "C" {
 #endif	/* defined(__LANGUAGE_C_PLUS_PLUS) || defined(__cplusplus) || defined(c_plusplus) */
 
-/* ATOK‚Ì‚½‚ß‚ÌƒRƒ“ƒeƒLƒXƒg‚ð’è‹` */
+/* ATOKï¿½Ì‚ï¿½ï¿½ß‚ÌƒRï¿½ï¿½ï¿½eï¿½Lï¿½Xï¿½gï¿½ï¿½ï¿½` */
 #define SCE_ATOK_CONTEXT_SIZE (4*1024)
 typedef unsigned char sceAtokContext[ SCE_ATOK_CONTEXT_SIZE ] __attribute__((aligned(64)));
 
-/* ATOK‚ÌŠeŽíÝ’è */
+/* ATOKï¿½ÌŠeï¿½ï¿½Ý’ï¿½ */
 typedef struct {
-	int Size;     /* sizeof(sceAtokConfig)‚ðÝ’è‚µ‚Ü‚· */
+	int Size;     /* sizeof(sceAtokConfig)ï¿½ï¿½Ý’è‚µï¿½Ü‚ï¿½ */
 	/* -----------------------------------------------------------------------*/
-	int KanjiInput;     /* Š¿Žš“ü—Íƒ‚[ƒh */
-	                    /* 1= ƒ[ƒ}ŽšŠ¿Žš */
-	                    /* 2= ‚©‚È“ü—ÍŠ¿Žš */
-	                    /* 3= ”¼ŠpƒXƒ‹[   */
+	int KanjiInput;     /* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Íƒï¿½ï¿½[ï¿½h */
+	                    /* 1= ï¿½ï¿½ï¿½[ï¿½}ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
+	                    /* 2= ï¿½ï¿½ï¿½È“ï¿½ï¿½ÍŠï¿½ï¿½ï¿½ */
+	                    /* 3= ï¿½ï¿½ï¿½pï¿½Xï¿½ï¿½ï¿½[   */
 
-	int KanDspType;     /* “ü—Í•¶ŽšŽí‚ÌÝ’è */
-	                    /* 1= ‚Ð‚ç‚ª‚È     */
-	                    /* 2= ‘SŠpƒJƒ^ƒJƒi */
-	                    /* 3= ‘SŠp–³•ÏŠ·   */
-	                    /* 4= ”¼ŠpƒJƒ^ƒJƒi */
-	                    /* 5= ”¼Šp–³•ÏŠ·   */
+	int KanDspType;     /* ï¿½ï¿½ï¿½Í•ï¿½ï¿½ï¿½ï¿½ï¿½ÌÝ’ï¿½ */
+	                    /* 1= ï¿½Ð‚ç‚ªï¿½ï¿½     */
+	                    /* 2= ï¿½Sï¿½pï¿½Jï¿½^ï¿½Jï¿½i */
+	                    /* 3= ï¿½Sï¿½pï¿½ï¿½ï¿½ÏŠï¿½   */
+	                    /* 4= ï¿½ï¿½ï¿½pï¿½Jï¿½^ï¿½Jï¿½i */
+	                    /* 5= ï¿½ï¿½ï¿½pï¿½ï¿½ï¿½ÏŠï¿½   */
 
-	int FixMode;        /* ŒÅ’è“ü—Íƒ‚[ƒh */
+	int FixMode;        /* ï¿½Å’ï¿½ï¿½ï¿½Íƒï¿½ï¿½[ï¿½h */
 	                    /* 0= OFF              */
-	                    /* 1= ŒÅ’è‚Ð‚ç‚ª‚È     */
-	                    /* 2= ŒÅ’è‘SŠpƒJƒ^ƒJƒi */
-	                    /* 3= ŒÅ’è‘SŠp–³•ÏŠ·   */
-	                    /* 4= ŒÅ’è”¼ŠpƒJƒ^ƒJƒi */
-	                    /* 5= ŒÅ’è”¼Šp–³•ÏŠ·   */
+	                    /* 1= ï¿½Å’ï¿½Ð‚ç‚ªï¿½ï¿½     */
+	                    /* 2= ï¿½Å’ï¿½Sï¿½pï¿½Jï¿½^ï¿½Jï¿½i */
+	                    /* 3= ï¿½Å’ï¿½Sï¿½pï¿½ï¿½ï¿½ÏŠï¿½   */
+	                    /* 4= ï¿½Å’è”¼ï¿½pï¿½Jï¿½^ï¿½Jï¿½i */
+	                    /* 5= ï¿½Å’è”¼ï¿½pï¿½ï¿½ï¿½ÏŠï¿½   */
 
-	int HZCnvMode;      /* ”¼Šp‘SŠp•ÏŠ·‚·‚é/‚µ‚È‚¢ */
-	                    /* bit 3: Œã•ÏŠ·’PŒê‚Ö‚Ì“K—p       */
-	                    /* bit 2: ƒ†[ƒU[“o˜^’PŒê‚Ö‚Ì“K—p */
-	                    /* bit 1: “ü—Í’†•¶Žš—ñ‚Ö‚Ì“K—p     */
-	                    /* bit 0: ”¼Šp‘SŠp•ÏŠ·             */
+	int HZCnvMode;      /* ï¿½ï¿½ï¿½pï¿½Sï¿½pï¿½ÏŠï¿½ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½È‚ï¿½ */
+	                    /* bit 3: ï¿½ï¿½ÏŠï¿½ï¿½Pï¿½ï¿½Ö‚Ì“Kï¿½p       */
+	                    /* bit 2: ï¿½ï¿½ï¿½[ï¿½Uï¿½[ï¿½oï¿½^ï¿½Pï¿½ï¿½Ö‚Ì“Kï¿½p */
+	                    /* bit 1: ï¿½ï¿½ï¿½Í’ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö‚Ì“Kï¿½p     */
+	                    /* bit 0: ï¿½ï¿½ï¿½pï¿½Sï¿½pï¿½ÏŠï¿½             */
 
-	int HZCnvDetail;    /* ”¼Šp‘SŠp•ÏŠ·Ú× */
-	                    /* bit 6: ”Žš    ¨‘SŠp */
-	                    /* bit 5: ‰pŽš    ¨‘SŠp */
-	                    /* bit 4: ƒJƒ^ƒJƒi¨‘SŠp */
-	                    /* bit 2: ”Žš    ¨”¼Šp */
-	                    /* bit 1: ‰pŽš    ¨”¼Šp */
-	                    /* bit 0: ƒJƒ^ƒJƒi¨”¼Šp */
+	int HZCnvDetail;    /* ï¿½ï¿½ï¿½pï¿½Sï¿½pï¿½ÏŠï¿½ï¿½Úï¿½ */
+	                    /* bit 6: ï¿½ï¿½ï¿½ï¿½    ï¿½ï¿½ï¿½Sï¿½p */
+	                    /* bit 5: ï¿½pï¿½ï¿½    ï¿½ï¿½ï¿½Sï¿½p */
+	                    /* bit 4: ï¿½Jï¿½^ï¿½Jï¿½iï¿½ï¿½ï¿½Sï¿½p */
+	                    /* bit 2: ï¿½ï¿½ï¿½ï¿½    ï¿½ï¿½ï¿½ï¿½ï¿½p */
+	                    /* bit 1: ï¿½pï¿½ï¿½    ï¿½ï¿½ï¿½ï¿½ï¿½p */
+	                    /* bit 0: ï¿½Jï¿½^ï¿½Jï¿½iï¿½ï¿½ï¿½ï¿½ï¿½p */
 
-	char *HankakuCnvStr; /* ”¼Šp•ÏŠ·‚·‚é‹L†•¶Žš—ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^ */
+	char *HankakuCnvStr; /* ï¿½ï¿½ï¿½pï¿½ÏŠï¿½ï¿½ï¿½ï¿½ï¿½Lï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö‚Ìƒ|ï¿½Cï¿½ï¿½ï¿½^ */
 
-	char *ZenkakuCnvStr; /* ‘SŠp•ÏŠ·‚·‚é‹L†•¶Žš—ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^ */
+	char *ZenkakuCnvStr; /* ï¿½Sï¿½pï¿½ÏŠï¿½ï¿½ï¿½ï¿½ï¿½Lï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö‚Ìƒ|ï¿½Cï¿½ï¿½ï¿½^ */
 
-	int FuriganaMode;   /* ‚Ó‚è‚ª‚È“ü—Íƒ‚[ƒh */
-	                    /* 0= I—¹ */
-	                    /* 1= ŠJŽn */
+	int FuriganaMode;   /* ï¿½Ó‚è‚ªï¿½È“ï¿½ï¿½Íƒï¿½ï¿½[ï¿½h */
+	                    /* 0= ï¿½Iï¿½ï¿½ */
+	                    /* 1= ï¿½Jï¿½n */
 
-	int MaxInputChars;  /* “ü—Í•¶Žš” */
+	int MaxInputChars;  /* ï¿½ï¿½ï¿½Í•ï¿½ï¿½ï¿½ï¿½ï¿½ */
 
-	int PutCursorMode;  /* –¢Šm’è•¶Žš—ñ––”ö‚ÉƒJ[ƒ\ƒ‹•¶Žš‚ð’Ç‰Á‚·‚é/‚µ‚È‚¢ */
-	                    /* 0= ‚µ‚È‚¢ */
-	                    /* 1= ‚·‚é   */
+	int PutCursorMode;  /* ï¿½ï¿½ï¿½mï¿½è•¶ï¿½ï¿½ï¿½ñ––”ï¿½ï¿½ÉƒJï¿½[ï¿½\ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç‰ï¿½ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½È‚ï¿½ */
+	                    /* 0= ï¿½ï¿½ï¿½È‚ï¿½ */
+	                    /* 1= ï¿½ï¿½ï¿½ï¿½   */
 
-	int PreAnalyze;     /* “ü—ÍŽž‚ÌŽ«‘æ“Ç‚Ý‚·‚é/‚µ‚È‚¢ */
-	                    /* 0= ‚µ‚È‚¢ */
-	                    /* 1= ‚·‚é   */
+	int PreAnalyze;     /* ï¿½ï¿½ï¿½ÍŽï¿½ï¿½ÌŽï¿½ï¿½ï¿½ï¿½ï¿½Ç‚Ý‚ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½È‚ï¿½ */
+	                    /* 0= ï¿½ï¿½ï¿½È‚ï¿½ */
+	                    /* 1= ï¿½ï¿½ï¿½ï¿½   */
 
 	/* -----------------------------------------------------------------------*/
-	int ConvMode;       /* •ÏŠ·ƒ‚[ƒh */
-	                    /* 0= ˜A•¶ß•ÏŠ· */
-	                    /* 1= ’P•¶ß•ÏŠ· */
-	                    /* 2= Ž©“®•ÏŠ·   */
+	int ConvMode;       /* ï¿½ÏŠï¿½ï¿½ï¿½ï¿½[ï¿½h */
+	                    /* 0= ï¿½Aï¿½ï¿½ï¿½ß•ÏŠï¿½ */
+	                    /* 1= ï¿½Pï¿½ï¿½ï¿½ß•ÏŠï¿½ */
+	                    /* 2= ï¿½ï¿½ï¿½ï¿½ï¿½ÏŠï¿½   */
 
-	int LearningMode;   /* ŠwKƒ‚[ƒh */
-	                    /* 0= ŠwK‚µ‚È‚¢ */
-	                    /* 1= ŠwK‚·‚é   */
+	int LearningMode;   /* ï¿½wï¿½Kï¿½ï¿½ï¿½[ï¿½h */
+	                    /* 0= ï¿½wï¿½Kï¿½ï¿½ï¿½È‚ï¿½ */
+	                    /* 1= ï¿½wï¿½Kï¿½ï¿½ï¿½ï¿½   */
 
-	int KutouCharSet;   /* ‹å“Ç“_‘g‚Ý‡‚í‚¹ƒpƒ^[ƒ“ */
-	                    /* 0= ",.[]/°"	(ƒJƒ“ƒ}/ ƒsƒŠƒIƒh/ ’†Š‡ŒÊ/   ƒXƒ‰ƒbƒVƒ…/ ‰¹ˆø‚«) */
-	                    /* 1= "¤¡¢£¥°"	(“Ç“_  / ‹å“_    / ‚©‚¬Š‡ŒÊ/ ’†•      / ‰¹ˆø‚«) */
+	int KutouCharSet;   /* ï¿½ï¿½Ç“_ï¿½gï¿½Ýï¿½ï¿½í‚¹ï¿½pï¿½^ï¿½[ï¿½ï¿½ */
+	                    /* 0= ",.[]/ï¿½"	(ï¿½Jï¿½ï¿½ï¿½}/ ï¿½sï¿½ï¿½ï¿½Iï¿½h/ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½/   ï¿½Xï¿½ï¿½ï¿½bï¿½Vï¿½ï¿½/ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½) */
+	                    /* 1= "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½"	(ï¿½Ç“_  / ï¿½ï¿½_    / ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½/ ï¿½ï¿½ï¿½ï¿½      / ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½) */
 
-	int OkuriMode;      /* ‘—‚è‚ª‚Èƒ‚[ƒh */
-	                    /* 0= –{‘¥(³‚µ‚¢“ú–{Œê) */
-	                    /* 1= È‚­               */
-	                    /* 2= ‘—‚é               */
+	int OkuriMode;      /* ï¿½ï¿½ï¿½è‚ªï¿½Èƒï¿½ï¿½[ï¿½h */
+	                    /* 0= ï¿½{ï¿½ï¿½(ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½{ï¿½ï¿½) */
+	                    /* 1= ï¿½È‚ï¿½               */
+	                    /* 2= ï¿½ï¿½ï¿½ï¿½               */
 
-	int AutoRegKind;    /* Ž©“®“o˜^Ží•Ê */
-	                    /* bit 3: –¢“o˜^Œê   */
-	                    /* bit 2: Œã•ÏŠ·     */
-	                    /* bit 1: •¡‡Œê     */
-	                    /* bit 0: •¶ß‹æØ‚è */
+	int AutoRegKind;    /* ï¿½ï¿½ï¿½ï¿½ï¿½oï¿½^ï¿½ï¿½ï¿½ */
+	                    /* bit 3: ï¿½ï¿½ï¿½oï¿½^ï¿½ï¿½   */
+	                    /* bit 2: ï¿½ï¿½ÏŠï¿½     */
+	                    /* bit 1: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½     */
+	                    /* bit 0: ï¿½ï¿½ï¿½ß‹ï¿½Ø‚ï¿½ */
 
-	int LearningKind;   /* ŠwKŽí•Ê */
-	                    /* bit 3: –¢“o˜^Œê         */
-	                    /* bit 2: Œã•ÏŠ·Œê         */
-	                    /* bit 1: •¡‡ŒêŠwKŒê     */
-	                    /* bit 0: ‹æØ‚è’¼‚µŠwKŒê */
+	int LearningKind;   /* ï¿½wï¿½Kï¿½ï¿½ï¿½ */
+	                    /* bit 3: ï¿½ï¿½ï¿½oï¿½^ï¿½ï¿½         */
+	                    /* bit 2: ï¿½ï¿½ÏŠï¿½ï¿½ï¿½         */
+	                    /* bit 1: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½wï¿½Kï¿½ï¿½     */
+	                    /* bit 0: ï¿½ï¿½Ø‚è’¼ï¿½ï¿½ï¿½wï¿½Kï¿½ï¿½ */
 
-	int RomanRecover;   /* ƒ[ƒ}Žš—§‚¿’¼‚è‚·‚é/‚µ‚È‚¢ */
-	                    /* 0= ‚µ‚È‚¢ */
-	                    /* 1= ‚·‚é   */
+	int RomanRecover;   /* ï¿½ï¿½ï¿½[ï¿½}ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½è‚·ï¿½ï¿½/ï¿½ï¿½ï¿½È‚ï¿½ */
+	                    /* 0= ï¿½ï¿½ï¿½È‚ï¿½ */
+	                    /* 1= ï¿½ï¿½ï¿½ï¿½   */
 
-	int AutoRecMode;    /* “ü—ÍŽx‰‡‚·‚é/‚µ‚È‚¢ */
-	                    /* 0= ‚µ‚È‚¢ */
-	                    /* 1= ‚·‚é   */
+	int AutoRecMode;    /* ï¿½ï¿½ï¿½ÍŽxï¿½ï¿½ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½È‚ï¿½ */
+	                    /* 0= ï¿½ï¿½ï¿½È‚ï¿½ */
+	                    /* 1= ï¿½ï¿½ï¿½ï¿½   */
 
-	int AutoRecRoman;   /* “ü—ÍŽx‰‡(ƒ[ƒ}Žš“ü—ÍŽž)‚ÌÚ×Ý’è */
-	                    /* bit 2: [N]‚Ì‰ß•s‘«  */
-	                    /* bit 1: Žq‰¹‚Ì’´‰ß   */
-	                    /* bit 0: •ê‰¹‚Ì‰ß•s‘« */
+	int AutoRecRoman;   /* ï¿½ï¿½ï¿½ÍŽxï¿½ï¿½(ï¿½ï¿½ï¿½[ï¿½}ï¿½ï¿½ï¿½ï¿½ï¿½ÍŽï¿½)ï¿½ÌÚ×Ý’ï¿½ */
+	                    /* bit 2: [N]ï¿½Ì‰ß•sï¿½ï¿½  */
+	                    /* bit 1: ï¿½qï¿½ï¿½ï¿½Ì’ï¿½ï¿½ï¿½   */
+	                    /* bit 0: ï¿½ê‰¹ï¿½Ì‰ß•sï¿½ï¿½ */
 
-	int AutoRecKana;    /* “ü—ÍŽx‰‡(‚©‚È“ü—ÍŽž)‚ÌÚ×Ý’è */
-	                    /* bit 2: u‚ív¨u‚ðv                 */
-	                    /* bit 1: u‚Âv¨u‚Áv(u‚Âv‚ðX‰¹‚É) */
-	                    /* bit 0: uKv¨uJv(”¼‘÷“_‚ð‘÷“_‚É) */
+	int AutoRecKana;    /* ï¿½ï¿½ï¿½ÍŽxï¿½ï¿½(ï¿½ï¿½ï¿½È“ï¿½ï¿½ÍŽï¿½)ï¿½ÌÚ×Ý’ï¿½ */
+	                    /* bit 2: ï¿½uï¿½ï¿½vï¿½ï¿½ï¿½uï¿½ï¿½v                 */
+	                    /* bit 1: ï¿½uï¿½Âvï¿½ï¿½ï¿½uï¿½ï¿½ï¿½v(ï¿½uï¿½Âvï¿½ï¿½Xï¿½ï¿½ï¿½ï¿½) */
+	                    /* bit 0: ï¿½uï¿½Kï¿½vï¿½ï¿½ï¿½uï¿½Jï¿½v(ï¿½ï¿½ï¿½ï¿½ï¿½_ï¿½ï¿½ï¿½ï¿½_ï¿½ï¿½) */
 
-	int AutoRecRep;     /* “ü—ÍŽx‰‡(’uŠ·)‚ÌÚ×Ý’è */
-	                    /* bit 3: uBv¨uDv(‹å“_‚ðƒsƒŠƒIƒh‚É)   */
-	                    /* bit 2: uAv¨uCv(“Ç“_‚ðƒJƒ“ƒ}‚É)     */
-	                    /* bit 1: uEv¨u^v(’†•‚ðƒXƒ‰ƒbƒVƒ…‚É) */
-	                    /* bit 0: u[v¨u|v(‰¹ˆø‚«‚ðƒnƒCƒtƒ“‚É) */
+	int AutoRecRep;     /* ï¿½ï¿½ï¿½ÍŽxï¿½ï¿½(ï¿½uï¿½ï¿½)ï¿½ÌÚ×Ý’ï¿½ */
+	                    /* bit 3: ï¿½uï¿½Bï¿½vï¿½ï¿½ï¿½uï¿½Dï¿½v(ï¿½ï¿½_ï¿½ï¿½sï¿½ï¿½ï¿½Iï¿½hï¿½ï¿½)   */
+	                    /* bit 2: ï¿½uï¿½Aï¿½vï¿½ï¿½ï¿½uï¿½Cï¿½v(ï¿½Ç“_ï¿½ï¿½Jï¿½ï¿½ï¿½}ï¿½ï¿½)     */
+	                    /* bit 1: ï¿½uï¿½Eï¿½vï¿½ï¿½ï¿½uï¿½^ï¿½v(ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Xï¿½ï¿½ï¿½bï¿½Vï¿½ï¿½ï¿½ï¿½) */
+	                    /* bit 0: ï¿½uï¿½[ï¿½vï¿½ï¿½ï¿½uï¿½|ï¿½v(ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½nï¿½Cï¿½tï¿½ï¿½ï¿½ï¿½) */
 
-	int AppendAtoHen;   /* Œã•ÏŠ·Œó•â‚ÌŒó•âƒŠƒXƒg‚Ö‚Ì’Ç‰Á‚ð‚·‚é/‚µ‚È‚¢ */
-	                    /* bit 4: ”¼Šp–³•ÏŠ·Œó•â   */
-	                    /* bit 3: ‘SŠp–³•ÏŠ·Œó•â   */
-	                    /* bit 2: ”¼ŠpƒJƒ^ƒJƒiŒó•â */
-	                    /* bit 1: ‘SŠpƒJƒ^ƒJƒiŒó•â */
-	                    /* bit 0: ‚Ð‚ç‚ª‚ÈŒó•â     */
+	int AppendAtoHen;   /* ï¿½ï¿½ÏŠï¿½ï¿½ï¿½ï¿½ÌŒï¿½âƒŠï¿½Xï¿½gï¿½Ö‚Ì’Ç‰ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½È‚ï¿½ */
+	                    /* bit 4: ï¿½ï¿½ï¿½pï¿½ï¿½ï¿½ÏŠï¿½ï¿½ï¿½ï¿½   */
+	                    /* bit 3: ï¿½Sï¿½pï¿½ï¿½ï¿½ÏŠï¿½ï¿½ï¿½ï¿½   */
+	                    /* bit 2: ï¿½ï¿½ï¿½pï¿½Jï¿½^ï¿½Jï¿½iï¿½ï¿½ï¿½ */
+	                    /* bit 1: ï¿½Sï¿½pï¿½Jï¿½^ï¿½Jï¿½iï¿½ï¿½ï¿½ */
+	                    /* bit 0: ï¿½Ð‚ç‚ªï¿½ÈŒï¿½ï¿½     */
 
-	int KutouCnvMode;   /* ‹å“Ç“_•ÏŠ·‚·‚é/‚µ‚È‚¢ */
-	                    /* 0= ‚µ‚È‚¢ */
-	                    /* 1= ‚·‚é   */
+	int KutouCnvMode;   /* ï¿½ï¿½Ç“_ï¿½ÏŠï¿½ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½È‚ï¿½ */
+	                    /* 0= ï¿½ï¿½ï¿½È‚ï¿½ */
+	                    /* 1= ï¿½ï¿½ï¿½ï¿½   */
 
-	int KutouCnvDetail; /* ‹å“Ç“_•ÏŠ·‚ÌÚ×Ý’è */
-	                    /* bit 3: [I](Š´’Q•„)‚Å•ÏŠ· */
-	                    /* bit 2: [H](‹^–â•„)‚Å•ÏŠ· */
-	                    /* bit 1: [A](“Ç“_)‚Å•ÏŠ·   */
-	                    /* bit 0: [B](‹å“_)‚Å•ÏŠ·   */
+	int KutouCnvDetail; /* ï¿½ï¿½Ç“_ï¿½ÏŠï¿½ï¿½ÌÚ×Ý’ï¿½ */
+	                    /* bit 3: [ï¿½I](ï¿½ï¿½ï¿½Qï¿½ï¿½)ï¿½Å•ÏŠï¿½ */
+	                    /* bit 2: [ï¿½H](ï¿½^ï¿½â•„)ï¿½Å•ÏŠï¿½ */
+	                    /* bit 1: [ï¿½A](ï¿½Ç“_)ï¿½Å•ÏŠï¿½   */
+	                    /* bit 0: [ï¿½B](ï¿½ï¿½_)ï¿½Å•ÏŠï¿½   */
 
-	int RuledZenCnv;    /* ‘SŠp•ÏŠ·—áŠO‹K‘¥‚ÌÝ’è */
-	                    /* bit 0: [~]¨[`]‚É•ÏŠ· */
+	int RuledZenCnv;    /* ï¿½Sï¿½pï¿½ÏŠï¿½ï¿½ï¿½Oï¿½Kï¿½ï¿½ï¿½ÌÝ’ï¿½ */
+	                    /* bit 0: [~]ï¿½ï¿½[ï¿½`]ï¿½É•ÏŠï¿½ */
 } sceAtokConfig;
 
 
 
 /*
- * sceAtokSetConfig()ŠÖ”AsceAtokGetConfig()ŠÖ”‚Ì
- * sceAtokConfig\‘¢‘Ì“à‚Ì—LŒøƒƒ“ƒoŽw’è—pƒ}ƒNƒ’è‹`
+ * sceAtokSetConfig()ï¿½Öï¿½ï¿½AsceAtokGetConfig()ï¿½Öï¿½ï¿½ï¿½
+ * sceAtokConfigï¿½\ï¿½ï¿½ï¿½Ì“ï¿½Ì—Lï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½oï¿½wï¿½ï¿½pï¿½}ï¿½Nï¿½ï¿½ï¿½ï¿½`
  */
-#define SCE_ATOK_CONFIG_KANJIINPUT      (0x00000001UL)	/* Š¿Žš“ü—Íƒ‚[ƒh */
-#define SCE_ATOK_CONFIG_KANDSPTYPE      (0x00000002UL)	/* “ü—Í•¶ŽšŽí */
-#define SCE_ATOK_CONFIG_FIXMODE         (0x00000004UL)	/* ŒÅ’è“ü—Íƒ‚[ƒh */
-#define SCE_ATOK_CONFIG_HZCNVMODE       (0x00000008UL)	/* ”¼Šp‘SŠp•ÏŠ·‚·‚é/‚µ‚È‚¢ */
-#define SCE_ATOK_CONFIG_HZCNVDETAIL     (0x00000010UL)	/* ”¼Šp‘SŠp•ÏŠ·Ú× */
-#define SCE_ATOK_CONFIG_HANKAKUCNVSTR   (0x00000020UL)	/* ”¼Šp•ÏŠ·‚·‚é‹L†•¶Žš—ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^ */
-#define SCE_ATOK_CONFIG_ZENKAKUCNVSTR   (0x00000040UL)	/* ‘SŠp•ÏŠ·‚·‚é‹L†•¶Žš—ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^ */
-#define SCE_ATOK_CONFIG_FURIGANAMODE    (0x00000080UL)	/* ‚Ó‚è‚ª‚È“ü—Íƒ‚[ƒh */
-#define SCE_ATOK_CONFIG_MAXINPUTCHARS   (0x00000100UL)	/* “ü—Í•¶Žš” */
-#define SCE_ATOK_CONFIG_PUTCURSORMODE   (0x00000200UL)	/* –¢Šm’è•¶Žš—ñ––”ö‚ÉƒJ[ƒ\ƒ‹•¶Žš‚ð’Ç‰Á‚·‚é/‚µ‚È‚¢ */
-#define SCE_ATOK_CONFIG_PREANALYZE      (0x00000400UL)	/* “ü—ÍŽž‚ÌŽ«‘æ“Ç‚Ý‚·‚é/‚µ‚È‚¢ */
-#define SCE_ATOK_CONFIG_CONVMODE        (0x00010000UL)	/* •ÏŠ·ƒ‚[ƒh */
-#define SCE_ATOK_CONFIG_LEARNINGMODE    (0x00020000UL)	/* ŠwKƒ‚[ƒh */
-#define SCE_ATOK_CONFIG_KUTOUCHARSET    (0x00040000UL)	/* ‹å“Ç“_‘g‚Ý‡‚í‚¹ƒpƒ^[ƒ“ */
-#define SCE_ATOK_CONFIG_OKURIMODE       (0x00080000UL)	/* ‘—‚è‚ª‚Èƒ‚[ƒh */
-#define SCE_ATOK_CONFIG_AUTOREGKIND     (0x00100000UL)	/* Ž©“®“o˜^Ží•Ê */
-#define SCE_ATOK_CONFIG_LEARNINGKIND    (0x00200000UL)	/* ŠwKŽí•Ê */
-#define SCE_ATOK_CONFIG_ROMANRECOVER    (0x00400000UL)	/* ƒ[ƒ}Žš—§‚¿’¼‚è‚·‚é/‚µ‚È‚¢ */
-#define SCE_ATOK_CONFIG_AUTORECMODE     (0x00800000UL)	/* “ü—ÍŽx‰‡‚·‚é/‚µ‚È‚¢ */
-#define SCE_ATOK_CONFIG_AUTORECROMAN    (0x01000000UL)	/* “ü—ÍŽx‰‡(ƒ[ƒ}Žš“ü—ÍŽž)‚ÌÚ×Ý’è */
-#define SCE_ATOK_CONFIG_AUTORECKANA     (0x02000000UL)	/* “ü—ÍŽx‰‡(‚©‚È“ü—ÍŽž)‚ÌÚ×Ý’è */
-#define SCE_ATOK_CONFIG_AUTORECREP      (0x04000000UL)	/* “ü—ÍŽx‰‡(’uŠ·)‚ÌÚ×Ý’è */
-#define SCE_ATOK_CONFIG_APPENDATOHEN    (0x08000000UL)	/* Œã•ÏŠ·Œó•â‚ÌŒó•âƒŠƒXƒg‚Ö‚Ì’Ç‰Á‚ð‚·‚é/‚µ‚È‚¢ */
-#define SCE_ATOK_CONFIG_KUTOUCNVMODE    (0x10000000UL)	/* ‹å“Ç“_•ÏŠ·‚·‚é/‚µ‚È‚¢ */
-#define SCE_ATOK_CONFIG_KUTOUCNVDETAIL  (0x20000000UL)	/* ‹å“Ç“_•ÏŠ·‚ÌÚ×Ý’è */
-#define SCE_ATOK_CONFIG_RULEDZENCNV     (0x40000000UL)	/* ‘SŠp•ÏŠ·—áŠO‹K‘¥‚ÌÝ’è */
+#define SCE_ATOK_CONFIG_KANJIINPUT      (0x00000001UL)	/* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Íƒï¿½ï¿½[ï¿½h */
+#define SCE_ATOK_CONFIG_KANDSPTYPE      (0x00000002UL)	/* ï¿½ï¿½ï¿½Í•ï¿½ï¿½ï¿½ï¿½ï¿½ */
+#define SCE_ATOK_CONFIG_FIXMODE         (0x00000004UL)	/* ï¿½Å’ï¿½ï¿½ï¿½Íƒï¿½ï¿½[ï¿½h */
+#define SCE_ATOK_CONFIG_HZCNVMODE       (0x00000008UL)	/* ï¿½ï¿½ï¿½pï¿½Sï¿½pï¿½ÏŠï¿½ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½È‚ï¿½ */
+#define SCE_ATOK_CONFIG_HZCNVDETAIL     (0x00000010UL)	/* ï¿½ï¿½ï¿½pï¿½Sï¿½pï¿½ÏŠï¿½ï¿½Úï¿½ */
+#define SCE_ATOK_CONFIG_HANKAKUCNVSTR   (0x00000020UL)	/* ï¿½ï¿½ï¿½pï¿½ÏŠï¿½ï¿½ï¿½ï¿½ï¿½Lï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö‚Ìƒ|ï¿½Cï¿½ï¿½ï¿½^ */
+#define SCE_ATOK_CONFIG_ZENKAKUCNVSTR   (0x00000040UL)	/* ï¿½Sï¿½pï¿½ÏŠï¿½ï¿½ï¿½ï¿½ï¿½Lï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö‚Ìƒ|ï¿½Cï¿½ï¿½ï¿½^ */
+#define SCE_ATOK_CONFIG_FURIGANAMODE    (0x00000080UL)	/* ï¿½Ó‚è‚ªï¿½È“ï¿½ï¿½Íƒï¿½ï¿½[ï¿½h */
+#define SCE_ATOK_CONFIG_MAXINPUTCHARS   (0x00000100UL)	/* ï¿½ï¿½ï¿½Í•ï¿½ï¿½ï¿½ï¿½ï¿½ */
+#define SCE_ATOK_CONFIG_PUTCURSORMODE   (0x00000200UL)	/* ï¿½ï¿½ï¿½mï¿½è•¶ï¿½ï¿½ï¿½ñ––”ï¿½ï¿½ÉƒJï¿½[ï¿½\ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç‰ï¿½ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½È‚ï¿½ */
+#define SCE_ATOK_CONFIG_PREANALYZE      (0x00000400UL)	/* ï¿½ï¿½ï¿½ÍŽï¿½ï¿½ÌŽï¿½ï¿½ï¿½ï¿½ï¿½Ç‚Ý‚ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½È‚ï¿½ */
+#define SCE_ATOK_CONFIG_CONVMODE        (0x00010000UL)	/* ï¿½ÏŠï¿½ï¿½ï¿½ï¿½[ï¿½h */
+#define SCE_ATOK_CONFIG_LEARNINGMODE    (0x00020000UL)	/* ï¿½wï¿½Kï¿½ï¿½ï¿½[ï¿½h */
+#define SCE_ATOK_CONFIG_KUTOUCHARSET    (0x00040000UL)	/* ï¿½ï¿½Ç“_ï¿½gï¿½Ýï¿½ï¿½í‚¹ï¿½pï¿½^ï¿½[ï¿½ï¿½ */
+#define SCE_ATOK_CONFIG_OKURIMODE       (0x00080000UL)	/* ï¿½ï¿½ï¿½è‚ªï¿½Èƒï¿½ï¿½[ï¿½h */
+#define SCE_ATOK_CONFIG_AUTOREGKIND     (0x00100000UL)	/* ï¿½ï¿½ï¿½ï¿½ï¿½oï¿½^ï¿½ï¿½ï¿½ */
+#define SCE_ATOK_CONFIG_LEARNINGKIND    (0x00200000UL)	/* ï¿½wï¿½Kï¿½ï¿½ï¿½ */
+#define SCE_ATOK_CONFIG_ROMANRECOVER    (0x00400000UL)	/* ï¿½ï¿½ï¿½[ï¿½}ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½è‚·ï¿½ï¿½/ï¿½ï¿½ï¿½È‚ï¿½ */
+#define SCE_ATOK_CONFIG_AUTORECMODE     (0x00800000UL)	/* ï¿½ï¿½ï¿½ÍŽxï¿½ï¿½ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½È‚ï¿½ */
+#define SCE_ATOK_CONFIG_AUTORECROMAN    (0x01000000UL)	/* ï¿½ï¿½ï¿½ÍŽxï¿½ï¿½(ï¿½ï¿½ï¿½[ï¿½}ï¿½ï¿½ï¿½ï¿½ï¿½ÍŽï¿½)ï¿½ÌÚ×Ý’ï¿½ */
+#define SCE_ATOK_CONFIG_AUTORECKANA     (0x02000000UL)	/* ï¿½ï¿½ï¿½ÍŽxï¿½ï¿½(ï¿½ï¿½ï¿½È“ï¿½ï¿½ÍŽï¿½)ï¿½ÌÚ×Ý’ï¿½ */
+#define SCE_ATOK_CONFIG_AUTORECREP      (0x04000000UL)	/* ï¿½ï¿½ï¿½ÍŽxï¿½ï¿½(ï¿½uï¿½ï¿½)ï¿½ÌÚ×Ý’ï¿½ */
+#define SCE_ATOK_CONFIG_APPENDATOHEN    (0x08000000UL)	/* ï¿½ï¿½ÏŠï¿½ï¿½ï¿½ï¿½ÌŒï¿½âƒŠï¿½Xï¿½gï¿½Ö‚Ì’Ç‰ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½È‚ï¿½ */
+#define SCE_ATOK_CONFIG_KUTOUCNVMODE    (0x10000000UL)	/* ï¿½ï¿½Ç“_ï¿½ÏŠï¿½ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½È‚ï¿½ */
+#define SCE_ATOK_CONFIG_KUTOUCNVDETAIL  (0x20000000UL)	/* ï¿½ï¿½Ç“_ï¿½ÏŠï¿½ï¿½ÌÚ×Ý’ï¿½ */
+#define SCE_ATOK_CONFIG_RULEDZENCNV     (0x40000000UL)	/* ï¿½Sï¿½pï¿½ÏŠï¿½ï¿½ï¿½Oï¿½Kï¿½ï¿½ï¿½ÌÝ’ï¿½ */
 
 
-/* ‘S‚Ä‚ÌÝ’è‚ð‚ðˆêŠ‡‚µ‚ÄŽw’è‚·‚éê‡‚ÉŽg—p */
+/* ï¿½Sï¿½Ä‚ÌÝ’ï¿½ï¿½ï¿½êŠ‡ï¿½ï¿½ï¿½ÄŽwï¿½è‚·ï¿½ï¿½ê‡ï¿½ÉŽgï¿½p */
 #define SCE_ATOK_CONFIG_ALL  ( \
 					SCE_ATOK_CONFIG_KANJIINPUT      | \
 					SCE_ATOK_CONFIG_KANDSPTYPE      | \
@@ -227,209 +227,209 @@ typedef struct {
 
 
 
-/* sceAtokConfig\‘¢‘Ì“à‚Ìƒƒ“ƒoÝ’è—pƒ}ƒNƒ’è‹`
+/* sceAtokConfigï¿½\ï¿½ï¿½ï¿½Ì“ï¿½Ìƒï¿½ï¿½ï¿½ï¿½oï¿½Ý’ï¿½pï¿½}ï¿½Nï¿½ï¿½ï¿½ï¿½`
 */
-/* SCE_ATOK_CONFIG_KANJIINPUT : Š¿Žš“ü—Íƒ‚[ƒh */
-#define SCE_ATOK_KANJIINPUT_ROMAN      (1)		/* ƒ[ƒ}ŽšŠ¿Žš */
-#define SCE_ATOK_KANJIINPUT_KANA       (2)		/* ‚©‚È“ü—ÍŠ¿Žš */
-#define SCE_ATOK_KANJIINPUT_HANTHROUGH (3)		/* ”¼ŠpƒXƒ‹[   */
-/* SCE_ATOK_CONFIG_KANDSPTYPE : “ü—Í•¶ŽšŽí*/
-#define SCE_ATOK_KANDSPTYPE_HIRA      (1)		/* ‚Ð‚ç‚ª‚È“ü—Í     */
-#define SCE_ATOK_KANDSPTYPE_ZENKANA   (2)		/* ‘SŠpƒJƒ^ƒJƒi“ü—Í */
-#define SCE_ATOK_KANDSPTYPE_ZENRAW    (3)		/* ‘SŠp–³•ÏŠ·“ü—Í   */
-#define SCE_ATOK_KANDSPTYPE_HANKANA   (4)		/* ”¼ŠpƒJƒ^ƒJƒi“ü—Í */
-#define SCE_ATOK_KANDSPTYPE_HANRAW    (5)		/* ”¼Šp–³•ÏŠ·“ü—Í   */
-/* SCE_ATOK_CONFIG_CONVMODE : •ÏŠ·ƒ‚[ƒh*/
-#define SCE_ATOK_CONVMODE_REN         (0)		/* ˜A•¶ß•ÏŠ· */
-#define SCE_ATOK_CONVMODE_TAN         (1)		/* ’P•¶ß•ÏŠ· */
-#define SCE_ATOK_CONVMODE_AUTO        (2)		/* Ž©“®•ÏŠ·   */
-/* SCE_ATOK_CONFIG_LEARNINGMODE : ŠwKƒ‚[ƒh*/
-#define SCE_ATOK_LEARNINGMODE_OFF     (0)		/* ŠwK‚µ‚È‚¢ */
-#define SCE_ATOK_LEARNINGMODE_ON      (1)		/* ŠwK‚·‚é   */
-/* SCE_ATOK_CONFIG_FIXMODE : ŒÅ’è“ü—Íƒ‚[ƒh*/
-#define SCE_ATOK_FIXMODE_OFF          (0)		/* ŒÅ’è‰ðœ     */
-#define SCE_ATOK_FIXMODE_HIRAGANA     (1)		/* ‚Ð‚ç‚ª‚È     */
-#define SCE_ATOK_FIXMODE_ZENKANA      (2)		/* ‘SŠpƒJƒ^ƒJƒi */
-#define SCE_ATOK_FIXMODE_ZENRAW       (3)		/* ‘SŠp–³•ÏŠ·   */
-#define SCE_ATOK_FIXMODE_HANKANA      (4)		/* ”¼ŠpƒJƒ^ƒJƒi */
-#define SCE_ATOK_FIXMODE_HANRAW       (5)		/* ”¼Šp–³•ÏŠ·   */
-/* SCE_ATOK_CONFIG_KUTOUCHARSET : ‹å“Ç“_‘g‚Ý‡‚í‚¹ƒpƒ^[ƒ“*/
-#define SCE_ATOK_KUTOUCHARSET_SET0    (0)		/* ƒJƒ“ƒ}/ ƒsƒŠƒIƒh/ ’†Š‡ŒÊ/ ƒXƒ‰ƒbƒVƒ…/ ‰¹ˆø‚«*/
-#define SCE_ATOK_KUTOUCHARSET_SET1    (1)		/* “Ç“_/ ‹å“_/ ‚©‚¬Š‡ŒÊ/ ’†•/ ‰¹ˆø‚« */
-/* SCE_ATOK_CONFIG_AUTOREGKIND : Ž©“®“o˜^Ží•Ê*/
-#define SCE_ATOK_AUTOREGKIND_CLAUSEGAP    (0x00000001)	/* •¶ß‹æØ‚è*/
-#define SCE_ATOK_AUTOREGKIND_MULTI        (0x00000002)	/* •¡‡Œê*/
-#define SCE_ATOK_AUTOREGKIND_CNVRAW       (0x00000004)	/* Œã•ÏŠ·*/
-#define SCE_ATOK_AUTOREGKIND_NONREG       (0x00000008)	/* –¢“o˜^Œê*/
-/* SCE_ATOK_CONFIG_LEARNINGKIND : ŠwKŽí•Ê*/
-#define SCE_ATOK_LEARNINGKIND_CLAUSEGAP   (0x00000001)	/* ‹æØ‚è‚È‚¨‚µŠwKŒê*/
-#define SCE_ATOK_LEARNINGKIND_MULTI       (0x00000002)	/* •¡‡ŒêŠwKŒê*/
-#define SCE_ATOK_LEARNINGKIND_CNVRAW      (0x00000004)	/* Œã•ÏŠ·Œã*/
-#define SCE_ATOK_LEARNINGKIND_NONREG      (0x00000008)	/* –¢“o˜^Œê*/
-/* SCE_ATOK_CONFIG_ROMANRECOVER : ƒ[ƒ}Žš—§‚¿’¼‚è‚·‚é/‚µ‚È‚¢ */
-#define SCE_ATOK_ROMANRECOVER_OFF         (0)			/* ‚µ‚È‚¢*/
-#define SCE_ATOK_ROMANRECOVER_ON          (1)			/* ‚·‚é*/
-/* SCE_ATOK_CONFIG_HZCNVMODE : ”¼Šp‘SŠp•ÏŠ·‚·‚é/‚µ‚È‚¢ */
-#define SCE_ATOK_HZCNVMODE_CNVHANZEN      (1<<0)		/* ”¼Šp‘SŠp•ÏŠ·*/
-#define SCE_ATOK_HZCNVMODE_INPUTCHARS     (1<<1)		/* “ü—Í’†•¶Žš—ñ‚Ö‚Ì“K—p*/
-#define SCE_ATOK_HZCNVMODE_USERREG        (1<<2)		/* ƒ†[ƒU“o˜^’PŒê‚Ö‚Ì“K—p*/
-#define SCE_ATOK_HZCNVMODE_RAWCNV         (1<<3)		/* Œã•ÏŠ·’PŒê‚Ö‚Ì“K—p*/
-/* SCE_ATOK_CONFIG_HZCNVDETAIL : ”¼Šp‘SŠp•ÏŠ·Ú× */
-#define SCE_ATOK_HZCNVDETAIL_KANA2HAN     (1<<0)		/* ƒJƒ^ƒJƒi ¨ ”¼Šp */
-#define SCE_ATOK_HZCNVDETAIL_ALPH2HAN     (1<<1)		/* ‰pŽš     ¨ ”¼Šp */
-#define SCE_ATOK_HZCNVDETAIL_NUM2HAN      (1<<2)		/* ”Žš     ¨ ”¼Šp */
-#define SCE_ATOK_HZCNVDETAIL_KANA2ZEN     (1<<4)		/* ƒJƒ^ƒJƒi ¨ ‘SŠp */
-#define SCE_ATOK_HZCNVDETAIL_ALPH2ZEN     (1<<5)		/* ‰pŽš     ¨ ‘SŠp */
-#define SCE_ATOK_HZCNVDETAIL_NUM2ZEN      (1<<6)		/* ”Žš     ¨ ‘SŠp */
-/* SCE_ATOK_CONFIG_AUTORECMODE : “ü—ÍŽx‰‡‚·‚é/‚µ‚È‚¢ */
-#define SCE_ATOK_AUTORECMODE_OFF            (0) 		/* ‚µ‚È‚¢ */
-#define SCE_ATOK_AUTORECMODE_ON             (1) 		/* ‚·‚é   */
-/* SCE_ATOK_CONFIG_AUTORECROMAN : “ü—ÍŽx‰‡iƒ[ƒ}Žš“ü—ÍŽžj‚ÌÚ×Ý’è/“Ç‚Ýo‚µ*/
-#define SCE_ATOK_AUTORECROMAN_BOIN          (1<<0)		/* •ê‰¹‚Ì‰ß•s‘« */
-#define SCE_ATOK_AUTORECROMAN_SHIIN         (1<<1)		/* Žq‰¹‚Ì’´‰ß   */
-#define SCE_ATOK_AUTORECROMAN_N             (1<<2)		/* [N]‚Ì‰ß•s‘«  */
-/* SCE_ATOK_CONFIG_AUTORECKANA : “ü—ÍŽx‰‡(‚©‚È“ü—ÍŽž)‚ÌÚ×Ý’è */
-#define SCE_ATOK_AUTORECKANA_HANDAKU2DAKU   (1<<0)		/* ußv ¨uJv(”¼‘÷“_‚ð‘÷“_)  */
-#define SCE_ATOK_AUTORECKANA_TSU            (1<<1)		/* u‚Âv¨u‚Áv(u‚Âv‚ðX‰¹‚É)*/
-#define SCE_ATOK_AUTORECKANA_WA2WO          (1<<2)		/* u‚ív¨u‚ðv*/
-/* SCE_ATOK_CONFIG_AUTORECREP : “ü—ÍŽx‰‡(’uŠ·)‚ÌÚ×Ý’è */
-#define SCE_ATOK_AUTORECREP_ONBIKI2HYPHEN   (1<<0)		/* u[v¨u-v(‰¹ˆø‚«‚ðƒnƒCƒtƒ“‚É)*/
-#define SCE_ATOK_AUTORECREP_NAKAGURO2SLASH  (1<<1)		/* uEv¨u/v(’†•‚ðƒXƒ‰ƒbƒVƒ…‚É)*/
-#define SCE_ATOK_AUTORECREP_DOKUTEN2COMMA   (1<<2)		/* uAv¨u,v(“Ç“_‚ðƒJƒ“ƒ}‚É)    */
-#define SCE_ATOK_AUTORECREP_KUTEN2PERIOD    (1<<3)		/* uBv¨u.v(‹å“_‚ðƒsƒŠƒIƒh‚É)  */
-/* SCE_ATOK_CONFIG_APPENDATOHEN : Œã•ÏŠ·Œó•â‚ÌŒó•âƒŠƒXƒg‚Ö‚Ì’Ç‰Á‚ð‚·‚é/‚µ‚È‚¢ */
-#define SCE_ATOK_APPENDATOHEN_HIRAGANACAND    (1<<0)	/* ‚Ð‚ç‚ª‚ÈŒó•â     */
-#define SCE_ATOK_APPENDATOHEN_ZENKATAKANACAND (1<<1)	/* ‘SŠpƒJƒ^ƒJƒiŒó•â */
-#define SCE_ATOK_APPENDATOHEN_HANKATAKANACAND (1<<2)	/* ”¼ŠpƒJƒ^ƒJƒiŒó•â */
-#define SCE_ATOK_APPENDATOHEN_ZENCNVRAWCAND   (1<<3)	/* ‘SŠp–³•ÏŠ·Œó•â   */
-#define SCE_ATOK_APPENDATOHEN_HANCNVRAWCAND   (1<<4)	/* ”¼Šp–³•ÏŠ·Œó•â   */
-/* SCE_ATOK_CONFIG_KUTOUCNVMODE : ‹å“Ç“_•ÏŠ·‚·‚é/‚µ‚È‚¢ */
-#define SCE_ATOK_KUTOUCNVMOD_OFF            (0)  		/* ‚µ‚È‚¢ */
-#define SCE_ATOK_KUTOUCNVMOD_ON             (1)  		/* ‚·‚é   */
-/* SCE_ATOK_CONFIG_KUTOUCNVDETAIL : ‹å“Ç“_•ÏŠ·‚ÌÚ×Ý’è */
-#define SCE_ATOK_KUTOUCNVDETAIL_KUTEN       (1<<0)		/* B(‹å“_)‚Å•ÏŠ·   */
-#define SCE_ATOK_KUTOUCNVDETAIL_DOKUTEN     (1<<1)		/* A(“Ç“_)‚Å•ÏŠ·   */
-#define SCE_ATOK_KUTOUCNVDETAIL_GIMONFU     (1<<2)		/* H(‹^–â•„)‚Å•ÏŠ· */
-#define SCE_ATOK_KUTOUCNVDETAIL_KANTANFU    (1<<3)		/* I(Š´’Q•„)‚Å•ÏŠ· */
-/* SCE_ATOK_CONFIG_FURIGANAMODE : ‚Ó‚è‚ª‚È“ü—Íƒ‚[ƒh */
-#define SCE_ATOK_FURIGANAMODE_FINISH        (0)  		/* I—¹ */
-#define SCE_ATOK_FURIGANAMODE_START         (1)  		/* ŠJŽn */
-/* SCE_ATOK_CONFIG_PUTCURSORMODE : –¢Šm’è•¶Žš—ñ––”ö‚ÉƒJ[ƒ\ƒ‹•¶Žš‚ð’Ç‰Á‚·‚é/‚µ‚È‚¢ */
-#define SCE_ATOK_PUTCURSORMODE_OFF          (0)  		/* ‚µ‚È‚¢ */
-#define SCE_ATOK_PUTCURSORMODE_ON           (1)  		/* ‚·‚é   */
-/* SCE_ATOK_CONFIG_PREANALYZE : “ü—ÍŽž‚ÌŽ«‘æ“Ç‚Ý‚·‚é/‚µ‚È‚¢ */
+/* SCE_ATOK_CONFIG_KANJIINPUT : ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Íƒï¿½ï¿½[ï¿½h */
+#define SCE_ATOK_KANJIINPUT_ROMAN      (1)		/* ï¿½ï¿½ï¿½[ï¿½}ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
+#define SCE_ATOK_KANJIINPUT_KANA       (2)		/* ï¿½ï¿½ï¿½È“ï¿½ï¿½ÍŠï¿½ï¿½ï¿½ */
+#define SCE_ATOK_KANJIINPUT_HANTHROUGH (3)		/* ï¿½ï¿½ï¿½pï¿½Xï¿½ï¿½ï¿½[   */
+/* SCE_ATOK_CONFIG_KANDSPTYPE : ï¿½ï¿½ï¿½Í•ï¿½ï¿½ï¿½ï¿½ï¿½*/
+#define SCE_ATOK_KANDSPTYPE_HIRA      (1)		/* ï¿½Ð‚ç‚ªï¿½È“ï¿½ï¿½ï¿½     */
+#define SCE_ATOK_KANDSPTYPE_ZENKANA   (2)		/* ï¿½Sï¿½pï¿½Jï¿½^ï¿½Jï¿½iï¿½ï¿½ï¿½ï¿½ */
+#define SCE_ATOK_KANDSPTYPE_ZENRAW    (3)		/* ï¿½Sï¿½pï¿½ï¿½ï¿½ÏŠï¿½ï¿½ï¿½ï¿½ï¿½   */
+#define SCE_ATOK_KANDSPTYPE_HANKANA   (4)		/* ï¿½ï¿½ï¿½pï¿½Jï¿½^ï¿½Jï¿½iï¿½ï¿½ï¿½ï¿½ */
+#define SCE_ATOK_KANDSPTYPE_HANRAW    (5)		/* ï¿½ï¿½ï¿½pï¿½ï¿½ï¿½ÏŠï¿½ï¿½ï¿½ï¿½ï¿½   */
+/* SCE_ATOK_CONFIG_CONVMODE : ï¿½ÏŠï¿½ï¿½ï¿½ï¿½[ï¿½h*/
+#define SCE_ATOK_CONVMODE_REN         (0)		/* ï¿½Aï¿½ï¿½ï¿½ß•ÏŠï¿½ */
+#define SCE_ATOK_CONVMODE_TAN         (1)		/* ï¿½Pï¿½ï¿½ï¿½ß•ÏŠï¿½ */
+#define SCE_ATOK_CONVMODE_AUTO        (2)		/* ï¿½ï¿½ï¿½ï¿½ï¿½ÏŠï¿½   */
+/* SCE_ATOK_CONFIG_LEARNINGMODE : ï¿½wï¿½Kï¿½ï¿½ï¿½[ï¿½h*/
+#define SCE_ATOK_LEARNINGMODE_OFF     (0)		/* ï¿½wï¿½Kï¿½ï¿½ï¿½È‚ï¿½ */
+#define SCE_ATOK_LEARNINGMODE_ON      (1)		/* ï¿½wï¿½Kï¿½ï¿½ï¿½ï¿½   */
+/* SCE_ATOK_CONFIG_FIXMODE : ï¿½Å’ï¿½ï¿½ï¿½Íƒï¿½ï¿½[ï¿½h*/
+#define SCE_ATOK_FIXMODE_OFF          (0)		/* ï¿½Å’ï¿½ï¿½ï¿½     */
+#define SCE_ATOK_FIXMODE_HIRAGANA     (1)		/* ï¿½Ð‚ç‚ªï¿½ï¿½     */
+#define SCE_ATOK_FIXMODE_ZENKANA      (2)		/* ï¿½Sï¿½pï¿½Jï¿½^ï¿½Jï¿½i */
+#define SCE_ATOK_FIXMODE_ZENRAW       (3)		/* ï¿½Sï¿½pï¿½ï¿½ï¿½ÏŠï¿½   */
+#define SCE_ATOK_FIXMODE_HANKANA      (4)		/* ï¿½ï¿½ï¿½pï¿½Jï¿½^ï¿½Jï¿½i */
+#define SCE_ATOK_FIXMODE_HANRAW       (5)		/* ï¿½ï¿½ï¿½pï¿½ï¿½ï¿½ÏŠï¿½   */
+/* SCE_ATOK_CONFIG_KUTOUCHARSET : ï¿½ï¿½Ç“_ï¿½gï¿½Ýï¿½ï¿½í‚¹ï¿½pï¿½^ï¿½[ï¿½ï¿½*/
+#define SCE_ATOK_KUTOUCHARSET_SET0    (0)		/* ï¿½Jï¿½ï¿½ï¿½}/ ï¿½sï¿½ï¿½ï¿½Iï¿½h/ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½/ ï¿½Xï¿½ï¿½ï¿½bï¿½Vï¿½ï¿½/ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
+#define SCE_ATOK_KUTOUCHARSET_SET1    (1)		/* ï¿½Ç“_/ ï¿½ï¿½_/ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½/ ï¿½ï¿½ï¿½ï¿½/ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
+/* SCE_ATOK_CONFIG_AUTOREGKIND : ï¿½ï¿½ï¿½ï¿½ï¿½oï¿½^ï¿½ï¿½ï¿½*/
+#define SCE_ATOK_AUTOREGKIND_CLAUSEGAP    (0x00000001)	/* ï¿½ï¿½ï¿½ß‹ï¿½Ø‚ï¿½*/
+#define SCE_ATOK_AUTOREGKIND_MULTI        (0x00000002)	/* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
+#define SCE_ATOK_AUTOREGKIND_CNVRAW       (0x00000004)	/* ï¿½ï¿½ÏŠï¿½*/
+#define SCE_ATOK_AUTOREGKIND_NONREG       (0x00000008)	/* ï¿½ï¿½ï¿½oï¿½^ï¿½ï¿½*/
+/* SCE_ATOK_CONFIG_LEARNINGKIND : ï¿½wï¿½Kï¿½ï¿½ï¿½*/
+#define SCE_ATOK_LEARNINGKIND_CLAUSEGAP   (0x00000001)	/* ï¿½ï¿½Ø‚ï¿½È‚ï¿½ï¿½ï¿½ï¿½wï¿½Kï¿½ï¿½*/
+#define SCE_ATOK_LEARNINGKIND_MULTI       (0x00000002)	/* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½wï¿½Kï¿½ï¿½*/
+#define SCE_ATOK_LEARNINGKIND_CNVRAW      (0x00000004)	/* ï¿½ï¿½ÏŠï¿½ï¿½ï¿½*/
+#define SCE_ATOK_LEARNINGKIND_NONREG      (0x00000008)	/* ï¿½ï¿½ï¿½oï¿½^ï¿½ï¿½*/
+/* SCE_ATOK_CONFIG_ROMANRECOVER : ï¿½ï¿½ï¿½[ï¿½}ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½è‚·ï¿½ï¿½/ï¿½ï¿½ï¿½È‚ï¿½ */
+#define SCE_ATOK_ROMANRECOVER_OFF         (0)			/* ï¿½ï¿½ï¿½È‚ï¿½*/
+#define SCE_ATOK_ROMANRECOVER_ON          (1)			/* ï¿½ï¿½ï¿½ï¿½*/
+/* SCE_ATOK_CONFIG_HZCNVMODE : ï¿½ï¿½ï¿½pï¿½Sï¿½pï¿½ÏŠï¿½ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½È‚ï¿½ */
+#define SCE_ATOK_HZCNVMODE_CNVHANZEN      (1<<0)		/* ï¿½ï¿½ï¿½pï¿½Sï¿½pï¿½ÏŠï¿½*/
+#define SCE_ATOK_HZCNVMODE_INPUTCHARS     (1<<1)		/* ï¿½ï¿½ï¿½Í’ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö‚Ì“Kï¿½p*/
+#define SCE_ATOK_HZCNVMODE_USERREG        (1<<2)		/* ï¿½ï¿½ï¿½[ï¿½Uï¿½oï¿½^ï¿½Pï¿½ï¿½Ö‚Ì“Kï¿½p*/
+#define SCE_ATOK_HZCNVMODE_RAWCNV         (1<<3)		/* ï¿½ï¿½ÏŠï¿½ï¿½Pï¿½ï¿½Ö‚Ì“Kï¿½p*/
+/* SCE_ATOK_CONFIG_HZCNVDETAIL : ï¿½ï¿½ï¿½pï¿½Sï¿½pï¿½ÏŠï¿½ï¿½Úï¿½ */
+#define SCE_ATOK_HZCNVDETAIL_KANA2HAN     (1<<0)		/* ï¿½Jï¿½^ï¿½Jï¿½i ï¿½ï¿½ ï¿½ï¿½ï¿½p */
+#define SCE_ATOK_HZCNVDETAIL_ALPH2HAN     (1<<1)		/* ï¿½pï¿½ï¿½     ï¿½ï¿½ ï¿½ï¿½ï¿½p */
+#define SCE_ATOK_HZCNVDETAIL_NUM2HAN      (1<<2)		/* ï¿½ï¿½ï¿½ï¿½     ï¿½ï¿½ ï¿½ï¿½ï¿½p */
+#define SCE_ATOK_HZCNVDETAIL_KANA2ZEN     (1<<4)		/* ï¿½Jï¿½^ï¿½Jï¿½i ï¿½ï¿½ ï¿½Sï¿½p */
+#define SCE_ATOK_HZCNVDETAIL_ALPH2ZEN     (1<<5)		/* ï¿½pï¿½ï¿½     ï¿½ï¿½ ï¿½Sï¿½p */
+#define SCE_ATOK_HZCNVDETAIL_NUM2ZEN      (1<<6)		/* ï¿½ï¿½ï¿½ï¿½     ï¿½ï¿½ ï¿½Sï¿½p */
+/* SCE_ATOK_CONFIG_AUTORECMODE : ï¿½ï¿½ï¿½ÍŽxï¿½ï¿½ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½È‚ï¿½ */
+#define SCE_ATOK_AUTORECMODE_OFF            (0) 		/* ï¿½ï¿½ï¿½È‚ï¿½ */
+#define SCE_ATOK_AUTORECMODE_ON             (1) 		/* ï¿½ï¿½ï¿½ï¿½   */
+/* SCE_ATOK_CONFIG_AUTORECROMAN : ï¿½ï¿½ï¿½ÍŽxï¿½ï¿½ï¿½iï¿½ï¿½ï¿½[ï¿½}ï¿½ï¿½ï¿½ï¿½ï¿½ÍŽï¿½ï¿½jï¿½ÌÚ×Ý’ï¿½/ï¿½Ç‚Ýoï¿½ï¿½*/
+#define SCE_ATOK_AUTORECROMAN_BOIN          (1<<0)		/* ï¿½ê‰¹ï¿½Ì‰ß•sï¿½ï¿½ */
+#define SCE_ATOK_AUTORECROMAN_SHIIN         (1<<1)		/* ï¿½qï¿½ï¿½ï¿½Ì’ï¿½ï¿½ï¿½   */
+#define SCE_ATOK_AUTORECROMAN_N             (1<<2)		/* [N]ï¿½Ì‰ß•sï¿½ï¿½  */
+/* SCE_ATOK_CONFIG_AUTORECKANA : ï¿½ï¿½ï¿½ÍŽxï¿½ï¿½(ï¿½ï¿½ï¿½È“ï¿½ï¿½ÍŽï¿½)ï¿½ÌÚ×Ý’ï¿½ */
+#define SCE_ATOK_AUTORECKANA_HANDAKU2DAKU   (1<<0)		/* ï¿½ußv ï¿½ï¿½ï¿½uï¿½Jï¿½v(ï¿½ï¿½ï¿½ï¿½ï¿½_ï¿½ï¿½ï¿½ï¿½_)  */
+#define SCE_ATOK_AUTORECKANA_TSU            (1<<1)		/* ï¿½uï¿½Âvï¿½ï¿½ï¿½uï¿½ï¿½ï¿½v(ï¿½uï¿½Âvï¿½ï¿½Xï¿½ï¿½ï¿½ï¿½)*/
+#define SCE_ATOK_AUTORECKANA_WA2WO          (1<<2)		/* ï¿½uï¿½ï¿½vï¿½ï¿½ï¿½uï¿½ï¿½v*/
+/* SCE_ATOK_CONFIG_AUTORECREP : ï¿½ï¿½ï¿½ÍŽxï¿½ï¿½(ï¿½uï¿½ï¿½)ï¿½ÌÚ×Ý’ï¿½ */
+#define SCE_ATOK_AUTORECREP_ONBIKI2HYPHEN   (1<<0)		/* ï¿½uï¿½[ï¿½vï¿½ï¿½ï¿½u-ï¿½v(ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½nï¿½Cï¿½tï¿½ï¿½ï¿½ï¿½)*/
+#define SCE_ATOK_AUTORECREP_NAKAGURO2SLASH  (1<<1)		/* ï¿½uï¿½Eï¿½vï¿½ï¿½ï¿½u/ï¿½v(ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Xï¿½ï¿½ï¿½bï¿½Vï¿½ï¿½ï¿½ï¿½)*/
+#define SCE_ATOK_AUTORECREP_DOKUTEN2COMMA   (1<<2)		/* ï¿½uï¿½Aï¿½vï¿½ï¿½ï¿½u,ï¿½v(ï¿½Ç“_ï¿½ï¿½Jï¿½ï¿½ï¿½}ï¿½ï¿½)    */
+#define SCE_ATOK_AUTORECREP_KUTEN2PERIOD    (1<<3)		/* ï¿½uï¿½Bï¿½vï¿½ï¿½ï¿½u.ï¿½v(ï¿½ï¿½_ï¿½ï¿½sï¿½ï¿½ï¿½Iï¿½hï¿½ï¿½)  */
+/* SCE_ATOK_CONFIG_APPENDATOHEN : ï¿½ï¿½ÏŠï¿½ï¿½ï¿½ï¿½ÌŒï¿½âƒŠï¿½Xï¿½gï¿½Ö‚Ì’Ç‰ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½È‚ï¿½ */
+#define SCE_ATOK_APPENDATOHEN_HIRAGANACAND    (1<<0)	/* ï¿½Ð‚ç‚ªï¿½ÈŒï¿½ï¿½     */
+#define SCE_ATOK_APPENDATOHEN_ZENKATAKANACAND (1<<1)	/* ï¿½Sï¿½pï¿½Jï¿½^ï¿½Jï¿½iï¿½ï¿½ï¿½ */
+#define SCE_ATOK_APPENDATOHEN_HANKATAKANACAND (1<<2)	/* ï¿½ï¿½ï¿½pï¿½Jï¿½^ï¿½Jï¿½iï¿½ï¿½ï¿½ */
+#define SCE_ATOK_APPENDATOHEN_ZENCNVRAWCAND   (1<<3)	/* ï¿½Sï¿½pï¿½ï¿½ï¿½ÏŠï¿½ï¿½ï¿½ï¿½   */
+#define SCE_ATOK_APPENDATOHEN_HANCNVRAWCAND   (1<<4)	/* ï¿½ï¿½ï¿½pï¿½ï¿½ï¿½ÏŠï¿½ï¿½ï¿½ï¿½   */
+/* SCE_ATOK_CONFIG_KUTOUCNVMODE : ï¿½ï¿½Ç“_ï¿½ÏŠï¿½ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½È‚ï¿½ */
+#define SCE_ATOK_KUTOUCNVMOD_OFF            (0)  		/* ï¿½ï¿½ï¿½È‚ï¿½ */
+#define SCE_ATOK_KUTOUCNVMOD_ON             (1)  		/* ï¿½ï¿½ï¿½ï¿½   */
+/* SCE_ATOK_CONFIG_KUTOUCNVDETAIL : ï¿½ï¿½Ç“_ï¿½ÏŠï¿½ï¿½ÌÚ×Ý’ï¿½ */
+#define SCE_ATOK_KUTOUCNVDETAIL_KUTEN       (1<<0)		/* ï¿½B(ï¿½ï¿½_)ï¿½Å•ÏŠï¿½   */
+#define SCE_ATOK_KUTOUCNVDETAIL_DOKUTEN     (1<<1)		/* ï¿½A(ï¿½Ç“_)ï¿½Å•ÏŠï¿½   */
+#define SCE_ATOK_KUTOUCNVDETAIL_GIMONFU     (1<<2)		/* ï¿½H(ï¿½^ï¿½â•„)ï¿½Å•ÏŠï¿½ */
+#define SCE_ATOK_KUTOUCNVDETAIL_KANTANFU    (1<<3)		/* ï¿½I(ï¿½ï¿½ï¿½Qï¿½ï¿½)ï¿½Å•ÏŠï¿½ */
+/* SCE_ATOK_CONFIG_FURIGANAMODE : ï¿½Ó‚è‚ªï¿½È“ï¿½ï¿½Íƒï¿½ï¿½[ï¿½h */
+#define SCE_ATOK_FURIGANAMODE_FINISH        (0)  		/* ï¿½Iï¿½ï¿½ */
+#define SCE_ATOK_FURIGANAMODE_START         (1)  		/* ï¿½Jï¿½n */
+/* SCE_ATOK_CONFIG_PUTCURSORMODE : ï¿½ï¿½ï¿½mï¿½è•¶ï¿½ï¿½ï¿½ñ––”ï¿½ï¿½ÉƒJï¿½[ï¿½\ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç‰ï¿½ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½È‚ï¿½ */
+#define SCE_ATOK_PUTCURSORMODE_OFF          (0)  		/* ï¿½ï¿½ï¿½È‚ï¿½ */
+#define SCE_ATOK_PUTCURSORMODE_ON           (1)  		/* ï¿½ï¿½ï¿½ï¿½   */
+/* SCE_ATOK_CONFIG_PREANALYZE : ï¿½ï¿½ï¿½ÍŽï¿½ï¿½ÌŽï¿½ï¿½ï¿½ï¿½ï¿½Ç‚Ý‚ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½È‚ï¿½ */
 #define SCE_ATOK_PREANALYZE_OFF             (0)
 #define SCE_ATOK_PREANALYZE_ON              (1)
-/* SCE_ATOK_CONFIG_OKURIMODE : ‘—‚è‚ª‚Èƒ‚[ƒh */
-#define SCE_ATOK_OKURIMODE_HONSOKU          (0)  		/* 0= –{‘¥(³‚µ‚¢“ú–{Œê) */
-#define SCE_ATOK_OKURIMODE_HABUKU           (1)  		/* 1= È‚­ */
-#define SCE_ATOK_OKURIMODE_OKURU            (2)  		/* 2= ‘—‚é */
-/* SCE_ATOK_CONFIG_RULEDZENCNV : ‘SŠp•ÏŠ·—áŠO‹K‘¥‚ÌÝ’è */
-#define SCE_ATOK_RULEDZENCNV_TILDE          (1<<0)		/* u~v¨u`v*/
+/* SCE_ATOK_CONFIG_OKURIMODE : ï¿½ï¿½ï¿½è‚ªï¿½Èƒï¿½ï¿½[ï¿½h */
+#define SCE_ATOK_OKURIMODE_HONSOKU          (0)  		/* 0= ï¿½{ï¿½ï¿½(ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½{ï¿½ï¿½) */
+#define SCE_ATOK_OKURIMODE_HABUKU           (1)  		/* 1= ï¿½È‚ï¿½ */
+#define SCE_ATOK_OKURIMODE_OKURU            (2)  		/* 2= ï¿½ï¿½ï¿½ï¿½ */
+/* SCE_ATOK_CONFIG_RULEDZENCNV : ï¿½Sï¿½pï¿½ÏŠï¿½ï¿½ï¿½Oï¿½Kï¿½ï¿½ï¿½ÌÝ’ï¿½ */
+#define SCE_ATOK_RULEDZENCNV_TILDE          (1<<0)		/* ï¿½u~ï¿½vï¿½ï¿½ï¿½uï¿½`ï¿½v*/
 
 
 
-/* •ÒW—pƒL[ƒR[ƒh‚Ì’l‚ð’è‹`
- * sceAtokEditConv()ŠÖ”‚Ìˆø”‚Æ‚µ‚ÄŽg—p‚µ‚Ü‚·
+/* ï¿½ÒWï¿½pï¿½Lï¿½[ï¿½Rï¿½[ï¿½hï¿½Ì’lï¿½ï¿½ï¿½`
+ * sceAtokEditConv()ï¿½Öï¿½ï¿½Ìˆï¿½ï¿½ï¿½ï¿½Æ‚ï¿½ï¿½ÄŽgï¿½pï¿½ï¿½ï¿½Ü‚ï¿½
  */
-#define SCE_ATOK_EDIT_BACKSPACE     (0x0100)	/* ¶•¶Žš1•¶Žšíœ(BACKSPACE) */
-#define SCE_ATOK_EDIT_DELETE        (0x0101)	/* ƒJ[ƒ\ƒ‹ˆÊ’u‚Ì1•¶Žšíœ(DELETE) */
-#define SCE_ATOK_EDIT_CURRIGHT      (0x0102)	/* ƒJ[ƒ\ƒ‹ˆÚ“®(‰E) */
-#define SCE_ATOK_EDIT_CURLEFT       (0x0103)	/* ƒJ[ƒ\ƒ‹ˆÚ“®(¶) */
-#define SCE_ATOK_EDIT_CUREND        (0x0104)	/* ƒJ[ƒ\ƒ‹ˆÚ“®(•¶––) */
-#define SCE_ATOK_EDIT_CURTOP        (0x0105)	/* ƒJ[ƒ\ƒ‹ˆÚ“®(•¶“ª) */
-#define SCE_ATOK_EDIT_CONVFORWARD   (0x0107)	/* •ÏŠ·AŽŸŒó•â‡ŽŸŽæ“¾ */
-#define SCE_ATOK_EDIT_CONVBACKWARD  (0x0108)	/* •ÏŠ·AŽŸŒó•â‡ŽŸŽæ“¾ */
-#define SCE_ATOK_EDIT_1ONKAKUTEI    (0x010A)	/* 1‰¹Šm’è */
-#define SCE_ATOK_EDIT_POSTCONVHIRA  (0x010B)	/* Œã•ÏŠ·:‚Ð‚ç‚ª‚È */
-#define SCE_ATOK_EDIT_POSTCONVKANA  (0x010C)	/* Œã•ÏŠ·:ƒJƒ^ƒJƒi */
-#define SCE_ATOK_EDIT_POSTCONVHALF  (0x010D)	/* Œã•ÏŠ·:”¼Šp */
-#define SCE_ATOK_EDIT_POSTCONVRAW   (0x010E)	/* Œã•ÏŠ·:–³•ÏŠ· */
-#define SCE_ATOK_EDIT_DICCONV       (0x010F)	/* Ž«‘Žw’è•ÏŠ· */
-#define SCE_ATOK_EDIT_KAKUTEIPART   (0x0110)	/* •”•ªŠm’è */
-#define SCE_ATOK_EDIT_KAKUTEIALL    (0x0111)	/* ‘S•¶Šm’è */
-#define SCE_ATOK_EDIT_DELETEALL     (0x0112)	/* ‘S•¶Žšíœ */
-#define SCE_ATOK_EDIT_KAKUTEIREP    (0x0113)	/* Šm’èƒŠƒs[ƒg */
-#define SCE_ATOK_EDIT_KAKUTEIUNDO   (0x0114)	/* Šm’èƒAƒ“ƒhƒD */
-#define SCE_ATOK_EDIT_KAKUTEIHEAD   (0x0115)	/* •¶“ª•¶ŽšŠm’è */
-#define SCE_ATOK_EDIT_KAKUTEITAIL   (0x0116)	/* •¶––•¶ŽšŠm’è */
-#define SCE_ATOK_EDIT_CONVCANCEL    (0x0117)	/* •ÏŠ·ƒLƒƒƒ“ƒZƒ‹(’–Ú•¶ßˆÈ~) */
-#define SCE_ATOK_EDIT_CANCELALL     (0x0118)	/* ‘S•ÏŠ·Žæ‚èÁ‚µ */
-#define SCE_ATOK_EDIT_FOCUSRIGHT    (0x0119)	/* ’–Ú•¶ß‹æØ‚è‚ð1•¶Žš‚Ì‚Î‚· */
-#define SCE_ATOK_EDIT_FOCUSLEFT     (0x011A)	/* ’–Ú•¶ß‹æØ‚è‚ð1•¶Žšk‚ß‚é */
-#define SCE_ATOK_EDIT_MOVFOCUSCLAUS (0x011B)	/* ’–Ú•¶ßˆÚ“® •¶ß‹æØ‚è’¼‚µ’†‚É‚ÍŽg‚¦‚Ü‚¹‚ñ */
-#define SCE_ATOK_EDIT_SELECTCAND    (0x011E)	/* Œó•â‘I‘ðˆÚ“® */
+#define SCE_ATOK_EDIT_BACKSPACE     (0x0100)	/* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½1ï¿½ï¿½ï¿½ï¿½ï¿½íœ(BACKSPACE) */
+#define SCE_ATOK_EDIT_DELETE        (0x0101)	/* ï¿½Jï¿½[ï¿½\ï¿½ï¿½ï¿½Ê’uï¿½ï¿½1ï¿½ï¿½ï¿½ï¿½ï¿½íœ(DELETE) */
+#define SCE_ATOK_EDIT_CURRIGHT      (0x0102)	/* ï¿½Jï¿½[ï¿½\ï¿½ï¿½ï¿½Ú“ï¿½(ï¿½E) */
+#define SCE_ATOK_EDIT_CURLEFT       (0x0103)	/* ï¿½Jï¿½[ï¿½\ï¿½ï¿½ï¿½Ú“ï¿½(ï¿½ï¿½) */
+#define SCE_ATOK_EDIT_CUREND        (0x0104)	/* ï¿½Jï¿½[ï¿½\ï¿½ï¿½ï¿½Ú“ï¿½(ï¿½ï¿½ï¿½ï¿½) */
+#define SCE_ATOK_EDIT_CURTOP        (0x0105)	/* ï¿½Jï¿½[ï¿½\ï¿½ï¿½ï¿½Ú“ï¿½(ï¿½ï¿½ï¿½ï¿½) */
+#define SCE_ATOK_EDIT_CONVFORWARD   (0x0107)	/* ï¿½ÏŠï¿½ï¿½Aï¿½ï¿½ï¿½ï¿½â‡ï¿½ï¿½ï¿½æ“¾ */
+#define SCE_ATOK_EDIT_CONVBACKWARD  (0x0108)	/* ï¿½ÏŠï¿½ï¿½Aï¿½ï¿½ï¿½ï¿½â‡ï¿½ï¿½ï¿½æ“¾ */
+#define SCE_ATOK_EDIT_1ONKAKUTEI    (0x010A)	/* 1ï¿½ï¿½ï¿½mï¿½ï¿½ */
+#define SCE_ATOK_EDIT_POSTCONVHIRA  (0x010B)	/* ï¿½ï¿½ÏŠï¿½:ï¿½Ð‚ç‚ªï¿½ï¿½ */
+#define SCE_ATOK_EDIT_POSTCONVKANA  (0x010C)	/* ï¿½ï¿½ÏŠï¿½:ï¿½Jï¿½^ï¿½Jï¿½i */
+#define SCE_ATOK_EDIT_POSTCONVHALF  (0x010D)	/* ï¿½ï¿½ÏŠï¿½:ï¿½ï¿½ï¿½p */
+#define SCE_ATOK_EDIT_POSTCONVRAW   (0x010E)	/* ï¿½ï¿½ÏŠï¿½:ï¿½ï¿½ï¿½ÏŠï¿½ */
+#define SCE_ATOK_EDIT_DICCONV       (0x010F)	/* ï¿½ï¿½ï¿½ï¿½ï¿½wï¿½ï¿½ÏŠï¿½ */
+#define SCE_ATOK_EDIT_KAKUTEIPART   (0x0110)	/* ï¿½ï¿½ï¿½ï¿½ï¿½mï¿½ï¿½ */
+#define SCE_ATOK_EDIT_KAKUTEIALL    (0x0111)	/* ï¿½Sï¿½ï¿½ï¿½mï¿½ï¿½ */
+#define SCE_ATOK_EDIT_DELETEALL     (0x0112)	/* ï¿½Sï¿½ï¿½ï¿½ï¿½ï¿½íœ */
+#define SCE_ATOK_EDIT_KAKUTEIREP    (0x0113)	/* ï¿½mï¿½èƒŠï¿½sï¿½[ï¿½g */
+#define SCE_ATOK_EDIT_KAKUTEIUNDO   (0x0114)	/* ï¿½mï¿½ï¿½Aï¿½ï¿½ï¿½hï¿½D */
+#define SCE_ATOK_EDIT_KAKUTEIHEAD   (0x0115)	/* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½mï¿½ï¿½ */
+#define SCE_ATOK_EDIT_KAKUTEITAIL   (0x0116)	/* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½mï¿½ï¿½ */
+#define SCE_ATOK_EDIT_CONVCANCEL    (0x0117)	/* ï¿½ÏŠï¿½ï¿½Lï¿½ï¿½ï¿½ï¿½ï¿½Zï¿½ï¿½(ï¿½ï¿½ï¿½Ú•ï¿½ï¿½ßˆÈ~) */
+#define SCE_ATOK_EDIT_CANCELALL     (0x0118)	/* ï¿½Sï¿½ÏŠï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
+#define SCE_ATOK_EDIT_FOCUSRIGHT    (0x0119)	/* ï¿½ï¿½ï¿½Ú•ï¿½ï¿½ß‹ï¿½Ø‚ï¿½ï¿½1ï¿½ï¿½ï¿½ï¿½ï¿½Ì‚Î‚ï¿½ */
+#define SCE_ATOK_EDIT_FOCUSLEFT     (0x011A)	/* ï¿½ï¿½ï¿½Ú•ï¿½ï¿½ß‹ï¿½Ø‚ï¿½ï¿½1ï¿½ï¿½ï¿½ï¿½ï¿½kï¿½ß‚ï¿½ */
+#define SCE_ATOK_EDIT_MOVFOCUSCLAUS (0x011B)	/* ï¿½ï¿½ï¿½Ú•ï¿½ï¿½ßˆÚ“ï¿½ ï¿½ï¿½ï¿½ß‹ï¿½Ø‚è’¼ï¿½ï¿½ï¿½ï¿½ï¿½É‚ÍŽgï¿½ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½ */
+#define SCE_ATOK_EDIT_SELECTCAND    (0x011E)	/* ï¿½ï¿½ï¿½Iï¿½ï¿½Ú“ï¿½ */
 
 
-/* ATOK ƒL[“ü—Íó‘Ô‚Ì’è‹`
- * sceAtokGetInputState()ŠÖ”‚Ì–ß‚è’l
+/* ATOK ï¿½Lï¿½[ï¿½ï¿½ï¿½Íï¿½Ô‚Ì’ï¿½`
+ * sceAtokGetInputState()ï¿½Öï¿½ï¿½Ì–ß‚ï¿½l
  */
-#define SCE_ATOK_ISTATE_BEFOREINPUT     (0)		/* –¢“ü—Í */
-#define SCE_ATOK_ISTATE_BEFORECONVERT   (1)		/* •ÏŠ·‘O */
-#define SCE_ATOK_ISTATE_CONVERTING      (2)		/* •ÏŠ·’† */
-#define SCE_ATOK_ISTATE_CANDEMPTY       (3)		/* Œó•âØ‚ê(Œó•â‚È‚µ) */
-#define SCE_ATOK_ISTATE_POSTCONVKANA    (4)		/* Œã•ÏŠ·(ƒJƒ^ƒJƒi) */
-#define SCE_ATOK_ISTATE_POSTCONVHALF    (5)		/* Œã•ÏŠ·(”¼Šp) */
-#define SCE_ATOK_ISTATE_POSTCONVRAW     (6)		/* Œã•ÏŠ·(–³•ÏŠ·) */
-#define SCE_ATOK_ISTATE_CANDIDATES      (7)		/* Œó•âˆê—— */
-#define SCE_ATOK_ISTATE_MOVECLAUSEGAP   (8)		/* •¶ß‹æØ‚è’¼‚µ */
+#define SCE_ATOK_ISTATE_BEFOREINPUT     (0)		/* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
+#define SCE_ATOK_ISTATE_BEFORECONVERT   (1)		/* ï¿½ÏŠï¿½ï¿½O */
+#define SCE_ATOK_ISTATE_CONVERTING      (2)		/* ï¿½ÏŠï¿½ï¿½ï¿½ */
+#define SCE_ATOK_ISTATE_CANDEMPTY       (3)		/* ï¿½ï¿½ï¿½Ø‚ï¿½(ï¿½ï¿½ï¿½È‚ï¿½) */
+#define SCE_ATOK_ISTATE_POSTCONVKANA    (4)		/* ï¿½ï¿½ÏŠï¿½(ï¿½Jï¿½^ï¿½Jï¿½i) */
+#define SCE_ATOK_ISTATE_POSTCONVHALF    (5)		/* ï¿½ï¿½ÏŠï¿½(ï¿½ï¿½ï¿½p) */
+#define SCE_ATOK_ISTATE_POSTCONVRAW     (6)		/* ï¿½ï¿½ÏŠï¿½(ï¿½ï¿½ï¿½ÏŠï¿½) */
+#define SCE_ATOK_ISTATE_CANDIDATES      (7)		/* ï¿½ï¿½ï¿½ê—— */
+#define SCE_ATOK_ISTATE_MOVECLAUSEGAP   (8)		/* ï¿½ï¿½ï¿½ß‹ï¿½Ø‚è’¼ï¿½ï¿½ */
 
 
 
 
-/* ƒvƒƒgƒ^ƒCƒvéŒ¾ */
-/*erx‰»—p*/
+/* ï¿½vï¿½ï¿½ï¿½gï¿½^ï¿½Cï¿½vï¿½éŒ¾ */
+/*erxï¿½ï¿½ï¿½p*/
 void *sceAtokGetErxEntries(void);
 
-/* ATOK‚Ì‰Šú‰» */
+/* ATOKï¿½Ìï¿½ï¿½ï¿½ï¿½ï¿½ */
 int sceAtokInit(sceAtokContext *context, const char *sysdic, const char *userdic ,const char *sysconf, const void *loadaddr);
-/* ATOK‚ÌƒŠƒZƒbƒg */
+/* ATOKï¿½Ìƒï¿½ï¿½Zï¿½bï¿½g */
 int sceAtokReset(sceAtokContext *context);
-/* ATOK‚Ì‰ð•ú */
+/* ATOKï¿½Ì‰ï¿½ï¿½ */
 int sceAtokExit(sceAtokContext *context);
 
-/* ATOK‚ÌŠeŽíƒRƒ“ƒtƒBƒMƒ…ƒŒ[ƒVƒ‡ƒ“‚Ì“Ç‚Ýo‚µ‚¨‚æ‚ÑÝ’è */
+/* ATOKï¿½ÌŠeï¿½ï¿½Rï¿½ï¿½ï¿½tï¿½Bï¿½Mï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½Ì“Ç‚Ýoï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÑÝ’ï¿½ */
 int sceAtokGetConfig(sceAtokContext *context, sceAtokConfig *config, unsigned long bits);
 int sceAtokSetConfig(sceAtokContext *context, const sceAtokConfig *config, unsigned long bits);
 
 
-/* ATOK‚ÉƒRƒ}ƒ“ƒh‚ð”­s‚·‚éŠÖ” */
-int sceAtokEditConv(sceAtokContext *context, int cmd, int param);  /* •ÒW,•ÏŠ·ˆ— */
-int sceAtokKanjiOn(sceAtokContext *context);                       /* Š¿Žšƒ‚[ƒhON */
-int sceAtokKanjiOff(sceAtokContext *context);                      /* Š¿Žšƒ‚[ƒhOFF */
-int sceAtokUndoClear(sceAtokContext *context);                     /* Šm’èƒAƒ“ƒhƒD‚Ì–³Œø‰» */
-int sceAtokConvAll(sceAtokContext *context, const char *str, int mode); /* ˆêŠ‡“Ç‚Ý•ÏŠ·ˆ— */
+/* ATOKï¿½ÉƒRï¿½}ï¿½ï¿½ï¿½hï¿½ð”­sï¿½ï¿½ï¿½ï¿½Öï¿½ */
+int sceAtokEditConv(sceAtokContext *context, int cmd, int param);  /* ï¿½ÒW,ï¿½ÏŠï¿½ï¿½ï¿½ï¿½ï¿½ */
+int sceAtokKanjiOn(sceAtokContext *context);                       /* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½hON */
+int sceAtokKanjiOff(sceAtokContext *context);                      /* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½hOFF */
+int sceAtokUndoClear(sceAtokContext *context);                     /* ï¿½mï¿½ï¿½Aï¿½ï¿½ï¿½hï¿½Dï¿½Ì–ï¿½ï¿½ï¿½ï¿½ï¿½ */
+int sceAtokConvAll(sceAtokContext *context, const char *str, int mode); /* ï¿½êŠ‡ï¿½Ç‚Ý•ÏŠï¿½ï¿½ï¿½ï¿½ï¿½ */
 
 
-/* ATOKƒRƒ“ƒeƒLƒXƒg“à‚Ìƒ[ƒNî•ñ‚ðŽæ“¾‚·‚éŠÖ” */
-int sceAtokGetKanjiState(sceAtokContext *context);     /* ATOKŽåó‘Ô‚ðŽæ“¾ */
-int sceAtokGetInputState(sceAtokContext *context);     /* “ü—Íó‘Ô‚ðŽæ“¾   */
+/* ATOKï¿½Rï¿½ï¿½ï¿½eï¿½Lï¿½Xï¿½gï¿½ï¿½Ìƒï¿½ï¿½[ï¿½Nï¿½ï¿½ï¿½ï¿½æ“¾ï¿½ï¿½ï¿½ï¿½Öï¿½ */
+int sceAtokGetKanjiState(sceAtokContext *context);     /* ATOKï¿½ï¿½ï¿½Ô‚ï¿½æ“¾ */
+int sceAtokGetInputState(sceAtokContext *context);     /* ï¿½ï¿½ï¿½Íï¿½Ô‚ï¿½æ“¾   */
 
-int sceAtokGetFocusClauseTop(sceAtokContext *context);    /* ƒtƒH[ƒJƒX(ƒJ[ƒ\ƒ‹)æ“ªˆÊ’u‚ÌŽæ“¾ */
-int sceAtokGetFocusClauseLen(sceAtokContext *context);    /* ƒtƒH[ƒJƒX‘I‘ðƒoƒCƒg”‚ÌŽæ“¾(0:‚È‚µ) */
-int sceAtokGetFocusClauseIndex(sceAtokContext *context);  /* ƒtƒH[ƒJƒX‚ª‚ ‚é•¶ß”Ô†‚ð“¾‚é */
+int sceAtokGetFocusClauseTop(sceAtokContext *context);    /* ï¿½tï¿½Hï¿½[ï¿½Jï¿½X(ï¿½Jï¿½[ï¿½\ï¿½ï¿½)ï¿½æ“ªï¿½Ê’uï¿½ÌŽæ“¾ */
+int sceAtokGetFocusClauseLen(sceAtokContext *context);    /* ï¿½tï¿½Hï¿½[ï¿½Jï¿½Xï¿½Iï¿½ï¿½oï¿½Cï¿½gï¿½ï¿½ï¿½ÌŽæ“¾(0:ï¿½È‚ï¿½) */
+int sceAtokGetFocusClauseIndex(sceAtokContext *context);  /* ï¿½tï¿½Hï¿½[ï¿½Jï¿½Xï¿½ï¿½ï¿½ï¿½ï¿½é•¶ï¿½ß”Ôï¿½ï¿½ð“¾‚ï¿½ */
 
-int sceAtokGetCurrentCandidateIndex(sceAtokContext *context); /* Œ»Ý‚Ì‘I‘ðŒó•â”Ô†       */
-int sceAtokGetCandidateCount(sceAtokContext *context);        /* Œó•âƒŠƒXƒg‚ðŽæ“¾         */
-int sceAtokGetCandidateListSize(sceAtokContext *context);     /* Œó•âƒŠƒXƒg‚ÌƒTƒCƒY‚ðŽæ“¾ */
-int sceAtokGetCandidateList(sceAtokContext *context, char *buf, int size); /* Œó•âƒŠƒXƒg‚ÌŽæ“¾ */
+int sceAtokGetCurrentCandidateIndex(sceAtokContext *context); /* ï¿½ï¿½ï¿½Ý‚Ì‘Iï¿½ï¿½ï¿½ï¿½Ôï¿½       */
+int sceAtokGetCandidateCount(sceAtokContext *context);        /* ï¿½ï¿½âƒŠï¿½Xï¿½gï¿½ï¿½æ“¾         */
+int sceAtokGetCandidateListSize(sceAtokContext *context);     /* ï¿½ï¿½âƒŠï¿½Xï¿½gï¿½ÌƒTï¿½Cï¿½Yï¿½ï¿½æ“¾ */
+int sceAtokGetCandidateList(sceAtokContext *context, char *buf, int size); /* ï¿½ï¿½âƒŠï¿½Xï¿½gï¿½ÌŽæ“¾ */
 
 
-/* Šm’è•¶Žš—ñ‚ÆŠm’è“Ç‚Ý•¶Žš—ñ‚ðƒtƒ‰ƒbƒVƒ…‚·‚é */
+/* ï¿½mï¿½è•¶ï¿½ï¿½ï¿½ï¿½ÆŠmï¿½ï¿½Ç‚Ý•ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½tï¿½ï¿½ï¿½bï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
 int sceAtokFlushConverted(sceAtokContext *context);
-/* Šm’è•¶Žš—ñ‚Ì•¶‚ðƒoƒbƒtƒ@‚ÉŽó‚¯Žæ‚é */
+/* ï¿½mï¿½è•¶ï¿½ï¿½ï¿½ï¿½Ì•ï¿½ï¿½ï¿½oï¿½bï¿½tï¿½@ï¿½ÉŽó‚¯Žï¿½ï¿½ */
 int sceAtokGetConvertedStr(sceAtokContext *context, char *buf, unsigned int size);
-/* Šm’è“Ç‚Ý•¶Žš—ñ‚Ì•¶‚ðƒoƒbƒtƒ@‚ÉŽó‚¯Žæ‚é */
+/* ï¿½mï¿½ï¿½Ç‚Ý•ï¿½ï¿½ï¿½ï¿½ï¿½Ì•ï¿½ï¿½ï¿½oï¿½bï¿½tï¿½@ï¿½ÉŽó‚¯Žï¿½ï¿½ */
 int sceAtokGetConvertedReadStr(sceAtokContext *context, char *buf, unsigned int size);
 
-/* –¢Šm’è•¶Žš—ñ‚Ì•¶‚ðƒoƒbƒtƒ@‚ÉŽó‚¯Žæ‚é */
+/* ï¿½ï¿½ï¿½mï¿½è•¶ï¿½ï¿½ï¿½ï¿½Ì•ï¿½ï¿½ï¿½oï¿½bï¿½tï¿½@ï¿½ÉŽó‚¯Žï¿½ï¿½ */
 int sceAtokGetConvertingStr(sceAtokContext *context, char *buf, unsigned int size);
-/* –¢’è“Ç‚Ý•¶Žš—ñ‚Ì•¶‚ðƒoƒbƒtƒ@‚ÉŽó‚¯Žæ‚é */
+/* ï¿½ï¿½ï¿½ï¿½Ç‚Ý•ï¿½ï¿½ï¿½ï¿½ï¿½Ì•ï¿½ï¿½ï¿½oï¿½bï¿½tï¿½@ï¿½ÉŽó‚¯Žï¿½ï¿½ */
 int sceAtokGetConvertingReadStr(sceAtokContext *context, char *buf, unsigned int size);
 
-/* –¢Šm’è•¶Žš—ñ‚Ì•¶ß”‚ðŽæ“¾ */
+/* ï¿½ï¿½ï¿½mï¿½è•¶ï¿½ï¿½ï¿½ï¿½Ì•ï¿½ï¿½ßï¿½ï¿½ï¿½æ“¾ */
 int sceAtokGetConvertingClauseCount(sceAtokContext *context);
-/* –¢Šm’è•¶Žš—ñ‚ð•¶ß‚²‚Æ‚ÉŽæ“¾ */
+/* ï¿½ï¿½ï¿½mï¿½è•¶ï¿½ï¿½ï¿½ï¿½ð•¶ß‚ï¿½ï¿½Æ‚ÉŽæ“¾ */
 int sceAtokGetConvertingClause(sceAtokContext *context, char *buf, unsigned int size, int index );
 
 int sceAtokDicDelWord(sceAtokContext *p, int p1, int p2, const char *pszWord, const char *pszReading, int iMode);

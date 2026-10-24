@@ -44,8 +44,8 @@
 #endif
 
 /*
- * –¢’è‹`ƒGƒ‰[”Ô†‚Ì’è‹`:
- *     errno.h ‚Ì EE/IOP ‚É‚¨‚¯‚é·ˆÙ‚ð‹zŽû
+ * ï¿½ï¿½ï¿½ï¿½`ï¿½Gï¿½ï¿½ï¿½[ï¿½Ôï¿½ï¿½Ì’ï¿½`:
+ *     errno.h ï¿½ï¿½ EE/IOP ï¿½É‚ï¿½ï¿½ï¿½ï¿½é·ï¿½Ù‚ï¿½zï¿½ï¿½
  */
 #ifndef EFORMAT
 #define EFORMAT		47
@@ -58,131 +58,131 @@
 #endif
 
 /*
- * `SCE_' ƒvƒŒƒtƒBƒbƒNƒX•t‚«•W€ƒGƒ‰[”Ô†
+ * `SCE_' ï¿½vï¿½ï¿½ï¿½tï¿½Bï¿½bï¿½Nï¿½Xï¿½tï¿½ï¿½ï¿½Wï¿½ï¿½ï¿½Gï¿½ï¿½ï¿½[ï¿½Ôï¿½
  */
 #include <sceerr.h>
 
 /*
- * SCE “ÆŽ©’è‹`ƒGƒ‰[”Ô†:
- * errno.h/kerror.h –¢’è‹`ƒGƒ‰[”Ô† (‰ºˆÊ 16 ƒrƒbƒg: SCE_EBASE..0xffff)
+ * SCE ï¿½ÆŽï¿½ï¿½ï¿½`ï¿½Gï¿½ï¿½ï¿½[ï¿½Ôï¿½:
+ * errno.h/kerror.h ï¿½ï¿½ï¿½ï¿½`ï¿½Gï¿½ï¿½ï¿½[ï¿½Ôï¿½ (ï¿½ï¿½ï¿½ï¿½ 16 ï¿½rï¿½bï¿½g: SCE_EBASE..0xffff)
  *     errno.h:         0-1xx
  *     kerror.h(IOP): 100-4xx
  */
 
 #define SCE_EBASE		0x8000		/* 32768 (decimal) */
 
-/* ‘ÎÛ‚ª”Ä—p‚ÈƒGƒ‰[ */
-#define SCE_EINIT		0x8001		/* ‰Šú‰»ˆ—‚ªs‚í‚ê‚Ä‚¢‚È‚¢	*/
-#define SCE_EID			0x8002		/* ID ‚ª‘¶Ý‚µ‚È‚¢		*/
-#define SCE_ESEMAPHORE		0x8003		/* ƒZƒ}ƒtƒHˆ—‚ªs‚¦‚È‚¢	*/
+/* ï¿½ÎÛ‚ï¿½ï¿½Ä—pï¿½ÈƒGï¿½ï¿½ï¿½[ */
+#define SCE_EINIT		0x8001		/* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½sï¿½ï¿½ï¿½Ä‚ï¿½ï¿½È‚ï¿½	*/
+#define SCE_EID			0x8002		/* ID ï¿½ï¿½ï¿½ï¿½ï¿½Ý‚ï¿½ï¿½È‚ï¿½		*/
+#define SCE_ESEMAPHORE		0x8003		/* ï¿½Zï¿½}ï¿½tï¿½Hï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½sï¿½ï¿½ï¿½È‚ï¿½	*/
 #define SCE_ESEMA		SCE_ESEMAPHORE
-#define SCE_ETHREAD		0x8004		/* ƒXƒŒƒbƒhˆ—‚ªs‚¦‚È‚¢	*/
-#define SCE_ETIMER		0x8005		/* ƒ^ƒCƒ}[/ƒAƒ‰[ƒ€ˆ—‚ªs‚¦‚È‚¢ */
-#define SCE_EHANDLER		0x8006		/* ƒnƒ“ƒhƒ‰“o˜^ˆ—‚ªs‚¦‚È‚¢	*/
-#define SCE_EILLEGAL_CONTEXT	0x8007		/* —áŠOEŠ„‚èž‚Ýƒnƒ“ƒhƒ‰‚©‚ç‚ÌŒÄ‚Ño‚µ */
-#define SCE_ECPUDI		0x8008		/* Šù‚ÉŠ„‚èž‚Ý‹ÖŽ~‚¾‚Á‚½	*/
-#define	SCE_EVERSION		0x8009		/* ƒ‚ƒWƒ…[ƒ‹‚Ìƒo[ƒWƒ‡ƒ“•s®‡ */
-#define	SCE_ERPC		0x800a		/* SIF RPC‚Ì”­s‚ªs‚¦‚È‚¢ */
-#define SCE_EUSB		0x800b		/* USB ’ÊM‚ªˆÙí		*/
-#define SCE_EREGISTER		0x800c		/* “o˜^ˆ—‚ªs‚í‚ê‚Ä‚¢‚È‚¢	*/
+#define SCE_ETHREAD		0x8004		/* ï¿½Xï¿½ï¿½ï¿½bï¿½hï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½sï¿½ï¿½ï¿½È‚ï¿½	*/
+#define SCE_ETIMER		0x8005		/* ï¿½^ï¿½Cï¿½}ï¿½[/ï¿½Aï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½sï¿½ï¿½ï¿½È‚ï¿½ */
+#define SCE_EHANDLER		0x8006		/* ï¿½nï¿½ï¿½ï¿½hï¿½ï¿½ï¿½oï¿½^ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½sï¿½ï¿½ï¿½È‚ï¿½	*/
+#define SCE_EILLEGAL_CONTEXT	0x8007		/* ï¿½ï¿½Oï¿½Eï¿½ï¿½ï¿½èžï¿½Ýƒnï¿½ï¿½ï¿½hï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÌŒÄ‚Ñoï¿½ï¿½ */
+#define SCE_ECPUDI		0x8008		/* ï¿½ï¿½ï¿½ÉŠï¿½ï¿½èžï¿½Ý‹ÖŽ~ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½	*/
+#define	SCE_EVERSION		0x8009		/* ï¿½ï¿½ï¿½Wï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½Ìƒoï¿½[ï¿½Wï¿½ï¿½ï¿½ï¿½ï¿½sï¿½ï¿½ï¿½ï¿½ */
+#define	SCE_ERPC		0x800a		/* SIF RPCï¿½Ì”ï¿½ï¿½sï¿½ï¿½ï¿½sï¿½ï¿½ï¿½È‚ï¿½ */
+#define SCE_EUSB		0x800b		/* USB ï¿½ÊMï¿½ï¿½ï¿½Ùï¿½		*/
+#define SCE_EREGISTER		0x800c		/* ï¿½oï¿½^ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½sï¿½ï¿½ï¿½Ä‚ï¿½ï¿½È‚ï¿½	*/
 
-/* ƒ‰ƒCƒuƒ‰ƒŠˆË‘¶‚ÈƒGƒ‰[ */
+/* ï¿½ï¿½ï¿½Cï¿½uï¿½ï¿½ï¿½ï¿½ï¿½Ë‘ï¿½ï¿½ÈƒGï¿½ï¿½ï¿½[ */
 #define SCE_EBASE_LIB		0x9000		/* 36864 (decimal) */
 
-#define SCE_EDEVICE_BROKEN	0x9001		/* ƒfƒoƒCƒX”j‘¹‚Ì‰Â”\«		*/
-#define SCE_EFILE_BROKEN	0x9002		/* ƒtƒ@ƒCƒ‹‚Ü‚½‚ÍƒfƒBƒŒƒNƒgƒŠ”j‘¹‚Ì‰Â”\« */
-#define SCE_ENEW_DEVICE		0x9003		/* V‹KƒfƒoƒCƒXŒŸo		*/
-#define SCE_EMDEPTH		0x9004		/* ƒfƒBƒŒƒNƒgƒŠ‚ª[‰ß‚¬‚é	*/
+#define SCE_EDEVICE_BROKEN	0x9001		/* ï¿½fï¿½oï¿½Cï¿½Xï¿½jï¿½ï¿½ï¿½Ì‰Â”\ï¿½ï¿½		*/
+#define SCE_EFILE_BROKEN	0x9002		/* ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½Ü‚ï¿½ï¿½Íƒfï¿½Bï¿½ï¿½ï¿½Nï¿½gï¿½ï¿½ï¿½jï¿½ï¿½ï¿½Ì‰Â”\ï¿½ï¿½ */
+#define SCE_ENEW_DEVICE		0x9003		/* ï¿½Vï¿½Kï¿½fï¿½oï¿½Cï¿½Xï¿½ï¿½ï¿½o		*/
+#define SCE_EMDEPTH		0x9004		/* ï¿½fï¿½Bï¿½ï¿½ï¿½Nï¿½gï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½ß‚ï¿½ï¿½ï¿½	*/
 
-#define SCE_ENO_PROGRAM		0x9005		/* ƒvƒƒOƒ‰ƒ€ƒ`ƒƒƒ“ƒN‚ª–³‚¢	*/
-#define SCE_ENO_SAMPLESET	0x9006		/* ƒTƒ“ƒvƒ‹ƒZƒbƒgƒ`ƒƒƒ“ƒN‚ª–³‚¢	*/
-#define SCE_ENO_SAMPLE		0x9007		/* ƒTƒ“ƒvƒ‹ƒ`ƒƒƒ“ƒN‚ª–³‚¢	*/
-#define SCE_ENO_VAGINFO		0x9008		/* VAGInfoƒ`ƒƒƒ“ƒN‚ª–³‚¢	*/
-#define SCE_ENO_SBADDR		0x9009		/* ƒXƒvƒŠƒbƒgƒuƒƒbƒN‚ÌƒAƒhƒŒƒXî•ñ‚ª–³‚¢ */
-#define SCE_EBAD_PNUM		0x9010		/* ƒvƒƒOƒ‰ƒ€ƒiƒ“ƒo[‚Í”ÍˆÍŠO	*/
-#define SCE_ENO_PNUM		0x9011		/* ƒvƒƒOƒ‰ƒ€ƒiƒ“ƒo[‚Í–¢Žg—p	*/
-#define SCE_EBAD_SSNUM		0x9012  	/* ƒTƒ“ƒvƒ‹ƒZƒbƒgƒiƒ“ƒo[‚Í”ÍˆÍŠO */
-#define SCE_ENO_SSNUM		0x9013  	/* ƒTƒ“ƒvƒ‹ƒZƒbƒgƒiƒ“ƒo[‚Í–¢Žg—p */
-#define SCE_EBAD_SPNUM		0x9014  	/* ƒTƒ“ƒvƒ‹ƒiƒ“ƒo[‚Í”ÍˆÍŠO	*/
-#define SCE_ENO_SPNUM		0x9015  	/* ƒTƒ“ƒvƒ‹ƒiƒ“ƒo[‚Í–¢Žg—p	*/
-#define SCE_EBAD_VAGNUM		0x9016  	/* VAGInfoƒiƒ“ƒo[‚Í”ÍˆÍŠO	*/
-#define SCE_ENO_VAGNUM		0x9017  	/* VAGInfoƒiƒ“ƒo[‚Í–¢Žg—p	*/
-#define SCE_EBAD_SBNUM		0x9018  	/* ƒXƒvƒŠƒbƒgƒuƒƒbƒNƒiƒ“ƒo[‚Í”ÍˆÍŠO */
-#define SCE_EVAGINFO_NOISE	0x9019  	/* VAGInfo‚ªŽw‚µŽ¦‚·VAG‚ÍƒmƒCƒY‚Å‚ ‚é */
-#define SCE_ENO_SPLITNUM	0x9020  	/* ƒXƒvƒŠƒbƒgƒiƒ“ƒo[‚Í–¢Žg—p	*/
+#define SCE_ENO_PROGRAM		0x9005		/* ï¿½vï¿½ï¿½ï¿½Oï¿½ï¿½ï¿½ï¿½ï¿½`ï¿½ï¿½ï¿½ï¿½ï¿½Nï¿½ï¿½ï¿½ï¿½ï¿½ï¿½	*/
+#define SCE_ENO_SAMPLESET	0x9006		/* ï¿½Tï¿½ï¿½ï¿½vï¿½ï¿½ï¿½Zï¿½bï¿½gï¿½`ï¿½ï¿½ï¿½ï¿½ï¿½Nï¿½ï¿½ï¿½ï¿½ï¿½ï¿½	*/
+#define SCE_ENO_SAMPLE		0x9007		/* ï¿½Tï¿½ï¿½ï¿½vï¿½ï¿½ï¿½`ï¿½ï¿½ï¿½ï¿½ï¿½Nï¿½ï¿½ï¿½ï¿½ï¿½ï¿½	*/
+#define SCE_ENO_VAGINFO		0x9008		/* VAGInfoï¿½`ï¿½ï¿½ï¿½ï¿½ï¿½Nï¿½ï¿½ï¿½ï¿½ï¿½ï¿½	*/
+#define SCE_ENO_SBADDR		0x9009		/* ï¿½Xï¿½vï¿½ï¿½ï¿½bï¿½gï¿½uï¿½ï¿½ï¿½bï¿½Nï¿½ÌƒAï¿½hï¿½ï¿½ï¿½Xï¿½ï¿½ñ‚ª–ï¿½ï¿½ï¿½ */
+#define SCE_EBAD_PNUM		0x9010		/* ï¿½vï¿½ï¿½ï¿½Oï¿½ï¿½ï¿½ï¿½ï¿½iï¿½ï¿½ï¿½oï¿½[ï¿½Í”ÍˆÍŠO	*/
+#define SCE_ENO_PNUM		0x9011		/* ï¿½vï¿½ï¿½ï¿½Oï¿½ï¿½ï¿½ï¿½ï¿½iï¿½ï¿½ï¿½oï¿½[ï¿½Í–ï¿½ï¿½gï¿½p	*/
+#define SCE_EBAD_SSNUM		0x9012  	/* ï¿½Tï¿½ï¿½ï¿½vï¿½ï¿½ï¿½Zï¿½bï¿½gï¿½iï¿½ï¿½ï¿½oï¿½[ï¿½Í”ÍˆÍŠO */
+#define SCE_ENO_SSNUM		0x9013  	/* ï¿½Tï¿½ï¿½ï¿½vï¿½ï¿½ï¿½Zï¿½bï¿½gï¿½iï¿½ï¿½ï¿½oï¿½[ï¿½Í–ï¿½ï¿½gï¿½p */
+#define SCE_EBAD_SPNUM		0x9014  	/* ï¿½Tï¿½ï¿½ï¿½vï¿½ï¿½ï¿½iï¿½ï¿½ï¿½oï¿½[ï¿½Í”ÍˆÍŠO	*/
+#define SCE_ENO_SPNUM		0x9015  	/* ï¿½Tï¿½ï¿½ï¿½vï¿½ï¿½ï¿½iï¿½ï¿½ï¿½oï¿½[ï¿½Í–ï¿½ï¿½gï¿½p	*/
+#define SCE_EBAD_VAGNUM		0x9016  	/* VAGInfoï¿½iï¿½ï¿½ï¿½oï¿½[ï¿½Í”ÍˆÍŠO	*/
+#define SCE_ENO_VAGNUM		0x9017  	/* VAGInfoï¿½iï¿½ï¿½ï¿½oï¿½[ï¿½Í–ï¿½ï¿½gï¿½p	*/
+#define SCE_EBAD_SBNUM		0x9018  	/* ï¿½Xï¿½vï¿½ï¿½ï¿½bï¿½gï¿½uï¿½ï¿½ï¿½bï¿½Nï¿½iï¿½ï¿½ï¿½oï¿½[ï¿½Í”ÍˆÍŠO */
+#define SCE_EVAGINFO_NOISE	0x9019  	/* VAGInfoï¿½ï¿½ï¿½wï¿½ï¿½ï¿½ï¿½ï¿½ï¿½VAGï¿½Íƒmï¿½Cï¿½Yï¿½Å‚ï¿½ï¿½ï¿½ */
+#define SCE_ENO_SPLITNUM	0x9020  	/* ï¿½Xï¿½vï¿½ï¿½ï¿½bï¿½gï¿½iï¿½ï¿½ï¿½oï¿½[ï¿½Í–ï¿½ï¿½gï¿½p	*/
 
-#define SCE_EINT_HANDLER	0x9021  	/* Š„‚èž‚Ýƒnƒ“ƒhƒ‰ˆ—‚ª•s³	*/
-#define SCE_EDMA_HANDLER	0x9022  	/* DMA Š„‚èž‚Ýƒnƒ“ƒhƒ‰ˆ—‚ª•s³ */
-/*				0x9023	*/ 	/* ƒVƒXƒeƒ€—\–ñ			*/
+#define SCE_EINT_HANDLER	0x9021  	/* ï¿½ï¿½ï¿½èžï¿½Ýƒnï¿½ï¿½ï¿½hï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½sï¿½ï¿½	*/
+#define SCE_EDMA_HANDLER	0x9022  	/* DMA ï¿½ï¿½ï¿½èžï¿½Ýƒnï¿½ï¿½ï¿½hï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½sï¿½ï¿½ */
+/*				0x9023	*/ 	/* ï¿½Vï¿½Xï¿½eï¿½ï¿½ï¿½\ï¿½ï¿½			*/
 
-#define SCE_ENO_MIDI            0x9024		/* Midiƒ`ƒƒƒ“ƒN‚ª–³‚¢		*/
-#define SCE_ENO_SONG            0x9025		/* Songƒ`ƒƒƒ“ƒN‚ª–³‚¢		*/
-#define SCE_ENO_MIDINUM         0x9026		/* Midiƒf[ƒ^ƒuƒƒbƒNƒiƒ“ƒo[‚Í–¢Žg—p */
-#define SCE_ENO_SONGNUM         0x9027		/* Songƒiƒ“ƒo[‚Í–¢Žg—p		*/
-#define SCE_ENO_COMPTABLE       0x9028		/* ˆ³kƒe[ƒuƒ‹‚ª–³‚¢		*/
-#define SCE_EBAD_COMPTABLEINDEX 0x9029		/* ˆ³kƒe[ƒuƒ‹ƒCƒ“ƒfƒbƒNƒX‚Í”ÍˆÍŠO */
-#define SCE_EBAD_POLYKEYDATA    0x902a		/* ƒ|ƒŠƒtƒHƒjƒbƒNƒL[ƒvƒŒƒbƒVƒƒ[‚Í•s³ */
+#define SCE_ENO_MIDI            0x9024		/* Midiï¿½`ï¿½ï¿½ï¿½ï¿½ï¿½Nï¿½ï¿½ï¿½ï¿½ï¿½ï¿½		*/
+#define SCE_ENO_SONG            0x9025		/* Songï¿½`ï¿½ï¿½ï¿½ï¿½ï¿½Nï¿½ï¿½ï¿½ï¿½ï¿½ï¿½		*/
+#define SCE_ENO_MIDINUM         0x9026		/* Midiï¿½fï¿½[ï¿½^ï¿½uï¿½ï¿½ï¿½bï¿½Nï¿½iï¿½ï¿½ï¿½oï¿½[ï¿½Í–ï¿½ï¿½gï¿½p */
+#define SCE_ENO_SONGNUM         0x9027		/* Songï¿½iï¿½ï¿½ï¿½oï¿½[ï¿½Í–ï¿½ï¿½gï¿½p		*/
+#define SCE_ENO_COMPTABLE       0x9028		/* ï¿½ï¿½ï¿½kï¿½eï¿½[ï¿½uï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½		*/
+#define SCE_EBAD_COMPTABLEINDEX 0x9029		/* ï¿½ï¿½ï¿½kï¿½eï¿½[ï¿½uï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½fï¿½bï¿½Nï¿½Xï¿½Í”ÍˆÍŠO */
+#define SCE_EBAD_POLYKEYDATA    0x902a		/* ï¿½|ï¿½ï¿½ï¿½tï¿½Hï¿½jï¿½bï¿½Nï¿½Lï¿½[ï¿½vï¿½ï¿½ï¿½bï¿½Vï¿½ï¿½ï¿½[ï¿½Í•sï¿½ï¿½ */
 
-#define SCE_ELINKERROR		0x902b		/* ƒ[ƒh‚µ‚½ƒ‚ƒWƒ…[ƒ‹‚ª•K—v‚Æ‚·‚éí’“ƒ‰ƒCƒuƒ‰ƒŠ‚ª‘¶Ý‚µ‚È‚¢ */
+#define SCE_ELINKERROR		0x902b		/* ï¿½ï¿½ï¿½[ï¿½hï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Wï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½Kï¿½vï¿½Æ‚ï¿½ï¿½ï¿½í’“ï¿½ï¿½ï¿½Cï¿½uï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý‚ï¿½ï¿½È‚ï¿½ */
 #define SCE_ELINKERR		SCE_ELINKERROR
-#define SCE_EILLEGAL_OBJECT	0x902c		/* ƒIƒuƒWƒFƒNƒgƒtƒ@ƒCƒ‹‚ÌŒ`Ž®‚ª³‚µ‚­‚È‚¢ */
-#define SCE_EUNKNOWN_MODULE 	0x902d		/* Žw’è‚µ‚½ƒ‚ƒWƒ…[ƒ‹‚ªŒ©‚Â‚©‚ç‚È‚¢ */
-#define SCE_EMEMINUSE 		0x902e		/* Žw’è‚µ‚½ƒAƒhƒŒƒX‚ÍŠù‚ÉŽg—p’†	*/
-#define SCE_EALREADY_STARTED	0x902f		/* Žw’è‚µ‚½ƒ‚ƒWƒ…[ƒ‹‚ÍŠù‚ÉƒXƒ^[ƒg‚µ‚Ä‚¢‚é */
-#define SCE_ENOT_STARTED	0x9030		/* Žw’è‚µ‚½ƒ‚ƒWƒ…[ƒ‹‚ÍƒXƒ^[ƒg‚µ‚Ä‚¢‚È‚¢ */
-#define SCE_EALREADY_STOPPING	0x9031		/* Žw’è‚µ‚½ƒ‚ƒWƒ…[ƒ‹‚ÍƒXƒgƒbƒvˆ—’† */
-#define SCE_EALREADY_STOPED	0x9032		/* Žw’è‚µ‚½ƒ‚ƒWƒ…[ƒ‹‚ÍŠù‚ÉƒXƒgƒbƒv‚µ‚Ä‚¢‚é */
-#define SCE_ENOT_STOPPED 	0x9033		/* Žw’è‚µ‚½ƒ‚ƒWƒ…[ƒ‹‚ÍƒXƒgƒbƒv‚µ‚Ä‚¢‚È‚¢ */
-#define SCE_ECAN_NOT_STOP	0x9034		/* ƒ‚ƒWƒ…[ƒ‹‚Ì’âŽ~‚Ío—ˆ‚È‚©‚Á‚½ */
-#define SCE_ENOT_REMOVABLE	0x9035		/* Žw’è‚µ‚½ƒ‚ƒWƒ…[ƒ‹‚Ííœ‰Â”\‚Å‚Í‚È‚¢ */
-#define SCE_ELIBRARY_FOUND 	0x9036		/* ƒ‰ƒCƒuƒ‰ƒŠ‚ÍŠù‚É“o˜^‚³‚ê‚Ä‚¢‚é */
-#define SCE_ELIBRARY_NOTFOUND 	0x9037		/* ƒ‰ƒCƒuƒ‰ƒŠ‚Í“o˜^‚³‚ê‚Ä‚¢‚È‚¢	*/
-#define SCE_ELIBRARY_INUSE	0x9038		/* ƒ‰ƒCƒuƒ‰ƒŠ‚ÍŽg—p’†		*/
-#define SCE_EILLEGAL_LIBRARY 	0x9039		/* ƒ‰ƒCƒuƒ‰ƒŠƒwƒbƒ_‚ªˆÙí	*/
+#define SCE_EILLEGAL_OBJECT	0x902c		/* ï¿½Iï¿½uï¿½Wï¿½Fï¿½Nï¿½gï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½ÌŒ`ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È‚ï¿½ */
+#define SCE_EUNKNOWN_MODULE 	0x902d		/* ï¿½wï¿½è‚µï¿½ï¿½ï¿½ï¿½ï¿½Wï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â‚ï¿½ï¿½ï¿½È‚ï¿½ */
+#define SCE_EMEMINUSE 		0x902e		/* ï¿½wï¿½è‚µï¿½ï¿½ï¿½Aï¿½hï¿½ï¿½ï¿½Xï¿½ÍŠï¿½ï¿½ÉŽgï¿½pï¿½ï¿½	*/
+#define SCE_EALREADY_STARTED	0x902f		/* ï¿½wï¿½è‚µï¿½ï¿½ï¿½ï¿½ï¿½Wï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ÍŠï¿½ï¿½ÉƒXï¿½^ï¿½[ï¿½gï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½ */
+#define SCE_ENOT_STARTED	0x9030		/* ï¿½wï¿½è‚µï¿½ï¿½ï¿½ï¿½ï¿½Wï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ÍƒXï¿½^ï¿½[ï¿½gï¿½ï¿½ï¿½Ä‚ï¿½ï¿½È‚ï¿½ */
+#define SCE_EALREADY_STOPPING	0x9031		/* ï¿½wï¿½è‚µï¿½ï¿½ï¿½ï¿½ï¿½Wï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ÍƒXï¿½gï¿½bï¿½vï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
+#define SCE_EALREADY_STOPED	0x9032		/* ï¿½wï¿½è‚µï¿½ï¿½ï¿½ï¿½ï¿½Wï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ÍŠï¿½ï¿½ÉƒXï¿½gï¿½bï¿½vï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½ */
+#define SCE_ENOT_STOPPED 	0x9033		/* ï¿½wï¿½è‚µï¿½ï¿½ï¿½ï¿½ï¿½Wï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ÍƒXï¿½gï¿½bï¿½vï¿½ï¿½ï¿½Ä‚ï¿½ï¿½È‚ï¿½ */
+#define SCE_ECAN_NOT_STOP	0x9034		/* ï¿½ï¿½ï¿½Wï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½Ì’ï¿½~ï¿½Íoï¿½ï¿½ï¿½È‚ï¿½ï¿½ï¿½ï¿½ï¿½ */
+#define SCE_ENOT_REMOVABLE	0x9035		/* ï¿½wï¿½è‚µï¿½ï¿½ï¿½ï¿½ï¿½Wï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½Ííœï¿½Â”\ï¿½Å‚Í‚È‚ï¿½ */
+#define SCE_ELIBRARY_FOUND 	0x9036		/* ï¿½ï¿½ï¿½Cï¿½uï¿½ï¿½ï¿½ï¿½ï¿½ÍŠï¿½ï¿½É“oï¿½^ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½ */
+#define SCE_ELIBRARY_NOTFOUND 	0x9037		/* ï¿½ï¿½ï¿½Cï¿½uï¿½ï¿½ï¿½ï¿½ï¿½Í“oï¿½^ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½È‚ï¿½	*/
+#define SCE_ELIBRARY_INUSE	0x9038		/* ï¿½ï¿½ï¿½Cï¿½uï¿½ï¿½ï¿½ï¿½ï¿½ÍŽgï¿½pï¿½ï¿½		*/
+#define SCE_EILLEGAL_LIBRARY 	0x9039		/* ï¿½ï¿½ï¿½Cï¿½uï¿½ï¿½ï¿½ï¿½ï¿½wï¿½bï¿½_ï¿½ï¿½ï¿½Ùï¿½	*/
 
-#define SCE_EBAD_FRAME		0x903a		/* Œ»Ý‚ÌƒtƒŒ[ƒ€‚Í•s³		*/
-#define SCE_ENO_STREAM		0x903b		/* ƒJƒƒ‰‚ªƒXƒgƒŠ[ƒ€ó‘Ô‚Å‚È‚¢	*/
-#define SCE_ENO_CAMERA		0x903c		/* ƒJƒƒ‰‚ªÚ‘±‚³‚ê‚Ä‚¢‚È‚¢	*/
+#define SCE_EBAD_FRAME		0x903a		/* ï¿½ï¿½ï¿½Ý‚Ìƒtï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½Í•sï¿½ï¿½		*/
+#define SCE_ENO_STREAM		0x903b		/* ï¿½Jï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Xï¿½gï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ï¿½Ô‚Å‚È‚ï¿½	*/
+#define SCE_ENO_CAMERA		0x903c		/* ï¿½Jï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú‘ï¿½ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½È‚ï¿½	*/
 
-#define SCE_ECAN_NOT_PLAY	0x903d		/* ‰‰‘t‚ªs‚¦‚È‚¢		*/
+#define SCE_ECAN_NOT_PLAY	0x903d		/* ï¿½ï¿½ï¿½tï¿½ï¿½ï¿½sï¿½ï¿½ï¿½È‚ï¿½		*/
 #define SCE_ECANT_PLAY		SCE_ECAN_NOT_PLAY
-#define SCE_ENOT_PLAYED		0x903e		/* ‰‰‘t‚³‚ê‚Ä‚¢‚È‚¢		*/
+#define SCE_ENOT_PLAYED		0x903e		/* ï¿½ï¿½ï¿½tï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½È‚ï¿½		*/
 
-/* 0xa000-0xa0ff */ /* DNAS—\–ñ */
+/* 0xa000-0xa0ff */ /* DNASï¿½\ï¿½ï¿½ */
 
 
 /*
- * ”Ä—p³íI—¹ƒ}ƒNƒ
+ * ï¿½Ä—pï¿½ï¿½ï¿½ï¿½Iï¿½ï¿½ï¿½}ï¿½Nï¿½ï¿½
  */
 #define SCE_OK	0
 
 /*
- * ƒ‰ƒCƒuƒ‰ƒŠŽ¯•ÊƒvƒŒƒtƒBƒbƒNƒX
+ * ï¿½ï¿½ï¿½Cï¿½uï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Êƒvï¿½ï¿½ï¿½tï¿½Bï¿½bï¿½Nï¿½X
  */
 
-/* ƒGƒ‰[Ž¯•Êƒrƒbƒg */
+/* ï¿½Gï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½Êƒrï¿½bï¿½g */
 #define SCE_ERROR_PREFIX_ERROR		0x80000000
 
-/* ƒvƒŒƒtƒBƒbƒNƒXEƒVƒtƒg—Ê */
+/* ï¿½vï¿½ï¿½ï¿½tï¿½Bï¿½bï¿½Nï¿½Xï¿½Eï¿½Vï¿½tï¿½gï¿½ï¿½ */
 #define SCE_ERROR_PREFIX_SHIFT		16
 
-/* ƒGƒ‰[Eƒrƒbƒgƒ}ƒXƒN */
+/* ï¿½Gï¿½ï¿½ï¿½[ï¿½Eï¿½rï¿½bï¿½gï¿½}ï¿½Xï¿½N */
 #define SCE_ERROR_MASK_LIBRARY_PREFIX	0x7fff0000
 #define SCE_ERROR_MASK_ERRNO		0x0000ffff
 
-/* ƒ‰ƒCƒuƒ‰ƒŠŽ¯•ÊƒvƒŒƒtƒBƒbƒNƒX’l */
-#define SCE_ERROR_PREFIX_MC2	  0x01010000 /* ƒƒ‚ƒŠ[ƒJ[ƒh        libmc2  */
+/* ï¿½ï¿½ï¿½Cï¿½uï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Êƒvï¿½ï¿½ï¿½tï¿½Bï¿½bï¿½Nï¿½Xï¿½l */
+#define SCE_ERROR_PREFIX_MC2	  0x01010000 /* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½Jï¿½[ï¿½h        libmc2  */
 #define SCE_ERROR_PREFIX_BNNETCNF 0x01020000 /* PS BB Navi. Net conf. bnnetcf */
 #define SCE_ERROR_PREFIX_SDHD	  0x01030000 /* Sound Data .HD        libsdhd */
 #define SCE_ERROR_PREFIX_SDSQ	  0x01040000 /* Sound Data .SQ        sdsq    */
 #define SCE_ERROR_PREFIX_ERX	  0x01050000 /* ERX		      liberx  */
 #define SCE_ERROR_PREFIX_TIMER	  0x01060000 /* Timer                 libtimer */
-#define SCE_ERROR_PREFIX_STDIO	  0x01070000 /* •W€“üo—Í            libkernl */
-#define SCE_ERROR_PREFIX_MC	  0x01080000 /* ƒƒ‚ƒŠ[ƒJ[ƒh        libmc   */
+#define SCE_ERROR_PREFIX_STDIO	  0x01070000 /* ï¿½Wï¿½ï¿½ï¿½ï¿½ï¿½oï¿½ï¿½            libkernl */
+#define SCE_ERROR_PREFIX_MC	  0x01080000 /* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½Jï¿½[ï¿½h        libmc   */
 #define SCE_ERROR_PREFIX_SESQ2	  0x01090000 /* SESQ2                 modsesq2 */
 
 /*
- * ƒ†[ƒeƒBƒŠƒeƒB
+ * ï¿½ï¿½ï¿½[ï¿½eï¿½Bï¿½ï¿½ï¿½eï¿½B
  */ 
 
 /* for library author */

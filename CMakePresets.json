@@ -1,0 +1,22 @@
+{
+  "version": 3,
+  "configurePresets": [
+    {
+      "name": "default",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/out"
+    },
+
+    {
+      "name": "fastbuild",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/out",
+      "cacheVariables": {
+        "FAST_BUILD": "ON"
+      }
+    }
+  ],
+  "buildPresets": [ { "name": "default", "configurePreset": "default" } ],
+  "testPresets":  [ { "name": "default", "configurePreset": "default" } ]
+}
+

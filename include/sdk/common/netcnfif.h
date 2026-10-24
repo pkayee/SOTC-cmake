@@ -37,11 +37,11 @@ extern "C" {
 #define SCE_NETCNFIF_PAD_BASE(x, base) (((x) + ((base) - 1)) & ~((base) - 1))
 #define SCE_NETCNFIF_PAD(x)            (SCE_NETCNFIF_PAD_BASE(( x ), 64))
 
-/* Sifrpc —p */
+/* Sifrpc ï¿½p */
 #define SCE_NETCNFIF_SSIZE                  (4096)
 #define SCE_NETCNFIF_INTERFACE              (0x80001101)
 
-/* Sifrpc ƒT[ƒrƒXŠÖ”—p”Ô† */
+/* Sifrpc ï¿½Tï¿½[ï¿½rï¿½Xï¿½Öï¿½ï¿½pï¿½Ôï¿½ */
 #define SCE_NETCNFIF_GET_COUNT              (0)
 #define SCE_NETCNFIF_GET_LIST               (1)
 #define SCE_NETCNFIF_LOAD_ENTRY             (2)
@@ -64,7 +64,7 @@ extern "C" {
 #define SCE_NETCNFIF_FREE_WORKAREA          (102)
 #define SCE_NETCNFIF_SET_ENV                (103)
 
-/* ƒGƒ‰[ƒR[ƒh(-20 ‚Ü‚Å‚Í netcnf.irx ‚Æ“¯“™) */
+/* ï¿½Gï¿½ï¿½ï¿½[ï¿½Rï¿½[ï¿½h(-20 ï¿½Ü‚Å‚ï¿½ netcnf.irx ï¿½Æ“ï¿½ï¿½ï¿½) */
 #define sceNETCNFIF_OK                      (0)
 #define sceNETCNFIF_NG                      (-1)
 #define sceNETCNFIF_ALLOC_ERROR             (-2)

@@ -22,142 +22,142 @@
  * typedef int			S32;	 32bit   signed
  * typedef unsigned int		U32;	 32bit unsigned
  *
- *  ƒtƒ@ƒCƒ‹ƒIƒtƒZƒbƒg(ƒtƒ@ƒCƒ‹‚Ìæ“ª‚©‚ç‚ÌƒoƒCƒg”)
+ *  ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½Iï¿½tï¿½Zï¿½bï¿½g(ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½Ìæ“ªï¿½ï¿½ï¿½ï¿½Ìƒoï¿½Cï¿½gï¿½ï¿½)
  * typedef U32 FOFST;
  * #define NO_FOFST ((FOFST)-1)
- *  ƒ`ƒƒƒ“ƒNƒIƒtƒZƒbƒg(ƒ`ƒƒƒ“ƒN‚Ìæ“ª‚©‚ç‚ÌƒoƒCƒg”)
+ *  ï¿½`ï¿½ï¿½ï¿½ï¿½ï¿½Nï¿½Iï¿½tï¿½Zï¿½bï¿½g(ï¿½`ï¿½ï¿½ï¿½ï¿½ï¿½Nï¿½Ìæ“ªï¿½ï¿½ï¿½ï¿½Ìƒoï¿½Cï¿½gï¿½ï¿½)
  * typedef U32 COFST;
  * #define NO_COFST ((COFST)-1)
- *  ƒ`ƒƒƒ“ƒN“à‚ÌƒIƒtƒZƒbƒg(ŠY“–ƒ`ƒƒƒ“ƒN‚Ìæ“ª‚©‚ç‚Ìbyte”)
+ *  ï¿½`ï¿½ï¿½ï¿½ï¿½ï¿½Nï¿½ï¿½ÌƒIï¿½tï¿½Zï¿½bï¿½g(ï¿½Yï¿½ï¿½ï¿½`ï¿½ï¿½ï¿½ï¿½ï¿½Nï¿½Ìæ“ªï¿½ï¿½ï¿½ï¿½ï¿½byteï¿½ï¿½)
  * typedef U32 SOFST;
  * #define NO_SOFST ((SOFST)-1)
- *  ƒ|ƒWƒVƒ‡ƒ“ƒIƒtƒZƒbƒg(ƒ`ƒƒƒ“ƒN“à‚ÌŒ»İ‚ÌˆÊ’u‚©‚ç‚ÌƒoƒCƒg”)
+ *  ï¿½|ï¿½Wï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½Iï¿½tï¿½Zï¿½bï¿½g(ï¿½`ï¿½ï¿½ï¿½ï¿½ï¿½Nï¿½ï¿½ÌŒï¿½ï¿½İ‚ÌˆÊ’uï¿½ï¿½ï¿½ï¿½Ìƒoï¿½Cï¿½gï¿½ï¿½)
  * typedef U32 POFST;
  * #define NO_POFST ((POFST)-1)
- *  ƒ`ƒƒƒ“ƒN“à‚ÌŒ»İ‚ÌˆÊ’u‚©‚ç‚ÌƒIƒtƒZƒbƒg
+ *  ï¿½`ï¿½ï¿½ï¿½ï¿½ï¿½Nï¿½ï¿½ÌŒï¿½ï¿½İ‚ÌˆÊ’uï¿½ï¿½ï¿½ï¿½ÌƒIï¿½tï¿½Zï¿½bï¿½g
  * typedef U32 TOFST;
  * #define NO_TOFST ((TOFST)-1)
- *  ƒ`ƒƒƒ“ƒNƒCƒ“ƒfƒbƒNƒX(ƒ`ƒƒƒ“ƒN“à‚Ì\‘¢‘Ì‚Ö‚ÌƒCƒ“ƒfƒbƒNƒX”Ô†)
+ *  ï¿½`ï¿½ï¿½ï¿½ï¿½ï¿½Nï¿½Cï¿½ï¿½ï¿½fï¿½bï¿½Nï¿½X(ï¿½`ï¿½ï¿½ï¿½ï¿½ï¿½Nï¿½ï¿½Ì\ï¿½ï¿½ï¿½Ì‚Ö‚ÌƒCï¿½ï¿½ï¿½fï¿½bï¿½Nï¿½Xï¿½Ôï¿½)
  * typedef U16 CINDEX;
  * #define NO_CINDEX ((CINDEX)-1)
- *  ƒ`ƒƒƒ“ƒN“à‚Ì\‘¢‘Ì‚Ö‚ÌƒCƒ“ƒfƒbƒNƒXƒiƒ“ƒo[
+ *  ï¿½`ï¿½ï¿½ï¿½ï¿½ï¿½Nï¿½ï¿½Ì\ï¿½ï¿½ï¿½Ì‚Ö‚ÌƒCï¿½ï¿½ï¿½fï¿½bï¿½Nï¿½Xï¿½iï¿½ï¿½ï¿½oï¿½[
  * typedef U16 SINDEX;
  * #define NO_SINDEX ((SINDEX)-1)
  */
 
 /*
- * ˆÈ‰º‚Ì\‘¢‘Ìƒƒ“ƒo‚Å—˜—p:
+ * ï¿½È‰ï¿½ï¿½Ì\ï¿½ï¿½ï¿½Ìƒï¿½ï¿½ï¿½ï¿½oï¿½Å—ï¿½ï¿½p:
  *	sceHardSynthProgramParam.progAttr
  *	sceHardSynthSeTimbreNoteBlock.seTimbreNoteAttr
  */
-#define SCEHD_ROUND_PAN			0x01	/* ƒpƒ“ƒ|ƒbƒg‚Ì‘Š‘Î•Ï‰»‚É‚¨‚¢‚Ä‹t‘Š‚à‰Â	*/
-#define SCEHD_REVERSE_PHASE_VOL		0x02	/* ‹t‘Šƒ{ƒŠƒ…[ƒ€w’è			*/
+#define SCEHD_ROUND_PAN			0x01	/* ï¿½pï¿½ï¿½ï¿½|ï¿½bï¿½gï¿½Ì‘ï¿½ï¿½Î•Ï‰ï¿½ï¿½É‚ï¿½ï¿½ï¿½ï¿½Ä‹tï¿½ï¿½ï¿½ï¿½ï¿½	*/
+#define SCEHD_REVERSE_PHASE_VOL		0x02	/* ï¿½tï¿½ï¿½ï¿½{ï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½wï¿½ï¿½			*/
 
 /*
- * ˆÈ‰º‚Ì\‘¢‘Ìƒƒ“ƒo‚Å—˜—p:
+ * ï¿½È‰ï¿½ï¿½Ì\ï¿½ï¿½ï¿½Ìƒï¿½ï¿½ï¿½ï¿½oï¿½Å—ï¿½ï¿½p:
  *	sceHardSynthProgramParam.progLfoWave
  *	sceHardSynthProgramParam.progLfoWave2
  *	sceHardSynthSeTimbreNoteBlock.seTimbreNotePitchLfoWave
  *	sceHardSynthSeTimbreNoteBlock.seTimbreNoteAmpLfoWave
  */
-#define SCEHD_LFO_NON			0	/* LFO ‚È‚µ			*/
-#define SCEHD_LFO_SAWUP			1	/* ‰Eã‚ª‚è‹˜”g			*/
-#define SCEHD_LFO_SAWDOWN		2	/* ‰E‰º‚ª‚è‹˜”g			*/
-#define SCEHD_LFO_TRIANGLE		3	/* OŠp”g			*/
-#define SCEHD_LFO_SQUEARE		4	/* ‹éŒ`”g			*/
-#define SCEHD_LFO_NOISE			5	/* ƒmƒCƒY			*/
-#define SCEHD_LFO_SIN			6	/* ³Œ·”g			*/
-#define SCEHD_LFO_USER			0x80	/* ƒ†[ƒU’è‹`			*/
+#define SCEHD_LFO_NON			0	/* LFO ï¿½È‚ï¿½			*/
+#define SCEHD_LFO_SAWUP			1	/* ï¿½Eï¿½ã‚ªï¿½è‹˜ï¿½g			*/
+#define SCEHD_LFO_SAWDOWN		2	/* ï¿½Eï¿½ï¿½ï¿½ï¿½ï¿½è‹˜ï¿½g			*/
+#define SCEHD_LFO_TRIANGLE		3	/* ï¿½Oï¿½pï¿½g			*/
+#define SCEHD_LFO_SQUEARE		4	/* ï¿½ï¿½`ï¿½g			*/
+#define SCEHD_LFO_NOISE			5	/* ï¿½mï¿½Cï¿½Y			*/
+#define SCEHD_LFO_SIN			6	/* ï¿½ï¿½ï¿½ï¿½ï¿½g			*/
+#define SCEHD_LFO_USER			0x80	/* ï¿½ï¿½ï¿½[ï¿½Uï¿½ï¿½`			*/
 
 /*
- * ˆÈ‰º‚Ì\‘¢‘Ìƒƒ“ƒo‚Å—˜—p:
+ * ï¿½È‰ï¿½ï¿½Ì\ï¿½ï¿½ï¿½Ìƒï¿½ï¿½ï¿½ï¿½oï¿½Å—ï¿½ï¿½p:
  *	sceHardSynthSampleParam.sampleLfoAttr
  *	sceHardSynthSeTimbreNoteBlock.seTimbreNoteLfoAttr
  */
 /* PITCH LFO */
-#define SCEHD_LFO_PITCH_KEYON		0x01	/* ƒgƒŠƒK[‚ªƒL[ƒIƒ“			*/
-#define SCEHD_LFO_PITCH_KEYOFF		0x02	/* ƒgƒŠƒK[‚ªƒL[ƒIƒt			*/
-#define SCEHD_LFO_PITCH_BOTH		0x04	/* ƒgƒŠƒK[‚ªƒL[ƒIƒ“‚ÆƒL[ƒIƒt	*/
+#define SCEHD_LFO_PITCH_KEYON		0x01	/* ï¿½gï¿½ï¿½ï¿½Kï¿½[ï¿½ï¿½ï¿½Lï¿½[ï¿½Iï¿½ï¿½ï¿½ï¿½			*/
+#define SCEHD_LFO_PITCH_KEYOFF		0x02	/* ï¿½gï¿½ï¿½ï¿½Kï¿½[ï¿½ï¿½ï¿½Lï¿½[ï¿½Iï¿½tï¿½ï¿½			*/
+#define SCEHD_LFO_PITCH_BOTH		0x04	/* ï¿½gï¿½ï¿½ï¿½Kï¿½[ï¿½ï¿½ï¿½Lï¿½[ï¿½Iï¿½ï¿½ï¿½ÆƒLï¿½[ï¿½Iï¿½tï¿½ï¿½	*/
 /* Amp. LFO */
-#define SCEHD_LFO_AMP_KEYON		0x10	/* ƒgƒŠƒK[‚ªƒL[ƒIƒ“			*/
-#define SCEHD_LFO_AMP_KEYOFF		0x20	/* ƒgƒŠƒK[‚ªƒL[ƒIƒt			*/
-#define SCEHD_LFO_AMP_BOTH		0x40	/* ƒgƒŠƒK[‚ªƒL[ƒIƒ“‚ÆƒL[ƒIƒt	*/
+#define SCEHD_LFO_AMP_KEYON		0x10	/* ï¿½gï¿½ï¿½ï¿½Kï¿½[ï¿½ï¿½ï¿½Lï¿½[ï¿½Iï¿½ï¿½ï¿½ï¿½			*/
+#define SCEHD_LFO_AMP_KEYOFF		0x20	/* ï¿½gï¿½ï¿½ï¿½Kï¿½[ï¿½ï¿½ï¿½Lï¿½[ï¿½Iï¿½tï¿½ï¿½			*/
+#define SCEHD_LFO_AMP_BOTH		0x40	/* ï¿½gï¿½ï¿½ï¿½Kï¿½[ï¿½ï¿½ï¿½Lï¿½[ï¿½Iï¿½ï¿½ï¿½ÆƒLï¿½[ï¿½Iï¿½tï¿½ï¿½	*/
 
 /*
- * ˆÈ‰º‚Ì\‘¢‘Ìƒƒ“ƒo‚Å—˜—p:
+ * ï¿½È‰ï¿½ï¿½Ì\ï¿½ï¿½ï¿½Ìƒï¿½ï¿½ï¿½ï¿½oï¿½Å—ï¿½ï¿½p:
  *	sceHardSynthVagParam.vagAttribute
  */
 #define SCEHD_VAG_1SHOT			0x00	/* No loop = 1 shot	*/
 #define SCEHD_VAG_LOOP			0x01	/* Loop			*/
 
 /*
- * ˆÈ‰º‚Ì\‘¢‘Ìƒƒ“ƒo‚Å—˜—p:
+ * ï¿½È‰ï¿½ï¿½Ì\ï¿½ï¿½ï¿½Ìƒï¿½ï¿½ï¿½ï¿½oï¿½Å—ï¿½ï¿½p:
  *	sceHardSynthSplitBlock.splitRangeLow
  *	sceHardSynthSplitBlock.splitRangeHigh
  *	sceHardSynthSampleParam.velRangeLow
  *	sceHardSynthSampleParam.velRangeHigh
  */
-#define SCEHD_CROSSFADE			0x80	/* ƒNƒƒXƒtƒF[ƒh‚Ìw’è */
+#define SCEHD_CROSSFADE			0x80	/* ï¿½Nï¿½ï¿½ï¿½Xï¿½tï¿½Fï¿½[ï¿½hï¿½Ìwï¿½ï¿½ */
 
 /*
- * ˆÈ‰º‚Ì\‘¢‘Ìƒƒ“ƒo‚Å—˜—p:
+ * ï¿½È‰ï¿½ï¿½Ì\ï¿½ï¿½ï¿½Ìƒï¿½ï¿½ï¿½ï¿½oï¿½Å—ï¿½ï¿½p:
  *	sceHardSynthSampleParam.sampleSpuAttr
  *	sceHardSynthSeTimbreNoteBlock.seTimbreNoteSpuAttr
  */
-#define SCEHD_SPU_DIRECTSEND_L		0x01	/* SPU2 [VMIXL0/1] ƒŒƒWƒXƒ^	*/
-#define SCEHD_SPU_DIRECTSEND_R		0x02	/* SPU2 [VMIXR0/1] ƒŒƒWƒXƒ^	*/
-#define SCEHD_SPU_EFFECTSEND_L		0x04	/* SPU2 [VMIXEL0/1] ƒŒƒWƒXƒ^	*/
-#define SCEHD_SPU_EFFECTSEND_R		0x08	/* SPU2 [VMIXER0/1] ƒŒƒWƒXƒ^	*/
-#define SCEHD_SPU_CORE_0		0x10	/* SPU2 CORE0‘I‘ğ		*/
-#define SCEHD_SPU_CORE_1		0x20	/* SPU2 CORE1‘I‘ğ		*/
+#define SCEHD_SPU_DIRECTSEND_L		0x01	/* SPU2 [VMIXL0/1] ï¿½ï¿½ï¿½Wï¿½Xï¿½^	*/
+#define SCEHD_SPU_DIRECTSEND_R		0x02	/* SPU2 [VMIXR0/1] ï¿½ï¿½ï¿½Wï¿½Xï¿½^	*/
+#define SCEHD_SPU_EFFECTSEND_L		0x04	/* SPU2 [VMIXEL0/1] ï¿½ï¿½ï¿½Wï¿½Xï¿½^	*/
+#define SCEHD_SPU_EFFECTSEND_R		0x08	/* SPU2 [VMIXER0/1] ï¿½ï¿½ï¿½Wï¿½Xï¿½^	*/
+#define SCEHD_SPU_CORE_0		0x10	/* SPU2 CORE0ï¿½Iï¿½ï¿½		*/
+#define SCEHD_SPU_CORE_1		0x20	/* SPU2 CORE1ï¿½Iï¿½ï¿½		*/
 
 /*
- * ˆÈ‰º‚Ì\‘¢‘Ìƒƒ“ƒo‚Å—˜—p:
+ * ï¿½È‰ï¿½ï¿½Ì\ï¿½ï¿½ï¿½Ìƒï¿½ï¿½ï¿½ï¿½oï¿½Å—ï¿½ï¿½p:
  *	sceHardSynthSampleSetParam.velCurve
  *	sceHardSynthSeTimbreNoteBlock.seTimbreNoteVelCurve
  */
-#define SCEHD_VEL_CURVE_B		0	/* B ƒJ[ƒu	*/
+#define SCEHD_VEL_CURVE_B		0	/* B ï¿½Jï¿½[ï¿½u	*/
 #define SCEHD_VEL_CURVE_B_REV		1
-#define SCEHD_VEL_CURVE_A		2	/* A ƒJ[ƒu	*/
+#define SCEHD_VEL_CURVE_A		2	/* A ï¿½Jï¿½[ï¿½u	*/
 #define SCEHD_VEL_CURVE_A_REV		3
-#define SCEHD_VEL_CURVE_C		4	/* C ƒJ[ƒu	*/
+#define SCEHD_VEL_CURVE_C		4	/* C ï¿½Jï¿½[ï¿½u	*/
 #define SCEHD_VEL_CURVE_C_REV		5
 
 /*
- * ˆÈ‰º‚Ì\‘¢‘Ìƒƒ“ƒo‚Å—˜—p:
+ * ï¿½È‰ï¿½ï¿½Ì\ï¿½ï¿½ï¿½Ìƒï¿½ï¿½ï¿½ï¿½oï¿½Å—ï¿½ï¿½p:
  *	sceHardSynthSampleParam.velFollowPitchVelCurve
  *	sceHardSynthSampleParam.velFollowAmpVelCurve
  *	sceHardSynthSeTimbreNoteBlock.seTimbreNoteVelFollowPitchCurve
  *	sceHardSynthSeTimbreNoteBlock.seTimbreNoteVelFollowAmpCurve
  */
-#define SCEHD_VELFOLLOW_CURVE_B		0	/* B ƒJ[ƒu	*/
+#define SCEHD_VELFOLLOW_CURVE_B		0	/* B ï¿½Jï¿½[ï¿½u	*/
 #define SCEHD_VELFOLLOW_CURVE_B_REV	1
-#define SCEHD_VELFOLLOW_CURVE_A		2	/* A ƒJ[ƒu	*/
+#define SCEHD_VELFOLLOW_CURVE_A		2	/* A ï¿½Jï¿½[ï¿½u	*/
 #define SCEHD_VELFOLLOW_CURVE_A_REV	3
-#define SCEHD_VELFOLLOW_CURVE_C		4	/* C ƒJ[ƒu	*/
+#define SCEHD_VELFOLLOW_CURVE_C		4	/* C ï¿½Jï¿½[ï¿½u	*/
 #define SCEHD_VELFOLLOW_CURVE_C_REV	5
-#define SCEHD_VELFOLLOW_CURVE_BB	6	/* Ü‚êü	*/
+#define SCEHD_VELFOLLOW_CURVE_BB	6	/* ï¿½Ü‚ï¿½ï¿½	*/
 #define SCEHD_VELFOLLOW_CURVE_BB_REV	7
-#define SCEHD_VELFOLLOW_CURVE_CA	8	/* C+A ƒJ[ƒu	*/
-#define SCEHD_VELFOLLOW_CURVE_AC	9	/* A+C ƒJ[ƒu	*/
+#define SCEHD_VELFOLLOW_CURVE_CA	8	/* C+A ï¿½Jï¿½[ï¿½u	*/
+#define SCEHD_VELFOLLOW_CURVE_AC	9	/* A+C ï¿½Jï¿½[ï¿½u	*/
 
 /****************************************************************
  * VAGInfo Chunk
  ****************************************************************/
 typedef struct {
-    unsigned int   vagOffsetAddr;	/*FOFST ”gŒ`ƒf[ƒ^‚ÌˆÊ’u		*/
-    unsigned short vagSampleRate;	/*U16 ƒTƒ“ƒvƒŠƒ“ƒOƒŒ[ƒg		*/
-    unsigned char  vagAttribute;	/*U8 ƒ‹[ƒvƒtƒ‰ƒO			*/
-    unsigned char  dmy;			/*U8 —\–ñ—Ìˆæ				*/
+    unsigned int   vagOffsetAddr;	/*FOFST ï¿½gï¿½`ï¿½fï¿½[ï¿½^ï¿½ÌˆÊ’u		*/
+    unsigned short vagSampleRate;	/*U16 ï¿½Tï¿½ï¿½ï¿½vï¿½ï¿½ï¿½ï¿½ï¿½Oï¿½ï¿½ï¿½[ï¿½g		*/
+    unsigned char  vagAttribute;	/*U8 ï¿½ï¿½ï¿½[ï¿½vï¿½tï¿½ï¿½ï¿½O			*/
+    unsigned char  dmy;			/*U8 ï¿½\ï¿½ï¿½Ìˆï¿½				*/
 } sceHardSynthVagParam;
 
 typedef struct {
-    unsigned int   Creator;		/*U32 ì¬ÒƒR[ƒh:   'SCEI'		*/
-    unsigned int   Type;		/*U32 ƒ`ƒƒƒ“ƒNƒ^ƒCƒv: 'Vagi'		*/
-    unsigned int   chunkSize;		/*U32 ƒ`ƒƒƒ“ƒNƒTƒCƒY			*/
-    unsigned int   maxVagInfoNumber;	/*U32 VagInfoƒiƒ“ƒo[‚ÌÅ‘å’l		*/
+    unsigned int   Creator;		/*U32 ï¿½ì¬ï¿½ÒƒRï¿½[ï¿½h:   'SCEI'		*/
+    unsigned int   Type;		/*U32 ï¿½`ï¿½ï¿½ï¿½ï¿½ï¿½Nï¿½^ï¿½Cï¿½v: 'Vagi'		*/
+    unsigned int   chunkSize;		/*U32 ï¿½`ï¿½ï¿½ï¿½ï¿½ï¿½Nï¿½Tï¿½Cï¿½Y			*/
+    unsigned int   maxVagInfoNumber;	/*U32 VagInfoï¿½iï¿½ï¿½ï¿½oï¿½[ï¿½ÌÅ‘ï¿½l		*/
 
-    unsigned int   vagInfoOffsetAddr[0];/*COFST VagInfoƒe[ƒuƒ‹‚Ö‚ÌƒIƒtƒZƒbƒg	*/
+    unsigned int   vagInfoOffsetAddr[0];/*COFST VagInfoï¿½eï¿½[ï¿½uï¿½ï¿½ï¿½Ö‚ÌƒIï¿½tï¿½Zï¿½bï¿½g	*/
     /* sceHardSynthVagParam vagInfoParam[] */
 } sceHardSynthVagInfoChunk;
 
@@ -165,59 +165,59 @@ typedef struct {
  * Sample Chunk
  ****************************************************************/
 typedef struct {
-    unsigned short VagIndex;			/*CINDEX VagInfoChunk‚Å‚ÌƒCƒ“ƒfƒbƒNƒXƒiƒ“ƒo[(NO_CINDEX:SPUƒmƒCƒY) */
+    unsigned short VagIndex;			/*CINDEX VagInfoChunkï¿½Å‚ÌƒCï¿½ï¿½ï¿½fï¿½bï¿½Nï¿½Xï¿½iï¿½ï¿½ï¿½oï¿½[(NO_CINDEX:SPUï¿½mï¿½Cï¿½Y) */
 
-    unsigned char  velRangeLow;			/*U8 ”­‰¹‰ºŒÀƒxƒƒVƒeƒB(0-127)				*/
-    unsigned char  velCrossFade;		/*U8 ƒNƒƒXƒtƒFƒCƒhŠJnƒxƒƒVƒeƒB(0-127)		*/
-    unsigned char  velRangeHigh;		/*U8 ”­‰¹ãŒÀƒxƒƒVƒeƒB(0-127)				*/
+    unsigned char  velRangeLow;			/*U8 ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½xï¿½ï¿½ï¿½Vï¿½eï¿½B(0-127)				*/
+    unsigned char  velCrossFade;		/*U8 ï¿½Nï¿½ï¿½ï¿½Xï¿½tï¿½Fï¿½Cï¿½hï¿½Jï¿½nï¿½xï¿½ï¿½ï¿½Vï¿½eï¿½B(0-127)		*/
+    unsigned char  velRangeHigh;		/*U8 ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½xï¿½ï¿½ï¿½Vï¿½eï¿½B(0-127)				*/
 
-    char	   velFollowPitch;		/*S8 ƒxƒƒVƒeƒB‚É‚æ‚éƒsƒbƒ`LFO‚Ì•Ï‰»•(’1)(0-127)	*/
-    unsigned char  velFollowPitchCenter;	/*U8 velFollowPitch‚ÌŒø‰Ê‚ª0‚É‚È‚éƒxƒƒVƒeƒB(0-127)	*/
-    unsigned char  velFollowPitchVelCurve;	/*U8 ƒsƒbƒ`LFO‚É‘Î‚·‚éƒxƒƒVƒeƒBƒJ[ƒu			*/
+    char	   velFollowPitch;		/*S8 ï¿½xï¿½ï¿½ï¿½Vï¿½eï¿½Bï¿½É‚ï¿½ï¿½sï¿½bï¿½`LFOï¿½Ì•Ï‰ï¿½ï¿½ï¿½(ï¿½ï¿½1)(0-127)	*/
+    unsigned char  velFollowPitchCenter;	/*U8 velFollowPitchï¿½ÌŒï¿½ï¿½Ê‚ï¿½0ï¿½É‚È‚ï¿½xï¿½ï¿½ï¿½Vï¿½eï¿½B(0-127)	*/
+    unsigned char  velFollowPitchVelCurve;	/*U8 ï¿½sï¿½bï¿½`LFOï¿½É‘Î‚ï¿½ï¿½ï¿½xï¿½ï¿½ï¿½Vï¿½eï¿½Bï¿½Jï¿½[ï¿½u			*/
 
-    char	   velFollowAmp;		/*S8 ƒxƒƒVƒeƒB‚É‚æ‚éƒAƒ“ƒvLFO‚Ì•Ï‰»•			*/
-    unsigned char  velFollowAmpCenter;		/*U8 velFollowAmp‚ÌŒø‰Ê‚ª0‚É‚È‚éƒxƒƒVƒeƒB(0-127)	*/
-    unsigned char  velFollowAmpVelCurve;	/*U8 ƒAƒ“ƒvLFO‚É‘Î‚·‚éƒxƒƒVƒeƒBƒJ[ƒu			*/
+    char	   velFollowAmp;		/*S8 ï¿½xï¿½ï¿½ï¿½Vï¿½eï¿½Bï¿½É‚ï¿½ï¿½Aï¿½ï¿½ï¿½vLFOï¿½Ì•Ï‰ï¿½ï¿½ï¿½			*/
+    unsigned char  velFollowAmpCenter;		/*U8 velFollowAmpï¿½ÌŒï¿½ï¿½Ê‚ï¿½0ï¿½É‚È‚ï¿½xï¿½ï¿½ï¿½Vï¿½eï¿½B(0-127)	*/
+    unsigned char  velFollowAmpVelCurve;	/*U8 ï¿½Aï¿½ï¿½ï¿½vLFOï¿½É‘Î‚ï¿½ï¿½ï¿½xï¿½ï¿½ï¿½Vï¿½eï¿½Bï¿½Jï¿½[ï¿½u			*/
 
-    unsigned char  sampleBaseNote;		/*U8 ƒx[ƒX‚Æ‚È‚éƒm[ƒgƒiƒ“ƒo[(0-127)			*/
-    char	   sampleDetune;		/*S8 ƒfƒBƒ`ƒ…[ƒ“(’1)(0-127)				*/
-    char	   samplePanpot;		/*S8 ƒpƒ“ƒ|ƒbƒg(0-64-127=¶-’†‰›-‰E;•‰‚Í‹t‘Š)		*/
-    unsigned char  sampleGroup;			/*U8 ƒOƒ‹[ƒv(0-127;0‚ÍƒOƒ‹[ƒv‚È‚µ)			*/
-    unsigned char  samplePriority;		/*U8 ƒvƒ‰ƒCƒIƒŠƒeƒB(127‚Åƒvƒ‰ƒCƒIƒŠƒeƒBÅ‘å)		*/
-    unsigned char  sampleVolume;		/*U8 ƒ{ƒŠƒ…[ƒ€(0-128)					*/
-    unsigned char  dmy;				/*U8 —\–ñ—Ìˆæ						*/
+    unsigned char  sampleBaseNote;		/*U8 ï¿½xï¿½[ï¿½Xï¿½Æ‚È‚ï¿½mï¿½[ï¿½gï¿½iï¿½ï¿½ï¿½oï¿½[(0-127)			*/
+    char	   sampleDetune;		/*S8 ï¿½fï¿½Bï¿½`ï¿½ï¿½ï¿½[ï¿½ï¿½(ï¿½ï¿½1)(0-127)				*/
+    char	   samplePanpot;		/*S8 ï¿½pï¿½ï¿½ï¿½|ï¿½bï¿½g(0-64-127=ï¿½ï¿½-ï¿½ï¿½ï¿½ï¿½-ï¿½E;ï¿½ï¿½ï¿½Í‹tï¿½ï¿½)		*/
+    unsigned char  sampleGroup;			/*U8 ï¿½Oï¿½ï¿½ï¿½[ï¿½v(0-127;0ï¿½ÍƒOï¿½ï¿½ï¿½[ï¿½vï¿½È‚ï¿½)			*/
+    unsigned char  samplePriority;		/*U8 ï¿½vï¿½ï¿½ï¿½Cï¿½Iï¿½ï¿½ï¿½eï¿½B(127ï¿½Åƒvï¿½ï¿½ï¿½Cï¿½Iï¿½ï¿½ï¿½eï¿½Bï¿½Å‘ï¿½)		*/
+    unsigned char  sampleVolume;		/*U8 ï¿½{ï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½ï¿½(0-128)					*/
+    unsigned char  dmy;				/*U8 ï¿½\ï¿½ï¿½Ìˆï¿½						*/
 
-    unsigned short sampleAdsr1;			/*U16 ƒGƒ“ƒxƒ[ƒv ADSR1				*/
-    unsigned short sampleAdsr2;			/*U16 ƒGƒ“ƒxƒ[ƒv ADSR2				*/
+    unsigned short sampleAdsr1;			/*U16 ï¿½Gï¿½ï¿½ï¿½xï¿½ï¿½ï¿½[ï¿½v ADSR1				*/
+    unsigned short sampleAdsr2;			/*U16 ï¿½Gï¿½ï¿½ï¿½xï¿½ï¿½ï¿½[ï¿½v ADSR2				*/
 
-    char	   keyFollowAr;			/*S8 AR‚Ì1ƒIƒNƒ^[ƒu–ˆ‚Ì•Ï‰»•				*/
-    unsigned char  keyFollowArCenter;		/*U8 keyFollowAr‚ÌŒø‰Ê‚ª0‚É‚È‚éƒm[ƒg(0-127)		*/
-    char	   keyFollowDr;			/*S8 DR‚Ì1ƒIƒNƒ^[ƒu–ˆ‚Ì•Ï‰»•				*/
-    unsigned char  keyFollowDrCenter;		/*U8 keyFollowDr‚ÌŒø‰Ê‚ª0‚É‚È‚éƒm[ƒg(0-127)		*/
-    char	   keyFollowSr;			/*S8 SR‚Ì1ƒIƒNƒ^[ƒu–ˆR‚Ì•Ï‰»•				*/
-    unsigned char  keyFollowSrCenter;		/*U8 keyFollowSr‚ÌŒø‰Ê‚ª0‚É‚È‚éƒm[ƒg(0-127)		*/
-    char	   keyFollowRr;			/*S8 RR‚Ì1ƒIƒNƒ^[ƒu–ˆ‚Ì•Ï‰»•				*/
-    unsigned char  keyFollowRrCenter;		/*U8 keyFollowRr‚ÌŒø‰Ê‚ª0‚É‚È‚éƒm[ƒg(0-127)		*/
-    char	   keyFollowSl;			/*S8 SL‚Ì1ƒIƒNƒ^[ƒu–ˆ‚Ì•Ï‰»•				*/
-    unsigned char  keyFollowSlCenter;		/*U8 keyFollowSl‚ÌŒø‰Ê‚ª0‚É‚È‚éƒm[ƒg(0-127)		*/
+    char	   keyFollowAr;			/*S8 ARï¿½ï¿½1ï¿½Iï¿½Nï¿½^ï¿½[ï¿½uï¿½ï¿½ï¿½Ì•Ï‰ï¿½ï¿½ï¿½				*/
+    unsigned char  keyFollowArCenter;		/*U8 keyFollowArï¿½ÌŒï¿½ï¿½Ê‚ï¿½0ï¿½É‚È‚ï¿½mï¿½[ï¿½g(0-127)		*/
+    char	   keyFollowDr;			/*S8 DRï¿½ï¿½1ï¿½Iï¿½Nï¿½^ï¿½[ï¿½uï¿½ï¿½ï¿½Ì•Ï‰ï¿½ï¿½ï¿½				*/
+    unsigned char  keyFollowDrCenter;		/*U8 keyFollowDrï¿½ÌŒï¿½ï¿½Ê‚ï¿½0ï¿½É‚È‚ï¿½mï¿½[ï¿½g(0-127)		*/
+    char	   keyFollowSr;			/*S8 SRï¿½ï¿½1ï¿½Iï¿½Nï¿½^ï¿½[ï¿½uï¿½ï¿½Rï¿½Ì•Ï‰ï¿½ï¿½ï¿½				*/
+    unsigned char  keyFollowSrCenter;		/*U8 keyFollowSrï¿½ÌŒï¿½ï¿½Ê‚ï¿½0ï¿½É‚È‚ï¿½mï¿½[ï¿½g(0-127)		*/
+    char	   keyFollowRr;			/*S8 RRï¿½ï¿½1ï¿½Iï¿½Nï¿½^ï¿½[ï¿½uï¿½ï¿½ï¿½Ì•Ï‰ï¿½ï¿½ï¿½				*/
+    unsigned char  keyFollowRrCenter;		/*U8 keyFollowRrï¿½ÌŒï¿½ï¿½Ê‚ï¿½0ï¿½É‚È‚ï¿½mï¿½[ï¿½g(0-127)		*/
+    char	   keyFollowSl;			/*S8 SLï¿½ï¿½1ï¿½Iï¿½Nï¿½^ï¿½[ï¿½uï¿½ï¿½ï¿½Ì•Ï‰ï¿½ï¿½ï¿½				*/
+    unsigned char  keyFollowSlCenter;		/*U8 keyFollowSlï¿½ÌŒï¿½ï¿½Ê‚ï¿½0ï¿½É‚È‚ï¿½mï¿½[ï¿½g(0-127)		*/
 
-    unsigned short samplePitchLfoDelay;		/*U16 Pitch LFOƒfƒBƒŒƒCƒ^ƒCƒ€(’PˆÊ:msec)		*/
-    unsigned short samplePitchLfoFade;		/*U16 Pitch LFOƒtƒFƒCƒhƒ^ƒCƒ€(’PˆÊ:msec)		*/
-    unsigned short sampleAmpLfoDelay;		/*U16 Amp LFOƒfƒBƒŒƒCƒ^ƒCƒ€(’PˆÊ:msec)			*/
-    unsigned short sampleAmpLfoFade;		/*U16 Amp LFOƒtƒFƒCƒhƒ^ƒCƒ€(’PˆÊ:msec)			*/
+    unsigned short samplePitchLfoDelay;		/*U16 Pitch LFOï¿½fï¿½Bï¿½ï¿½ï¿½Cï¿½^ï¿½Cï¿½ï¿½(ï¿½Pï¿½ï¿½:msec)		*/
+    unsigned short samplePitchLfoFade;		/*U16 Pitch LFOï¿½tï¿½Fï¿½Cï¿½hï¿½^ï¿½Cï¿½ï¿½(ï¿½Pï¿½ï¿½:msec)		*/
+    unsigned short sampleAmpLfoDelay;		/*U16 Amp LFOï¿½fï¿½Bï¿½ï¿½ï¿½Cï¿½^ï¿½Cï¿½ï¿½(ï¿½Pï¿½ï¿½:msec)			*/
+    unsigned short sampleAmpLfoFade;		/*U16 Amp LFOï¿½tï¿½Fï¿½Cï¿½hï¿½^ï¿½Cï¿½ï¿½(ï¿½Pï¿½ï¿½:msec)			*/
 
-    unsigned char  sampleLfoAttr;		/*U8 LFO‚ÉŠÖ‚·‚éAttribute				*/
-    unsigned char  sampleSpuAttr;		/*U8 SPU‚ÉŠÖ‚·‚éAttribute				*/
+    unsigned char  sampleLfoAttr;		/*U8 LFOï¿½ÉŠÖ‚ï¿½ï¿½ï¿½Attribute				*/
+    unsigned char  sampleSpuAttr;		/*U8 SPUï¿½ÉŠÖ‚ï¿½ï¿½ï¿½Attribute				*/
 } sceHardSynthSampleParam;
-/* ’1: ’PˆÊ: ”¼‰¹‚ğ128“™•ª */
+/* ï¿½ï¿½1: ï¿½Pï¿½ï¿½: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½128ï¿½ï¿½ï¿½ï¿½ */
 
 typedef struct {
-    unsigned int   Creator;			/*U32 ì¬ÒƒR[ƒh:   'SCEI'				*/
-    unsigned int   Type;			/*U32 ƒ`ƒƒƒ“ƒNƒ^ƒCƒv: 'Smpl'				*/
-    unsigned int   chunkSize;			/*U32 ƒ`ƒƒƒ“ƒNƒTƒCƒY					*/
-    unsigned int   maxSampleNumber;		/*U32 ƒTƒ“ƒvƒ‹ƒiƒ“ƒo[‚ÌÅ‘å’l				*/
+    unsigned int   Creator;			/*U32 ï¿½ì¬ï¿½ÒƒRï¿½[ï¿½h:   'SCEI'				*/
+    unsigned int   Type;			/*U32 ï¿½`ï¿½ï¿½ï¿½ï¿½ï¿½Nï¿½^ï¿½Cï¿½v: 'Smpl'				*/
+    unsigned int   chunkSize;			/*U32 ï¿½`ï¿½ï¿½ï¿½ï¿½ï¿½Nï¿½Tï¿½Cï¿½Y					*/
+    unsigned int   maxSampleNumber;		/*U32 ï¿½Tï¿½ï¿½ï¿½vï¿½ï¿½ï¿½iï¿½ï¿½ï¿½oï¿½[ï¿½ÌÅ‘ï¿½l				*/
 
-    unsigned int   sampleOffsetAddr[0];		/*COFST ƒTƒ“ƒvƒ‹ƒe[ƒuƒ‹‚Ö‚ÌƒIƒtƒZƒbƒg			*/
+    unsigned int   sampleOffsetAddr[0];		/*COFST ï¿½Tï¿½ï¿½ï¿½vï¿½ï¿½ï¿½eï¿½[ï¿½uï¿½ï¿½ï¿½Ö‚ÌƒIï¿½tï¿½Zï¿½bï¿½g			*/
     /* sceHardSynthSampleRaram sampleParam[] */
 } sceHardSynthSampleChunk;
 
@@ -225,21 +225,21 @@ typedef struct {
  * Sample Set Chunk
  ****************************************************************/
 typedef struct {
-    unsigned char  velCurve;			/*U8 ƒxƒƒVƒeƒBƒJ[ƒuƒ^ƒCƒv(for AMP LEVEL)		*/
-    unsigned char  velLimitLow;			/*U8 ”­‰¹ãŒÀƒxƒƒVƒeƒB					*/
-    unsigned char  velLimitHigh;		/*U8 ”­‰¹‰ºŒÀƒxƒƒVƒeƒB					*/
-    unsigned char  nSample;			/*U8 ‚±‚ÌƒTƒ“ƒvƒ‹ƒZƒbƒg‚É‘®‚·‚éƒTƒ“ƒvƒ‹‚ÌŒÂ”		*/
+    unsigned char  velCurve;			/*U8 ï¿½xï¿½ï¿½ï¿½Vï¿½eï¿½Bï¿½Jï¿½[ï¿½uï¿½^ï¿½Cï¿½v(for AMP LEVEL)		*/
+    unsigned char  velLimitLow;			/*U8 ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½xï¿½ï¿½ï¿½Vï¿½eï¿½B					*/
+    unsigned char  velLimitHigh;		/*U8 ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½xï¿½ï¿½ï¿½Vï¿½eï¿½B					*/
+    unsigned char  nSample;			/*U8 ï¿½ï¿½ï¿½ÌƒTï¿½ï¿½ï¿½vï¿½ï¿½ï¿½Zï¿½bï¿½gï¿½É‘ï¿½ï¿½ï¿½ï¿½ï¿½Tï¿½ï¿½ï¿½vï¿½ï¿½ï¿½ÌŒÂï¿½		*/
 
-    unsigned short sampleIndex[0];		/*CINDEX ƒTƒ“ƒvƒ‹ƒ`ƒƒƒ“ƒN‚Å‚ÌƒCƒ“ƒfƒbƒNƒXƒiƒ“ƒo[	*/
+    unsigned short sampleIndex[0];		/*CINDEX ï¿½Tï¿½ï¿½ï¿½vï¿½ï¿½ï¿½`ï¿½ï¿½ï¿½ï¿½ï¿½Nï¿½Å‚ÌƒCï¿½ï¿½ï¿½fï¿½bï¿½Nï¿½Xï¿½iï¿½ï¿½ï¿½oï¿½[	*/
 } sceHardSynthSampleSetParam;
 
 typedef struct {
-    unsigned int   Creator;			/*U32 ì¬ÒƒR[ƒh:   'SCEI'				*/
-    unsigned int   Type;			/*U32 ƒ`ƒƒƒ“ƒNƒ^ƒCƒv: 'Sset'				*/
-    unsigned int   chunkSize;			/*U32 ƒ`ƒƒƒ“ƒNƒTƒCƒY					*/
-    unsigned int   maxSampleSetNumber;		/*U32 ƒTƒ“ƒvƒ‹ƒZƒbƒgƒiƒ“ƒo[‚ÌÅ‘å’l			*/
+    unsigned int   Creator;			/*U32 ï¿½ì¬ï¿½ÒƒRï¿½[ï¿½h:   'SCEI'				*/
+    unsigned int   Type;			/*U32 ï¿½`ï¿½ï¿½ï¿½ï¿½ï¿½Nï¿½^ï¿½Cï¿½v: 'Sset'				*/
+    unsigned int   chunkSize;			/*U32 ï¿½`ï¿½ï¿½ï¿½ï¿½ï¿½Nï¿½Tï¿½Cï¿½Y					*/
+    unsigned int   maxSampleSetNumber;		/*U32 ï¿½Tï¿½ï¿½ï¿½vï¿½ï¿½ï¿½Zï¿½bï¿½gï¿½iï¿½ï¿½ï¿½oï¿½[ï¿½ÌÅ‘ï¿½l			*/
 
-    unsigned int   sampleSetOffsetAddr[0];	/*COFST ƒTƒ“ƒvƒ‹ƒZƒbƒgƒe[ƒuƒ‹‚Ö‚ÌƒIƒtƒZƒbƒg		*/
+    unsigned int   sampleSetOffsetAddr[0];	/*COFST ï¿½Tï¿½ï¿½ï¿½vï¿½ï¿½ï¿½Zï¿½bï¿½gï¿½eï¿½[ï¿½uï¿½ï¿½ï¿½Ö‚ÌƒIï¿½tï¿½Zï¿½bï¿½g		*/
     /* sceHardSynthSampleSetParam sampleSetParam[] */
 } sceHardSynthSampleSetChunk;
 
@@ -247,176 +247,176 @@ typedef struct {
  * Program Chunk
  ****************************************************************/
 typedef struct {
-    unsigned short sampleSetIndex;		/*CINDEX ƒTƒ“ƒvƒ‹ƒZƒbƒgƒ`ƒƒƒ“ƒN‚Å‚ÌƒCƒ“ƒfƒbƒNƒXƒiƒ“ƒo[	*/
+    unsigned short sampleSetIndex;		/*CINDEX ï¿½Tï¿½ï¿½ï¿½vï¿½ï¿½ï¿½Zï¿½bï¿½gï¿½`ï¿½ï¿½ï¿½ï¿½ï¿½Nï¿½Å‚ÌƒCï¿½ï¿½ï¿½fï¿½bï¿½Nï¿½Xï¿½iï¿½ï¿½ï¿½oï¿½[	*/
 
-    unsigned char  splitRangeLow;		/*U8 ”­‰¹‰ºŒÀƒm[ƒgƒiƒ“ƒo[(0-127)			*/
-    unsigned char  splitCrossFade;		/*U8 ƒNƒƒXƒtƒFƒCƒhŠJnƒm[ƒgƒiƒ“ƒo[(0-127)		*/
-    unsigned char  splitRangeHigh;		/*U8 ”­‰¹ãŒÀƒm[ƒgƒiƒ“ƒo[(0-127)			*/
-    unsigned char  splitNumber;			/*U8 ƒXƒvƒŠƒbƒgƒiƒ“ƒo[(0-127)				*/
+    unsigned char  splitRangeLow;		/*U8 ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½mï¿½[ï¿½gï¿½iï¿½ï¿½ï¿½oï¿½[(0-127)			*/
+    unsigned char  splitCrossFade;		/*U8 ï¿½Nï¿½ï¿½ï¿½Xï¿½tï¿½Fï¿½Cï¿½hï¿½Jï¿½nï¿½mï¿½[ï¿½gï¿½iï¿½ï¿½ï¿½oï¿½[(0-127)		*/
+    unsigned char  splitRangeHigh;		/*U8 ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½mï¿½[ï¿½gï¿½iï¿½ï¿½ï¿½oï¿½[(0-127)			*/
+    unsigned char  splitNumber;			/*U8 ï¿½Xï¿½vï¿½ï¿½ï¿½bï¿½gï¿½iï¿½ï¿½ï¿½oï¿½[(0-127)				*/
 
-    unsigned short splitBendRangeLow;		/*U16 ƒxƒ“ƒhƒŒƒ“ƒW-(’1)				*/
-    unsigned short splitBendRangeHigh;		/*U16 ƒxƒ“ƒhƒŒƒ“ƒW+(’1)				*/
+    unsigned short splitBendRangeLow;		/*U16 ï¿½xï¿½ï¿½ï¿½hï¿½ï¿½ï¿½ï¿½ï¿½W-(ï¿½ï¿½1)				*/
+    unsigned short splitBendRangeHigh;		/*U16 ï¿½xï¿½ï¿½ï¿½hï¿½ï¿½ï¿½ï¿½ï¿½W+(ï¿½ï¿½1)				*/
 
-    char	   keyFollowPitch;		/*S8 1ƒIƒNƒ^[ƒu–ˆ‚É•Ï‰»‚·‚éƒsƒbƒ`LFO‚Ì•Ï‰»•(’1)	*/
-    unsigned char  keyFollowPitchCenter;	/*U8 keyFollowPitch ‚É‚æ‚éŒø‰Ê‚ª0‚É‚È‚éƒm[ƒg(0-127)	*/
-    char	   keyFollowAmp;		/*S8 1ƒIƒNƒ^[ƒu–ˆ‚É•Ï‰»‚·‚éƒAƒ“ƒvLFO‚Ì•Ï‰»•		*/
-    unsigned char  keyFollowAmpCenter;		/*U8 keyFollowAmp ‚É‚æ‚éŒø‰Ê‚ª0‚É‚È‚éƒm[ƒg(0-127)	*/
-    char	   keyFollowPan;		/*S8 1ƒIƒNƒ^[ƒu–ˆ‚É•Ï‰»‚·‚éƒpƒ“ƒ|ƒbƒg‚Ì•Ï‰»•		*/
-    unsigned char  keyFollowPanCenter;		/*U8 keyFollowPan ‚É‚æ‚éŒø‰Ê‚ª0‚É‚È‚éƒm[ƒg(0-127)	*/
+    char	   keyFollowPitch;		/*S8 1ï¿½Iï¿½Nï¿½^ï¿½[ï¿½uï¿½ï¿½ï¿½É•Ï‰ï¿½ï¿½ï¿½ï¿½ï¿½sï¿½bï¿½`LFOï¿½Ì•Ï‰ï¿½ï¿½ï¿½(ï¿½ï¿½1)	*/
+    unsigned char  keyFollowPitchCenter;	/*U8 keyFollowPitch ï¿½É‚ï¿½ï¿½ï¿½ï¿½Ê‚ï¿½0ï¿½É‚È‚ï¿½mï¿½[ï¿½g(0-127)	*/
+    char	   keyFollowAmp;		/*S8 1ï¿½Iï¿½Nï¿½^ï¿½[ï¿½uï¿½ï¿½ï¿½É•Ï‰ï¿½ï¿½ï¿½ï¿½ï¿½Aï¿½ï¿½ï¿½vLFOï¿½Ì•Ï‰ï¿½ï¿½ï¿½		*/
+    unsigned char  keyFollowAmpCenter;		/*U8 keyFollowAmp ï¿½É‚ï¿½ï¿½ï¿½ï¿½Ê‚ï¿½0ï¿½É‚È‚ï¿½mï¿½[ï¿½g(0-127)	*/
+    char	   keyFollowPan;		/*S8 1ï¿½Iï¿½Nï¿½^ï¿½[ï¿½uï¿½ï¿½ï¿½É•Ï‰ï¿½ï¿½ï¿½ï¿½ï¿½pï¿½ï¿½ï¿½|ï¿½bï¿½gï¿½Ì•Ï‰ï¿½ï¿½ï¿½		*/
+    unsigned char  keyFollowPanCenter;		/*U8 keyFollowPan ï¿½É‚ï¿½ï¿½ï¿½ï¿½Ê‚ï¿½0ï¿½É‚È‚ï¿½mï¿½[ï¿½g(0-127)	*/
 
-    unsigned char  splitVolume;			/*U8 ƒXƒvƒŠƒbƒgƒ{ƒŠƒ…[ƒ€(0-128)			*/
-    char	   splitPanpot;			/*S8 ƒXƒvƒŠƒbƒgƒpƒ“ƒ|ƒbƒg(0-64-127=¶-’†‰›-‰E;•‰‚Í‹t‘Š)	*/
-    char	   splitTranspose;		/*S8 ƒgƒ‰ƒ“ƒXƒ|[ƒY(’PˆÊ:ƒm[ƒg)			*/
-    char	   splitDetune;			/*S8 ƒfƒBƒ`ƒ…[ƒ“(’1)					*/
+    unsigned char  splitVolume;			/*U8 ï¿½Xï¿½vï¿½ï¿½ï¿½bï¿½gï¿½{ï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½ï¿½(0-128)			*/
+    char	   splitPanpot;			/*S8 ï¿½Xï¿½vï¿½ï¿½ï¿½bï¿½gï¿½pï¿½ï¿½ï¿½|ï¿½bï¿½g(0-64-127=ï¿½ï¿½-ï¿½ï¿½ï¿½ï¿½-ï¿½E;ï¿½ï¿½ï¿½Í‹tï¿½ï¿½)	*/
+    char	   splitTranspose;		/*S8 ï¿½gï¿½ï¿½ï¿½ï¿½ï¿½Xï¿½|ï¿½[ï¿½Y(ï¿½Pï¿½ï¿½:ï¿½mï¿½[ï¿½g)			*/
+    char	   splitDetune;			/*S8 ï¿½fï¿½Bï¿½`ï¿½ï¿½ï¿½[ï¿½ï¿½(ï¿½ï¿½1)					*/
 } sceHardSynthSplitBlock;
-/* ’1: ’PˆÊ: ”¼‰¹‚ğ128“™•ª */
+/* ï¿½ï¿½1: ï¿½Pï¿½ï¿½: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½128ï¿½ï¿½ï¿½ï¿½ */
 
 typedef struct {
-    unsigned int   splitBlockAddr;		/*POFST ƒXƒvƒŠƒbƒgƒuƒƒbƒN‚Ö‚ÌƒIƒtƒZƒbƒg		*/
+    unsigned int   splitBlockAddr;		/*POFST ï¿½Xï¿½vï¿½ï¿½ï¿½bï¿½gï¿½uï¿½ï¿½ï¿½bï¿½Nï¿½Ö‚ÌƒIï¿½tï¿½Zï¿½bï¿½g		*/
 
-    unsigned char  nSplit;			/*U8 ‚±‚ÌƒvƒƒOƒ‰ƒ€‚É‘®‚·‚é splitBlock ‚ÌŒÂ”		*/
-    unsigned char  sizeSplitBlock;		/*U8 ‚Ğ‚Æ‚Â‚Ì splitBlock ‚ÌƒTƒCƒY			*/
+    unsigned char  nSplit;			/*U8 ï¿½ï¿½ï¿½Ìƒvï¿½ï¿½ï¿½Oï¿½ï¿½ï¿½ï¿½ï¿½É‘ï¿½ï¿½ï¿½ï¿½ï¿½ splitBlock ï¿½ÌŒÂï¿½		*/
+    unsigned char  sizeSplitBlock;		/*U8 ï¿½Ğ‚Æ‚Â‚ï¿½ splitBlock ï¿½ÌƒTï¿½Cï¿½Y			*/
 
-    unsigned char  progVolume;			/*U8 ƒvƒƒOƒ‰ƒ€ƒ{ƒŠƒ…[ƒ€(0-128)			*/
-    char	   progPanpot;			/*S8 ƒvƒƒOƒ‰ƒ€ƒpƒ“ƒ|ƒbƒg(0-64-127=¶-’†‰›-‰E;•‰‚Í‹t‘Š)	*/
-    char	   progTranspose;		/*S8 ƒgƒ‰ƒ“ƒXƒ|[ƒY(’PˆÊ:ƒm[ƒg)			*/
-    char	   progDetune;			/*S8 ƒfƒBƒ`ƒ…[ƒ“(’1)					*/
-    char	   keyFollowPan;		/*S8 1ƒIƒNƒ^[ƒu–ˆ‚É•Ï‰»‚·‚éƒpƒ“ƒ|ƒbƒg‚Ì•Ï‰»•		*/
-    unsigned char  keyFollowPanCenter;		/*U8 keyFollowPan ‚É‚æ‚éŒø‰Ê‚ª0‚É‚È‚éƒm[ƒg(0-127)	*/
-    unsigned char  progAttr;			/*U8 ƒvƒƒOƒ‰ƒ€ƒAƒgƒŠƒrƒ…[ƒg				*/
-    unsigned char  dmy;				/*U8 —\–ñ—Ìˆæ						*/
+    unsigned char  progVolume;			/*U8 ï¿½vï¿½ï¿½ï¿½Oï¿½ï¿½ï¿½ï¿½ï¿½{ï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½ï¿½(0-128)			*/
+    char	   progPanpot;			/*S8 ï¿½vï¿½ï¿½ï¿½Oï¿½ï¿½ï¿½ï¿½ï¿½pï¿½ï¿½ï¿½|ï¿½bï¿½g(0-64-127=ï¿½ï¿½-ï¿½ï¿½ï¿½ï¿½-ï¿½E;ï¿½ï¿½ï¿½Í‹tï¿½ï¿½)	*/
+    char	   progTranspose;		/*S8 ï¿½gï¿½ï¿½ï¿½ï¿½ï¿½Xï¿½|ï¿½[ï¿½Y(ï¿½Pï¿½ï¿½:ï¿½mï¿½[ï¿½g)			*/
+    char	   progDetune;			/*S8 ï¿½fï¿½Bï¿½`ï¿½ï¿½ï¿½[ï¿½ï¿½(ï¿½ï¿½1)					*/
+    char	   keyFollowPan;		/*S8 1ï¿½Iï¿½Nï¿½^ï¿½[ï¿½uï¿½ï¿½ï¿½É•Ï‰ï¿½ï¿½ï¿½ï¿½ï¿½pï¿½ï¿½ï¿½|ï¿½bï¿½gï¿½Ì•Ï‰ï¿½ï¿½ï¿½		*/
+    unsigned char  keyFollowPanCenter;		/*U8 keyFollowPan ï¿½É‚ï¿½ï¿½ï¿½ï¿½Ê‚ï¿½0ï¿½É‚È‚ï¿½mï¿½[ï¿½g(0-127)	*/
+    unsigned char  progAttr;			/*U8 ï¿½vï¿½ï¿½ï¿½Oï¿½ï¿½ï¿½ï¿½ï¿½Aï¿½gï¿½ï¿½ï¿½rï¿½ï¿½ï¿½[ï¿½g				*/
+    unsigned char  dmy;				/*U8 ï¿½\ï¿½ï¿½Ìˆï¿½						*/
 
-    unsigned char  progLfoWave;			/*U8 LFO”gŒ`(ƒsƒbƒ`)					*/
-    unsigned char  progLfoWave2;		/*U8 LFO”gŒ`(ƒAƒ“ƒv)					*/
-    unsigned char  progLfoStartPhase;		/*U8 LFOƒXƒ^[ƒgˆÊ‘Š(ƒsƒbƒ`)(0-255:0-359‹)		*/
-    unsigned char  progLfoStartPhase2;		/*U8 LFOƒXƒ^[ƒgˆÊ‘Š(ƒAƒ“ƒv)(0-255:0-359‹)		*/
-    unsigned char  progLfoPhaseRandom;		/*U8 LFOƒ‰ƒ“ƒ_ƒ€ƒXƒ^[ƒgˆÊ‘Š(ƒsƒbƒ`)(0-255:0-359‹)	*/
-    unsigned char  progLfoPhaseRandom2;		/*U8 LFOƒ‰ƒ“ƒ_ƒ€ƒXƒ^[ƒgˆÊ‘Š(ƒAƒ“ƒv)(0-255:0-359‹)	*/
-    unsigned short progLfoFreq;			/*U16 LFOüŠú(ƒsƒbƒ`)(’PˆÊ:msec)			*/
-    unsigned short progLfoFreq2;		/*U16 LFOüŠú(ƒAƒ“ƒv)(’PˆÊ:msec)			*/
-    short	   progLfoPitchDepth;		/*S16 ƒsƒbƒ`ƒ‚ƒWƒ…ƒŒ[ƒVƒ‡ƒ“U•+(’1)			*/
-    short	   progLfoPitchDepth2;		/*S16 ƒsƒbƒ`ƒ‚ƒWƒ…ƒŒ[ƒVƒ‡ƒ“U•-(’1)			*/
-    short	   progLfoMidiPitchDepth;	/*S16 MIDIƒsƒbƒ`ƒ‚ƒWƒ…ƒŒ[ƒVƒ‡ƒ“Å‘åU•+(’1)		*/
-    short	   progLfoMidiPitchDepth2;	/*S16 MIDIƒsƒbƒ`ƒ‚ƒWƒ…ƒŒ[ƒVƒ‡ƒ“Å‘åU•-(’1)		*/
-    char	   progLfoAmpDepth;		/*S8 ƒAƒ“ƒvƒ‚ƒWƒ…ƒŒ[ƒVƒ‡ƒ“U•+			*/
-    char	   progLfoAmpDepth2;		/*S8 ƒAƒ“ƒvƒ‚ƒWƒ…ƒŒ[ƒVƒ‡ƒ“U•-			*/
-    char	   progLfoMidiAmpDepth;		/*S8 MIDIƒ‚ƒWƒ…ƒŒ[ƒVƒ‡ƒ“Å‘åU•+			*/
-    char	   progLfoMidiAmpDepth2;	/*S8 MIDIƒ‚ƒWƒ…ƒŒ[ƒVƒ‡ƒ“Å‘åU•-			*/
+    unsigned char  progLfoWave;			/*U8 LFOï¿½gï¿½`(ï¿½sï¿½bï¿½`)					*/
+    unsigned char  progLfoWave2;		/*U8 LFOï¿½gï¿½`(ï¿½Aï¿½ï¿½ï¿½v)					*/
+    unsigned char  progLfoStartPhase;		/*U8 LFOï¿½Xï¿½^ï¿½[ï¿½gï¿½Ê‘ï¿½(ï¿½sï¿½bï¿½`)(0-255:0-359ï¿½ï¿½)		*/
+    unsigned char  progLfoStartPhase2;		/*U8 LFOï¿½Xï¿½^ï¿½[ï¿½gï¿½Ê‘ï¿½(ï¿½Aï¿½ï¿½ï¿½v)(0-255:0-359ï¿½ï¿½)		*/
+    unsigned char  progLfoPhaseRandom;		/*U8 LFOï¿½ï¿½ï¿½ï¿½ï¿½_ï¿½ï¿½ï¿½Xï¿½^ï¿½[ï¿½gï¿½Ê‘ï¿½(ï¿½sï¿½bï¿½`)(0-255:0-359ï¿½ï¿½)	*/
+    unsigned char  progLfoPhaseRandom2;		/*U8 LFOï¿½ï¿½ï¿½ï¿½ï¿½_ï¿½ï¿½ï¿½Xï¿½^ï¿½[ï¿½gï¿½Ê‘ï¿½(ï¿½Aï¿½ï¿½ï¿½v)(0-255:0-359ï¿½ï¿½)	*/
+    unsigned short progLfoFreq;			/*U16 LFOï¿½ï¿½ï¿½ï¿½(ï¿½sï¿½bï¿½`)(ï¿½Pï¿½ï¿½:msec)			*/
+    unsigned short progLfoFreq2;		/*U16 LFOï¿½ï¿½ï¿½ï¿½(ï¿½Aï¿½ï¿½ï¿½v)(ï¿½Pï¿½ï¿½:msec)			*/
+    short	   progLfoPitchDepth;		/*S16 ï¿½sï¿½bï¿½`ï¿½ï¿½ï¿½Wï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½Uï¿½ï¿½+(ï¿½ï¿½1)			*/
+    short	   progLfoPitchDepth2;		/*S16 ï¿½sï¿½bï¿½`ï¿½ï¿½ï¿½Wï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½Uï¿½ï¿½-(ï¿½ï¿½1)			*/
+    short	   progLfoMidiPitchDepth;	/*S16 MIDIï¿½sï¿½bï¿½`ï¿½ï¿½ï¿½Wï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½Å‘ï¿½Uï¿½ï¿½+(ï¿½ï¿½1)		*/
+    short	   progLfoMidiPitchDepth2;	/*S16 MIDIï¿½sï¿½bï¿½`ï¿½ï¿½ï¿½Wï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½Å‘ï¿½Uï¿½ï¿½-(ï¿½ï¿½1)		*/
+    char	   progLfoAmpDepth;		/*S8 ï¿½Aï¿½ï¿½ï¿½vï¿½ï¿½ï¿½Wï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½Uï¿½ï¿½+			*/
+    char	   progLfoAmpDepth2;		/*S8 ï¿½Aï¿½ï¿½ï¿½vï¿½ï¿½ï¿½Wï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½Uï¿½ï¿½-			*/
+    char	   progLfoMidiAmpDepth;		/*S8 MIDIï¿½ï¿½ï¿½Wï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½Å‘ï¿½Uï¿½ï¿½+			*/
+    char	   progLfoMidiAmpDepth2;	/*S8 MIDIï¿½ï¿½ï¿½Wï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½Å‘ï¿½Uï¿½ï¿½-			*/
 
-    sceHardSynthSplitBlock splitBlock[0];	/* ƒXƒvƒŠƒbƒgƒuƒƒbƒN (ŒÂ”•ª)				*/
+    sceHardSynthSplitBlock splitBlock[0];	/* ï¿½Xï¿½vï¿½ï¿½ï¿½bï¿½gï¿½uï¿½ï¿½ï¿½bï¿½N (ï¿½Âï¿½ï¿½ï¿½)				*/
 } sceHardSynthProgramParam;
-/* ’1: ’PˆÊ: ”¼‰¹‚ğ128“™•ª */
+/* ï¿½ï¿½1: ï¿½Pï¿½ï¿½: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½128ï¿½ï¿½ï¿½ï¿½ */
 
 typedef struct {
-    unsigned int   Creator;			/*U32 ì¬ÒƒR[ƒh:   'SCEI'		*/
-    unsigned int   Type;			/*U32 ƒ`ƒƒƒ“ƒNƒ^ƒCƒv: 'Prog'		*/
-    unsigned int   chunkSize;			/*U32 ƒ`ƒƒƒ“ƒNƒTƒCƒY			*/
-    unsigned int   maxProgramNumber;		/*U32 ƒvƒƒOƒ‰ƒ€ƒiƒ“ƒo[‚ÌÅ‘å’l	*/
+    unsigned int   Creator;			/*U32 ï¿½ì¬ï¿½ÒƒRï¿½[ï¿½h:   'SCEI'		*/
+    unsigned int   Type;			/*U32 ï¿½`ï¿½ï¿½ï¿½ï¿½ï¿½Nï¿½^ï¿½Cï¿½v: 'Prog'		*/
+    unsigned int   chunkSize;			/*U32 ï¿½`ï¿½ï¿½ï¿½ï¿½ï¿½Nï¿½Tï¿½Cï¿½Y			*/
+    unsigned int   maxProgramNumber;		/*U32 ï¿½vï¿½ï¿½ï¿½Oï¿½ï¿½ï¿½ï¿½ï¿½iï¿½ï¿½ï¿½oï¿½[ï¿½ÌÅ‘ï¿½l	*/
 
-    unsigned int   programOffsetAddr[0];	/*COFST ƒvƒƒOƒ‰ƒ€‚Ö‚ÌƒIƒtƒZƒbƒgƒAƒhƒŒƒX */
+    unsigned int   programOffsetAddr[0];	/*COFST ï¿½vï¿½ï¿½ï¿½Oï¿½ï¿½ï¿½ï¿½ï¿½Ö‚ÌƒIï¿½tï¿½Zï¿½bï¿½gï¿½Aï¿½hï¿½ï¿½ï¿½X */
 } sceHardSynthProgramChunk;
 
 /****************************************************************
  * SE Timbre Chunk
  ****************************************************************/
 typedef struct {
-    unsigned short VagIndex;				/*CINDEX VAGInfo ƒ`ƒƒƒ“ƒN‚ÌƒCƒ“ƒfƒbƒNƒX		*/
+    unsigned short VagIndex;				/*CINDEX VAGInfo ï¿½`ï¿½ï¿½ï¿½ï¿½ï¿½Nï¿½ÌƒCï¿½ï¿½ï¿½fï¿½bï¿½Nï¿½X		*/
 
-    unsigned char  seTimbreNoteVelCurve;		/*U8 ƒm[ƒgƒxƒƒVƒeƒBƒJ[ƒuƒ^ƒCƒv(0-5)		*/
-    unsigned char  seTimbreNoteVolume;			/*U8 ƒm[ƒgƒ{ƒŠƒ…[ƒ€(0-128)			*/
-    char	   seTimbreNotePanpot;			/*S8 ƒm[ƒgƒpƒ“ƒ|ƒbƒg(0-64-127=¶-’†‰›-‰E;•‰‚Í‹t‘Š) */
-    char	   seTimbreNoteTranspose;		/*S8 ƒm[ƒgƒgƒ‰ƒ“ƒXƒ|[ƒY(’PˆÊƒm[ƒg)		*/
-    char	   seTimbreNoteDetune;			/*S8 ƒm[ƒgƒfƒBƒ`ƒ…[ƒ“(’1)			*/
-    unsigned char  seTimbreNoteGroup;			/*U8 ƒm[ƒgƒOƒ‹[ƒv(0-127;0‚ÍƒOƒ‹[ƒv‚È‚µ)	*/
-    unsigned char  seTimbreNoteGroupLimit;		/*U8 ƒm[ƒgƒOƒ‹[ƒv“à”­‰¹”ƒŠƒ~ƒbƒg(0-48;0‚ÍƒŠƒ~ƒbƒg‚È‚µ) */
-    unsigned char  seTimbreNotePriority;		/*U8 ƒm[ƒgƒvƒ‰ƒCƒIƒŠƒeƒB			*/
-    unsigned char  dmy0;				/*U8 —\–ñ—Ìˆæ					*/
-    unsigned char  dmy1;				/*U8 —\–ñ—Ìˆæ					*/
-    unsigned char  seTimbreNoteAttr;			/*U8 ƒm[ƒgƒAƒgƒŠƒrƒ…[ƒg			*/
+    unsigned char  seTimbreNoteVelCurve;		/*U8 ï¿½mï¿½[ï¿½gï¿½xï¿½ï¿½ï¿½Vï¿½eï¿½Bï¿½Jï¿½[ï¿½uï¿½^ï¿½Cï¿½v(0-5)		*/
+    unsigned char  seTimbreNoteVolume;			/*U8 ï¿½mï¿½[ï¿½gï¿½{ï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½ï¿½(0-128)			*/
+    char	   seTimbreNotePanpot;			/*S8 ï¿½mï¿½[ï¿½gï¿½pï¿½ï¿½ï¿½|ï¿½bï¿½g(0-64-127=ï¿½ï¿½-ï¿½ï¿½ï¿½ï¿½-ï¿½E;ï¿½ï¿½ï¿½Í‹tï¿½ï¿½) */
+    char	   seTimbreNoteTranspose;		/*S8 ï¿½mï¿½[ï¿½gï¿½gï¿½ï¿½ï¿½ï¿½ï¿½Xï¿½|ï¿½[ï¿½Y(ï¿½Pï¿½Êƒmï¿½[ï¿½g)		*/
+    char	   seTimbreNoteDetune;			/*S8 ï¿½mï¿½[ï¿½gï¿½fï¿½Bï¿½`ï¿½ï¿½ï¿½[ï¿½ï¿½(ï¿½ï¿½1)			*/
+    unsigned char  seTimbreNoteGroup;			/*U8 ï¿½mï¿½[ï¿½gï¿½Oï¿½ï¿½ï¿½[ï¿½v(0-127;0ï¿½ÍƒOï¿½ï¿½ï¿½[ï¿½vï¿½È‚ï¿½)	*/
+    unsigned char  seTimbreNoteGroupLimit;		/*U8 ï¿½mï¿½[ï¿½gï¿½Oï¿½ï¿½ï¿½[ï¿½vï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½~ï¿½bï¿½g(0-48;0ï¿½Íƒï¿½ï¿½~ï¿½bï¿½gï¿½È‚ï¿½) */
+    unsigned char  seTimbreNotePriority;		/*U8 ï¿½mï¿½[ï¿½gï¿½vï¿½ï¿½ï¿½Cï¿½Iï¿½ï¿½ï¿½eï¿½B			*/
+    unsigned char  dmy0;				/*U8 ï¿½\ï¿½ï¿½Ìˆï¿½					*/
+    unsigned char  dmy1;				/*U8 ï¿½\ï¿½ï¿½Ìˆï¿½					*/
+    unsigned char  seTimbreNoteAttr;			/*U8 ï¿½mï¿½[ï¿½gï¿½Aï¿½gï¿½ï¿½ï¿½rï¿½ï¿½ï¿½[ï¿½g			*/
     unsigned char  seTimbreNoteSpuAttr;			/*U8 SPU Attribute				*/
     unsigned short seTimbreNoteAdsr1;			/*U16 ADSR1					*/
     unsigned short seTimbreNoteAdsr2;			/*U16 ADSR2					*/
 
-    unsigned char  seTimbreNotePitchLfoWave;		/*U8  LFO ”gŒ`(ƒsƒbƒ`)				*/
-    unsigned char  seTimbreNoteAmpLfoWave;		/*U8  LFO ”gŒ`(ƒAƒ“ƒv)				*/
-    unsigned char  seTimbreNotePitchLfoStartPhase;	/*U8  LFO ƒXƒ^[ƒgˆÊ‘Š(ƒsƒbƒ`)(0-255:0-359‹)	*/
-    unsigned char  seTimbreNoteAmpLfoStartPhase;	/*U8  LFO ƒXƒ^[ƒgˆÊ‘Š(ƒAƒ“ƒv)(0-255:0-359‹)	*/
-    unsigned char  seTimbreNotePitchLfoRandomPhase;	/*U8  LFO ƒ‰ƒ“ƒ_ƒ€ƒXƒ^[ƒgˆÊ‘Š(ƒsƒbƒ`)(0-255:0-359‹) */
-    unsigned char  seTimbreNoteAmpLfoRandomPhase;	/*U8  LFO ƒ‰ƒ“ƒ_ƒ€ƒXƒ^[ƒgˆÊ‘Š(ƒAƒ“ƒv)(0-255:0-359‹) */
-    unsigned short seTimbreNotePitchLfoCycle;		/*U16 LFO üŠú(ƒsƒbƒ`)(’PˆÊ:msec)		*/
-    unsigned short seTimbreNoteAmpLfoCycle;		/*U16 LFO üŠú(ƒAƒ“ƒv)(’PˆÊ:msec)		*/
-    short	   seTimbreNotePitchLfoDepth;		/*S16 LFO U•+(ƒsƒbƒ`)(’1)			*/
-    short	   seTimbreNotePitchLfoDepth2;		/*S16 LFO U•-(ƒsƒbƒ`)(’1)			*/
-    char	   seTimbreNoteAmpLfoDepth;		/*S8  LFO U•+(ƒAƒ“ƒv)				*/
-    char	   seTimbreNoteAmpLfoDepth2;		/*S8  LFO U•-(ƒAƒ“ƒv)				*/
+    unsigned char  seTimbreNotePitchLfoWave;		/*U8  LFO ï¿½gï¿½`(ï¿½sï¿½bï¿½`)				*/
+    unsigned char  seTimbreNoteAmpLfoWave;		/*U8  LFO ï¿½gï¿½`(ï¿½Aï¿½ï¿½ï¿½v)				*/
+    unsigned char  seTimbreNotePitchLfoStartPhase;	/*U8  LFO ï¿½Xï¿½^ï¿½[ï¿½gï¿½Ê‘ï¿½(ï¿½sï¿½bï¿½`)(0-255:0-359ï¿½ï¿½)	*/
+    unsigned char  seTimbreNoteAmpLfoStartPhase;	/*U8  LFO ï¿½Xï¿½^ï¿½[ï¿½gï¿½Ê‘ï¿½(ï¿½Aï¿½ï¿½ï¿½v)(0-255:0-359ï¿½ï¿½)	*/
+    unsigned char  seTimbreNotePitchLfoRandomPhase;	/*U8  LFO ï¿½ï¿½ï¿½ï¿½ï¿½_ï¿½ï¿½ï¿½Xï¿½^ï¿½[ï¿½gï¿½Ê‘ï¿½(ï¿½sï¿½bï¿½`)(0-255:0-359ï¿½ï¿½) */
+    unsigned char  seTimbreNoteAmpLfoRandomPhase;	/*U8  LFO ï¿½ï¿½ï¿½ï¿½ï¿½_ï¿½ï¿½ï¿½Xï¿½^ï¿½[ï¿½gï¿½Ê‘ï¿½(ï¿½Aï¿½ï¿½ï¿½v)(0-255:0-359ï¿½ï¿½) */
+    unsigned short seTimbreNotePitchLfoCycle;		/*U16 LFO ï¿½ï¿½ï¿½ï¿½(ï¿½sï¿½bï¿½`)(ï¿½Pï¿½ï¿½:msec)		*/
+    unsigned short seTimbreNoteAmpLfoCycle;		/*U16 LFO ï¿½ï¿½ï¿½ï¿½(ï¿½Aï¿½ï¿½ï¿½v)(ï¿½Pï¿½ï¿½:msec)		*/
+    short	   seTimbreNotePitchLfoDepth;		/*S16 LFO ï¿½Uï¿½ï¿½+(ï¿½sï¿½bï¿½`)(ï¿½ï¿½1)			*/
+    short	   seTimbreNotePitchLfoDepth2;		/*S16 LFO ï¿½Uï¿½ï¿½-(ï¿½sï¿½bï¿½`)(ï¿½ï¿½1)			*/
+    char	   seTimbreNoteAmpLfoDepth;		/*S8  LFO ï¿½Uï¿½ï¿½+(ï¿½Aï¿½ï¿½ï¿½v)				*/
+    char	   seTimbreNoteAmpLfoDepth2;		/*S8  LFO ï¿½Uï¿½ï¿½-(ï¿½Aï¿½ï¿½ï¿½v)				*/
 
-    unsigned short seTimbreNotePitchLfoDelay;		/*U16 LFO ƒfƒBƒŒƒCƒ^ƒCƒ€(’PˆÊ:msec)(ƒsƒbƒ`)	*/
-    unsigned short seTimbreNoteAmpLfoDelay;		/*U16 LFO ƒfƒBƒŒƒCƒ^ƒCƒ€(’PˆÊ:msec)(ƒAƒ“ƒv)	*/
-    unsigned short seTimbreNotePitchLfoFade;		/*U16 LFO ƒtƒFƒCƒhƒ^ƒCƒ€(’PˆÊ:msec)(ƒsƒbƒ`)	*/
-    unsigned short seTimbreNoteAmpLfoFade;		/*U16 LFO ƒtƒFƒCƒhƒ^ƒCƒ€(’PˆÊ:msec)(ƒAƒ“ƒv)	*/
-    char	   seTimbreNoteVelFollowPitch;		/*S8 ƒxƒƒVƒeƒB‚É‚æ‚éƒsƒbƒ`LFO‚Ì•Ï‰»•(-127..0..127)(’1) */
-    char	   seTimbreNoteVelFollowAmp;		/*S8 ƒxƒƒVƒeƒB‚É‚æ‚éƒAƒ“ƒvLFO‚Ì•Ï‰»•(-127..0..127)	*/
-    unsigned char  seTimbreNoteVelFollowPitchCenter;	/*U8 seTimbreNoteVelFollowPitch‚ÌŒø‰Ê‚ª0‚É‚È‚éƒxƒƒVƒeƒB(1-127)	*/
-    unsigned char  seTimbreNoteVelFollowAmpCenter;	/*U8 seTimbreNoteVelFollowAmp‚ÌŒø‰Ê‚ª0‚É‚È‚éƒxƒƒVƒeƒB(1-127)	*/
-    unsigned char  seTimbreNoteVelFollowPitchCurve;	/*U8 seTimbreNoteVelFollowPitch‚ÌŒø‰Ê—Ê‚ğ’è‚ß‚é‚½‚ß‚ÌƒxƒƒVƒeƒBƒJ[ƒu(0-9) */
-    unsigned char  seTimbreNoteVelFollowAmpCurve;	/*U8 seTimbreNoteVelFollowAmp‚ÌŒø‰Ê—Ê‚ğ’è‚ß‚é‚½‚ß‚ÌƒxƒƒVƒeƒBƒJ[ƒu(0-9) */
-    unsigned char  dmy;					/*U8 —\–ñ—Ìˆæ					*/
+    unsigned short seTimbreNotePitchLfoDelay;		/*U16 LFO ï¿½fï¿½Bï¿½ï¿½ï¿½Cï¿½^ï¿½Cï¿½ï¿½(ï¿½Pï¿½ï¿½:msec)(ï¿½sï¿½bï¿½`)	*/
+    unsigned short seTimbreNoteAmpLfoDelay;		/*U16 LFO ï¿½fï¿½Bï¿½ï¿½ï¿½Cï¿½^ï¿½Cï¿½ï¿½(ï¿½Pï¿½ï¿½:msec)(ï¿½Aï¿½ï¿½ï¿½v)	*/
+    unsigned short seTimbreNotePitchLfoFade;		/*U16 LFO ï¿½tï¿½Fï¿½Cï¿½hï¿½^ï¿½Cï¿½ï¿½(ï¿½Pï¿½ï¿½:msec)(ï¿½sï¿½bï¿½`)	*/
+    unsigned short seTimbreNoteAmpLfoFade;		/*U16 LFO ï¿½tï¿½Fï¿½Cï¿½hï¿½^ï¿½Cï¿½ï¿½(ï¿½Pï¿½ï¿½:msec)(ï¿½Aï¿½ï¿½ï¿½v)	*/
+    char	   seTimbreNoteVelFollowPitch;		/*S8 ï¿½xï¿½ï¿½ï¿½Vï¿½eï¿½Bï¿½É‚ï¿½ï¿½sï¿½bï¿½`LFOï¿½Ì•Ï‰ï¿½ï¿½ï¿½(-127..0..127)(ï¿½ï¿½1) */
+    char	   seTimbreNoteVelFollowAmp;		/*S8 ï¿½xï¿½ï¿½ï¿½Vï¿½eï¿½Bï¿½É‚ï¿½ï¿½Aï¿½ï¿½ï¿½vLFOï¿½Ì•Ï‰ï¿½ï¿½ï¿½(-127..0..127)	*/
+    unsigned char  seTimbreNoteVelFollowPitchCenter;	/*U8 seTimbreNoteVelFollowPitchï¿½ÌŒï¿½ï¿½Ê‚ï¿½0ï¿½É‚È‚ï¿½xï¿½ï¿½ï¿½Vï¿½eï¿½B(1-127)	*/
+    unsigned char  seTimbreNoteVelFollowAmpCenter;	/*U8 seTimbreNoteVelFollowAmpï¿½ÌŒï¿½ï¿½Ê‚ï¿½0ï¿½É‚È‚ï¿½xï¿½ï¿½ï¿½Vï¿½eï¿½B(1-127)	*/
+    unsigned char  seTimbreNoteVelFollowPitchCurve;	/*U8 seTimbreNoteVelFollowPitchï¿½ÌŒï¿½ï¿½Ê—Ê‚ï¿½ï¿½ß‚é‚½ï¿½ß‚Ìƒxï¿½ï¿½ï¿½Vï¿½eï¿½Bï¿½Jï¿½[ï¿½u(0-9) */
+    unsigned char  seTimbreNoteVelFollowAmpCurve;	/*U8 seTimbreNoteVelFollowAmpï¿½ÌŒï¿½ï¿½Ê—Ê‚ï¿½ï¿½ß‚é‚½ï¿½ß‚Ìƒxï¿½ï¿½ï¿½Vï¿½eï¿½Bï¿½Jï¿½[ï¿½u(0-9) */
+    unsigned char  dmy;					/*U8 ï¿½\ï¿½ï¿½Ìˆï¿½					*/
     unsigned char  seTimbreNoteLfoAttr;			/*U8 LFO Attribute				*/
 } sceHardSynthSeTimbreNoteBlock;
-/* ’1: ’PˆÊ:”¼‰¹‚ğ128“™•ª */
+/* ï¿½ï¿½1: ï¿½Pï¿½ï¿½:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½128ï¿½ï¿½ï¿½ï¿½ */
 
 typedef struct {
-    unsigned int   seTimbreNoteBlockAddr;	/*POFST Œø‰Ê‰¹ƒeƒBƒ“ƒo[ƒm[ƒg‚Ìæ“ª‚Ö‚ÌƒIƒtƒZƒbƒg	*/
-    unsigned char  seTimbreNoteBlockSize;	/*U8 ‚Ğ‚Æ‚Â‚ÌŒø‰Ê‰¹ƒhƒ‰ƒ€ƒm[ƒgƒuƒƒbƒN‚ÌƒTƒCƒY		*/
-    unsigned char  seTimbreNoteStart;		/*U8 Œø‰Ê‰¹ƒeƒBƒ“ƒo[ƒXƒ^[ƒgƒm[ƒgƒiƒ“ƒo[		*/
-    unsigned char  seTimbreNoteEnd;		/*U8 Œø‰Ê‰¹ƒeƒBƒ“ƒo[ƒGƒ“ƒhƒm[ƒgƒiƒ“ƒo[		*/
-    unsigned char  dmy;				/*U8 —\–ñ—Ìˆæ	*/
+    unsigned int   seTimbreNoteBlockAddr;	/*POFST ï¿½ï¿½ï¿½Ê‰ï¿½ï¿½eï¿½Bï¿½ï¿½ï¿½oï¿½[ï¿½mï¿½[ï¿½gï¿½Ìæ“ªï¿½Ö‚ÌƒIï¿½tï¿½Zï¿½bï¿½g	*/
+    unsigned char  seTimbreNoteBlockSize;	/*U8 ï¿½Ğ‚Æ‚Â‚ÌŒï¿½ï¿½Ê‰ï¿½ï¿½hï¿½ï¿½ï¿½ï¿½ï¿½mï¿½[ï¿½gï¿½uï¿½ï¿½ï¿½bï¿½Nï¿½ÌƒTï¿½Cï¿½Y		*/
+    unsigned char  seTimbreNoteStart;		/*U8 ï¿½ï¿½ï¿½Ê‰ï¿½ï¿½eï¿½Bï¿½ï¿½ï¿½oï¿½[ï¿½Xï¿½^ï¿½[ï¿½gï¿½mï¿½[ï¿½gï¿½iï¿½ï¿½ï¿½oï¿½[		*/
+    unsigned char  seTimbreNoteEnd;		/*U8 ï¿½ï¿½ï¿½Ê‰ï¿½ï¿½eï¿½Bï¿½ï¿½ï¿½oï¿½[ï¿½Gï¿½ï¿½ï¿½hï¿½mï¿½[ï¿½gï¿½iï¿½ï¿½ï¿½oï¿½[		*/
+    unsigned char  dmy;				/*U8 ï¿½\ï¿½ï¿½Ìˆï¿½	*/
 
-    sceHardSynthSeTimbreNoteBlock seTimbreNoteBlock[0];	/* Œø‰Ê‰¹ƒeƒBƒ“ƒo[ƒm[ƒgƒuƒƒbƒN(ŒÂ”•ª)	*/
+    sceHardSynthSeTimbreNoteBlock seTimbreNoteBlock[0];	/* ï¿½ï¿½ï¿½Ê‰ï¿½ï¿½eï¿½Bï¿½ï¿½ï¿½oï¿½[ï¿½mï¿½[ï¿½gï¿½uï¿½ï¿½ï¿½bï¿½N(ï¿½Âï¿½ï¿½ï¿½)	*/
 } sceHardSynthSeTimbreBlock;
 
 typedef struct {
-    unsigned int   maxSeTimbreNumber;	/*U32 Œø‰Ê‰¹ƒeƒBƒ“ƒo[ƒZƒbƒg‚É‘®‚·‚é
-					  Œø‰Ê‰¹ƒeƒBƒ“ƒo[ƒiƒ“ƒo[‚ÌÅ‘å’l	*/
-    unsigned int   seTimbreOffsetAddr[0];/*COFST Œø‰Ê‰¹ƒeƒBƒ“ƒo[‚Ö‚ÌƒIƒtƒZƒbƒg	*/
+    unsigned int   maxSeTimbreNumber;	/*U32 ï¿½ï¿½ï¿½Ê‰ï¿½ï¿½eï¿½Bï¿½ï¿½ï¿½oï¿½[ï¿½Zï¿½bï¿½gï¿½É‘ï¿½ï¿½ï¿½ï¿½ï¿½
+					  ï¿½ï¿½ï¿½Ê‰ï¿½ï¿½eï¿½Bï¿½ï¿½ï¿½oï¿½[ï¿½iï¿½ï¿½ï¿½oï¿½[ï¿½ÌÅ‘ï¿½l	*/
+    unsigned int   seTimbreOffsetAddr[0];/*COFST ï¿½ï¿½ï¿½Ê‰ï¿½ï¿½eï¿½Bï¿½ï¿½ï¿½oï¿½[ï¿½Ö‚ÌƒIï¿½tï¿½Zï¿½bï¿½g	*/
 } sceHardSynthSeTimbreSetBlock;
 
 typedef struct {
-    unsigned int   Creator;		/*U32 ì¬ÒƒR[ƒh:   'SCEI'	*/
-    unsigned int   Type;		/*U32 ƒ`ƒƒƒ“ƒNƒ^ƒCƒv: 'Setb'	*/
-    unsigned int   chunkSize;		/*U32 ƒ`ƒƒƒ“ƒNƒTƒCƒY		*/
-    unsigned int   maxSeTimbreSetNumber;/*U32 Œø‰Ê‰¹ƒeƒBƒ“ƒo[ƒZƒbƒgƒiƒ“ƒo[‚ÌÅ‘å’l */
+    unsigned int   Creator;		/*U32 ï¿½ì¬ï¿½ÒƒRï¿½[ï¿½h:   'SCEI'	*/
+    unsigned int   Type;		/*U32 ï¿½`ï¿½ï¿½ï¿½ï¿½ï¿½Nï¿½^ï¿½Cï¿½v: 'Setb'	*/
+    unsigned int   chunkSize;		/*U32 ï¿½`ï¿½ï¿½ï¿½ï¿½ï¿½Nï¿½Tï¿½Cï¿½Y		*/
+    unsigned int   maxSeTimbreSetNumber;/*U32 ï¿½ï¿½ï¿½Ê‰ï¿½ï¿½eï¿½Bï¿½ï¿½ï¿½oï¿½[ï¿½Zï¿½bï¿½gï¿½iï¿½ï¿½ï¿½oï¿½[ï¿½ÌÅ‘ï¿½l */
 
-    unsigned int   seTimbreSetOffsetAddr[0];/*COFST Œø‰Ê‰¹ƒeƒBƒ“ƒo[ƒZƒbƒg‚Ö‚ÌƒIƒtƒZƒbƒg */
+    unsigned int   seTimbreSetOffsetAddr[0];/*COFST ï¿½ï¿½ï¿½Ê‰ï¿½ï¿½eï¿½Bï¿½ï¿½ï¿½oï¿½[ï¿½Zï¿½bï¿½gï¿½Ö‚ÌƒIï¿½tï¿½Zï¿½bï¿½g */
 } sceHardSynthSeTimbreChunk;
 
 /****************************************************************
  * Header Chunk
  ****************************************************************/
 typedef struct {
-    unsigned int   Creator;		/*U32 ì¬ÒƒR[ƒh:   'SCEI'	*/
-    unsigned int   Type;		/*U32 ƒ`ƒƒƒ“ƒNƒ^ƒCƒv: 'Head'	*/
-    unsigned int   chunkSize;		/*U32 ƒ`ƒƒƒ“ƒNƒTƒCƒY		*/
-    unsigned int   headerSize;		/*U32 ƒwƒbƒ_ƒtƒ@ƒCƒ‹ƒTƒCƒY	*/
-    unsigned int   bodySize;		/*U32 ƒ{ƒfƒBƒtƒ@ƒCƒ‹ƒTƒCƒY	*/
+    unsigned int   Creator;		/*U32 ï¿½ì¬ï¿½ÒƒRï¿½[ï¿½h:   'SCEI'	*/
+    unsigned int   Type;		/*U32 ï¿½`ï¿½ï¿½ï¿½ï¿½ï¿½Nï¿½^ï¿½Cï¿½v: 'Head'	*/
+    unsigned int   chunkSize;		/*U32 ï¿½`ï¿½ï¿½ï¿½ï¿½ï¿½Nï¿½Tï¿½Cï¿½Y		*/
+    unsigned int   headerSize;		/*U32 ï¿½wï¿½bï¿½_ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½Tï¿½Cï¿½Y	*/
+    unsigned int   bodySize;		/*U32 ï¿½{ï¿½fï¿½Bï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½Tï¿½Cï¿½Y	*/
 
-    unsigned int   programChunkAddr;	/*FOFST ƒIƒtƒZƒbƒgƒAƒhƒŒƒX: ƒvƒƒOƒ‰ƒ€ƒ`ƒƒƒ“ƒN		*/
-    unsigned int   sampleSetChunkAddr;	/*FOFST ƒIƒtƒZƒbƒgƒAƒhƒŒƒX: ƒTƒ“ƒvƒ‹ƒZƒbƒgƒ`ƒƒƒ“ƒN	*/
-    unsigned int   sampleChunkAddr;	/*FOFST ƒIƒtƒZƒbƒgƒAƒhƒŒƒX: ƒTƒ“ƒvƒ‹ƒ`ƒƒƒ“ƒN		*/
-    unsigned int   vagInfoChunkAddr;	/*FOFST ƒIƒtƒZƒbƒgƒAƒhƒŒƒX: VagInfoƒ`ƒƒƒ“ƒN		*/
-    unsigned int   seTimbreChunkAddr;	/*FOFST ƒIƒtƒZƒbƒgƒAƒhƒŒƒX: Œø‰Ê‰¹ƒeƒBƒ“ƒo[ƒ`ƒƒƒ“ƒN	*/
+    unsigned int   programChunkAddr;	/*FOFST ï¿½Iï¿½tï¿½Zï¿½bï¿½gï¿½Aï¿½hï¿½ï¿½ï¿½X: ï¿½vï¿½ï¿½ï¿½Oï¿½ï¿½ï¿½ï¿½ï¿½`ï¿½ï¿½ï¿½ï¿½ï¿½N		*/
+    unsigned int   sampleSetChunkAddr;	/*FOFST ï¿½Iï¿½tï¿½Zï¿½bï¿½gï¿½Aï¿½hï¿½ï¿½ï¿½X: ï¿½Tï¿½ï¿½ï¿½vï¿½ï¿½ï¿½Zï¿½bï¿½gï¿½`ï¿½ï¿½ï¿½ï¿½ï¿½N	*/
+    unsigned int   sampleChunkAddr;	/*FOFST ï¿½Iï¿½tï¿½Zï¿½bï¿½gï¿½Aï¿½hï¿½ï¿½ï¿½X: ï¿½Tï¿½ï¿½ï¿½vï¿½ï¿½ï¿½`ï¿½ï¿½ï¿½ï¿½ï¿½N		*/
+    unsigned int   vagInfoChunkAddr;	/*FOFST ï¿½Iï¿½tï¿½Zï¿½bï¿½gï¿½Aï¿½hï¿½ï¿½ï¿½X: VagInfoï¿½`ï¿½ï¿½ï¿½ï¿½ï¿½N		*/
+    unsigned int   seTimbreChunkAddr;	/*FOFST ï¿½Iï¿½tï¿½Zï¿½bï¿½gï¿½Aï¿½hï¿½ï¿½ï¿½X: ï¿½ï¿½ï¿½Ê‰ï¿½ï¿½eï¿½Bï¿½ï¿½ï¿½oï¿½[ï¿½`ï¿½ï¿½ï¿½ï¿½ï¿½N	*/
 } sceHardSynthHeaderChunk;
 
 /****************************************************************
  * Version Chunk
  ****************************************************************/
 typedef struct {
-    unsigned int   Creator;		/*U32 ì¬ÒƒR[ƒh:   'SCEI'	*/
-    unsigned int   Type;		/*U32 ƒ`ƒƒƒ“ƒNƒ^ƒCƒv: 'Vers'	*/
-    unsigned int   chunkSize;		/*U32 ƒ`ƒƒƒ“ƒNƒTƒCƒY		*/
-    unsigned short reserved;		/*U16 —\–ñ—Ìˆæ			*/
-    unsigned char  versionMajor;	/*U8 ƒƒWƒƒ[ƒo[ƒWƒ‡ƒ“		*/
-    unsigned char  versionMinor;	/*U8 ƒ}ƒCƒi[ƒo[ƒWƒ‡ƒ“		*/
+    unsigned int   Creator;		/*U32 ï¿½ì¬ï¿½ÒƒRï¿½[ï¿½h:   'SCEI'	*/
+    unsigned int   Type;		/*U32 ï¿½`ï¿½ï¿½ï¿½ï¿½ï¿½Nï¿½^ï¿½Cï¿½v: 'Vers'	*/
+    unsigned int   chunkSize;		/*U32 ï¿½`ï¿½ï¿½ï¿½ï¿½ï¿½Nï¿½Tï¿½Cï¿½Y		*/
+    unsigned short reserved;		/*U16 ï¿½\ï¿½ï¿½Ìˆï¿½			*/
+    unsigned char  versionMajor;	/*U8 ï¿½ï¿½ï¿½Wï¿½ï¿½ï¿½[ï¿½oï¿½[ï¿½Wï¿½ï¿½ï¿½ï¿½		*/
+    unsigned char  versionMinor;	/*U8 ï¿½}ï¿½Cï¿½iï¿½[ï¿½oï¿½[ï¿½Wï¿½ï¿½ï¿½ï¿½		*/
 } sceHardSynthVersionChunk;
 
 #endif /* _SCE_FORMAT_SOUND_HD_H */

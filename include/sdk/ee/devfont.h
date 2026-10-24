@@ -34,67 +34,67 @@
 extern "C" {
 #endif
 
-/* ƒRƒ“ƒ\[ƒ‹ƒ‰ƒCƒuƒ‰ƒŠ‚ğ‰Šú‰» */
+/* ï¿½Rï¿½ï¿½ï¿½\ï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½Cï¿½uï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
 void sceDevConsInit(void);
 
-/* ƒRƒ“ƒ\[ƒ‹‚ğƒI[ƒvƒ“Bi‚P‚Â‚µ‚©‚È‚¢BƒTƒCƒY‚ÌÅ‘å‚Í80 x 64ƒLƒƒƒ‰ƒNƒ^j */
+/* ï¿½Rï¿½ï¿½ï¿½\ï¿½[ï¿½ï¿½ï¿½ï¿½Iï¿½[ï¿½vï¿½ï¿½ï¿½Bï¿½iï¿½Pï¿½Â‚ï¿½ï¿½ï¿½ï¿½È‚ï¿½ï¿½Bï¿½Tï¿½Cï¿½Yï¿½ÌÅ‘ï¿½ï¿½80 x 64ï¿½Lï¿½ï¿½ï¿½ï¿½ï¿½Nï¿½^ï¿½j */
 int sceDevConsOpen(u_int gs_x, u_int gs_y, u_int chr_w, u_int chr_h);
 
-/* ƒRƒ“ƒ\[ƒ‹‚ğƒNƒ[ƒY */
+/* ï¿½Rï¿½ï¿½ï¿½\ï¿½[ï¿½ï¿½ï¿½ï¿½Nï¿½ï¿½ï¿½[ï¿½Y */
 void sceDevConsClose(int cd);
 
 
-/* ƒRƒ“ƒ\[ƒ‹‚ÌƒCƒ[ƒW‚ğƒpƒPƒbƒg‚É‚Â‚¯‚éB */
+/* ï¿½Rï¿½ï¿½ï¿½\ï¿½[ï¿½ï¿½ï¿½ÌƒCï¿½ï¿½ï¿½[ï¿½Wï¿½ï¿½pï¿½Pï¿½bï¿½gï¿½É‚Â‚ï¿½ï¿½ï¿½B */
 void sceDevConsRef(int cd, sceGifPacket* pPacket);
 
-/* ƒRƒ“ƒ\[ƒ‹‚ÌƒCƒ[ƒW‚ğ•`‰æ */
+/* ï¿½Rï¿½ï¿½ï¿½\ï¿½[ï¿½ï¿½ï¿½ÌƒCï¿½ï¿½ï¿½[ï¿½Wï¿½ï¿½`ï¿½ï¿½ */
 void sceDevConsDraw(int cd);
 
-/* ƒRƒ“ƒ\[ƒ‹‚ÌƒCƒ[ƒW‚ğ•`‰æiƒXƒNƒ‰ƒbƒ`ƒpƒbƒhg—pj */
+/* ï¿½Rï¿½ï¿½ï¿½\ï¿½[ï¿½ï¿½ï¿½ÌƒCï¿½ï¿½ï¿½[ï¿½Wï¿½ï¿½`ï¿½ï¿½iï¿½Xï¿½Nï¿½ï¿½ï¿½bï¿½`ï¿½pï¿½bï¿½hï¿½gï¿½pï¿½j */
 void sceDevConsDrawS(int cd);
 
-/* ƒRƒ“ƒ\[ƒ‹ƒNƒŠƒA */
+/* ï¿½Rï¿½ï¿½ï¿½\ï¿½[ï¿½ï¿½ï¿½Nï¿½ï¿½ï¿½A */
 void sceDevConsClear(int cd);
 
-/* ƒRƒ“ƒ\[ƒ‹‚Ö•¶š•\¦ */
+/* ï¿½Rï¿½ï¿½ï¿½\ï¿½[ï¿½ï¿½ï¿½Ö•ï¿½ï¿½ï¿½ï¿½\ï¿½ï¿½ */
 u_int sceDevConsPrintf(int cd, const char* str, ...);
 
-/* ƒtƒHƒ“ƒg‚ÌƒJƒ‰[ƒe[ƒuƒ‹‚Ì•ÏX */
+/* ï¿½tï¿½Hï¿½ï¿½ï¿½gï¿½ÌƒJï¿½ï¿½ï¿½[ï¿½eï¿½[ï¿½uï¿½ï¿½ï¿½Ì•ÏX */
 void sceDevConsSetColor(int cd, u_char c, u_char r, u_char g, u_char b);
 
 
-/* ƒJ[ƒ\ƒ‹ˆÊ’u‚ğ•ÏX */
+/* ï¿½Jï¿½[ï¿½\ï¿½ï¿½ï¿½Ê’uï¿½ï¿½ÏX */
 void sceDevConsLocate(int cd, u_int lx, u_int ly);
 
-/* ƒJ[ƒ\ƒ‹ˆÊ’u‚É‚P•¶šo—Í */
+/* ï¿½Jï¿½[ï¿½\ï¿½ï¿½ï¿½Ê’uï¿½É‚Pï¿½ï¿½ï¿½ï¿½ï¿½oï¿½ï¿½ */
 void sceDevConsPut(int cd, u_char c, u_char a);
 
-/* ƒJ[ƒ\ƒ‹ˆÊ’u‚©‚ç‚P•¶šæ“¾(ãˆÊ‚Wƒrƒbƒg‚É‚ÍƒAƒgƒŠƒrƒ…[ƒg) */
+/* ï¿½Jï¿½[ï¿½\ï¿½ï¿½ï¿½Ê’uï¿½ï¿½ï¿½ï¿½Pï¿½ï¿½ï¿½ï¿½ï¿½æ“¾(ï¿½ï¿½Ê‚Wï¿½rï¿½bï¿½gï¿½É‚ÍƒAï¿½gï¿½ï¿½ï¿½rï¿½ï¿½ï¿½[ï¿½g) */
 u_short sceDevConsGet(int cd);
 
-/* ƒAƒgƒŠƒrƒ…[ƒg(F)•ÏX */
+/* ï¿½Aï¿½gï¿½ï¿½ï¿½rï¿½ï¿½ï¿½[ï¿½g(ï¿½F)ï¿½ÏX */
 void sceDevConsAttribute(int cd, u_char col);
 
 
-/* ‹éŒ`—ÌˆæƒNƒŠƒA */
+/* ï¿½ï¿½`ï¿½Ìˆï¿½Nï¿½ï¿½ï¿½A */
 void sceDevConsClearBox(int cd, int x, int y, u_int w, u_int h);
 
-/* ‹éŒ`—ÌˆæˆÚ“® */
+/* ï¿½ï¿½`ï¿½Ìˆï¿½Ú“ï¿½ */
 void sceDevConsMove(int cd, int dx, int dy, int sx, int sy, u_int w, u_int h);
 
-/* ƒ[ƒ‹ƒAƒbƒv */
+/* ï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½Aï¿½bï¿½v */
 void sceDevConsRollup(int cd, u_int line);
 
 
-/* ˜g‚Â‚«ƒƒbƒZ[ƒW•\¦ */
+/* ï¿½gï¿½Â‚ï¿½ï¿½ï¿½ï¿½bï¿½Zï¿½[ï¿½Wï¿½\ï¿½ï¿½ */
 void sceDevConsMessage(int cd, int x, int y, char const* str);
 
-/* ƒtƒŒ[ƒ€ */
+/* ï¿½tï¿½ï¿½ï¿½[ï¿½ï¿½ */
 void sceDevConsFrame(int cd, int x, int y, u_int w, u_int h);
 
-/* ‹Œƒ‰ƒCƒuƒ‰ƒŠƒTƒ|[ƒg */
+/* ï¿½ï¿½ï¿½ï¿½ï¿½Cï¿½uï¿½ï¿½ï¿½ï¿½ï¿½Tï¿½|ï¿½[ï¿½g */
 u_long128* sceDevFont(u_long128*, int, int, int, char *, int);
-  /* packet, x, y, z(–³Œø), str, ctxt */
+  /* packet, x, y, z(ï¿½ï¿½ï¿½ï¿½), str, ctxt */
 
 #ifdef __cplusplus
 }

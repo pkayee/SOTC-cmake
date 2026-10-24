@@ -28,11 +28,11 @@ typedef struct {
 } sceCslBuffGrp;
 
 typedef struct {
-	int			buffGrpNum;	/* ƒoƒbƒtƒ@ƒOƒ‹[ƒv”@@@@@F•K{ */
-	sceCslBuffGrp*		buffGrp;	/* ƒoƒbƒtƒ@ƒOƒ‹[ƒv‚Ö‚Ìƒ|ƒCƒ“ƒ^F•K{ */
-	void*			conf;		/* ƒ‚ƒWƒ…[ƒ‹Ý’è\‘¢‘Ì@@@@F”CˆÓ */
-	void*			callBack;	/* ƒR[ƒ‹ƒoƒbƒNŠÖ”@@@@@@F”CˆÓ */
-	char**			extmod;		/* ŠO•”ƒ‚ƒWƒ…[ƒ‹‚ÌƒGƒ“ƒgƒŠ@@F”CˆÓ */
+	int			buffGrpNum;	/* ï¿½oï¿½bï¿½tï¿½@ï¿½Oï¿½ï¿½ï¿½[ï¿½vï¿½ï¿½ï¿½@ï¿½@ï¿½@ï¿½@ï¿½@ï¿½Fï¿½Kï¿½{ */
+	sceCslBuffGrp*		buffGrp;	/* ï¿½oï¿½bï¿½tï¿½@ï¿½Oï¿½ï¿½ï¿½[ï¿½vï¿½Ö‚Ìƒ|ï¿½Cï¿½ï¿½ï¿½^ï¿½Fï¿½Kï¿½{ */
+	void*			conf;		/* ï¿½ï¿½ï¿½Wï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½Ý’ï¿½\ï¿½ï¿½ï¿½Ì@ï¿½@ï¿½@ï¿½@ï¿½Fï¿½Cï¿½ï¿½ */
+	void*			callBack;	/* ï¿½Rï¿½[ï¿½ï¿½ï¿½oï¿½bï¿½Nï¿½Öï¿½ï¿½@ï¿½@ï¿½@ï¿½@ï¿½@ï¿½@ï¿½Fï¿½Cï¿½ï¿½ */
+	char**			extmod;		/* ï¿½Oï¿½ï¿½ï¿½ï¿½ï¿½Wï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ÌƒGï¿½ï¿½ï¿½gï¿½ï¿½ï¿½@ï¿½@ï¿½Fï¿½Cï¿½ï¿½ */
 } sceCslCtx;
 
 #define sceCslNoError	0

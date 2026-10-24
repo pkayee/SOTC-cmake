@@ -44,7 +44,7 @@ extern "C" {
 #define SCE_TIMER_MAX_SOFTCOUNTER	128
 #define SCE_TIMER_MAX_SOFTALARM		64
 
-/* ƒvƒƒgƒ^ƒCƒvéŒ¾ */
+/* ï¿½vï¿½ï¿½ï¿½gï¿½^ï¿½Cï¿½vï¿½éŒ¾ */
 int    sceTimerInit(u_int uiMode);
 int    sceTimerEnd(void);
 

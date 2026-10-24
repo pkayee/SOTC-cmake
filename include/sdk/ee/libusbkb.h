@@ -65,20 +65,20 @@ typedef struct {
 #define USBKB_E_PAR1 (-11)  /* first parameter error */
 #define USBKB_E_PAR2 (-12)  /* second parameter error */
 
-/* sceUsbKbSyncä÷êî */
+/* sceUsbKbSyncÔøΩ÷êÔøΩ */
 #define USBKB_WAIT     0
 #define USBKB_NO_WAIT  1
 #define USBKB_DONE     0
 #define USBKB_EXEC     1
 
-/* USBKBDATA_t ÇÃ led Ç≈égóp */
+/* USBKBDATA_t ÔøΩÔøΩ led ÔøΩ≈égÔøΩp */
 #define USBKB_LED_NUM_LOCK    (1U<<0)  /* 0:OFF 1:ON */
 #define USBKB_LED_CAPS_LOCK   (1U<<1)  /* 0:OFF 1:ON */
 #define USBKB_LED_SCROLL_LOCK (1U<<2)  /* 0:OFF 1:ON */
 #define USBKB_LED_COMPOSE     (1U<<3)  /* 0:OFF 1:ON */
 #define USBKB_LED_KANA        (1U<<4)  /* 0:OFF 1:ON */
 
-/* USBKBDATA_t ÇÃ mkey Ç≈égóp */
+/* USBKBDATA_t ÔøΩÔøΩ mkey ÔøΩ≈égÔøΩp */
 #define USBKB_MKEY_L_CTRL   (1U<<0)  /* 0:Release 1:Push */
 #define USBKB_MKEY_L_SHIFT  (1U<<1)  /* 0:Release 1:Push */
 #define USBKB_MKEY_L_ALT    (1U<<2)  /* 0:Release 1:Push */
@@ -88,43 +88,43 @@ typedef struct {
 #define USBKB_MKEY_R_ALT    (1U<<6)  /* 0:Release 1:Push */
 #define USBKB_MKEY_R_WIN    (1U<<7)  /* 0:Release 1:Push */
 /*
-   Å¶MacintoshópÉLÅ[É{Å[ÉhÇÃèÍçáÅAALT Ç∆ WIN ÇÕÅA
-   ÇªÇÍÇºÇÍ OPTION Ç∆ APPLE Ç…Ç»ÇËÇ‹Ç∑ÅB
+   ÔøΩÔøΩMacintoshÔøΩpÔøΩLÔøΩ[ÔøΩ{ÔøΩ[ÔøΩhÔøΩÃèÍçáÔøΩAALT ÔøΩÔøΩ WIN ÔøΩÕÅA
+   ÔøΩÔøΩÔøΩÍÇºÔøΩÔøΩ OPTION ÔøΩÔøΩ APPLE ÔøΩ…Ç»ÇÔøΩ‹ÇÔøΩÔøΩB
 */
 
-/* sceUsbKbSetLEDMode() Ç≈égópÇ∑ÇÈÉ}ÉNÉç */
+/* sceUsbKbSetLEDMode() ÔøΩ≈égÔøΩpÔøΩÔøΩÔøΩÔøΩ}ÔøΩNÔøΩÔøΩ */
 #define USBKB_LED_MODE_MANUAL 0
 #define USBKB_LED_MODE_AUTO1  1
 #define USBKB_LED_MODE_AUTO2  2
 
-/* sceUsbdKbCodeType() Ç≈égópÇ∑ÇÈÉ}ÉNÉç */
+/* sceUsbdKbCodeType() ÔøΩ≈égÔøΩpÔøΩÔøΩÔøΩÔøΩ}ÔøΩNÔøΩÔøΩ */
 #define USBKB_CODETYPE_RAW    0
 #define USBKB_CODETYPE_ASCII  1
 
-/* sceUsbKbSetArrangement() Ç≈égópÇ∑ÇÈÉ}ÉNÉç */
+/* sceUsbKbSetArrangement() ÔøΩ≈égÔøΩpÔøΩÔøΩÔøΩÔøΩ}ÔøΩNÔøΩÔøΩ */
 #define USBKB_ARRANGEMENT_101      0
 #define USBKB_ARRANGEMENT_106      1
 #define USBKB_ARRANGEMENT_106_KANA 2
 
-/* sceUsbKbSetReadMode() Ç≈égópÇ∑ÇÈÉ}ÉNÉç */
+/* sceUsbKbSetReadMode() ÔøΩ≈égÔøΩpÔøΩÔøΩÔøΩÔøΩ}ÔøΩNÔøΩÔøΩ */
 #define USBKB_RMODE_INPUTCHAR 0
 #define USBKB_RMODE_PACKET    1
 
 /* Keycode flag */
-#define USBKB_RAWDAT 0x8000U  /* ASCIIÉRÅ[ÉhÇ…ïœä∑Ç≈Ç´Ç»Ç¢ÉRÅ[Éh */
-#define USBKB_KEYPAD 0x4000U  /* ÉLÅ[ÉpÉbÉhÉRÅ[Éh */
+#define USBKB_RAWDAT 0x8000U  /* ASCIIÔøΩRÔøΩ[ÔøΩhÔøΩ…ïœäÔøΩÔøΩ≈ÇÔøΩÔøΩ»ÇÔøΩÔøΩRÔøΩ[ÔøΩh */
+#define USBKB_KEYPAD 0x4000U  /* ÔøΩLÔøΩ[ÔøΩpÔøΩbÔøΩhÔøΩRÔøΩ[ÔøΩh */
 
-/* ******* ASCII Code Ç…ïœä∑Ç≈Ç´Ç»Ç¢ÉLÅ[ÉRÅ[Éh ********/
+/* ******* ASCII Code ÔøΩ…ïœäÔøΩÔøΩ≈ÇÔøΩÔøΩ»ÇÔøΩÔøΩLÔøΩ[ÔøΩRÔøΩ[ÔøΩh ********/
 /*
-  Å¶1 USBKB_RAWDAT ÉrÉbÉgÇ™óßÇ¡ÇƒÇ¢ÇÈÇ∆Ç´Ç…à»â∫ÇÃÇÊÇ§Ç»ÉRÅ[ÉhÇ™óàÇ‹Ç∑ÅB
-  Å¶2 â∫ãLà»äOÇÃÉRÅ[ÉhÇ™óàÇÈÇ±Ç∆Ç‡Ç†ÇËÇ‹Ç∑ÅB
+  ÔøΩÔøΩ1 USBKB_RAWDAT ÔøΩrÔøΩbÔøΩgÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩƒÇÔøΩÔøΩÔøΩ∆ÇÔøΩÔøΩ…à»âÔøΩÔøΩÃÇÊÇ§ÔøΩ»ÉRÔøΩ[ÔøΩhÔøΩÔøΩÔøΩÔøΩÔøΩ‹ÇÔøΩÔøΩB
+  ÔøΩÔøΩ2 ÔøΩÔøΩÔøΩLÔøΩ»äOÔøΩÃÉRÔøΩ[ÔøΩhÔøΩÔøΩÔøΩÔøΩÔøΩÈÇ±ÔøΩ∆ÇÔøΩÔøΩÔøΩÔøΩ‹ÇÔøΩÔøΩB
 */
 #define USBKEYC_NO_EVENT    0x00
 #define USBKEYC_E_ROLLOVER  0x01
 #define USBKEYC_E_POSTFAIL  0x02
 #define USBKEYC_E_UNDEF     0x03
 #define USBKEYC_ESCAPE      0x29
-#define USBKEYC_106_KANJI   0x35  /* îºäpÅ^ëSäp äøéö */
+#define USBKEYC_106_KANJI   0x35  /* ÔøΩÔøΩÔøΩpÔøΩ^ÔøΩSÔøΩp ÔøΩÔøΩÔøΩÔøΩ */
 #define USBKEYC_CAPS_LOCK   0x39
 #define USBKEYC_F1          0x3a
 #define USBKEYC_F2          0x3b
@@ -152,17 +152,17 @@ typedef struct {
 #define USBKEYC_DOWN_ARROW  0x51
 #define USBKEYC_UP_ARROW    0x52
 #define USBKEYC_NUM_LOCK    0x53
-#define USBKEYC_APPLICATION 0x65  /* ÉAÉvÉäÉPÅ[ÉVÉáÉìÉLÅ[ */
-#define USBKEYC_KANA        0x88  /* ÉJÉ^ÉJÉiÅ^Ç–ÇÁÇ™Ç»Å^ÉçÅ[É}éö */
-#define USBKEYC_HENKAN      0x8a  /* ëOåÛï‚Å^ïœä∑Å^ëSåÛï‚ */
-#define USBKEYC_MUHENKAN    0x8b  /* ñ≥ïœä∑ */
+#define USBKEYC_APPLICATION 0x65  /* ÔøΩAÔøΩvÔøΩÔøΩÔøΩPÔøΩ[ÔøΩVÔøΩÔøΩÔøΩÔøΩÔøΩLÔøΩ[ */
+#define USBKEYC_KANA        0x88  /* ÔøΩJÔøΩ^ÔøΩJÔøΩiÔøΩ^ÔøΩ–ÇÁÇ™ÔøΩ»Å^ÔøΩÔøΩÔøΩ[ÔøΩ}ÔøΩÔøΩ */
+#define USBKEYC_HENKAN      0x8a  /* ÔøΩOÔøΩÔøΩÔøΩ^ÔøΩœäÔøΩÔøΩ^ÔøΩSÔøΩÔøΩÔøΩ */
+#define USBKEYC_MUHENKAN    0x8b  /* ÔøΩÔøΩÔøΩœäÔøΩ */
 
 
-/* ******* ë„ï\ìIÇ»ê∂ÉRÅ[Éh *******/
+/* ******* ÔøΩÔøΩ\ÔøΩIÔøΩ»êÔøΩÔøΩRÔøΩ[ÔøΩh *******/
 /*
-  Å¶1 ê∂ÉRÅ[ÉhÇ≈ÇÊÇ≠égÇÌÇÍÇÈÇ‡ÇÃÇíËã`ÇµÇƒÇ¢Ç‹Ç∑ÅB
-      è„ãLÇÃÅuASCII Code Ç…ïœä∑Ç≈Ç´Ç»Ç¢ÉLÅ[ÉRÅ[ÉhÅvÇ∆ïπÇπÇƒÇ®égÇ¢Ç≠ÇæÇ≥Ç¢ÅB
-  Å¶2 â∫ãLà»äOÇÃÉRÅ[ÉhÇ™óàÇÈÇ±Ç∆Ç‡Ç†ÇËÇ‹Ç∑ÅB
+  ÔøΩÔøΩ1 ÔøΩÔøΩÔøΩRÔøΩ[ÔøΩhÔøΩ≈ÇÊÇ≠ÔøΩgÔøΩÔøΩÔøΩÔøΩÔøΩÃÇÔøΩÔøΩ`ÔøΩÔøΩÔøΩƒÇÔøΩÔøΩ‹ÇÔøΩÔøΩB
+      ÔøΩÔøΩLÔøΩÃÅuASCII Code ÔøΩ…ïœäÔøΩÔøΩ≈ÇÔøΩÔøΩ»ÇÔøΩÔøΩLÔøΩ[ÔøΩRÔøΩ[ÔøΩhÔøΩvÔøΩ∆ïÔøΩÔøΩÔøΩÔøΩƒÇÔøΩÔøΩgÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩB
+  ÔøΩÔøΩ2 ÔøΩÔøΩÔøΩLÔøΩ»äOÔøΩÃÉRÔøΩ[ÔøΩhÔøΩÔøΩÔøΩÔøΩÔøΩÈÇ±ÔøΩ∆ÇÔøΩÔøΩÔøΩÔøΩ‹ÇÔøΩÔøΩB
 */
 #define USBKEYC_A           0x04
 #define USBKEYC_B           0x05

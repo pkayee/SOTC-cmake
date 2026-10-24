@@ -30,8 +30,8 @@
 #include <libvu0.h>
 
 typedef struct _sceGpChain {
-    u_long128 *ot;      /* chain ‚ÌƒAƒhƒŒƒX */
-    u_long128 *pKick; 	/* DMA “]‘—ŠJŽnƒAƒhƒŒƒX */
+    u_long128 *ot;      /* chain ï¿½ÌƒAï¿½hï¿½ï¿½ï¿½X */
+    u_long128 *pKick; 	/* DMA ï¿½]ï¿½ï¿½ï¿½Jï¿½nï¿½Aï¿½hï¿½ï¿½ï¿½X */
     u_long128 *pEnd;
     int resolution;
 } sceGpChain;

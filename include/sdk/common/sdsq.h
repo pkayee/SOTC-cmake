@@ -23,21 +23,21 @@ extern "C" {
 #include <sys/types.h>
 #include <format/sound/sq.h>
 
-/* ˆ³kƒ‚[ƒh */
+/* ï¿½ï¿½ï¿½kï¿½ï¿½ï¿½[ï¿½h */
 #define SCESDSQ_COMPMODE_NOTCOMP   0  /* SceSdSqMidiData->compMode */
 #define SCESDSQ_COMPMODE_COMP      1  /* SceSdSqMidiData->compMode */
 
-/* ó‘ÔƒXƒe[ƒ^ƒX */
-#define SCESDSQ_READSTATUS_OK      0  /* \‘¢‘Ìg—p‰Â”\ */
-#define SCESDSQ_READSTATUS_END     1  /* ƒŠ[ƒhƒ|ƒWƒVƒ‡ƒ“‚ª––’[‚É“’B */
-                                      /*i\‘¢‘Ìg—p•s‰Âj */
-#define SCESDSQ_READSTATUS_ERROR   2  /* ƒŠ[ƒhƒGƒ‰[i\‘¢‘Ìg—p•s‰Âj*/
+/* ï¿½ï¿½ÔƒXï¿½eï¿½[ï¿½^ï¿½X */
+#define SCESDSQ_READSTATUS_OK      0  /* ï¿½\ï¿½ï¿½ï¿½Ìgï¿½pï¿½Â”\ */
+#define SCESDSQ_READSTATUS_END     1  /* ï¿½ï¿½ï¿½[ï¿½hï¿½|ï¿½Wï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½É“ï¿½ï¿½B */
+                                      /*ï¿½iï¿½\ï¿½ï¿½ï¿½Ìgï¿½pï¿½sï¿½Âj */
+#define SCESDSQ_READSTATUS_ERROR   2  /* ï¿½ï¿½ï¿½[ï¿½hï¿½Gï¿½ï¿½ï¿½[ï¿½iï¿½\ï¿½ï¿½ï¿½Ìgï¿½pï¿½sï¿½Âj*/
 
 #define SCESDSQ_MAXMIDIMESSAGELENGTH       8
 #define SCESDSQ_MAXORIGINALMESSAGELENGTH   12
 #define SCESDSQ_MAXSONGMESSAGELENGTH       3
 
-/* MIDIƒf[ƒ^î•ñ\‘¢‘Ì */
+/* MIDIï¿½fï¿½[ï¿½^ï¿½ï¿½ï¿½\ï¿½ï¿½ï¿½ï¿½ */
 typedef struct{
     u_int                 readStatus;
     u_int                 midiNumber;
@@ -57,28 +57,28 @@ typedef struct{
 } SceSdSqMidiData;
 
 /* J
-  readStatus            : ó‘ÔƒXƒe[ƒ^ƒX
-  midiNumber            : ‚±‚Ì\‘¢‘Ì‚ªg—p‚µ‚Ä‚¢‚éMIDIƒf[ƒ^ƒuƒƒbƒNƒiƒ“ƒo[
-  midiData              : midiNumber‚ªw‚·ƒf[ƒ^ƒuƒƒbƒNisceSeqMidiDataBlockj
-                          ‚ÌƒAƒhƒŒƒX
-  offset                : Œ»İ‚Ìƒf[ƒ^‚Ö‚ÌƒIƒtƒZƒbƒg
-  nextOffset            : Ÿƒf[ƒ^‚Ö‚ÌƒIƒtƒZƒbƒg
-  division              : ‚S•ª‰¹•„‚ ‚½‚è‚Ì•ª‰ğ”\
-  compMode              : ˆ³kƒ‚[ƒh
-  compTableSize         : ˆ³kƒe[ƒuƒ‹‚ÌƒTƒCƒYi”ñˆ³kƒ‚[ƒh‚Ìê‡‚Oj
-  deltaTime             : ‚R‚Qƒrƒbƒgƒf[ƒ^‚É•ÏŠ·Œã‚Ìƒfƒ‹ƒ^ƒ^ƒCƒ€
-  lastStatus            : ƒ‰ƒ“ƒjƒ“ƒOƒXƒe[ƒ^ƒX
-  reserve[3]            : —\–ñ—Ìˆæ
-  messageLength         : •â³Œã‚Ìƒf[ƒ^’·
-  message[8]            : •â³Œã‚Ìƒf[ƒ^
-  originalMessageLength : •â³‘O‚Ìƒf[ƒ^’·
-  originalMessage[12]   : •â³‘O‚Ìƒf[ƒ^ideltaTime + messagej
+  readStatus            : ï¿½ï¿½ÔƒXï¿½eï¿½[ï¿½^ï¿½X
+  midiNumber            : ï¿½ï¿½ï¿½Ì\ï¿½ï¿½ï¿½Ì‚ï¿½ï¿½gï¿½pï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½MIDIï¿½fï¿½[ï¿½^ï¿½uï¿½ï¿½ï¿½bï¿½Nï¿½iï¿½ï¿½ï¿½oï¿½[
+  midiData              : midiNumberï¿½ï¿½ï¿½wï¿½ï¿½ï¿½fï¿½[ï¿½^ï¿½uï¿½ï¿½ï¿½bï¿½Nï¿½isceSeqMidiDataBlockï¿½j
+                          ï¿½ÌƒAï¿½hï¿½ï¿½ï¿½X
+  offset                : ï¿½ï¿½ï¿½İ‚Ìƒfï¿½[ï¿½^ï¿½Ö‚ÌƒIï¿½tï¿½Zï¿½bï¿½g
+  nextOffset            : ï¿½ï¿½ï¿½fï¿½[ï¿½^ï¿½Ö‚ÌƒIï¿½tï¿½Zï¿½bï¿½g
+  division              : ï¿½Sï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì•ï¿½ï¿½ï¿½\
+  compMode              : ï¿½ï¿½ï¿½kï¿½ï¿½ï¿½[ï¿½h
+  compTableSize         : ï¿½ï¿½ï¿½kï¿½eï¿½[ï¿½uï¿½ï¿½ï¿½ÌƒTï¿½Cï¿½Yï¿½iï¿½ñˆ³kï¿½ï¿½ï¿½[ï¿½hï¿½Ìê‡ï¿½Oï¿½j
+  deltaTime             : ï¿½Rï¿½Qï¿½rï¿½bï¿½gï¿½fï¿½[ï¿½^ï¿½É•ÏŠï¿½ï¿½ï¿½Ìƒfï¿½ï¿½ï¿½^ï¿½^ï¿½Cï¿½ï¿½
+  lastStatus            : ï¿½ï¿½ï¿½ï¿½ï¿½jï¿½ï¿½ï¿½Oï¿½Xï¿½eï¿½[ï¿½^ï¿½X
+  reserve[3]            : ï¿½\ï¿½ï¿½Ìˆï¿½
+  messageLength         : ï¿½â³ï¿½ï¿½Ìƒfï¿½[ï¿½^ï¿½ï¿½
+  message[8]            : ï¿½â³ï¿½ï¿½Ìƒfï¿½[ï¿½^
+  originalMessageLength : ï¿½â³ï¿½Oï¿½Ìƒfï¿½[ï¿½^ï¿½ï¿½
+  originalMessage[12]   : ï¿½â³ï¿½Oï¿½Ìƒfï¿½[ï¿½^ï¿½ideltaTime + messageï¿½j
 */
 /* E
 
  */
 
-/* Songƒf[ƒ^\‘¢‘Ì */
+/* Songï¿½fï¿½[ï¿½^ï¿½\ï¿½ï¿½ï¿½ï¿½ */
 typedef struct{
     u_int    readStatus;
     u_int    songNumber;
@@ -90,27 +90,27 @@ typedef struct{
 } SceSdSqSongData;
 
 /*
-  readStatus : ó‘ÔƒXƒe[ƒ^ƒX
-  songNumber : ‚±‚Ì\‘¢‘Ì‚ªg—p‚µ‚Ä‚¢‚éMIDIƒf[ƒ^ƒuƒƒbƒNƒiƒ“ƒo[
-  topAddr    : songNumber‚ªw‚·songƒRƒ}ƒ“ƒh‚Ìæ“ªƒAƒhƒŒƒX
-  offset     : Œ»İ‚Ìƒf[ƒ^‚Ö‚ÌƒIƒtƒZƒbƒg
-  nextOffset : Ÿƒf[ƒ^‚Ö‚ÌƒIƒtƒZƒbƒg
-  message[3] : SongƒRƒ}ƒ“ƒhƒf[ƒ^
-  reserve    : —\–ñ—Ìˆæ
+  readStatus : ï¿½ï¿½ÔƒXï¿½eï¿½[ï¿½^ï¿½X
+  songNumber : ï¿½ï¿½ï¿½Ì\ï¿½ï¿½ï¿½Ì‚ï¿½ï¿½gï¿½pï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½MIDIï¿½fï¿½[ï¿½^ï¿½uï¿½ï¿½ï¿½bï¿½Nï¿½iï¿½ï¿½ï¿½oï¿½[
+  topAddr    : songNumberï¿½ï¿½ï¿½wï¿½ï¿½songï¿½Rï¿½}ï¿½ï¿½ï¿½hï¿½Ìæ“ªï¿½Aï¿½hï¿½ï¿½ï¿½X
+  offset     : ï¿½ï¿½ï¿½İ‚Ìƒfï¿½[ï¿½^ï¿½Ö‚ÌƒIï¿½tï¿½Zï¿½bï¿½g
+  nextOffset : ï¿½ï¿½ï¿½fï¿½[ï¿½^ï¿½Ö‚ÌƒIï¿½tï¿½Zï¿½bï¿½g
+  message[3] : Songï¿½Rï¿½}ï¿½ï¿½ï¿½hï¿½fï¿½[ï¿½^
+  reserve    : ï¿½\ï¿½ï¿½Ìˆï¿½
  */
 
-/* ˆ³kƒe[ƒuƒ‹ƒf[ƒ^\‘¢‘Ì */
-/* ƒ|ƒŠƒtƒHƒjƒbƒNƒL[ƒvƒŒƒbƒVƒƒ[î•ñ\‘¢‘Ì */
+/* ï¿½ï¿½ï¿½kï¿½eï¿½[ï¿½uï¿½ï¿½ï¿½fï¿½[ï¿½^ï¿½\ï¿½ï¿½ï¿½ï¿½ */
+/* ï¿½|ï¿½ï¿½ï¿½tï¿½Hï¿½jï¿½bï¿½Nï¿½Lï¿½[ï¿½vï¿½ï¿½ï¿½bï¿½Vï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½\ï¿½ï¿½ï¿½ï¿½ */
 typedef struct{
-    u_char   status;  /* ƒXƒe[ƒ^ƒXƒoƒCƒgƒf[ƒ^ */
-    u_char   data;    /* ƒf[ƒ^ */
+    u_char   status;  /* ï¿½Xï¿½eï¿½[ï¿½^ï¿½Xï¿½oï¿½Cï¿½gï¿½fï¿½[ï¿½^ */
+    u_char   data;    /* ï¿½fï¿½[ï¿½^ */
 } SceSdSqCompTableData, SceSdSqPolyKeyData;
 
-/* ‰ğ“€ƒm[ƒgƒIƒ“ƒf[ƒ^\‘¢‘Ì */
+/* ï¿½ğ“€ƒmï¿½[ï¿½gï¿½Iï¿½ï¿½ï¿½fï¿½[ï¿½^ï¿½\ï¿½ï¿½ï¿½ï¿½ */
 typedef struct{
-    u_char   status;    /* ƒXƒe[ƒ^ƒXƒoƒCƒgƒf[ƒ^ */
-    u_char   note;      /* ƒm[ƒg */
-    u_char   velocity;  /* ƒxƒƒVƒeƒB */
+    u_char   status;    /* ï¿½Xï¿½eï¿½[ï¿½^ï¿½Xï¿½oï¿½Cï¿½gï¿½fï¿½[ï¿½^ */
+    u_char   note;      /* ï¿½mï¿½[ï¿½g */
+    u_char   velocity;  /* ï¿½xï¿½ï¿½ï¿½Vï¿½eï¿½B */
     u_char   reserve;
 } SceSdSqCompTableNoteOnEvent;
 

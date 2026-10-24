@@ -40,35 +40,35 @@
 extern "C" {
 #endif
 
-/* ƒ‚ƒWƒ…[ƒ‹‚ÌƒGƒ“ƒgƒŠŠÖ”‚ªŒÄ‚Î‚ê‚½‚Æ‚«‚Ì——RƒR[ƒh */
-#define SCE_ERX_REASON_START			(0)		/* ƒ‚ƒWƒ…[ƒ‹‚Ì‹N“®Žž */
-#define SCE_ERX_REASON_STOP				(1)		/* ƒ‚ƒWƒ…[ƒ‹‚Ì’âŽ~Žž */
-#define SCE_ERX_REASON_RESTART			(2)		/* ƒ‚ƒWƒ…[ƒ‹‚ÌÄ‹N“®Žž(–¢ƒTƒ|[ƒg) */
+/* ï¿½ï¿½ï¿½Wï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ÌƒGï¿½ï¿½ï¿½gï¿½ï¿½ï¿½Öï¿½ï¿½ï¿½ï¿½Ä‚Î‚ê‚½ï¿½Æ‚ï¿½ï¿½Ì—ï¿½ï¿½Rï¿½Rï¿½[ï¿½h */
+#define SCE_ERX_REASON_START			(0)		/* ï¿½ï¿½ï¿½Wï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½Ì‹Nï¿½ï¿½ï¿½ï¿½ */
+#define SCE_ERX_REASON_STOP				(1)		/* ï¿½ï¿½ï¿½Wï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½Ì’ï¿½~ï¿½ï¿½ */
+#define SCE_ERX_REASON_RESTART			(2)		/* ï¿½ï¿½ï¿½Wï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ÌÄ‹Nï¿½ï¿½ï¿½ï¿½(ï¿½ï¿½ï¿½Tï¿½|ï¿½[ï¿½g) */
 
-/* ƒ‚ƒWƒ…[ƒ‹‚ÌƒGƒ“ƒgƒŠŠÖ”‚Ì•Ô‚è’l‚ð’è‹` */
-#define SCE_ERX_RESIDENT_END			(0)		/* í’“I—¹ */
-#define SCE_ERX_NO_RESIDENT_END			(1)		/* ”ñí’“I—¹ */
-#define SCE_ERX_FAREWELL_END			(1)		/* ”ñí’“I—¹ */
-#define SCE_ERX_REMOVABLE_RESIDENT_END	(2)		/* í’“I—¹(ƒAƒ“ƒ[ƒh‘Î‰ž) */
+/* ï¿½ï¿½ï¿½Wï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ÌƒGï¿½ï¿½ï¿½gï¿½ï¿½ï¿½Öï¿½ï¿½Ì•Ô‚ï¿½lï¿½ï¿½ï¿½` */
+#define SCE_ERX_RESIDENT_END			(0)		/* ï¿½í’“ï¿½Iï¿½ï¿½ */
+#define SCE_ERX_NO_RESIDENT_END			(1)		/* ï¿½ï¿½í’“ï¿½Iï¿½ï¿½ */
+#define SCE_ERX_FAREWELL_END			(1)		/* ï¿½ï¿½í’“ï¿½Iï¿½ï¿½ */
+#define SCE_ERX_REMOVABLE_RESIDENT_END	(2)		/* ï¿½í’“ï¿½Iï¿½ï¿½(ï¿½Aï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½hï¿½Î‰ï¿½) */
 
-/* ƒƒ‚ƒŠƒAƒƒP[ƒgíp */
-#define SCE_ERX_SMEM_LOW				(0x00000000U)		/* ‰ºˆÊ‘¤ƒAƒhƒŒƒX‚æ‚èƒƒ‚ƒŠŠm•Û */
-#define SCE_ERX_SMEM_HIGH				(0x00000001U)		/* ãˆÊ‘¤ƒAƒhƒŒƒX‚æ‚èƒƒ‚ƒŠŠm•Û */
-#define SCE_ERX_SMEM_ADDR				(0x00000002U)		/* ƒAƒhƒŒƒXŽw’è‚µ‚Äƒƒ‚ƒŠŠm•Û */
-#define SCE_ERX_SMEM_LOWALIGNED			(0x00000004U)		/* ‰ºˆÊ‘¤ƒAƒhƒŒƒX‚æ‚èƒAƒ‰ƒCƒ“ƒƒ“ƒgŽw’è‚Â‚«ƒƒ‚ƒŠŠm•Û */
-#define SCE_ERX_SMEM_HIGHALIGNED		(0x00000005U)		/* ãˆÊ‘¤ƒAƒhƒŒƒX‚æ‚èƒAƒ‰ƒCƒ“ƒƒ“ƒgŽw’è‚Â‚«ƒƒ‚ƒŠŠm•Û */
+/* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Aï¿½ï¿½ï¿½Pï¿½[ï¿½gï¿½ï¿½p */
+#define SCE_ERX_SMEM_LOW				(0x00000000U)		/* ï¿½ï¿½ï¿½Ê‘ï¿½ï¿½Aï¿½hï¿½ï¿½ï¿½Xï¿½ï¿½èƒï¿½ï¿½ï¿½ï¿½ï¿½mï¿½ï¿½ */
+#define SCE_ERX_SMEM_HIGH				(0x00000001U)		/* ï¿½ï¿½Ê‘ï¿½ï¿½Aï¿½hï¿½ï¿½ï¿½Xï¿½ï¿½èƒï¿½ï¿½ï¿½ï¿½ï¿½mï¿½ï¿½ */
+#define SCE_ERX_SMEM_ADDR				(0x00000002U)		/* ï¿½Aï¿½hï¿½ï¿½ï¿½Xï¿½wï¿½è‚µï¿½Äƒï¿½ï¿½ï¿½ï¿½ï¿½ï¿½mï¿½ï¿½ */
+#define SCE_ERX_SMEM_LOWALIGNED			(0x00000004U)		/* ï¿½ï¿½ï¿½Ê‘ï¿½ï¿½Aï¿½hï¿½ï¿½ï¿½Xï¿½ï¿½ï¿½Aï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½gï¿½wï¿½ï¿½Â‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½mï¿½ï¿½ */
+#define SCE_ERX_SMEM_HIGHALIGNED		(0x00000005U)		/* ï¿½ï¿½Ê‘ï¿½ï¿½Aï¿½hï¿½ï¿½ï¿½Xï¿½ï¿½ï¿½Aï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½gï¿½wï¿½ï¿½Â‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½mï¿½ï¿½ */
 
-/* ƒ‚ƒWƒ…[ƒ‹ƒtƒ@ƒCƒ‹ƒ[ƒhŽž‚Ìƒtƒ@ƒCƒ‹ƒAƒNƒZƒXŽw’è */
-#define SCE_ERX_ACCESS_NOSEEK			(0x00000000U)		/* ƒV[ƒN‚È‚µ,   ƒ[ƒNƒƒ‚ƒŠŽg—p—Ê‘å */
-#define SCE_ERX_ACCESS_SEEKFEW			(0x00000100U)		/* ƒV[ƒN‰ñ”­, ƒ[ƒNƒƒ‚ƒŠŽg—p—Ê’† */
-#define SCE_ERX_ACCESS_SEEKMANY			(0x00000200U)		/* ƒV[ƒN‰ñ”‘½, ƒ[ƒNƒƒ‚ƒŠŽg—p‚È‚µ */
+/* ï¿½ï¿½ï¿½Wï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½hï¿½ï¿½ï¿½Ìƒtï¿½@ï¿½Cï¿½ï¿½ï¿½Aï¿½Nï¿½Zï¿½Xï¿½wï¿½ï¿½ */
+#define SCE_ERX_ACCESS_NOSEEK			(0x00000000U)		/* ï¿½Vï¿½[ï¿½Nï¿½È‚ï¿½,   ï¿½ï¿½ï¿½[ï¿½Nï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½gï¿½pï¿½Ê‘ï¿½ */
+#define SCE_ERX_ACCESS_SEEKFEW			(0x00000100U)		/* ï¿½Vï¿½[ï¿½Nï¿½ñ”ï¿½, ï¿½ï¿½ï¿½[ï¿½Nï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½gï¿½pï¿½Ê’ï¿½ */
+#define SCE_ERX_ACCESS_SEEKMANY			(0x00000200U)		/* ï¿½Vï¿½[ï¿½Nï¿½ñ”‘ï¿½, ï¿½ï¿½ï¿½[ï¿½Nï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½gï¿½pï¿½È‚ï¿½ */
 
-/* ƒ‚ƒWƒ…[ƒ‹‚Ìˆ³kŽw’è */
-#define SCE_ERX_ENCODE_GZIP				(0x00001000U)		/* gzipˆ³kŽw’è */
+/* ï¿½ï¿½ï¿½Wï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½Ìˆï¿½ï¿½kï¿½wï¿½ï¿½ */
+#define SCE_ERX_ENCODE_GZIP				(0x00001000U)		/* gzipï¿½ï¿½ï¿½kï¿½wï¿½ï¿½ */
 
-/* ƒ‚ƒWƒ…[ƒ‹‚ÌˆÃ†‰»Žw’è */
-#define SCE_ERX_ENCRYPT_DNAS			(0x00002000U)		/* DNAS(hdd)ˆÃ†‰»Žw’è */
-#define SCE_ERX_ENCRYPT_DNAS_NOHDD		(0x00004000U)		/* DNAS(nohdd)ˆÃ†‰»Žw’è */
+/* ï¿½ï¿½ï¿½Wï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ÌˆÃï¿½ï¿½ï¿½ï¿½wï¿½ï¿½ */
+#define SCE_ERX_ENCRYPT_DNAS			(0x00002000U)		/* DNAS(hdd)ï¿½Ãï¿½ï¿½ï¿½ï¿½wï¿½ï¿½ */
+#define SCE_ERX_ENCRYPT_DNAS_NOHDD		(0x00004000U)		/* DNAS(nohdd)ï¿½Ãï¿½ï¿½ï¿½ï¿½wï¿½ï¿½ */
 
 /* liberx library*/
 int sceErxInit(int iPriority, void *pStart, u_int uiSize, int nMaxModules);
@@ -87,50 +87,50 @@ int   sceErxQueryRegionType(const void *addr, u_int size);
 /* loadcore library */
 typedef struct SceErxLibraryHeader {
 	u_int	magic[4];		/* library header magic(0x41C00000) */
-	const char *name;		/* ƒ‰ƒCƒuƒ‰ƒŠ–¼(ASCIZ) */
-	u_short	version;		/* ƒ‰ƒCƒuƒ‰ƒŠ‚Ìƒo[ƒWƒ‡ƒ“ */
+	const char *name;		/* ï¿½ï¿½ï¿½Cï¿½uï¿½ï¿½ï¿½ï¿½ï¿½ï¿½(ASCIZ) */
+	u_short	version;		/* ï¿½ï¿½ï¿½Cï¿½uï¿½ï¿½ï¿½ï¿½ï¿½Ìƒoï¿½[ï¿½Wï¿½ï¿½ï¿½ï¿½ */
 	u_short	flags;
 	u_int reserved[2];
 } SceErxLibraryHeader;
 
 typedef struct SceErxModuleStatus {
-	char	name[56];		/* ƒ‚ƒWƒ…[ƒ‹–¼ */
-	u_short	version;		/* ƒ‚ƒWƒ…[ƒ‹‚Ìƒo[ƒWƒ‡ƒ“ */
-	u_short flags;			/* ƒ‚ƒWƒ…[ƒ‹‚Ìó‘Ô */
-	int		id;				/* ƒ‚ƒWƒ…[ƒ‹‚ðŽ¯•Ê‚·‚é ID ”Ô† */
-	u_int	entry_addr;		/* ƒ‚ƒWƒ…[ƒ‹‚ÌŽÀsŠJŽnƒAƒhƒŒƒX */
-	u_int	gp_value;		/* ƒ‚ƒWƒ…[ƒ‹‚Ì GP ƒŒƒWƒXƒ^’l */
-	u_int	text_addr;		/* ƒ‚ƒWƒ…[ƒ‹‚Ìæ“ªƒAƒhƒŒƒX */
-	u_int	text_size;		/* ƒ‚ƒWƒ…[ƒ‹‚ÌƒeƒLƒXƒgƒZƒOƒƒ“ƒgƒTƒCƒY */
-	u_int	data_size;		/* ƒ‚ƒWƒ…[ƒ‹‚Ìƒf[ƒ^ƒZƒOƒƒ“ƒgƒTƒCƒY */
-	u_int	bss_size;		/* ƒ‚ƒWƒ…[ƒ‹‚Ì–¢‰Šú‰»ƒf[ƒ^ƒZƒOƒƒ“ƒgƒTƒCƒY */
-	u_int   erx_lib_addr;	/* ERXƒ‰ƒCƒuƒ‰ƒŠƒGƒ“ƒgƒŠ‚ÌŠJŽnƒAƒhƒŒƒX */
-	u_int   erx_lib_size;	/* ERXƒ‰ƒCƒuƒ‰ƒŠƒGƒ“ƒgƒŠ‚ÌƒTƒCƒY */
-	u_int   erx_stub_addr;	/* ERXƒ‰ƒCƒuƒ‰ƒŠƒXƒ^ƒu‚ÌŠJŽnƒAƒhƒŒƒX */
-	u_int   erx_stub_size;	/* ERXƒ‰ƒCƒuƒ‰ƒŠƒXƒ^ƒu‚ÌƒTƒCƒY */
+	char	name[56];		/* ï¿½ï¿½ï¿½Wï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ï¿½ */
+	u_short	version;		/* ï¿½ï¿½ï¿½Wï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½Ìƒoï¿½[ï¿½Wï¿½ï¿½ï¿½ï¿½ */
+	u_short flags;			/* ï¿½ï¿½ï¿½Wï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½Ìï¿½ï¿½ */
+	int		id;				/* ï¿½ï¿½ï¿½Wï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê‚ï¿½ï¿½ï¿½ ID ï¿½Ôï¿½ */
+	u_int	entry_addr;		/* ï¿½ï¿½ï¿½Wï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ÌŽï¿½ï¿½sï¿½Jï¿½nï¿½Aï¿½hï¿½ï¿½ï¿½X */
+	u_int	gp_value;		/* ï¿½ï¿½ï¿½Wï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ï¿½ GP ï¿½ï¿½ï¿½Wï¿½Xï¿½^ï¿½l */
+	u_int	text_addr;		/* ï¿½ï¿½ï¿½Wï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½Ìæ“ªï¿½Aï¿½hï¿½ï¿½ï¿½X */
+	u_int	text_size;		/* ï¿½ï¿½ï¿½Wï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½Ìƒeï¿½Lï¿½Xï¿½gï¿½Zï¿½Oï¿½ï¿½ï¿½ï¿½ï¿½gï¿½Tï¿½Cï¿½Y */
+	u_int	data_size;		/* ï¿½ï¿½ï¿½Wï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½Ìƒfï¿½[ï¿½^ï¿½Zï¿½Oï¿½ï¿½ï¿½ï¿½ï¿½gï¿½Tï¿½Cï¿½Y */
+	u_int	bss_size;		/* ï¿½ï¿½ï¿½Wï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½Ì–ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½fï¿½[ï¿½^ï¿½Zï¿½Oï¿½ï¿½ï¿½ï¿½ï¿½gï¿½Tï¿½Cï¿½Y */
+	u_int   erx_lib_addr;	/* ERXï¿½ï¿½ï¿½Cï¿½uï¿½ï¿½ï¿½ï¿½ï¿½Gï¿½ï¿½ï¿½gï¿½ï¿½ï¿½ÌŠJï¿½nï¿½Aï¿½hï¿½ï¿½ï¿½X */
+	u_int   erx_lib_size;	/* ERXï¿½ï¿½ï¿½Cï¿½uï¿½ï¿½ï¿½ï¿½ï¿½Gï¿½ï¿½ï¿½gï¿½ï¿½ï¿½ÌƒTï¿½Cï¿½Y */
+	u_int   erx_stub_addr;	/* ERXï¿½ï¿½ï¿½Cï¿½uï¿½ï¿½ï¿½ï¿½ï¿½Xï¿½^ï¿½uï¿½ÌŠJï¿½nï¿½Aï¿½hï¿½ï¿½ï¿½X */
+	u_int   erx_stub_size;	/* ERXï¿½ï¿½ï¿½Cï¿½uï¿½ï¿½ï¿½ï¿½ï¿½Xï¿½^ï¿½uï¿½ÌƒTï¿½Cï¿½Y */
 } SceErxModuleStatus;
 
 /* SceErxModuleStatus.flags */
-#define SCE_ERX_MSTF_LOADED			(0x0001)		/* ƒ[ƒh’¼Œã */
-#define SCE_ERX_MSTF_EXEC			(0x0002)		/* ƒ[ƒhŒã‚ÌƒGƒ“ƒgƒŠƒ‹[ƒ`ƒ“‚ðŽÀs’† */
-#define SCE_ERX_MSTF_RESIDENT		(0x0003)		/* í’“ó‘Ô */
-#define SCE_ERX_MSTF_STOPPING		(0x0004)		/* ’âŽ~‚Ì‚½‚ß‚ÉƒGƒ“ƒgƒŠƒ‹[ƒ`ƒ“‚ðŽÀs’† */
-#define SCE_ERX_MSTF_SelfSTOPPING	(0x0005)		/* Ž©ŒÈ’âŽ~‚Ì‚½‚ß‚ÉƒGƒ“ƒgƒŠƒ‹[ƒ`ƒ“‚ðŽÀs’† */
-#define SCE_ERX_MSTF_STOPPED		(0x0006)		/* ’âŽ~ó‘Ô */
-#define SCE_ERX_MSTF_SelfSTOPPED	(0x0007)		/* Ž©ŒÈ’âŽ~ó‘Ô */
+#define SCE_ERX_MSTF_LOADED			(0x0001)		/* ï¿½ï¿½ï¿½[ï¿½hï¿½ï¿½ï¿½ï¿½ */
+#define SCE_ERX_MSTF_EXEC			(0x0002)		/* ï¿½ï¿½ï¿½[ï¿½hï¿½ï¿½ÌƒGï¿½ï¿½ï¿½gï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½`ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½sï¿½ï¿½ */
+#define SCE_ERX_MSTF_RESIDENT		(0x0003)		/* ï¿½í’“ï¿½ï¿½ï¿½ */
+#define SCE_ERX_MSTF_STOPPING		(0x0004)		/* ï¿½ï¿½~ï¿½Ì‚ï¿½ï¿½ß‚ÉƒGï¿½ï¿½ï¿½gï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½`ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½sï¿½ï¿½ */
+#define SCE_ERX_MSTF_SelfSTOPPING	(0x0005)		/* ï¿½ï¿½ï¿½È’ï¿½~ï¿½Ì‚ï¿½ï¿½ß‚ÉƒGï¿½ï¿½ï¿½gï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½`ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½sï¿½ï¿½ */
+#define SCE_ERX_MSTF_STOPPED		(0x0006)		/* ï¿½ï¿½~ï¿½ï¿½ï¿½ */
+#define SCE_ERX_MSTF_SelfSTOPPED	(0x0007)		/* ï¿½ï¿½ï¿½È’ï¿½~ï¿½ï¿½ï¿½ */
 #define SCE_ERX_MSTF_MASK(x)		((x) & 0x000F)
 
-#define SCE_ERX_MSTF_REMOVABLE		(0x0010)		/* ƒAƒ“ƒ[ƒh‘Î‰ž */
-#define SCE_ERX_MSTF_NOSYSALLOC		(0x0020)		/* sysmemŠÇ—ŠO‚Ìƒƒ‚ƒŠ‚Éƒ[ƒh‚³‚ê‚½ */
-#define SCE_ERX_MSTF_CLEARMOD		(0x0040)		/* ƒAƒ“ƒ[ƒhŽž‚Ìƒƒ‚ƒŠƒNƒŠƒAÝ’è */
+#define SCE_ERX_MSTF_REMOVABLE		(0x0010)		/* ï¿½Aï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½hï¿½Î‰ï¿½ */
+#define SCE_ERX_MSTF_NOSYSALLOC		(0x0020)		/* sysmemï¿½Ç—ï¿½ï¿½Oï¿½Ìƒï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Éƒï¿½ï¿½[ï¿½hï¿½ï¿½ï¿½ê‚½ */
+#define SCE_ERX_MSTF_CLEARMOD		(0x0040)		/* ï¿½Aï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½hï¿½ï¿½ï¿½Ìƒï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Nï¿½ï¿½ï¿½Aï¿½Ý’ï¿½ */
 
-/* í’“ƒ‰ƒCƒuƒ‰ƒŠ‚ÌƒGƒ“ƒgƒŠƒe[ƒuƒ‹“o˜^ */
+/* ï¿½í’“ï¿½ï¿½ï¿½Cï¿½uï¿½ï¿½ï¿½ï¿½ï¿½ÌƒGï¿½ï¿½ï¿½gï¿½ï¿½ï¿½eï¿½[ï¿½uï¿½ï¿½ï¿½oï¿½^ */
 int   sceErxRegisterLibraryEntries(SceErxLibraryHeader *lib);
 
-/* ƒGƒ“ƒgƒŠƒe[ƒuƒ‹‚Ì“o˜^–•Á */
+/* ï¿½Gï¿½ï¿½ï¿½gï¿½ï¿½ï¿½eï¿½[ï¿½uï¿½ï¿½ï¿½Ì“oï¿½^ï¿½ï¿½ï¿½ï¿½ */
 int   sceErxReleaseLibraryEntries(SceErxLibraryHeader *lib);
 
-/* í’“ƒ‰ƒCƒuƒ‰ƒŠ‚ðŽg—p‚µ‚Ä‚¢‚éƒNƒ‰ƒCƒAƒ“ƒg‚ÌŒÂ”‚ðŽæ“¾ */
+/* ï¿½í’“ï¿½ï¿½ï¿½Cï¿½uï¿½ï¿½ï¿½ï¿½ï¿½ï¿½gï¿½pï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½Nï¿½ï¿½ï¿½Cï¿½Aï¿½ï¿½ï¿½gï¿½ÌŒÂï¿½ï¿½ï¿½æ“¾ */
 int   sceErxGetLibraryClients(const SceErxLibraryHeader *pLibHead);
 
 int   sceErxSearchModuleByName(const char *modulename);
@@ -174,12 +174,12 @@ int   sceErxSelfStopUnloadLoadStartModuleFile(int stopargs, const char *stopargp
 
 int   sceErxSync(int mode, int *result);
 
-extern __inline__ void *sceErxQueryGp(void);		/* Œ»Ý‚Ì$gpƒŒƒWƒXƒ^’l‚ðŽæ“¾ */
-extern __inline__ void *sceErxSetGp(void *newgp);	/* $gpƒŒƒWƒXƒ^‚ÉV‚µ‚¢’l‚ðÝ’è(–ß‚è’l‚ÍŒ»Ý‚Ì$gp’l) */
-void *sceErxGetModuleGp(void *target);				/* Žw’èƒAƒhƒŒƒX‚ðŠÜ‚Þƒ‚ƒWƒ…[ƒ‹‚Ì_gpƒAƒhƒŒƒX’l‚ðŽæ“¾ */
-extern __inline__ void *sceErxSetModuleGp(void);	/* $gpƒŒƒWƒXƒ^‚É‚±‚Ìƒ‚ƒWƒ…[ƒ‹‚Å‚Ì_gpƒAƒhƒŒƒX’l‚ðÝ’è(–ß‚è’l‚ÍŒ»Ý‚Ì$gp’l) */
+extern __inline__ void *sceErxQueryGp(void);		/* ï¿½ï¿½ï¿½Ý‚ï¿½$gpï¿½ï¿½ï¿½Wï¿½Xï¿½^ï¿½lï¿½ï¿½æ“¾ */
+extern __inline__ void *sceErxSetGp(void *newgp);	/* $gpï¿½ï¿½ï¿½Wï¿½Xï¿½^ï¿½ÉVï¿½ï¿½ï¿½ï¿½ï¿½lï¿½ï¿½Ý’ï¿½(ï¿½ß‚ï¿½lï¿½ÍŒï¿½ï¿½Ý‚ï¿½$gpï¿½l) */
+void *sceErxGetModuleGp(void *target);				/* ï¿½wï¿½ï¿½Aï¿½hï¿½ï¿½ï¿½Xï¿½ï¿½Ü‚Þƒï¿½ï¿½Wï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ï¿½_gpï¿½Aï¿½hï¿½ï¿½ï¿½Xï¿½lï¿½ï¿½æ“¾ */
+extern __inline__ void *sceErxSetModuleGp(void);	/* $gpï¿½ï¿½ï¿½Wï¿½Xï¿½^ï¿½É‚ï¿½ï¿½Ìƒï¿½ï¿½Wï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½Å‚ï¿½_gpï¿½Aï¿½hï¿½ï¿½ï¿½Xï¿½lï¿½ï¿½Ý’ï¿½(ï¿½ß‚ï¿½lï¿½ÍŒï¿½ï¿½Ý‚ï¿½$gpï¿½l) */
 
-/* Œ»Ý‚Ì$gpƒŒƒWƒXƒ^’l‚ðŽæ“¾ */
+/* ï¿½ï¿½ï¿½Ý‚ï¿½$gpï¿½ï¿½ï¿½Wï¿½Xï¿½^ï¿½lï¿½ï¿½æ“¾ */
 extern __inline__ void *sceErxQueryGp(void)
 {
 	void *gp;
@@ -192,7 +192,7 @@ extern __inline__ void *sceErxQueryGp(void)
 	return (gp);
 }
 
-/* $gpƒŒƒWƒXƒ^‚ÉV‚µ‚¢’l‚ðÝ’è(–ß‚è’l‚ÍŒ»Ý‚Ì$gp’l) */
+/* $gpï¿½ï¿½ï¿½Wï¿½Xï¿½^ï¿½ÉVï¿½ï¿½ï¿½ï¿½ï¿½lï¿½ï¿½Ý’ï¿½(ï¿½ß‚ï¿½lï¿½ÍŒï¿½ï¿½Ý‚ï¿½$gpï¿½l) */
 extern __inline__ void *sceErxSetGp(void *newgp)
 {
 	void *oldgp;
@@ -206,7 +206,7 @@ extern __inline__ void *sceErxSetGp(void *newgp)
 	return (oldgp);
 }
 
-/* $gpƒŒƒWƒXƒ^‚É‚±‚Ìƒ‚ƒWƒ…[ƒ‹‚Å‚Ì_gp’l‚ðÝ’è(–ß‚è’l‚ÍŒ»Ý‚Ì$gp’l) */
+/* $gpï¿½ï¿½ï¿½Wï¿½Xï¿½^ï¿½É‚ï¿½ï¿½Ìƒï¿½ï¿½Wï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½Å‚ï¿½_gpï¿½lï¿½ï¿½Ý’ï¿½(ï¿½ß‚ï¿½lï¿½ÍŒï¿½ï¿½Ý‚ï¿½$gpï¿½l) */
 extern __inline__ void *sceErxSetModuleGp(void)
 {
 	void *oldgp;
@@ -221,21 +221,21 @@ extern __inline__ void *sceErxSetModuleGp(void)
 }
 
 
-/* $gpƒŒƒWƒXƒ^’l‚Ì•Û‘¶,•œ‹A‚Â‚«ŠÖ”ŒÄ‚Ño‚µ */
-/* ƒXƒ^ƒbƒN‚Ìƒf[ƒ^‚Í128ƒoƒCƒg‚ðãŒÀ‚Æ‚µ‚ÄƒRƒs[,–ß‚è’l‚Íƒ|ƒCƒ“ƒ^Œ^‚ð‘z’è */
+/* $gpï¿½ï¿½ï¿½Wï¿½Xï¿½^ï¿½lï¿½Ì•Û‘ï¿½,ï¿½ï¿½ï¿½Aï¿½Â‚ï¿½ï¿½Öï¿½ï¿½Ä‚Ñoï¿½ï¿½ */
+/* ï¿½Xï¿½^ï¿½bï¿½Nï¿½Ìƒfï¿½[ï¿½^ï¿½ï¿½128ï¿½oï¿½Cï¿½gï¿½ï¿½ï¿½ï¿½ï¿½Æ‚ï¿½ï¿½ÄƒRï¿½sï¿½[,ï¿½ß‚ï¿½lï¿½Íƒ|ï¿½Cï¿½ï¿½ï¿½^ï¿½^ï¿½ï¿½zï¿½ï¿½ */
 #if defined(SCE_ERX_USE_GPEXECHELPER)
 
-/* ŒÄ‚Ño‚µæŠÖ”ƒ|ƒCƒ“ƒ^‚ªŠÜ‚Ü‚ê‚éƒ‚ƒWƒ…[ƒ‹‚©‚ç_gp‚ð“Á’è‚·‚é */
+/* ï¿½Ä‚Ñoï¿½ï¿½ï¿½ï¿½Öï¿½ï¿½|ï¿½Cï¿½ï¿½ï¿½^ï¿½ï¿½ï¿½Ü‚Ü‚ï¿½éƒ‚ï¿½Wï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½_gpï¿½ï¿½ï¿½ï¿½è‚·ï¿½ï¿½ */
 void *sceErxExecModuleFunction(void (*pFunc)(), ...);
 
 #if !defined(__GNUC__)
 
-/* $gpƒŒƒWƒXƒ^‚Ì’l‚ð–¾Ž¦“I‚ÉŽw’è‚µ‚ÄŠÖ”ŒÄ‚Ño‚µ */
+/* $gpï¿½ï¿½ï¿½Wï¿½Xï¿½^ï¿½Ì’lï¿½ð–¾Žï¿½ï¿½Iï¿½ÉŽwï¿½è‚µï¿½ÄŠÖï¿½ï¿½Ä‚Ñoï¿½ï¿½ */
 void *sceErxExecGpFunction(void *newgp, void (*pFunc)(), ...);
 
 #else	/* !defined(__GNUC__) */
 
-/* $gpƒŒƒWƒXƒ^‚Ì’l‚ð–¾Ž¦“I‚ÉŽw’è‚µ‚ÄŠÖ”ŒÄ‚Ño‚µ */
+/* $gpï¿½ï¿½ï¿½Wï¿½Xï¿½^ï¿½Ì’lï¿½ð–¾Žï¿½ï¿½Iï¿½ÉŽwï¿½è‚µï¿½ÄŠÖï¿½ï¿½Ä‚Ñoï¿½ï¿½ */
 extern __inline__ void *sceErxExecGpFunction(void *newgp, void (*pFunc)(), ...);
 
 extern __inline__ void *sceErxExecGpFunction(void *newgp, void (*pFunc)(), ...)
@@ -243,13 +243,13 @@ extern __inline__ void *sceErxExecGpFunction(void *newgp, void (*pFunc)(), ...)
 	void *oldgp;
 	void *pReturn;
 
-	/* $gpƒŒƒWƒXƒ^‚Ì•Û‘¶‚ÆV‚µ‚¢$gpƒŒƒWƒXƒ^’lÝ’è */
+	/* $gpï¿½ï¿½ï¿½Wï¿½Xï¿½^ï¿½Ì•Û‘ï¿½ï¿½ÆVï¿½ï¿½ï¿½ï¿½$gpï¿½ï¿½ï¿½Wï¿½Xï¿½^ï¿½lï¿½Ý’ï¿½ */
 	oldgp = sceErxSetGp(newgp);
 
-	/* ŠÔÚ“I‚ÈŠÖ”‚ÌŒÄ‚Ño‚µ */
+	/* ï¿½ÔÚ“Iï¿½ÈŠÖï¿½ï¿½ÌŒÄ‚Ñoï¿½ï¿½ */
 	pReturn  = __builtin_apply(pFunc, __builtin_apply_args(), 128);
 
-	/* $gpƒŒƒWƒXƒ^’l•œ‹A */
+	/* $gpï¿½ï¿½ï¿½Wï¿½Xï¿½^ï¿½lï¿½ï¿½ï¿½A */
 	sceErxSetGp(oldgp);
 	__builtin_return (pReturn);
 }

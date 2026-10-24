@@ -50,33 +50,33 @@
  * Macros for Spindle control
  */
 #define SCECdSpinMax		0
-#define SCECdSpinNom		1	/* driver‚Ì“Ç‚Ý‚¾‚¹‚éÅ‚‘¬“x‚Å‰ñ‚· */
-#define SCECdSpinStm		0	/* ƒXƒgƒŠ[ƒ€‚Ì„§‘¬“x‚Å‰ñ‚·       */
-#define SCECdSpinDvdDL0		0	/* DVDƒfƒ…ƒAƒ‹ƒŒƒCƒA0„§‘¬“x‚Å‰ñ‚·  */	
-#define SCECdSpinX1             2       /* •W€‘¬‚Å‰ñ‚· CD-DA read          */
+#define SCECdSpinNom		1	/* driverï¿½Ì“Ç‚Ý‚ï¿½ï¿½ï¿½ï¿½ï¿½Åï¿½ï¿½ï¿½ï¿½xï¿½Å‰ï¿½ */
+#define SCECdSpinStm		0	/* ï¿½Xï¿½gï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½Ìï¿½ï¿½ï¿½ï¿½ï¿½ï¿½xï¿½Å‰ï¿½       */
+#define SCECdSpinDvdDL0		0	/* DVDï¿½fï¿½ï¿½ï¿½Aï¿½ï¿½ï¿½ï¿½ï¿½Cï¿½A0ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½xï¿½Å‰ï¿½  */	
+#define SCECdSpinX1             2       /* ï¿½Wï¿½ï¿½ï¿½ï¿½ï¿½Å‰ï¿½ CD-DA read          */
 
 /*
  * Macros for Error code
  */
-#define SCECdErFAIL             -1      /* sceCdGetError()ŠÖ”‚Ì
-                                                        ”­s‚ÉŽ¸”s‚µ‚½      */
+#define SCECdErFAIL             -1      /* sceCdGetError()ï¿½Öï¿½ï¿½ï¿½
+                                                        ï¿½ï¿½ï¿½sï¿½ÉŽï¿½ï¿½sï¿½ï¿½ï¿½ï¿½      */
 #define SCECdErNO		0x00    /* No Error                         */
-#define SCECdErEOM		0x32    /* Ä¶’†‚ÉÅŠOŽü‚É’B‚µ‚½	    */
-#define SCECdErTRMOPN		0x31	/* Ä¶’†‚ÉŠW‚ª‚ ‚¯‚ç‚ê‚½  	    */
-#define SCECdErREAD		0x30	/* “Ç‚Ý‚¾‚µ’†–â‘è‚ª‚É”­¶‚µ‚½	    */
-#define SCECdErPRM		0x22	/* ˆê”ÊƒRƒ}ƒ“ƒh‚Ìƒpƒ‰ƒ[ƒ^‚ÉŒë‚è   */
-#define SCECdErILI		0x21	/* “]‘—’·Žw’è‚ªŒë‚è		    */
-#define SCECdErIPI		0x20	/* “]‘—ŠJŽnƒAƒhƒŒƒXŽw’è‚ªŒë‚è	    */
-#define SCECdErCUD		0x14	/* ƒhƒ‰ƒCƒu’†‚ÌƒfƒBƒXƒN‚É‚Í•s“KØ   */
-#define SCECdErNORDY		0x13    /* ƒRƒ}ƒ“ƒhˆ—’†		    */
-#define SCECdErNODISC		0x12	/* ƒfƒBƒXƒN‚ª–³‚¢		    */
-#define SCECdErOPENS		0x11	/* ŠW‚ªŠJ‚¢‚Ä‚¢‚é		    */
-#define SCECdErCMD		0x10	/* –¢ƒTƒ|[ƒg‚ÌƒRƒ}ƒ“ƒh”­s	    */
-#define SCECdErABRT		0x01	/* ƒRƒ}ƒ“ƒhˆ—’†‚ÉƒAƒ{[ƒg”­s	    */
-#define SCECdErREADCF		0xfd	/* “Ç‚Ý‚¾‚µƒRƒ}ƒ“ƒh”­s‚ÉŽ¸”s‚µ‚½B */
-#define SCECdErREADCFR  	0xfe	/* “Ç‚Ý‚¾‚µƒRƒ}ƒ“ƒh”­s‚ÉŽ¸”s‚µ‚½B */
-#define SCECdErSFRMTNG		0x38    /* ƒRƒ}ƒ“ƒh‚ÆƒZƒNƒ^‚ÌƒtƒH[ƒ}ƒbƒg‚ª */
-					/* ˆÙ‚È‚éB			    */
+#define SCECdErEOM		0x32    /* ï¿½Äï¿½ï¿½ï¿½ï¿½ÉÅŠOï¿½ï¿½ï¿½É’Bï¿½ï¿½ï¿½ï¿½	    */
+#define SCECdErTRMOPN		0x31	/* ï¿½Äï¿½ï¿½ï¿½ï¿½ÉŠWï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ê‚½  	    */
+#define SCECdErREAD		0x30	/* ï¿½Ç‚Ý‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½è‚ªï¿½É”ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½	    */
+#define SCECdErPRM		0x22	/* ï¿½ï¿½ÊƒRï¿½}ï¿½ï¿½ï¿½hï¿½Ìƒpï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½^ï¿½ÉŒï¿½ï¿½   */
+#define SCECdErILI		0x21	/* ï¿½]ï¿½ï¿½ï¿½ï¿½ï¿½wï¿½è‚ªï¿½ï¿½ï¿½		    */
+#define SCECdErIPI		0x20	/* ï¿½]ï¿½ï¿½ï¿½Jï¿½nï¿½Aï¿½hï¿½ï¿½ï¿½Xï¿½wï¿½è‚ªï¿½ï¿½ï¿½	    */
+#define SCECdErCUD		0x14	/* ï¿½hï¿½ï¿½ï¿½Cï¿½uï¿½ï¿½ï¿½Ìƒfï¿½Bï¿½Xï¿½Nï¿½É‚Í•sï¿½Kï¿½ï¿½   */
+#define SCECdErNORDY		0x13    /* ï¿½Rï¿½}ï¿½ï¿½ï¿½hï¿½ï¿½ï¿½ï¿½ï¿½ï¿½		    */
+#define SCECdErNODISC		0x12	/* ï¿½fï¿½Bï¿½Xï¿½Nï¿½ï¿½ï¿½ï¿½ï¿½ï¿½		    */
+#define SCECdErOPENS		0x11	/* ï¿½Wï¿½ï¿½ï¿½Jï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½		    */
+#define SCECdErCMD		0x10	/* ï¿½ï¿½ï¿½Tï¿½|ï¿½[ï¿½gï¿½ÌƒRï¿½}ï¿½ï¿½ï¿½hï¿½ï¿½ï¿½s	    */
+#define SCECdErABRT		0x01	/* ï¿½Rï¿½}ï¿½ï¿½ï¿½hï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÉƒAï¿½{ï¿½[ï¿½gï¿½ï¿½ï¿½s	    */
+#define SCECdErREADCF		0xfd	/* ï¿½Ç‚Ý‚ï¿½ï¿½ï¿½ï¿½Rï¿½}ï¿½ï¿½ï¿½hï¿½ï¿½ï¿½sï¿½ÉŽï¿½ï¿½sï¿½ï¿½ï¿½ï¿½ï¿½B */
+#define SCECdErREADCFR  	0xfe	/* ï¿½Ç‚Ý‚ï¿½ï¿½ï¿½ï¿½Rï¿½}ï¿½ï¿½ï¿½hï¿½ï¿½ï¿½sï¿½ÉŽï¿½ï¿½sï¿½ï¿½ï¿½ï¿½ï¿½B */
+#define SCECdErSFRMTNG		0x38    /* ï¿½Rï¿½}ï¿½ï¿½ï¿½hï¿½ÆƒZï¿½Nï¿½^ï¿½Ìƒtï¿½Hï¿½[ï¿½}ï¿½bï¿½gï¿½ï¿½ */
+					/* ï¿½Ù‚È‚ï¿½B			    */
 
 /*
  * Macros for sceCdGetDiskType()
@@ -84,31 +84,31 @@
 #define SCECdIllgalMedia 	0xff
 #define SCECdIllegalMedia 	0xff
 	/* ILIMEDIA (Illegal Media)
-            Disc ‚ª ”ñPS/”ñPS2 Disc ‚Å‚ ‚é‚±‚Æ‚ð•\‚í‚·B */
+            Disc ï¿½ï¿½ ï¿½ï¿½PS/ï¿½ï¿½PS2 Disc ï¿½Å‚ï¿½ï¿½é‚±ï¿½Æ‚ï¿½\ï¿½í‚·ï¿½B */
 #define SCECdDVDV		0xfe
 	/* DVDV (DVD Video)
-            Disc ‚ª ”ñPS/”ñPS2 ‚Å‚©‚Â DVD Video ‚Å‚ ‚é‚±‚Æ‚ð•\‚í‚·B*/
+            Disc ï¿½ï¿½ ï¿½ï¿½PS/ï¿½ï¿½PS2 ï¿½Å‚ï¿½ï¿½ï¿½ DVD Video ï¿½Å‚ï¿½ï¿½é‚±ï¿½Æ‚ï¿½\ï¿½í‚·ï¿½B*/
 #define SCECdCDDA		0xfd
 	/* CDDA (CD DA)
-            Disc ‚ª ”ñPS/”ñPS2 ‚Å‚©‚Â DA ƒgƒ‰ƒbƒNŠÜ‚Þ‚±‚Æ‚ð•\‚í‚·B*/
+            Disc ï¿½ï¿½ ï¿½ï¿½PS/ï¿½ï¿½PS2 ï¿½Å‚ï¿½ï¿½ï¿½ DA ï¿½gï¿½ï¿½ï¿½bï¿½Nï¿½Ü‚Þ‚ï¿½ï¿½Æ‚ï¿½\ï¿½í‚·ï¿½B*/
 #define SCECdPS2DVD		0x14
-	/* PS2DVD  Disc ‚ª PS2 —p DVD ‚Å‚ ‚é‚±‚Æ‚ð•\‚í‚·B*/
+	/* PS2DVD  Disc ï¿½ï¿½ PS2 ï¿½p DVD ï¿½Å‚ï¿½ï¿½é‚±ï¿½Æ‚ï¿½\ï¿½í‚·ï¿½B*/
 #define SCECdPS2CDDA		0x13
-	/* PS2CDDA Disc ‚ª PS2 —p CD ‚Å‚©‚Â DA ƒgƒ‰ƒbƒNŠÜ‚Þ‚±‚Æ‚ð•\‚í‚·B*/
+	/* PS2CDDA Disc ï¿½ï¿½ PS2 ï¿½p CD ï¿½Å‚ï¿½ï¿½ï¿½ DA ï¿½gï¿½ï¿½ï¿½bï¿½Nï¿½Ü‚Þ‚ï¿½ï¿½Æ‚ï¿½\ï¿½í‚·ï¿½B*/
 #define SCECdPS2CD		0x12
-	/* PS2CD   Disc ‚ª PS2 —p CD ‚Å‚©‚Â DA ƒgƒ‰ƒbƒNŠÜ‚Ü‚È‚¢‚±‚Æ‚ð•\‚í‚·B*/
+	/* PS2CD   Disc ï¿½ï¿½ PS2 ï¿½p CD ï¿½Å‚ï¿½ï¿½ï¿½ DA ï¿½gï¿½ï¿½ï¿½bï¿½Nï¿½Ü‚Ü‚È‚ï¿½ï¿½ï¿½ï¿½Æ‚ï¿½\ï¿½í‚·ï¿½B*/
 #define SCECdPSCDDA 		0x11
-	/* PSCDDA  Disc ‚ª PS —p CD ‚Å‚©‚Â DA ƒgƒ‰ƒbƒNŠÜ‚Þ‚±‚Æ‚ð•\‚í‚·B */
+	/* PSCDDA  Disc ï¿½ï¿½ PS ï¿½p CD ï¿½Å‚ï¿½ï¿½ï¿½ DA ï¿½gï¿½ï¿½ï¿½bï¿½Nï¿½Ü‚Þ‚ï¿½ï¿½Æ‚ï¿½\ï¿½í‚·ï¿½B */
 #define SCECdPSCD		0x10
-	/* PSCD    Disc ‚ª PS —p CD ‚Å‚©‚Â DA ƒgƒ‰ƒbƒNŠÜ‚Ü‚È‚¢‚±‚Æ‚ð•\‚í‚·B*/
+	/* PSCD    Disc ï¿½ï¿½ PS ï¿½p CD ï¿½Å‚ï¿½ï¿½ï¿½ DA ï¿½gï¿½ï¿½ï¿½bï¿½Nï¿½Ü‚Ü‚È‚ï¿½ï¿½ï¿½ï¿½Æ‚ï¿½\ï¿½í‚·ï¿½B*/
 #define SCECdDETCT		0x01
-	/* DETCT (Detecting) Disc ”»•Ê“®ì’†‚ð•\‚í‚·B*/
+	/* DETCT (Detecting) Disc ï¿½ï¿½ï¿½Ê“ï¿½ï¿½ì’†ï¿½ï¿½\ï¿½í‚·ï¿½B*/
 #define SCECdNODISC 		0x00
-	/* NODISC (No disc) Disc ‚ª“ü‚Á‚Ä‚¢‚È‚¢ó‘Ô‚ð•\‚í‚·B*/
+	/* NODISC (No disc) Disc ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½È‚ï¿½ï¿½ï¿½Ô‚ï¿½\ï¿½í‚·ï¿½B*/
 #define SCECdUNKNOWN		0x05
-	/* UNKNOWN          Disc ”»•Ê•s”\	*/
+	/* UNKNOWN          Disc ï¿½ï¿½ï¿½Ê•sï¿½\	*/
 #define SCECdGDTFUNCFAIL        (-1)
-    /* FUNCFAIL			ŠÖ”ŒÄ‚Ño‚µŽ¸”s */
+    /* FUNCFAIL			ï¿½Öï¿½ï¿½Ä‚Ñoï¿½ï¿½ï¿½ï¿½ï¿½s */
 
 
 /*
