@@ -1,3 +1,18 @@
+## CMake (wsl/linux)
+```sh
+cmake --preset default # Sets preset for building and downloads deps and sets up compiler
+cmake --build out # Builds the project
+ctest --test-dir out # Tests sha-1 hashes
+```
+With the default preset all dependencies will be checked and missing dependencies will be installed and the compiler will be setup as well. if you run cmake --preset fastbuild it will build without checking before hand
+
+## Docker (Any Platform)
+```sh
+docker build -t sotc .
+docker run --rm -v "$($PWD.Path):/workspace" sotc
+```
+Docker is mostly platform independent this is what i recommend for windows as wsl can be a hassle to get working.
+
 # Building
 
 ```sh
@@ -46,3 +61,4 @@ Ten `OK` lines or you are not done.
 
 ## CI
 `.github/workflows/build.yml` (upstream) builds loader and kernel from files fetched from secret URLs. It does not cover the other 8 modules; extending it is the repository owner's decision. Never commit the game files.
+
