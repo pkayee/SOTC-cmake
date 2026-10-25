@@ -58,7 +58,9 @@ if (NOT FAST_BUILD)
     include(cmake/Dependencies.cmake)
 endif ()
 
-decomp_check_dependencies()            # venv, compiler, tools, game files
+if (NOT FAST_BUILD)
+    decomp_check_dependencies()
+endif()                            
 include(cmake/Toolchain.cmake)         # assembler, python, patcher settings
 include(cmake/Decomp.cmake)            # the build rules
 
