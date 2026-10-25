@@ -73,6 +73,7 @@ permuter_settings.toml
 /nonmatchings
 
 /.vscode
+.idea/
 
 *undefined_funcs_auto.txt
 *undefined_syms_auto.txt
