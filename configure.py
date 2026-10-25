@@ -79,7 +79,25 @@ compiler_type = "gcc"
         )
 
 
-def build_stuff(basename, linker_entries: List[LinkerEntry], is_xff, split):
+def cmake_quote(value) -> str:
+    return '"' + str(value).replace("\\", "\\\\").replace('"', '\\"').replace("$", "\\$") + '"'
+
+
+def write_cmake_manifest(path, is_xff, rows):
+    """One decomp_object() line per object, same data the ninja rules get."""
+    with open(path, "w") as f:
+        f.write(f"set(DECOMP_XFF {'ON' if is_xff else 'OFF'})\n")
+        f.write(f"set(DECOMP_INCLUDES {cmake_quote(COMMON_INCLUDES)})\n")
+        for kind, obj, srcs, variables in rows:
+            quoted_srcs = " ".join(cmake_quote(src) for src in srcs)
+            line = f"decomp_object({kind} {cmake_quote(obj)} SRC {quoted_srcs}"
+            for key in ("optlevel", "regnames", "override"):
+                if variables.get(key):
+                    line += f" {key.upper()} {cmake_quote(variables[key])}"
+            f.write(line + ")\n")
+
+
+def build_stuff(basename, linker_entries: List[LinkerEntry], is_xff, split, manifest_rows=None):
     built_objects: Set[Path] = set()
 
     def build(
@@ -93,6 +111,10 @@ def build_stuff(basename, linker_entries: List[LinkerEntry], is_xff, split):
             object_paths = [object_paths]
 
         object_strs = [str(obj) for obj in object_paths]
+
+        if manifest_rows is not None:
+            for object_str in object_strs:
+                manifest_rows.append((task, object_str, [str(p) for p in src_paths], variables))
 
         for object_path in object_paths:
             if object_path.suffix == ".o":
@@ -315,7 +337,13 @@ def split_binaries(args):
 
         create_custom_specs()
 
-        build_stuff(target_file, linker_entries, target_file != "SCPS_150.97", split)
+        manifest_rows = [] if args.emit_cmake else None
+        is_xff = target_file != "SCPS_150.97"
+
+        build_stuff(target_file, linker_entries, is_xff, split, manifest_rows)
+
+        if args.emit_cmake:
+            write_cmake_manifest(args.emit_cmake, is_xff, manifest_rows)
         
 #        ninja.build(
 #            f"build/{target_file}/{target_file}",
@@ -363,7 +391,16 @@ if __name__ == "__main__":
         help="Rescans the target XFF file for reallocations",
         action="store_true",
     )
+    parser.add_argument(
+        "--emit-cmake",
+        help="Also write a CMake object manifest to this path (use with a single -t target)",
+        metavar="PATH",
+        default=None,
+    )
     args = parser.parse_args()
+
+    if args.emit_cmake and (not args.target or len(args.target) != 1):
+        parser.error("--emit-cmake needs exactly one -t target")
 
     if args.cleansrc:
         shutil.rmtree("src", ignore_errors=True)
