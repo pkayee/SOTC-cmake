@@ -1,0 +1,6 @@
+services:
+  sotc:
+    image: sotc
+    build: .
+    volumes:
+      - .:/workspace

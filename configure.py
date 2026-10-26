@@ -1,4 +1,4 @@
-#!./.python3/bin/python3
+#!/usr/bin/env python3
 
 import argparse
 import os
@@ -20,12 +20,14 @@ from splat.segtypes.linker_entry import LinkerEntry
 
 ROOT = Path(__file__).parent
 TOOLS_DIR = ROOT / "tools"
+PYTHON_BIN = os.environ.get("DECOMP_PYTHON", sys.executable)
 
 COMMON_INCLUDES = "-Iinclude -I include/sdk/common -I include/sdk/ee -I include/sdk -I include/gcc"
 
 MODULES_FILE = ROOT / "config" / "modules.txt"
 
 
+"""look at config/modules.txt for more context"""
 class Module(NamedTuple):
     name: str  # what -t takes (and the make/CMake target name)
     basename: str  # the file in iso/ and config/<basename>/<basename>.yaml
@@ -68,9 +70,16 @@ def load_modules() -> List[Module]:
         modules.append(Module(name, basename, kind == "xff", tuple(aligns)))
     return modules
 
-COMPILER = "ee-gcc2.96"
-GAME_CC_DIR = f"{TOOLS_DIR}/cc/{COMPILER}/bin"
-CUSTOM_SPECS_FILE = f"{TOOLS_DIR}/cc/{COMPILER}/lib/regnames.specs"
+_env_cc = os.environ.get("DECOMP_CC")
+if _env_cc:
+    _cc_path = Path(_env_cc)
+    GAME_CC_DIR = str(_cc_path.parent)
+    CUSTOM_SPECS_FILE = str(_cc_path.parent.parent / "lib" / "regnames.specs")
+    COMPILER = _cc_path.parent.parent.name
+else:
+    COMPILER = "ee-gcc2.96"
+    GAME_CC_DIR = f"{TOOLS_DIR}/cc/{COMPILER}/bin"
+    CUSTOM_SPECS_FILE = f"{TOOLS_DIR}/cc/{COMPILER}/lib/regnames.specs"
 
 GAME_COMPILE_CMD = f"{GAME_CC_DIR}/ee-gcc -c {COMMON_INCLUDES} $optlevel -g2 $regnames"
 
@@ -109,7 +118,12 @@ def clean(target):
 
 
 def write_permuter_settings():
-    rel_cc_dir = Path(GAME_CC_DIR).relative_to(ROOT)
+    try:
+        rel_cc_dir = Path(GAME_CC_DIR).relative_to(ROOT)
+    except ValueError:
+        # If the compiler is located outside ROOT (e.g. in /opt/sotc-cc), use the absolute path or string
+        rel_cc_dir = GAME_CC_DIR
+
     with open("permuter_settings.toml", "w") as f:
         f.write(
             f"""compiler_command = "{rel_cc_dir}/ee-gcc -c {COMMON_INCLUDES} -O2 -g2"

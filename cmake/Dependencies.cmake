@@ -18,9 +18,12 @@ set(DECOMP_EEGCC_SHA256
         "0590d2ca9da8f5903889d66761220d14b47a8d14ba987ca53db84a1650a1fd0a"
         CACHE STRING "expected SHA-256 of that archive (empty = do not verify)"
 )
+set(DECOMP_PYTHON CACHE STRING "${CMAKE_SOURCE_DIR}/.python3/bin/python3")
+set(DECOMP_CC CACHE STRING "${CMAKE_SOURCE_DIR}/tools/cc/ee-gcc2.96/bin/ee-gcc")
 
 function(_decomp_ensure_python_venv)
-    set(venv "${CMAKE_SOURCE_DIR}/.python3")
+    get_filename_component(_python_dir "${DECOMP_PYTHON}" DIRECTORY)
+    get_filename_component(venv "${_python_dir}" DIRECTORY)
     set(requirements "${CMAKE_SOURCE_DIR}/requirements.txt")
     set(stamp "${venv}/.requirements.sha256") # hash of the requirements pip last installed
 
@@ -33,7 +36,7 @@ function(_decomp_ensure_python_venv)
     file(SHA256 "${requirements}" wanted_hash)
 
     if (DECOMP_AUTO_SETUP)
-        if (NOT EXISTS "${venv}/bin/python3")
+        if (NOT EXISTS "${DECOMP_PYTHON}")
             find_program(system_python NAMES python3 python REQUIRED)
             message(STATUS "decomp: creating the python venv in ${venv}")
 
@@ -60,7 +63,7 @@ function(_decomp_ensure_python_venv)
 
         if (NOT installed_hash STREQUAL wanted_hash)
             message(STATUS "decomp: installing python requirements (requirements.txt changed or first run)")
-            execute_process(COMMAND "${venv}/bin/python3" -m pip install -U -r "${requirements}" RESULT_VARIABLE rc)
+            execute_process(COMMAND "${DECOMP_PYTHON}" -m pip install -U -r "${requirements}" RESULT_VARIABLE rc)
 
             if (NOT rc EQUAL 0)
                 message(FATAL_ERROR "pip install -r requirements.txt failed (see the output above)")
@@ -71,19 +74,20 @@ function(_decomp_ensure_python_venv)
 
     endif ()
 
-    if (NOT EXISTS "${venv}/bin/python3")
-        message(FATAL_ERROR "${venv} is missing. Re-run with -DDECOMP_AUTO_SETUP=ON or create it as the README says.")
+    if (NOT EXISTS "${DECOMP_PYTHON}")
+        message(FATAL_ERROR "${DECOMP_PYTHON} is missing. Re-run with -DDECOMP_AUTO_SETUP=ON or create it as the README says.")
     endif ()
 
 endfunction()
 
 
 function(_decomp_ensure_compiler)
-    set(compiler_dir "${CMAKE_SOURCE_DIR}/tools/cc/ee-gcc2.96")
+    get_filename_component(_compiler_bin "${DECOMP_CC}" DIRECTORY) #
+    get_filename_component(_compiler_root "${DECOMP_CC}" DIRECTORY)
 
-    if (NOT EXISTS "${compiler_dir}/bin/ee-gcc")
+    if (NOT EXISTS "${DECOMP_CC}")
         if (NOT DECOMP_AUTO_SETUP)
-            message(FATAL_ERROR "${compiler_dir}/bin/ee-gcc is missing; run scripts/setup_compiler.sh "
+            message(FATAL_ERROR "${DECOMP_CC} is missing; run scripts/setup_compiler.sh "
                     "or use -DDECOMP_AUTO_SETUP=ON"
             )
         endif ()
@@ -113,11 +117,11 @@ function(_decomp_ensure_compiler)
             )
         endif ()
 
-        file(MAKE_DIRECTORY "${compiler_dir}")
-        file(ARCHIVE_EXTRACT INPUT "${archive}" DESTINATION "${compiler_dir}")
+        file(MAKE_DIRECTORY "${DECOMP_CC}")
+        file(ARCHIVE_EXTRACT INPUT "${archive}" DESTINATION "${DECOMP_CC}")
         file(
                 CHMOD_RECURSE
-                "${compiler_dir}"
+                "${DECOMP_CC}"
                 FILE_PERMISSIONS
                 OWNER_READ
                 OWNER_WRITE
@@ -133,13 +137,13 @@ function(_decomp_ensure_compiler)
 
     # ee-gcc is a 32-bit x86 executable; on a 64-bit host it needs the 32-bit loader and libc
     execute_process(
-            COMMAND "${compiler_dir}/bin/ee-gcc" --version
+            COMMAND "${DECOMP_CC}" --version
             RESULT_VARIABLE rc
             OUTPUT_QUIET ERROR_QUIET
     )
 
     if (NOT rc EQUAL 0)
-        message(FATAL_ERROR "${compiler_dir}/bin/ee-gcc does not run (${rc}). It is a 32-bit program; "
+        message(FATAL_ERROR "${DECOMP_CC} does not run (${rc}). It is a 32-bit program; "
                 "on Debian/Ubuntu install the 32-bit libc:  sudo apt install libc6-i386")
     endif ()
 

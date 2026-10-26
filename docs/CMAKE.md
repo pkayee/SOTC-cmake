@@ -43,16 +43,16 @@ changed or is missing, not on every CMake edit.
 
 Pass them as `-D<NAME>=<value>` when configuring.
 
-| Option | Default | Meaning |
-|---|---|---|
-| `SOTC_MODULES` | `all` | Which modules to extract and build: `all` or a list of names from `config/modules.txt` |
-| `DECOMP_AUTO_SETUP` | `ON` | Create the venv and download the compiler when missing |
-| `DECOMP_CROSS` | `mips-linux-gnu-` | Prefix of the binutils (`as`, `ld`, `objcopy`, `strip`); may be an absolute path prefix |
-| `DECOMP_CC` | `tools/cc/ee-gcc2.96/bin/ee-gcc` | The game's compiler |
-| `DECOMP_PYTHON` | `.python3/bin/python3` | Python with splat installed |
-| `DECOMP_NUMERIC_REGS` | `AUTO` | `AUTO`, `ON` or `OFF`; see below |
-| `DECOMP_EEGCC_URL` | decompme release | Where the compiler archive is downloaded from |
-| `DECOMP_EEGCC_SHA256` | pinned hash | Expected hash of that archive; empty skips the check |
+| Option                | Default                                                                                                 | Meaning                                                                                 |
+|-----------------------|---------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------|
+| `SOTC_MODULES`        | `all`                                                                                                   | Which modules to extract and build: `all` or a list of names from `config/modules.txt`  |
+| `DECOMP_AUTO_SETUP`   | `ON`                                                                                                    | Create the venv and download the compiler when missing                                  |
+| `DECOMP_CROSS`        | `mips-linux-gnu-`                                                                                       | Prefix of the binutils (`as`, `ld`, `objcopy`, `strip`); may be an absolute path prefix |
+| `DECOMP_CC`           | `tools/cc/ee-gcc2.96/bin/ee-gcc`                                                                        | The game's compiler                                                                     |
+| `DECOMP_PYTHON`       | `.python3/bin/python3`                                                                                  | Python with splat installed                                                             |
+| `DECOMP_NUMERIC_REGS` | `AUTO`                                                                                                  | `AUTO`, `ON` or `OFF`; see below                                                        |
+| `DECOMP_EEGCC_URL`    | [DecompMe Release](https://github.com/decompme/compilers/releases/download/compilers/ee-gcc2.96.tar.xz) | Where the compiler archive is downloaded from                                           |
+| `DECOMP_EEGCC_SHA256` | <abbr title="0590d2ca9da8f5903889d66761220d14b47a8d14ba987ca53db84a1650a1fd0a">`0590d2ca...`</abbr>     | Expected hash of that archive; empty skips the check                                    |
 
 ## Files
 

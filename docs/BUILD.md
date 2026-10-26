@@ -247,14 +247,11 @@ config/
 
 iso/<file>                    input binary (not in git)
 
-asm/<file>/                   disassembly (splat output)
-assets/<file>/                extracted data
 build/<file>/
   **/*.o                      objects
   <file>.elf                  linked ELF (or relocatable ELF for XFF)
   <file>                      final binary
   <file>.map                  link map
-  <file>.ok                   sha1 success stamp
 
 <file>.ld                     linker script (splat)
 <file>.ninja                  generated build file
