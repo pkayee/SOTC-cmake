@@ -8,7 +8,7 @@ import sys
 import re
 
 from pathlib import Path
-from typing import Dict, List, Set, Union
+from typing import Dict, List, NamedTuple, Set, Tuple, Union
 
 import ninja_syntax
 
@@ -22,6 +22,51 @@ ROOT = Path(__file__).parent
 TOOLS_DIR = ROOT / "tools"
 
 COMMON_INCLUDES = "-Iinclude -I include/sdk/common -I include/sdk/ee -I include/sdk -I include/gcc"
+
+MODULES_FILE = ROOT / "config" / "modules.txt"
+
+
+class Module(NamedTuple):
+    name: str  # what -t takes (and the make/CMake target name)
+    basename: str  # the file in iso/ and config/<basename>/<basename>.yaml
+    is_xff: bool  # XFF files are linked relocatable and fixed up by tools/fix_xff.py
+    # (directory below asm/<basename>/, "<section>:<alignment>") pairs; the first match decides the
+    # --section-align override given to tools/elf_patcher.py for that directory's objects
+    section_aligns: Tuple[Tuple[str, str], ...]
+
+
+def load_modules() -> List[Module]:
+    """Reads config/modules.txt: `<name> <basename> <elf|xff> [align=<dir>:<section>:<alignment> ...]`."""
+    if not MODULES_FILE.is_file():
+        sys.exit(f"Error: {MODULES_FILE} not found")
+
+    modules: List[Module] = []
+    for number, line in enumerate(MODULES_FILE.read_text().splitlines(), 1):
+        fields = line.split("#")[0].split()
+        if not fields:
+            continue
+
+        def fail(message: str):
+            sys.exit(f"Error: {MODULES_FILE}:{number}: {message}")
+
+        if len(fields) < 3:
+            fail("expected '<name> <basename> <elf|xff> [align=<dir>:<section>:<alignment> ...]'")
+        name, basename, kind = fields[:3]
+        if kind not in ("elf", "xff"):
+            fail(f"format must be 'elf' or 'xff', not '{kind}'")
+        if any(m.name == name for m in modules):
+            fail(f"duplicate module '{name}'")
+
+        aligns = []
+        for option in fields[3:]:
+            key, _, value = option.partition("=")
+            parts = value.split(":")
+            if key != "align" or len(parts) != 3:
+                fail(f"unrecognized option '{option}' (expected align=<dir>:<section>:<alignment>)")
+            aligns.append((parts[0], f"{parts[1]}:{parts[2]}"))
+
+        modules.append(Module(name, basename, kind == "xff", tuple(aligns)))
+    return modules
 
 COMPILER = "ee-gcc2.96"
 GAME_CC_DIR = f"{TOOLS_DIR}/cc/{COMPILER}/bin"
@@ -97,7 +142,7 @@ def write_cmake_manifest(path, is_xff, rows):
             f.write(line + ")\n")
 
 
-def build_stuff(basename, linker_entries: List[LinkerEntry], is_xff, split, manifest_rows=None):
+def build_stuff(basename, linker_entries: List[LinkerEntry], is_xff, split, section_aligns=(), manifest_rows=None):
     built_objects: Set[Path] = set()
 
     def build(
@@ -196,12 +241,11 @@ def build_stuff(basename, linker_entries: List[LinkerEntry], is_xff, split, mani
         if entry.object_path is None:
             continue
 
-        if entry.object_path.is_relative_to(Path("build/SCPS_150.97/asm/SCPS_150.97/sdk")):
-            override = "--section-align .text:0x4"
-        elif entry.object_path.is_relative_to(Path("build/SCPS_150.97/asm/SCPS_150.97/data/section")):
-            override = "--section-align .data:0x4"
-        else:
-            override = ""
+        override = ""
+        for directory, align in section_aligns:
+            if entry.object_path.is_relative_to(Path(f"build/{basename}/asm/{basename}/{directory}")):
+                override = f"--section-align {align}"
+                break
 
         if isinstance(seg, splat.segtypes.common.asm.CommonSegAsm) or isinstance(
             seg, splat.segtypes.common.data.CommonSegData
@@ -298,21 +342,17 @@ def replace_instructions_with_opcodes(asm_folder: Path) -> None:
 
 
 def split_binaries(args):
-    target_aliases = {
-        "loader" : "SCPS_150.97", 
-        "kernel" : "KERNEL.XFF",
-        }
-    
-    target_files = []
-    
+    modules = {module.name: module for module in load_modules()}
+
     if not args.target:
-        target_files = list(target_aliases.values())
+        selected = list(modules.values())
     else:
+        selected = []
         for target in args.target:
-            if target not in target_aliases.keys():
-                print(f"Error: Unrecognized target. Valid targets: {list(target_aliases.keys())}." )
+            if target not in modules:
+                print(f"Error: Unrecognized target. Valid targets: {list(modules.keys())}.")
                 return
-            target_files.append(target_aliases.get(target))
+            selected.append(modules[target])
 
 #    ninja = ninja_syntax.Writer(open(str(ROOT / "build.ninja"), "w"), width=9999)
 #    ninja.rule(
@@ -321,7 +361,8 @@ def split_binaries(args):
 #        command=f"ninja -f $in",
 #    )
 
-    for target_file in target_files:
+    for module in selected:
+        target_file = module.basename
 
         if args.clean:
             clean(target_file)
@@ -338,12 +379,11 @@ def split_binaries(args):
         create_custom_specs()
 
         manifest_rows = [] if args.emit_cmake else None
-        is_xff = target_file != "SCPS_150.97"
 
-        build_stuff(target_file, linker_entries, is_xff, split, manifest_rows)
+        build_stuff(target_file, linker_entries, module.is_xff, split, module.section_aligns, manifest_rows)
 
         if args.emit_cmake:
-            write_cmake_manifest(args.emit_cmake, is_xff, manifest_rows)
+            write_cmake_manifest(args.emit_cmake, module.is_xff, manifest_rows)
         
 #        ninja.build(
 #            f"build/{target_file}/{target_file}",
@@ -380,7 +420,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "-t",
         "--target",
-        help="Choose one or more target binaries",
+        help="Choose one or more targets, as listed in config/modules.txt",
         action="extend",
         nargs="+",
         type=str
