@@ -16,7 +16,7 @@ We are currently targeting the Preview Version's main ELF (``SCPS_150.97``, sha1
 </a>
 
 ## Getting Started
-*note*: if you have problems with building on wsl use docker
+(NOTE: if you have problems with building on wsl use docker)
 ### Requirements
 **MakeFile**: Linux or WSL2 required
 1. ``sudo apt install gcc-mipsel-linux-gnu binutils-mips-linux-gnu ninja-build``
