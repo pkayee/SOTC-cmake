@@ -370,6 +370,13 @@ def split_binaries(args):
                 return
             selected.append(modules[target])
 
+    if len(selected) > 1:
+        print(
+            "Warning: several targets in one process leak state into each other (the later ones can fail their "
+            "checksum). Run one target per process: ./configure.py -c -t <name>",
+            file=sys.stderr,
+        )
+
 #    ninja = ninja_syntax.Writer(open(str(ROOT / "build.ninja"), "w"), width=9999)
 #    ninja.rule(
 #        "ninja",

@@ -115,7 +115,7 @@ function(_decomp_write_manifest name base manifest)
         set(ENV{DECOMP_CC} "${DECOMP_CC}")
 
         message(STATUS "decomp: extracting ${base} with splat")
-        execute_process(COMMAND "${DECOMP_PYTHON}" "${script}" -t ${name} --emit-cmake "${manifest}"
+        execute_process(COMMAND "${DECOMP_PYTHON}" "${script}" -c -t ${name} --emit-cmake "${manifest}"
                 WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
                 COMMAND_ERROR_IS_FATAL ANY
         )
