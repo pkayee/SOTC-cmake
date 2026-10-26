@@ -142,6 +142,8 @@ def write_cmake_manifest(path, is_xff, rows):
             f.write(line + ")\n")
 
 
+
+
 def build_stuff(basename, linker_entries: List[LinkerEntry], is_xff, split, section_aligns=(), manifest_rows=None):
     built_objects: Set[Path] = set()
 
@@ -384,7 +386,12 @@ def split_binaries(args):
 
         if args.emit_cmake:
             write_cmake_manifest(args.emit_cmake, module.is_xff, manifest_rows)
-        
+
+        if args.emit_objdiff:
+            from tools.gen_objdiff import write_objdiff_config
+            basenames = [m.basename for m in selected]
+            write_objdiff_config(args.emit_objdiff, basenames)
+
 #        ninja.build(
 #            f"build/{target_file}/{target_file}",
 #            "ninja",
@@ -436,6 +443,12 @@ if __name__ == "__main__":
         help="Also write a CMake object manifest to this path (use with a single -t target)",
         metavar="PATH",
         default=None,
+    )
+    parser.add_argument(
+        "--emit-objdiff",
+        metavar="PATH",
+        default=None,
+        help="Write objdiff project config JSON to this path"
     )
     args = parser.parse_args()
 

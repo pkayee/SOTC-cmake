@@ -40,16 +40,17 @@ $(foreach m,$(MODULES),$(eval $(call module_rules,$(word 1,$(subst :, ,$(m))),$(
 status:
 	@python3 tools/status.py
 
-## Generate objdiff.json (expected vs current objects) for objdiff GUI/CLI
+## Generate objdiff.json (for GUI / CLI)
 objdiff:
 	@./configure.py --emit-objdiff objdiff.json
-	@echo "Wrote objdiff.json — open it with the objdiff GUI or:"
-	@echo "  objdiff-cli report -p objdiff.json -o build/report.json"
+	@echo "Wrote objdiff.json — open this directory in the objdiff GUI, or run:"
+	@echo "  make progress"
 
-## Run objdiff progress report (requires objdiff-cli on PATH)
+## Progress report (needs objdiff-cli on PATH)
 progress: objdiff
+	@mkdir -p build
 	@if command -v objdiff-cli >/dev/null 2>&1; then \
-		objdiff-cli report -p objdiff.json -o build/report.json -f json && \
+		objdiff-cli report generate -p . -o build/report.json -f json && \
 		python3 tools/status.py --report build/report.json; \
 	else \
 		echo "objdiff-cli not found. Install from https://github.com/encounter/objdiff/releases"; \

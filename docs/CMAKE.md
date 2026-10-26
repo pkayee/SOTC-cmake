@@ -54,16 +54,7 @@ Pass them as `-D<NAME>=<value>` when configuring.
 | `DECOMP_EEGCC_URL` | decompme release | Where the compiler archive is downloaded from |
 | `DECOMP_EEGCC_SHA256` | pinned hash | Expected hash of that archive; empty skips the check |
 
-## How it fits together
-
-```
-configure.py --emit-cmake      writes out/<module>/objects.cmake (one decomp_object() per object)
-        |
-decomp_add_module()            includes it (each decomp_object() defines that object's rule), then
-        |                      links with splat's <module>.ld, runs objcopy (+ tools/fix_xff.py for
-        v                      the kernel) and registers the sha1 check as a test
-cmake --build / ctest
-```
+## Files
 
 | File | Role |
 |---|---|
@@ -84,16 +75,15 @@ both builds. `configure-kernel.py` and `configure-SCPS_150.97.py` are not used b
 
 ## Troubleshooting
 
-| Symptom | Cause and fix |
-|---|---|
-| `ee-gcc does not run` | 32-bit libc missing: `sudo apt install libc6-i386` |
-| `could not create .python3` | `sudo apt install python3-venv python3-pip` |
-| `downloading the compiler failed` / hash mismatch | The release asset changed or the network failed. Check `DECOMP_EEGCC_URL`, then update `DECOMP_EEGCC_SHA256` (or pass it empty to skip the check) |
-| `missing game files: iso/...` | Extract the files from your own ISO into `iso/` |
-| `'...as' was not found or cannot run` | Install `binutils-mips-linux-gnu` or set `DECOMP_CROSS` |
-| `Unknown module 'x'` | The name is not in `config/modules.txt` |
-| `missing and no known rule` for an `asm/...` file | `asm/` was deleted; run `cmake --preset default` again to re-extract |
-| `No such file` for `asm/<NAME>/nonmatchings/...` after moving a function between C and `INCLUDE_ASM` | Splat decides which per-function `.s` files to write by looking at the C file, and CMake only re-runs it when the YAML or `configure.py` changed. Force it: `rm -rf asm/<NAME> && cmake --preset default` |
-| `rule 'x' is not defined` | `configure.py` emitted an object kind that `cmake/Decomp.cmake` does not implement (only `cc` and `as` exist). Add the rule in `decomp_object`, and if it needs more variables, extend `write_cmake_manifest` in `configure.py` |
-| `loader_sha1` or `kernel_sha1` fails | Compare `sha1sum iso/<file>` with `checksum-<file>.sha1`; they must be equal. If they differ you have a different game version or a bad dump. If they match, suspect the toolchain (assembler, compiler flags) |
-
+| Symptom | Cause and fix                                                                                                                                                                                                                                    |
+|---|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `ee-gcc does not run` | 32-bit libc missing: `sudo apt install libc6-i386`                                                                                                                                                                                               |
+| `could not create .python3` | `sudo apt install python3-venv python3-pip`                                                                                                                                                                                                      |
+| `downloading the compiler failed` | The release asset changed or the network failed. Check `DECOMP_EEGCC_URL`                                                                                                                                                                        |
+| `missing game files: iso/...` | Extract the files from your own ISO into `iso/`                                                                                                                                                                                                  |
+| `'...as' was not found or cannot run` | Install `binutils-mips-linux-gnu` or set `DECOMP_CROSS`                                                                                                                                                                                          |
+| `Unknown module 'x'` | The name is not in `config/modules.txt`                                                                                                                                                                                                          |
+| `missing and no known rule` for an `asm/...` file | `asm/` was deleted; run `cmake --preset default` again to re-extract                                                                                                                                                                             |
+| `No such file` for `asm/<NAME>/nonmatchings/...` after moving a function between C and `INCLUDE_ASM` | Splat decides which per-function `.s` files to write by looking at the C file, and CMake only re-runs it when the YAML or `configure.py` changed. Force it: `rm -rf asm/<NAME> && cmake --preset default`                                        |
+| `rule 'x' is not defined` | `configure.py` emitted an object kind that `cmake/Decomp.cmake` does not implement (only `cc` and `as` exist). Add the rule in `decomp_object`, and if it needs more variables, extend `write_cmake_manifest` in `configure.py`                  |
+| `loader_sha1` or `kernel_sha1` fails | Compare `sha1sum iso/<file>` with `checksum-<file>.sha1`; they must be equal. If they differ you have a different game version or a bad dump. If they match, suspect the toolchain (assembler, compiler flags) also try -DDECOMP_NUMERIC_REGS=ON |
