@@ -10,7 +10,7 @@ Linux or WSL2 only: the game's compiler (`ee-gcc` 2.96) is a 32-bit Linux progra
 
 ```sh
 scripts/bootstrap.sh                 # system packages (Debian/Ubuntu); --dry-run shows what it would do
-                                     # put the game files in iso/ as described in the README
+# put the game files in iso/ as described in the README
 cmake --preset default               # sets up what is missing, runs splat, writes the build files
 cmake --build out                    # builds every enabled module
 ctest --test-dir out                 # checks each result against checksum-<module>.sha1
@@ -45,7 +45,7 @@ Pass them as `-D<NAME>=<value>` when configuring.
 
 | Option | Default | Meaning |
 |---|---|---|
-| `SOTC_MODULES` | `all` | Which modules to extract and build: `all` or a list of names from the registry in `CMakeLists.txt` |
+| `SOTC_MODULES` | `all` | Which modules to extract and build: `all` or a list of names from `config/modules.txt` |
 | `DECOMP_AUTO_SETUP` | `ON` | Create the venv and download the compiler when missing |
 | `DECOMP_CROSS` | `mips-linux-gnu-` | Prefix of the binutils (`as`, `ld`, `objcopy`, `strip`); may be an absolute path prefix |
 | `DECOMP_CC` | `tools/cc/ee-gcc2.96/bin/ee-gcc` | The game's compiler |
@@ -67,7 +67,8 @@ cmake --build / ctest
 
 | File | Role |
 |---|---|
-| `CMakeLists.txt` | Module registry, `SOTC_MODULES` selection, includes the files below |
+| `config/modules.txt` | The module registry (name, file, format, options), read by `configure.py`, the makefile and `CMakeLists.txt` |
+| `CMakeLists.txt` | Reads the registry, handles `SOTC_MODULES`, includes the files below |
 | `cmake/Dependencies.cmake` | Venv, compiler download, tool and game-file checks |
 | `cmake/Toolchain.cmake` | Assembler checks, python and patcher settings |
 | `cmake/Decomp.cmake` | The rules: objects, link, objcopy, sha1 test |
@@ -75,34 +76,11 @@ cmake --build / ctest
 | `cmake/probe/eabi_registers.s` | Tiny file used to probe the assembler |
 | `tools/elf_patcher_lite.py` | Same patch as `tools/elf_patcher.py`, without the `spimdisasm` import |
 | `tools/regs_numeric.pl` | Rewrites `$t0`-style register names to numbers (see below) |
-| `configure.py` | Gains `--emit-cmake`; its behaviour for `make` is unchanged |
+| `configure.py` | Reads `config/modules.txt` instead of hardcoding the two binaries, and gains `--emit-cmake`; its output for `make` is unchanged |
+| `makefile` | Generates the per-module rules from `config/modules.txt`; same targets as before |
 
 The legacy `*.ninja` files are only used by `make`. The `*.ld` files are written by splat and are needed by
 both builds. `configure-kernel.py` and `configure-SCPS_150.97.py` are not used by either.
-
-## Adding a module
-
-Source subfolders under a module need nothing: the manifest lists every object.
-
-A new module (a new binary from the ISO) needs:
-
-1. `config/<NAME>/<NAME>.yaml` and its symbol files, as for the existing modules.
-2. A line in the registry in `CMakeLists.txt`: `<target name>:<NAME>` (`<NAME>` is also the file in `iso/`).
-3. `checksum-<NAME>.sha1` containing the original file's sha1 and `build/<NAME>/<NAME>`.
-4. The matching entries in `configure.py`: the target alias table, the test that decides whether the file is an
-   XFF (`is_xff`), and any section handling that is specific to the loader.
-
-## Assembler register names
-
-The project's assembly uses names like `$t4`. GNU as development snapshots after the 2.45 release apply
-n32-style register names to `-mabi=eabi`, where `$t4`-`$t7` do not exist and `$t0`-`$t3` silently mean
-different registers, so such an assembler either fails or assembles the wrong code.
-
-`DECOMP_NUMERIC_REGS=AUTO` probes the assembler once at configure time. If it behaves that way, the build pipes
-each assembly file through `tools/regs_numeric.pl`, which rewrites register names to numbers (string literals
-are left alone) before assembling. Numeric names mean the same on every version. With an assembler that accepts
-the names (2.42 and the released 2.45 do), nothing is rewritten. `ON` always rewrites; `OFF` never does
-and stops with an error if the assembler needs it. The legacy `make` build does not have this mode.
 
 ## Troubleshooting
 
@@ -113,6 +91,9 @@ and stops with an error if the assembler needs it. The legacy `make` build does 
 | `downloading the compiler failed` / hash mismatch | The release asset changed or the network failed. Check `DECOMP_EEGCC_URL`, then update `DECOMP_EEGCC_SHA256` (or pass it empty to skip the check) |
 | `missing game files: iso/...` | Extract the files from your own ISO into `iso/` |
 | `'...as' was not found or cannot run` | Install `binutils-mips-linux-gnu` or set `DECOMP_CROSS` |
-| `Unknown module 'x'` | The name is not in the registry in `CMakeLists.txt` |
+| `Unknown module 'x'` | The name is not in `config/modules.txt` |
 | `missing and no known rule` for an `asm/...` file | `asm/` was deleted; run `cmake --preset default` again to re-extract |
+| `No such file` for `asm/<NAME>/nonmatchings/...` after moving a function between C and `INCLUDE_ASM` | Splat decides which per-function `.s` files to write by looking at the C file, and CMake only re-runs it when the YAML or `configure.py` changed. Force it: `rm -rf asm/<NAME> && cmake --preset default` |
+| `rule 'x' is not defined` | `configure.py` emitted an object kind that `cmake/Decomp.cmake` does not implement (only `cc` and `as` exist). Add the rule in `decomp_object`, and if it needs more variables, extend `write_cmake_manifest` in `configure.py` |
 | `loader_sha1` or `kernel_sha1` fails | Compare `sha1sum iso/<file>` with `checksum-<file>.sha1`; they must be equal. If they differ you have a different game version or a bad dump. If they match, suspect the toolchain (assembler, compiler flags) |
+

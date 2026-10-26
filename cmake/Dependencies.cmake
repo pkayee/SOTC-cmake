@@ -19,8 +19,6 @@ set(DECOMP_EEGCC_SHA256
         CACHE STRING "expected SHA-256 of that archive (empty = do not verify)"
 )
 
-# ---- python venv ------------------------------------------------------------------------------------
-
 function(_decomp_ensure_python_venv)
     set(venv "${CMAKE_SOURCE_DIR}/.python3")
     set(requirements "${CMAKE_SOURCE_DIR}/requirements.txt")
@@ -31,6 +29,7 @@ function(_decomp_ensure_python_venv)
             APPEND
             PROPERTY CMAKE_CONFIGURE_DEPENDS "${requirements}"
     )
+
     file(SHA256 "${requirements}" wanted_hash)
 
     if (DECOMP_AUTO_SETUP)
@@ -50,10 +49,10 @@ function(_decomp_ensure_python_venv)
                         "On Debian/Ubuntu: sudo apt install python3-venv python3-pip"
                 )
             endif ()
+
         endif ()
 
         set(installed_hash "")
-
         if (EXISTS "${stamp}")
             file(READ "${stamp}" installed_hash)
             string(STRIP "${installed_hash}" installed_hash)
@@ -69,14 +68,15 @@ function(_decomp_ensure_python_venv)
 
             file(WRITE "${stamp}" "${wanted_hash}\n")
         endif ()
+
     endif ()
 
     if (NOT EXISTS "${venv}/bin/python3")
         message(FATAL_ERROR "${venv} is missing. Re-run with -DDECOMP_AUTO_SETUP=ON or create it as the README says.")
     endif ()
+
 endfunction()
 
-# ---- the game's compiler ----------------------------------------------------------------------------
 
 function(_decomp_ensure_compiler)
     set(compiler_dir "${CMAKE_SOURCE_DIR}/tools/cc/ee-gcc2.96")
@@ -84,7 +84,8 @@ function(_decomp_ensure_compiler)
     if (NOT EXISTS "${compiler_dir}/bin/ee-gcc")
         if (NOT DECOMP_AUTO_SETUP)
             message(FATAL_ERROR "${compiler_dir}/bin/ee-gcc is missing; run scripts/setup_compiler.sh "
-                    "or use -DDECOMP_AUTO_SETUP=ON")
+                    "or use -DDECOMP_AUTO_SETUP=ON"
+            )
         endif ()
 
         set(archive "${CMAKE_BINARY_DIR}/ee-gcc2.96.tar.xz")
@@ -100,8 +101,8 @@ function(_decomp_ensure_compiler)
                 STATUS download
                 TLS_VERIFY ON
         )
-        list(GET download 0 download_code)
 
+        list(GET download 0 download_code)
         if (NOT download_code EQUAL 0)
             file(REMOVE "${archive}")
             message(
@@ -126,6 +127,7 @@ function(_decomp_ensure_compiler)
                 WORLD_READ
                 WORLD_EXECUTE
         )
+
         file(REMOVE "${archive}")
     endif ()
 
@@ -138,36 +140,35 @@ function(_decomp_ensure_compiler)
 
     if (NOT rc EQUAL 0)
         message(FATAL_ERROR "${compiler_dir}/bin/ee-gcc does not run (${rc}). It is a 32-bit program; "
-                "on Debian/Ubuntu install the 32-bit libc:  sudo apt install libc6-i386"
-        )
+                "on Debian/Ubuntu install the 32-bit libc:  sudo apt install libc6-i386")
     endif ()
-endfunction()
 
-# ---- everyday tools and game files --------------------------------------------------------------------
+endfunction()
 
 function(_decomp_check_tools)
     set(missing "")
-
     foreach (tool cpp iconv sh)
         find_program(_decomp_tool_${tool} NAMES ${tool})
         if (NOT _decomp_tool_${tool})
             list(APPEND missing ${tool})
         endif ()
+
     endforeach ()
 
     if (missing)
         message(FATAL_ERROR "missing tools: ${missing}  (Debian/Ubuntu: sudo apt install cpp libc-bin)")
     endif ()
+
 endfunction()
 
 # The game files cannot be downloaded: SOTC_ENABLED_BASENAMES comes from the root CMakeLists.txt.
 function(_decomp_check_game_files)
     set(missing "")
-
     foreach (basename ${SOTC_ENABLED_BASENAMES})
         if (NOT EXISTS "${CMAKE_SOURCE_DIR}/iso/${basename}")
             list(APPEND missing "iso/${basename}")
         endif ()
+
     endforeach ()
 
     if (missing)
@@ -175,6 +176,7 @@ function(_decomp_check_game_files)
                 "Extract them from a Shadow of the Colossus Preview ISO into ${CMAKE_SOURCE_DIR}/iso/"
         )
     endif ()
+
 endfunction()
 
 function(decomp_check_dependencies)

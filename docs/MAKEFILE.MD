@@ -18,7 +18,13 @@ make
 
 ## Everyday use
 
-| Task              | Command                                        |
-|-------------------|------------------------------------------------|
-| Build one module  | `make loader` (or `kernel`)                    |
-| Clean build files | `make clean`  |
+| Task                          | Command                               |
+|-------------------------------|---------------------------------------|
+| Build one module              | `make loader` (or `kernel`)           |
+| Clean build files             | `make clean`                          |
+| List make commands            | `make help`                           |
+| SHA-1 & Non-Matching count    | `make status`                         |
+| Write objdiff.json            | `make objdif`                         |
+| objdif report + percentages   | `make progress`                       |
+| Refresh compile_commands.json | `make compdb`                         |
+| Check individual objects      | `make check OBJ=build/<Module>/foo.o` |

@@ -1,6 +1,6 @@
 # Build rules for the SOTC decomp.
 #
-#   configure.py --emit-cmake   writes <build>/<module>/objects.cmake, one decomp_object() per object
+#   configure_o.py --emit-cmake   writes <build>/<module>/objects.cmake, one decomp_object() per object
 #               |
 #   decomp_add_module()         includes it (each decomp_object() defines that object's rule), then
 #               |               links with splat's .ld, runs objcopy (+ fix_xff.py for the kernel),
@@ -10,15 +10,13 @@
 # Needs the Ninja generator (it creates output directories) and cmake/Toolchain.cmake included first.
 # Commands run from the repo root, so relative paths match the legacy ninja rules.
 
-# ---- per-object rules ---------------------------------------------------------------------------
-
 # <src> and <obj> are repo-relative as the manifest gives them (they go into the command line);
 # <abs_src> and <out> are absolute (Ninja needs those for dependencies and outputs).
 function(_decomp_compile_rule out obj src abs_src optlevel regnames)
     separate_arguments(include_flags UNIX_COMMAND "${DECOMP_INCLUDES}")
     separate_arguments(opt_flags UNIX_COMMAND "${optlevel}")
-
     set(small_data_flags "")
+
     if (DECOMP_XFF)
         set(small_data_flags -G0) # the kernel's legacy compile rule has it, the loader's doesn't
     endif ()
@@ -99,30 +97,25 @@ function(decomp_object kind obj)
     )
 endfunction()
 
-# ---- one module (loader, kernel, ...) --------------------------------------------------------------
-
-# Runs splat through configure.py, but only when something it reads changed, not on every CMake edit.
+# Runs splat through configure_o.py, but only when something it reads changed, not on every CMake edit.
 function(_decomp_write_manifest name base manifest)
     set(yaml "${CMAKE_SOURCE_DIR}/config/${base}/${base}.yaml")
     set(script "${CMAKE_SOURCE_DIR}/configure.py")
-
     set_property(
             DIRECTORY
             APPEND
-            PROPERTY CMAKE_CONFIGURE_DEPENDS "${yaml}" "${script}"
-    )
+            PROPERTY CMAKE_CONFIGURE_DEPENDS "${yaml}" "${script}")
 
     if (NOT EXISTS "${manifest}"
             OR NOT EXISTS "${CMAKE_SOURCE_DIR}/asm/${base}"
             OR "${yaml}" IS_NEWER_THAN "${manifest}"
             OR "${script}" IS_NEWER_THAN "${manifest}"
-        )
+    )
 
         message(STATUS "decomp: extracting ${base} with splat")
         execute_process(COMMAND "${DECOMP_PYTHON}" "${script}" -t ${name} --emit-cmake "${manifest}"
                 WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}" COMMAND_ERROR_IS_FATAL ANY
         )
-
     endif ()
 endfunction()
 
@@ -151,13 +144,18 @@ function(decomp_add_module name)
     # 2. link: the objects are named inside splat's linker script, so they are only dependencies
     set(link_flags -EL)
     set(link_deps "${root}/${linker_script}")
+
     foreach (script IN LISTS symbol_scripts)
         list(APPEND link_flags -T "${script}")
+
         if (EXISTS "${root}/${script}")
             list(APPEND link_deps "${root}/${script}")
         endif ()
+
     endforeach ()
+
     list(APPEND link_flags -Map "${map_file}")
+
     if (DECOMP_XFF)
         list(APPEND link_flags -r) # the kernel stays relocatable
     endif ()
@@ -172,9 +170,11 @@ function(decomp_add_module name)
 
     # 3. flat binary (the kernel additionally needs its XFF header fixed up)
     set(fix_xff "")
+
     if (DECOMP_XFF)
         set(fix_xff COMMAND "${DECOMP_PYTHON}" tools/fix_xff.py "${binary}")
     endif ()
+
     add_custom_command(
             OUTPUT "${root}/${binary}"
             COMMAND "${DECOMP_CROSS}objcopy" "${linked_elf}" "${binary}" -O binary ${fix_xff}

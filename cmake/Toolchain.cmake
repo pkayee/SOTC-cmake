@@ -23,19 +23,19 @@ set_property(CACHE DECOMP_NUMERIC_REGS PROPERTY STRINGS AUTO ON OFF)
 
 set(_DECOMP_CMAKE_DIR "${CMAKE_CURRENT_LIST_DIR}") # CMAKE_CURRENT_LIST_DIR is the caller's inside functions
 
-# ---- the assembler -------------------------------------------------------------------------
-
 function(_decomp_require_assembler)
     execute_process(
             COMMAND "${DECOMP_CROSS}as" --version
             RESULT_VARIABLE rc
             OUTPUT_QUIET ERROR_QUIET
     )
+
     if (NOT rc EQUAL 0)
         message(FATAL_ERROR "'${DECOMP_CROSS}as' was not found or cannot run. Install binutils-mips-linux-gnu "
                 "or pass -DDECOMP_CROSS=/path/to/bin/mips-linux-gnu-"
         )
     endif ()
+
 endfunction()
 
 # result_var = TRUE when the assembler understands o32-style names ($t4, ...) under -mabi=eabi
@@ -57,6 +57,7 @@ function(_decomp_assembler_accepts_o32_names result_var)
                 PARENT_SCOPE
         )
     endif ()
+
 endfunction()
 
 # Development snapshots of GNU as after the 2.45 release pick n32-style register names for
@@ -86,11 +87,13 @@ function(_decomp_choose_register_mode)
                     "names there). Use -DDECOMP_NUMERIC_REGS=AUTO (or ON), or an older binutils."
             )
         endif ()
+
     endif ()
 
     if (rewrite)
         find_program(DECOMP_PERL NAMES perl REQUIRED)
     endif ()
+
     set(DECOMP_REGFILTER
             ${rewrite}
             PARENT_SCOPE
@@ -100,8 +103,6 @@ endfunction()
 _decomp_require_assembler()
 _decomp_choose_register_mode()
 
-# ---- python and the elf patcher --------------------------------------------------------------
-
 # configure.py needs splat & co, which live in the repo's venv (README: ./.python3)
 if (NOT DECOMP_PYTHON)
     if (EXISTS "${CMAKE_SOURCE_DIR}/.python3/bin/python3")
@@ -109,9 +110,11 @@ if (NOT DECOMP_PYTHON)
                 "${CMAKE_SOURCE_DIR}/.python3/bin/python3"
                 CACHE FILEPATH "python with splat installed"
         )
+
     else ()
         find_program(DECOMP_PYTHON NAMES python3 python REQUIRED)
     endif ()
+
 endif ()
 
 # the dependency-free patcher is byte-identical and ~6x faster per object

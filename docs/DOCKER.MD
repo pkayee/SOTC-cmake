@@ -17,3 +17,5 @@ docker run --rm -v "$(pwd):/workspace" sotc
 # WindowsCMD:
 docker run --rm -v "%cd%:/workspace" sotc
 ```
+
+
