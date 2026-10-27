@@ -2,5 +2,6 @@ services:
   sotc:
     image: sotc
     build: .
+    platform: linux/amd64
     volumes:
       - .:/workspace
