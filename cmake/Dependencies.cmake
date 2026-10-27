@@ -20,6 +20,7 @@ set(DECOMP_EEGCC_SHA256
 )
 set(DECOMP_PYTHON CACHE STRING "${CMAKE_SOURCE_DIR}/.python3/bin/python3")
 set(DECOMP_CC CACHE STRING "${CMAKE_SOURCE_DIR}/tools/cc/ee-gcc2.96/bin/ee-gcc")
+set(ISO_PATH CACHE STRING "${CMAKE_SOURCE_DIR}/iso")
 
 function(_decomp_ensure_python_venv)
     get_filename_component(_python_dir "${DECOMP_PYTHON}" DIRECTORY)
