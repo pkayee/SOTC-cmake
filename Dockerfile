@@ -32,7 +32,7 @@ RUN dpkg --add-architecture i386 \
 RUN dpkg --add-architecture i386 \
       && apt-get update \
       && apt-get install -y libc6:i386 libstdc++6:i386 \
-      && rm -rf /var/lib/apt/lists/*; \
+      && rm -rf /var/lib/apt/lists/*;
 
 COPY requirements.txt /tmp/requirements.txt
 RUN python3 -m venv /opt/sotc-venv \
