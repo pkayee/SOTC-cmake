@@ -1,6 +1,19 @@
 #!/bin/bash
 set -euo pipefail
 
+arch=$(uname -m)
+
+case "$arch" in
+  x86_64)
+  ;;
+  aarch64|arm64)
+  if ! qemu-i386 -version >/dev/null 2>&1 && ! qemu-x86_64 -version >/dev/null 2>&1; then
+        echo "arm64 host: install qemu-user-static or run:" >&2
+        echo "  docker run --platform linux/amd64 ..." >&2
+      fi
+  ;;
+esac
+
 WORK=/tmp/sotc-build
 rm -rf "$WORK"
 mkdir -p "$WORK"
