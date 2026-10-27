@@ -4,7 +4,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 ARG TARGETARCH
 RUN if [ "$TARGETARCH" = "arm64" ]; then \
-    echo "DEBUG: On arm64 please run 'docker buildx build --platform linux/amd64 -t sotc .' when building." \
+    echo "DEBUG: On arm64 please run 'docker buildx build --platform linux/amd64 -t sotc .' when building."; \
     exit 1; \
     fi
 
