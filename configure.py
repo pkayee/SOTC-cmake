@@ -20,9 +20,23 @@ from splat.segtypes.linker_entry import LinkerEntry
 
 ROOT = Path(__file__).parent
 TOOLS_DIR = ROOT / "tools"
-PYTHON_BIN = os.environ.get("DECOMP_PYTHON", sys.executable)
-
+PYTHON_BIN = os.environ.get("DECOMP_PYTHON", sys.executable) or f"{ROOT}/.python3/bin/python3"
+ISO_PATH = os.environ.get("ISO_PATH", sys.executable) or f"{ROOT}/iso"
 COMMON_INCLUDES = "-Iinclude -I include/sdk/common -I include/sdk/ee -I include/sdk -I include/gcc"
+_env_cc = os.environ.get("DECOMP_CC")
+if _env_cc:
+    _cc_path = Path(_env_cc)
+    GAME_CC_DIR = str(_cc_path.parent)
+    CUSTOM_SPECS_FILE = str(_cc_path.parent.parent / "lib" / "regnames.specs")
+    COMPILER = _cc_path.parent.parent.name
+else:
+    COMPILER = "ee-gcc2.96"
+    GAME_CC_DIR = f"{TOOLS_DIR}/cc/{COMPILER}/bin"
+    CUSTOM_SPECS_FILE = f"{TOOLS_DIR}/cc/{COMPILER}/lib/regnames.specs"
+
+GAME_COMPILE_CMD = f"{GAME_CC_DIR}/ee-gcc -c {COMMON_INCLUDES} $optlevel -g2 $regnames"
+
+XFF_COMPILE_CMD = f"{GAME_CC_DIR}/ee-gcc -c {COMMON_INCLUDES} $optlevel -G0 -g2 $regnames"
 
 MODULES_FILE = ROOT / "config" / "modules.txt"
 
@@ -70,20 +84,7 @@ def load_modules() -> List[Module]:
         modules.append(Module(name, basename, kind == "xff", tuple(aligns)))
     return modules
 
-_env_cc = os.environ.get("DECOMP_CC")
-if _env_cc:
-    _cc_path = Path(_env_cc)
-    GAME_CC_DIR = str(_cc_path.parent)
-    CUSTOM_SPECS_FILE = str(_cc_path.parent.parent / "lib" / "regnames.specs")
-    COMPILER = _cc_path.parent.parent.name
-else:
-    COMPILER = "ee-gcc2.96"
-    GAME_CC_DIR = f"{TOOLS_DIR}/cc/{COMPILER}/bin"
-    CUSTOM_SPECS_FILE = f"{TOOLS_DIR}/cc/{COMPILER}/lib/regnames.specs"
 
-GAME_COMPILE_CMD = f"{GAME_CC_DIR}/ee-gcc -c {COMMON_INCLUDES} $optlevel -g2 $regnames"
-
-XFF_COMPILE_CMD = f"{GAME_CC_DIR}/ee-gcc -c {COMMON_INCLUDES} $optlevel -G0 -g2 $regnames"
 
 # Custom spec rule that invokes the preprocessor before assembling
 # avoids us having to manually pipe each step and just use GCC
@@ -391,7 +392,7 @@ def split_binaries(args):
             clean(target_file)
         
         if args.rescan:
-            parse_xff_relocs.main(f"iso/{target_file}")
+            parse_xff_relocs.main(f"{ISO_PATH}/{target_file}")
 
         yaml_file = f"config/{target_file}/{target_file}.yaml"
 
