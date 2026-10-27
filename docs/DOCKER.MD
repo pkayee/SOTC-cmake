@@ -5,6 +5,7 @@ allows you to to build this project without the hassle of dependencies and envir
 You will have to install docker desktop in order to use docker this [Setup Guide](https://github.com/WCSCourses/index/blob/main/Docker_guide.md)
 will help you install it on any platform. You will also have to setup the iso folder as described in the [ReadMe](../README.md#requirements).
 ## Quick Start
+(NOTE: For Mac M series laptops / arm64 laptops use `docker buildx build --platform linux/amd64 -t sotc .`)
 ```sh
 # This sets up the docker container
 docker build -t sotc .                          

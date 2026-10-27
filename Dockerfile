@@ -3,6 +3,11 @@ FROM ubuntu:24.04
 ENV DEBIAN_FRONTEND=noninteractive
 
 ARG TARGETARCH
+RUN if [ "$TARGETARCH" = "arm64" ]; then \
+    echo "DEBUG: On arm64 please run 'docker buildx build --platform linux/amd64 -t sotc .' when building." \
+    exit 1; \
+    fi
+
 
 RUN dpkg --add-architecture i386 \
  && apt-get update && apt-get install -y --no-install-recommends \
@@ -24,16 +29,10 @@ RUN dpkg --add-architecture i386 \
     curl \
  && rm -rf /var/lib/apt/lists/*
 
-RUN if [ "$TARGETARCH" = "amd64" ]; then \
-      dpkg --add-architecture i386 \
+RUN dpkg --add-architecture i386 \
       && apt-get update \
       && apt-get install -y libc6:i386 libstdc++6:i386 \
       && rm -rf /var/lib/apt/lists/*; \
-    elif [ "$TARGETARCH" = "arm64" ]; then \
-      apt-get update \
-      && apt-get install -y qemu-user-static \
-      && rm -rf /var/lib/apt/lists/*; \
-    fi
 
 COPY requirements.txt /tmp/requirements.txt
 RUN python3 -m venv /opt/sotc-venv \
